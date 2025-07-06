@@ -1,0 +1,164 @@
+{
+    "skyboxes":[
+	"sky1.png",
+	"sky1-blue.png",
+	"sky1-ds9.png",
+	"sky1-rainbow.png",
+	"sky-bored-alice.png",
+	"sky-delight.png",
+	"sky-neb2-rvb.png"
+	],
+	
+	"cargo": [
+        "Iron",
+        "Tharium",
+        "Reisium",
+        "Alerite",
+        "Cabrite",
+        "Ashfilum",
+        "Denebite",
+        "Aegirine",
+        "Nuidinium",
+        "Gredian",
+        "AMC",
+        "Life Support",
+        "Navigational Array",
+        "Tactical Array",
+        "FCS",
+        "Computer Core",
+        "Comms Relay",
+        "Warp Inhibitor",
+        "Sensor Buoy",
+        "Sensor Relay",
+        "Black Box",
+        "Aid Package",
+        "Repair Materials",
+        "Medical Supplies",
+        "Iso B Circuit",
+        "Container",
+        "Micro Controller",
+        "High Yield Warhead",
+        "Warhead",
+        "Torpedo Casing",
+        "Guidance System",
+        "Denebite Crystals",
+        "Tharium Plating",
+        "Sensor Suite",
+        "Casing",
+        "Transmitter",
+        "Receiver",
+        "Power Relay",
+        "Analysis Suite",
+        "Homing",
+        "Nuke",
+        "EMP",
+        "Mine"
+    ],
+    "teams": [
+        "DamCon",
+        "Medics",
+        "Combat Engineers",
+        "Evacuees",
+        "Diplomats"
+    ],
+    "presets": {
+        "Empty": {
+            "cargo": {
+            },
+            "teams": {
+            }
+        },
+		"Mining Outpost": {
+            "cargo": {
+				"Iron": 750,
+				"Tharium": 60,
+				"Reisium": 60,
+				"Alerite":54,
+				"Cabrite": 815,
+				"Ashfilum": 258,
+				"Denebite": 30,
+				"Aegirine": 151,
+				"Nuidinium": 159,
+				"Gredian": 180,
+				"Warhead": 10,
+				"Life Support": 1,
+				"Micro Controller":8,
+				"Power Relay":16
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            }
+        },
+		"Denebite Refinery": {
+            "cargo": {
+				"Iron": 6,
+				"Tharium": 5,
+				"Reisium": 5,
+				"Alerite": 5,
+				"Cabrite": 20,
+				"Ashfilum": 14,
+				"Denebite": 600,
+				"Aegirine": 5,
+				"Nuidinium": 5,
+				"Gredian": 5,
+				"Warhead": 4,
+				"Life Support": 1,
+				"Micro Controller":8,
+				"Power Relay":16
+            },
+            "teams": {
+            }
+        },
+		"Civilian": {
+            "cargo": {
+				"Repair Materials": 16,
+				"Medical Supplies": 30,
+				"Iso B Circuit": 25,
+				"Container": 25,
+				"Life Support": 1,
+				"Micro Controller": 8,
+				"Power Relay": 16,
+				"Aid Package": 16
+            },
+            "teams": {
+				"Diplomats": 1
+            }
+        },
+		"Sci Outpost": {
+            "cargo": {
+				"High Yield Warhead": 10,
+				"Life Support": 3,
+				"Micro Controller":25,
+				"Power Relay":16,
+				"Transmitter": 6,
+				"Receiver": 6,
+				"Power Relay": 5,
+				"Analysis Suite": 8
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            }
+        },
+		"Armory": {
+            "cargo": {
+				"Homing":150,
+				"Nuke": 25,
+				"EMP": 25,
+				"Mine": 20,
+				"High Yield Warhead": 5,
+				"Warhead": 25,
+				"Torpedo Casing": 100,
+				"Navigational Array": 1,
+				"Tactical Array":10,
+				"Guidance System": 60
+            },
+            "teams": {
+                "DamCon": 10,
+                "Medics": 2,
+				"Combat Engineers": 10
+            }
+        }
+    }
+}
