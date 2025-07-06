@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volantis.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h2 class="header">Volantis</h2>
+        <h3 class="subheader">Alignment: USFP</h3>
+        <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"Volantis Command": {"type": "station", "x": -31632.441343638122, "y": -42933.0265513948, "grid": "J10", "hull": "starbase_command", "facilities": [], "sides": ["TSN"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "Station": {"type": "station", "x": -28806.941343638122, "y": -41476.5812388948, "grid": "J10", "hull": "starbase_industry", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "Waypoint 52": {"type": "jump_point", "x": 111335.05865636189, "y": -88118.90545764481, "grid": "H17"}, "Promethean": {"type": "jump_point", "x": -51531.94134363812, "y": 53665.0945423552, "grid": "O09"}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var infoHtml = '<span style="font-size:20pt;">' + name + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+            }
+        } else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+            infoHtml += '<b>Type:</b> ' + obj.type + '<br>';
+            infoHtml += '<b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [40157.82079909098, 91972.82079909097, 101689.2965136328, 49874.29651363279, 40157.82079909098], "y": [-25137.449661901348, -72521.44966190135, -61896.36125338827, -14512.361253388266, -25137.449661901348], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-34291.43103341469, -34487.43103341469, -26348.451653861557, -26152.451653861557, -34291.43103341469], "y": [22688.543474093738, 10312.54347409374, 10183.645610616653, 22559.645610616655, 22688.543474093738], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-34439.288927354166, -33919.288927354166, -25786.593759922078, -26306.593759922078, -34439.288927354166], "y": [34068.707395483165, 21802.707395483165, 22147.48168922723, 34413.48168922723, 34068.707395483165], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-42882.810355425034, -35190.810355425034, -30505.07233185121, -38197.07233185121, -42882.810355425034], "y": [21319.05235608282, 15904.05235608282, 22560.136728627574, 27975.136728627574, 21319.05235608282], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-49366.059406140455, -41909.059406140455, -42402.82328113579, -49859.82328113579, -49366.059406140455], "y": [17783.44731377661, 18592.44731377661, 23143.741770933782, 22334.741770933782, 17783.44731377661], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [68386.92037033952, 104705.92037033952, 105758.19694238425, 69439.19694238425, 68386.92037033952], "y": [-69771.47084670386, -77225.47084670386, -72098.34006858576, -64644.34006858576, -69771.47084670386], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-10018.515682731977, -24579.515682731977, -25890.367004544267, -11329.367004544267, -10018.515682731977], "y": [-51604.18291168642, -48537.18291168642, -54760.62800360319, -57827.62800360319, -51604.18291168642], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4596366873740089)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4596366873740089)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-30614.700028927393, -45019.70002892739, -47538.18265834885, -33133.18265834885, -30614.700028927393], "y": [-48960.852151397536, -42748.852151397536, -48588.95876389207, -54800.95876389207, -48960.852151397536], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4359960336060656)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4359960336060656)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-81143.47155725, -46079.47155725, -41604.41113002623, -76668.41113002623, -81143.47155725], "y": [-72935.73188428467, -83614.73188428467, -68921.07903100495, -58242.07903100494, -72935.73188428467], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-22693.033337981884, -25505.033337981884, -31476.84934929436, -28664.84934929436, -22693.033337981884], "y": [-69389.801251184, -51604.80125118401, -52549.00966410561, -70334.00966410562, -69389.801251184], "fill": "toself", "fillcolor": "rgba(128,0,128,0.43632477487587196)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.43632477487587196)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-30601.83159127522, -39869.831591275215, -41564.05109600103, -32296.051096001025, -30601.83159127522], "y": [-75257.22471672711, -72686.22471672711, -78793.58619856251, -81364.58619856251, -75257.22471672711], "fill": "toself", "fillcolor": "rgba(128,0,128,0.5167419082886658)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.5167419082886658)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-57807.67403110659, -43783.67403110659, -43184.208656169656, -57208.208656169656, -57807.67403110659], "y": [-73847.28366762964, -75976.28366762964, -72027.52724765998, -69898.52724765998, -73847.28366762964], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-32108.92058659272, -34789.92058659272, -31969.962100683522, -29288.962100683522, -32108.92058659272], "y": [25591.265066645865, 21871.265066645865, 19838.92401806453, 23558.92401806453, 25591.265066645865], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-58896.201165243794, -56596.201165243794, -53515.68152203245, -55815.68152203245, -58896.201165243794], "y": [22664.958726515866, 18264.958726515866, 19875.230358194527, 24275.230358194527, 22664.958726515866], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-55005.60958973517, -49231.60958973517, -48488.273097541074, -54262.273097541074, -55005.60958973517], "y": [18121.299880199862, 16857.299880199862, 20252.88920451053, 21516.88920451053, 18121.299880199862], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-31632.441343638122], "y": [-42933.0265513948], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "green"}, "hovertext": ["Volantis Command [J10]"], "hoverinfo": "text", "text": ["Volantis Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [-28806.941343638122], "y": [-41476.5812388948], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Station [J10]"], "hoverinfo": "text", "text": ["Station"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [111335.05865636189], "y": [-88118.90545764481], "mode": "markers+text", "marker": {"symbol": "circle", "size": 12, "color": "white"}, "hovertext": ["Waypoint 52 [H17]"], "hoverinfo": "text", "text": ["Waypoint 52"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [-51531.94134363812], "y": [53665.0945423552], "mode": "markers+text", "marker": {"symbol": "circle", "size": 12, "color": "white"}, "hovertext": ["Promethean [O09]"], "hoverinfo": "text", "text": ["Promethean"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}], "layout": {"title": "Volantis", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Volantis';
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Custom click: select nearest object within 10px of cursor
+    plotDiv.addEventListener('click', function(evt) {
+        var rect = plotDiv.getBoundingClientRect();
+        var px = evt.clientX - rect.left;
+        var py = evt.clientY - rect.top;
+        var xaxis = plotDiv._fullLayout.xaxis;
+        var yaxis = plotDiv._fullLayout.yaxis;
+        var l2px = xaxis.l2p.bind(xaxis);
+        var l2py = yaxis.l2p.bind(yaxis);
+        var minDist = Infinity, closest = null;
+        for (var name in objData) {
+            var pt = objData[name];
+            var xPx = l2px(pt.x);
+            var yPx = l2py(pt.y);
+            var dx = xPx - px, dy = yPx - py;
+            var d = Math.sqrt(dx*dx + dy*dy);
+            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
+            if (d < minDist) {
+                minDist = d;
+                closest = name;
+            }
+        }
+        if (minDist <= 35 && closest) {
+            highlight(closest);
+        }
+    });
+
+  var ctrl = document.getElementById('controls');
+
+  // Helper: create and append a single button
+  function addButton(label, fn, header, color) {
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+  addButton('--- Stations ---', null, true, null);
+  addButton('Station',function(){highlight('Station');},false,'blue');
+    addButton('Volantis Command',function(){highlight('Volantis Command');},false,'green');
+    
+</script>
+</body>
+</html>

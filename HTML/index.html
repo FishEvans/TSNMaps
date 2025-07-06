@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>System Map</title>
+  <style>
+    body { margin:0; background:black; color:white; display:flex; height:100vh; }
+    #controls { width:200px; background:#333; padding:10px; overflow-y:auto; }
+    .system-button { width:100%; padding:2px; font-size:14pt; background:#444; color:white; border:none; margin-bottom:5px; cursor:pointer; text-align:left; }
+    #maparea { flex:1; position:relative; background:url("Images/starfield.jpg") center/cover; overflow:hidden; cursor: grab; }
+    #map { width: 9600.0px; height: 4022.238480808273px; transform-origin: top left; cursor: grab; }
+    .map-container { position:absolute; top:0; left:0; }
+    svg { position:absolute; top:0; left:0; z-index:0; pointer-events:auto; }
+    svg polyline { pointer-events: stroke; }
+    .system { position:absolute; width:50px; transform:translate(-50%,-50%); z-index:1; cursor:pointer; text-align:center; }
+    .icon { position:relative; width:75px; height:75px; }
+    .alignment-img { position:absolute; top:15px; left:15px; width:40px; height:40px; }
+    .tint-img { position:absolute; top:0; left:0; width:70px; height:70px; opacity:0.3; }
+    .system-name {
+      position: absolute;
+      left: 50%;
+      
+      text-align: center;
+      top: calc(=100% + 4px);
+      transform: translateX(-50%);
+      white-space: wrap;
+      font-size: 90px;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+      pointer-events: none;
+    }
+    
+@keyframes jumpPulse {
+  0% { stroke: white; stroke-width: 12; }
+  100% { stroke: cyan; stroke-width: 18; }
+}
+
+.jump-arrow-active {
+  animation: jumpPulse 1s infinite alternate ease-in-out !important;
+  pointer-events: none !important;
+
+}
+    #info {
+      width: 300px;
+      background: #333;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    #info img {
+      max-width: 80%;
+      height: auto;
+    }
+    #system-details { text-align: left; }
+</style>
+</head>
+<body>
+  <div id="controls">
+    <h2>Systems</h2>
+    <button class='system-button' onclick="document.location.href='Acantha.html'">Acantha</button><button class='system-button' onclick="document.location.href='AlMare.html'">AlMare</button><button class='system-button' onclick="document.location.href='Alpha.html'">Alpha</button><button class='system-button' onclick="document.location.href='Ashia.html'">Ashia</button><button class='system-button' onclick="document.location.href='Athorn.html'">Athorn</button><button class='system-button' onclick="document.location.href='Atietis.html'">Atietis</button><button class='system-button' onclick="document.location.href='Atlantis.html'">Atlantis</button><button class='system-button' onclick="document.location.href='Blackspire.html'">Blackspire</button><button class='system-button' onclick="document.location.href='Brightfall.html'">Brightfall</button><button class='system-button' onclick="document.location.href='Burin.html'">Burin</button><button class='system-button' onclick="document.location.href='Castor.html'">Castor</button><button class='system-button' onclick="document.location.href='Cerberus.html'">Cerberus</button><button class='system-button' onclick="document.location.href='Charon.html'">Charon</button><button class='system-button' onclick="document.location.href='Corus.html'">Corus</button><button class='system-button' onclick="document.location.href='DaRiln.html'">DaRiln</button><button class='system-button' onclick="document.location.href='Danae.html'">Danae</button><button class='system-button' onclick="document.location.href='Eulis.html'">Eulis</button><button class='system-button' onclick="document.location.href='Euphini.html'">Euphini</button><button class='system-button' onclick="document.location.href='Freya.html'">Freya</button><button class='system-button' onclick="document.location.href='GeTorin.html'">GeTorin</button><button class='system-button' onclick="document.location.href='Helios.html'">Helios</button><button class='system-button' onclick="document.location.href='Hypherion.html'">Hypherion</button><button class='system-button' onclick="document.location.href='Khoros.html'">Khoros</button><button class='system-button' onclick="document.location.href='Krisenda.html'">Krisenda</button><button class='system-button' onclick="document.location.href='Mria.html'">Mria</button><button class='system-button' onclick="document.location.href='Norayne.html'">Norayne</button><button class='system-button' onclick="document.location.href='Oberon.html'">Oberon</button><button class='system-button' onclick="document.location.href='Phinmor.html'">Phinmor</button><button class='system-button' onclick="document.location.href='Poseidon.html'">Poseidon</button><button class='system-button' onclick="document.location.href='Promethean.html'">Promethean</button><button class='system-button' onclick="document.location.href='Reema.html'">Reema</button><button class='system-button' onclick="document.location.href='Rhea.html'">Rhea</button><button class='system-button' onclick="document.location.href='Sumri.html'">Sumri</button><button class='system-button' onclick="document.location.href='Tethys.html'">Tethys</button><button class='system-button' onclick="document.location.href='Tilminra.html'">Tilminra</button><button class='system-button' onclick="document.location.href='Tiridian.html'">Tiridian</button><button class='system-button' onclick="document.location.href='Titan.html'">Titan</button><button class='system-button' onclick="document.location.href='Triton.html'">Triton</button><button class='system-button' onclick="document.location.href='Tyr.html'">Tyr</button><button class='system-button' onclick="document.location.href='Vesper%20Point.html'">Vesper Point</button><button class='system-button' onclick="document.location.href='Vilnara.html'">Vilnara</button><button class='system-button' onclick="document.location.href='Waypoint%2033.html'">Waypoint 33</button><button class='system-button' onclick="document.location.href='Waypoint%2046.html'">Waypoint 46</button><button class='system-button' onclick="document.location.href='Waypoint%2052.html'">Waypoint 52</button><button class='system-button' onclick="document.location.href='Waypoint%2060.html'">Waypoint 60</button><button class='system-button' onclick="document.location.href='Waypoint%2089.html'">Waypoint 89</button>
+  </div>
+  <div id="maparea">
+    <div class="map-container" id="map">
+      <svg width="100%" height="100%">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="white" />
+          </marker>
+        </defs>
+        <line x1="1849.2657053665225" y1="2692.8082260145034" x2="1927.933446917902" y2="3413.993058973824" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1849.2657053665225" y1="2692.8082260145034" x2="1875.488285883649" y2="2933.203170334277" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-AlMare" /><line x1="1849.2657053665225" y1="2692.8082260145034" x2="1374.7673195671978" y2="2401.8026563100148" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1849.2657053665225" y1="2692.8082260145034" x2="1691.0995767667475" y2="2595.8063694463403" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-AlMare" /><line x1="1274.0628958631842" y1="3698.3783439235904" x2="1289.7120092773303" y2="3025.466467115326" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1274.0628958631842" y1="3698.3783439235904" x2="1279.279267001233" y2="3474.074384987502" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Blackspire" /><line x1="1274.0628958631842" y1="3698.3783439235904" x2="624.9221109952005" y2="3656.0296412151247" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1274.0628958631842" y1="3698.3783439235904" x2="1057.682634240523" y2="3684.262109687435" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Blackspire" /><line x1="1289.7120092773303" y1="3025.466467115326" x2="1374.7673195671978" y2="2401.8026563100148" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1289.7120092773303" y1="3025.466467115326" x2="1318.0637793739527" y2="2817.578530180222" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Brightfall" /><line x1="1289.7120092773303" y1="3025.466467115326" x2="1274.0628958631842" y2="3698.3783439235904" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1289.7120092773303" y1="3025.466467115326" x2="1284.4956381392815" y2="3249.7704260514142" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Brightfall" /><line x1="4106.658271829514" y1="4022.238480808273" x2="4746.73154323573" y2="3893.9740688308216" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4106.658271829514" y1="4022.238480808273" x2="4320.016028964919" y2="3979.4836768157893" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Corus" /><line x1="4106.658271829514" y1="4022.238480808273" x2="3552.5080606051324" y2="3908.4628170271576" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4106.658271829514" y1="4022.238480808273" x2="3921.94153475472" y2="3984.313259547901" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Corus" /><line x1="4106.658271829514" y1="4022.238480808273" x2="4145.4344899313555" y2="3531.0221808526476" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4106.658271829514" y1="4022.238480808273" x2="4119.583677863461" y2="3858.4997141563977" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Corus" /><line x1="892.7633526774707" y1="2446.381941920651" x2="1374.7673195671978" y2="2401.8026563100148" stroke="white" stroke-width="6" opacity="0.5" /><line x1="892.7633526774707" y1="2446.381941920651" x2="1053.431341640713" y2="2431.522180050439" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Danae" /><line x1="4746.73154323573" y1="3893.9740688308216" x2="4106.658271829514" y2="4022.238480808273" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4746.73154323573" y1="3893.9740688308216" x2="4533.373786100325" y2="3936.728872823305" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Freya" /><line x1="3552.5080606051324" y1="3908.4628170271576" x2="4106.658271829514" y2="4022.238480808273" stroke="white" stroke-width="6" opacity="0.5" /><line x1="3552.5080606051324" y1="3908.4628170271576" x2="3737.2247976799263" y2="3946.3880382875295" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Hypherion" /><line x1="3552.5080606051324" y1="3908.4628170271576" x2="4145.4344899313555" y2="3531.0221808526476" stroke="white" stroke-width="6" opacity="0.5" /><line x1="3552.5080606051324" y1="3908.4628170271576" x2="3750.1502037138735" y2="3782.6492716356543" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Hypherion" /><line x1="4145.4344899313555" y1="3531.0221808526476" x2="4265.804908228831" y2="2808.588359812574" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4145.4344899313555" y1="3531.0221808526476" x2="4185.55796269718" y2="3290.210907172623" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Oberon" /><line x1="4145.4344899313555" y1="3531.0221808526476" x2="4106.658271829514" y2="4022.238480808273" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4145.4344899313555" y1="3531.0221808526476" x2="4132.509083897408" y2="3694.760947504523" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Oberon" /><line x1="4145.4344899313555" y1="3531.0221808526476" x2="3552.5080606051324" y2="3908.4628170271576" stroke="white" stroke-width="6" opacity="0.5" /><line x1="4145.4344899313555" y1="3531.0221808526476" x2="3947.7923468226145" y2="3656.835726244151" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Oberon" /><line x1="1927.933446917902" y1="3413.993058973824" x2="1849.2657053665225" y2="2692.8082260145034" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1927.933446917902" y1="3413.993058973824" x2="1901.7108664007756" y2="3173.5981146540507" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Tiridian" /><line x1="624.9221109952005" y1="3656.0296412151247" x2="1274.0628958631842" y2="3698.3783439235904" stroke="white" stroke-width="6" opacity="0.5" /><line x1="624.9221109952005" y1="3656.0296412151247" x2="841.3023726178617" y2="3670.14587545128" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Vesper-Point" /><line x1="624.9221109952005" y1="3656.0296412151247" x2="892.7633526774707" y2="2446.381941920651" stroke="white" stroke-width="6" opacity="0.5" /><line x1="624.9221109952005" y1="3656.0296412151247" x2="714.2025248892905" y2="3252.8137414503003" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Vesper-Point" /><line x1="1374.7673195671978" y1="2401.8026563100148" x2="892.7633526774707" y2="2446.381941920651" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1374.7673195671978" y1="2401.8026563100148" x2="1214.0993306039554" y2="2416.6624181802267" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Waypoint-60" /><line x1="1374.7673195671978" y1="2401.8026563100148" x2="1289.7120092773303" y2="3025.466467115326" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1374.7673195671978" y1="2401.8026563100148" x2="1346.4155494705753" y2="2609.6905932451186" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Waypoint-60" /><line x1="1374.7673195671978" y1="2401.8026563100148" x2="1849.2657053665225" y2="2692.8082260145034" stroke="white" stroke-width="6" opacity="0.5" /><line x1="1374.7673195671978" y1="2401.8026563100148" x2="1532.9334481669728" y2="2498.804512878178" stroke="white" stroke-width="12" marker-end="url(#arrow)" class="jump-arrow jump-from-Waypoint-60" /><polyline points="3561.9085513563514,1245.1115541184263 3768.9907056206,2148.3787408124826 4287.649508197723,2213.211091134623 4802.494643108838,1227.3779994714878 5666.48105284301,880.7156086313369 7114.149298859745,553.5029228878282 8110.660659987703,-165.3734321547288" stroke="Red" stroke-width="6" fill="none"><title></title></polyline><polyline points="949.7431273968928,3987.170747449351 636.9623216555092,2419.0426508321316 797.5723578046159,1807.765647578068 1257.827983784146,1313.9497155375302 1800.7799313598016,1186.7827774182854 2499.5593080414205,1237.2404445409418 3053.304358048043,1874.8862597000827 3530.340137058077,2131.382884594925 4697.759355037407,2291.9929207440323 5170.231616709167,2015.9631107832074 6036.846708343132,1879.8949236507192 7358.449574190427,1638.4228686615345 18063.319676077375,597.6716087558591" stroke="white" stroke-width="6" fill="none"><title></title></polyline><text x="6051.687090073795" y="1491.7543354018353" fill="Orange" font-size="28"><tspan x="6051.687090073795" dy="0">League of Traders</tspan><tspan x="6051.687090073795" dy="33.6">Dictaorship</tspan></text><text x="3557.1685634502187" y="1076.675159219939" fill="Red" font-size="38"><tspan x="3557.1685634502187" dy="0">Hegemony Space</tspan></text>
+      </svg>
+      <a href="Acantha.html" class="system" data-system="Acantha" style="left:5001.627110981172px;top:1984.444185969078px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Acantha</div></a><a href="AlMare.html" class="system" data-system="AlMare" style="left:1849.2657053665225px;top:2692.8082260145034px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">AlMare</div></a><a href="Alpha.html" class="system" data-system="Alpha" style="left:8373.272421336736px;top:1262.6778915004156px;"><div class="icon"><img src="Images/Factions/Ximni.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Alpha</div></a><a href="Ashia.html" class="system" data-system="Ashia" style="left:5385.012868276853px;top:2277.1872328932213px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Ashia</div></a><a href="Athorn.html" class="system" data-system="Athorn" style="left:7557.411213058071px;top:1153.5823021321912px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Athorn</div></a><a href="Atietis.html" class="system" data-system="Atietis" style="left:2956.598779896793px;top:2102.032671506396px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Atietis</div></a><a href="Atlantis.html" class="system" data-system="Atlantis" style="left:1866.8496704601148px;top:2046.5175817109105px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Atlantis</div></a><a href="Blackspire.html" class="system" data-system="Blackspire" style="left:1274.0628958631842px;top:3698.3783439235904px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Blackspire</div></a><a href="Brightfall.html" class="system" data-system="Brightfall" style="left:1289.7120092773303px;top:3025.466467115326px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Brightfall</div></a><a href="Burin.html" class="system" data-system="Burin" style="left:8005.836129393285px;top:813.2598209849291px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Burin</div></a><a href="Castor.html" class="system" data-system="Castor" style="left:7997.037789829594px;top:1973.8344924062496px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Castor</div></a><a href="Cerberus.html" class="system" data-system="Cerberus" style="left:1423.0258242341743px;top:1529.3663174128592px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Cerberus</div></a><a href="Charon.html" class="system" data-system="Charon" style="left:4007.526148217749px;top:2389.9986453118554px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Charon</div></a><a href="Corus.html" class="system" data-system="Corus" style="left:4106.658271829514px;top:4022.238480808273px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Corus</div></a><a href="Danae.html" class="system" data-system="Danae" style="left:892.7633526774707px;top:2446.381941920651px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Danae</div></a><a href="DaRiln.html" class="system" data-system="DaRiln" style="left:7809.650228496628px;top:352.823522962163px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">DaRiln</div></a><a href="Eulis.html" class="system" data-system="Eulis" style="left:6017.56803412823px;top:1226.1447239837803px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Eulis</div></a><a href="Euphini.html" class="system" data-system="Euphini" style="left:0.0px;top:2483.7292621336187px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Euphini</div></a><a href="Freya.html" class="system" data-system="Freya" style="left:4746.73154323573px;top:3893.9740688308216px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Freya</div></a><a href="GeTorin.html" class="system" data-system="GeTorin" style="left:5554.783496833699px;top:1097.030804145414px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">GeTorin</div></a><a href="Helios.html" class="system" data-system="Helios" style="left:7439.481776876477px;top:2080.035637730653px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Helios</div></a><a href="Hypherion.html" class="system" data-system="Hypherion" style="left:3552.5080606051324px;top:3908.4628170271576px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Hypherion</div></a><a href="Khoros.html" class="system" data-system="Khoros" style="left:6653.051335330063px;top:1307.821883662854px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Khoros</div></a><a href="Krisenda.html" class="system" data-system="Krisenda" style="left:1044.8107204938083px;top:1880.5660566003414px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Krisenda</div></a><a href="Mria.html" class="system" data-system="Mria" style="left:6796.374841300925px;top:1820.432838048778px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Mria</div></a><a href="Norayne.html" class="system" data-system="Norayne" style="left:4091.8617932277652px;top:1720.4491965966952px;"><div class="icon"><img src="Images/Factions/Torgoth.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Norayne</div></a><a href="Oberon.html" class="system" data-system="Oberon" style="left:4145.4344899313555px;top:3531.0221808526476px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Oberon</div></a><a href="Phinmor.html" class="system" data-system="Phinmor" style="left:4877.361512392999px;top:2473.122843936112px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Phinmor</div></a><a href="Poseidon.html" class="system" data-system="Poseidon" style="left:3453.819811288704px;top:1817.388010747789px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Poseidon</div></a><a href="Promethean.html" class="system" data-system="Promethean" style="left:1947.8957641187644px;top:1444.4608859609402px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Promethean</div></a><a href="Reema.html" class="system" data-system="Reema" style="left:5860.008288986888px;top:2217.8128053044675px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Reema</div></a><a href="Rhea.html" class="system" data-system="Rhea" style="left:2692.382577126836px;top:3283.5837805226097px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Rhea</div></a><a href="Sumri.html" class="system" data-system="Sumri" style="left:5545.286010240606px;top:1709.7284971437043px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Sumri</div></a><a href="Tethys.html" class="system" data-system="Tethys" style="left:3543.7822573892863px;top:3092.3282711143293px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Tethys</div></a><a href="Tilminra.html" class="system" data-system="Tilminra" style="left:5104.235567777161px;top:1523.5065248012313px;"><div class="icon"><img src="Images/Factions/Unknown.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Tilminra</div></a><a href="Tiridian.html" class="system" data-system="Tiridian" style="left:1927.933446917902px;top:3413.993058973824px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Tiridian</div></a><a href="Titan.html" class="system" data-system="Titan" style="left:2359.8857826298113px;top:2761.0888177415704px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Titan</div></a><a href="Triton.html" class="system" data-system="Triton" style="left:3606.7487619936546px;top:2274.218511513784px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Triton</div></a><a href="Tyr.html" class="system" data-system="Tyr" style="left:5067.3596806770165px;top:3120.3041046535354px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Tyr</div></a><a href="Vesper%20Point.html" class="system" data-system="Vesper Point" style="left:624.9221109952005px;top:3656.0296412151247px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Vesper Point</div></a><a href="Vilnara.html" class="system" data-system="Vilnara" style="left:5444.3872958656075px;top:3393.4264715618056px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Vilnara</div></a><a href="Waypoint%2033.html" class="system" data-system="Waypoint 33" style="left:3018.993167113338px;top:3669.9855814023076px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Waypoint 33</div></a><a href="Waypoint%2046.html" class="system" data-system="Waypoint 46" style="left:4265.804908228831px;top:2808.588359812574px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Waypoint 46</div></a><a href="Waypoint%2052.html" class="system" data-system="Waypoint 52" style="left:2510.9276573719485px;top:1983.3197608718929px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Waypoint 52</div></a><a href="Waypoint%2060.html" class="system" data-system="Waypoint 60" style="left:1374.7673195671978px;top:2401.8026563100148px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Waypoint 60</div></a><a href="Waypoint%2089.html" class="system" data-system="Waypoint 89" style="left:3110.972291627556px;top:2731.4016039471935px;"><div class="icon"><img src="Images/Factions/USFP.png" class="alignment-img" /><img src="Images/ring.png" class="tint-img" /></div><div class="system-name">Waypoint 89</div></a>
+    </div>
+  </div>
+  <div id="info">
+    <img src="Images/compass.png" alt="Compass" />
+    <button onclick="resetZoom()" class="system-button" style="background-color:#222;width:100%;font-size:16pt;">Home</button>
+    <div id="system-details">
+      <p>Select a system to view metadata.</p>
+    </div>
+  </div>
+  <script>
+  
+    const map     = document.getElementById('map');
+    const maparea = document.getElementById('maparea');
+    let scale = Math.min(maparea.clientWidth/map.clientWidth, maparea.clientHeight/map.clientHeight);
+    let panX = 0, panY = 0;
+    // Initial center of Y (from Python)
+    const INITIAL_CENTER_PY = 2011.1192404041365;
+    // Pan bounds
+    let PANX_MIN, PANX_MAX, PANY_MIN, PANY_MAX;    
+    PANX_MIN = -8049.062492381797;
+    PANX_MAX = 49.062492381796815;
+    PANY_MIN = -3271.3009731900697;
+    PANY_MAX = 49.062492381796815;
+
+    // Parsed system metadata
+    const systemMeta = {"Acantha": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {"pirate": "Low", "enemy": "Low", "assets": []}, "description": ""}, "AlMare": {"alignment": "USFP", "development": "Colony", "focus": "Military", "exports": "None", "intel": {"pirate": "Low", "enemy": "None", "assets": ["Armory", "Fortification"]}, "description": ""}, "Alpha": {"alignment": "Ximni", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Ashia": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Athorn": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {"pirate": "Low", "enemy": "Low", "assets": []}, "description": ""}, "Atietis": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Atlantis": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Blackspire": {"alignment": "USFP", "development": "Outpost", "focus": "Research", "exports": "Mining, Research", "intel": {"pirate": "Low", "enemy": "Low", "assets": []}, "description": "Black Spire is an unusual Sytem that has 3 Black holes. Other then that the system bearly quilifes as an outpost, some mineing. The Ashes explorioty Gate has recently come online provideing a basis for the primary exploration of Vesper Point."}, "Brightfall": {"alignment": "USFP", "development": "Outpost", "focus": "Industry", "exports": "Mining, Industry", "intel": {"pirate": "High", "enemy": "Low", "assets": []}, "description": "Brightfall has 4 seperate govenments each consiting of two Civil class stations and an industrial facility. unforunetlyt the govenments do not get along with each other and disputes are frequent between them. The single jump point means that a lot of trade simply bypasses the system. Piracy is rife in Brightfall due to the conflicted nature of the area. blockades of the jump point are not unheard of."}, "Burin": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Castor": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Cerberus": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Charon": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Corus": {"alignment": "USFP", "development": "Colony", "focus": "Agriculture", "exports": "Agriculture", "intel": {"pirate": "Low", "enemy": "Low", "assets": ["Shipyard"]}, "description": "Corus is home to the planet Corus (not implimented yet) and has a number of obiting stations. notably it is the HQ system for the Corus Cargo Co. Fort Grey is a TSN Marine training facility."}, "Danae": {"alignment": "USFP", "development": "Colony", "focus": "Agriculture", "exports": "Agriculture, Research", "intel": {"pirate": "Low", "enemy": "None", "assets": []}, "description": "Danae is one of the newer colonies in the USFP, only just achiving Colony Status in XXXX. Its econmoy is mainly focused on Agriculture however the Long Bar Exploritory Gate is present here takeing advantage of strong jump point that allows access to the Euphine Expanse and beyond."}, "DaRiln": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Eulis": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Euphini": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Freya": {"alignment": "USFP", "development": "Outpost", "focus": "Research", "exports": "Mining, Research", "intel": {"pirate": "Low", "enemy": "Low", "assets": ["Shipyard"]}, "description": "System discovered in XXXX. Principally a Research system with light industry and a rear storage armory"}, "GeTorin": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Helios": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Hypherion": {"alignment": "USFP", "development": "Administrative Center", "focus": "Agriculture", "exports": "Agriculture, Industry", "intel": {"pirate": "Low", "enemy": "Low", "assets": ["Armory", "Shipyard"]}, "description": "This is a well established system a joint venture by Terra and the AlMare Union. Contains a significant Shipyard complex and an Armory point though lacks in TSN Facilitys otherwise."}, "Khoros": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Krisenda": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Mria": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Norayne": {"alignment": "Torgoth", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Oberon": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Phinmor": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Poseidon": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Promethean": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Reema": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Rhea": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Sumri": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Tethys": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Tilminra": {"alignment": "Unknown", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Tiridian": {"alignment": "USFP", "development": "Outpost", "focus": "", "exports": "None", "intel": {"pirate": "Mid", "enemy": "Low", "assets": ["Shipyard"]}, "description": ""}, "Titan": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Triton": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Tyr": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Vesper Point": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {"pirate": "Mid", "enemy": "Mid", "assets": []}, "description": "Vesper Point is a recently opened system undergoing a primary survey. the USFP have made claim to this system."}, "Vilnara": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Waypoint 33": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Waypoint 46": {"alignment": "USFP", "development": "Uninhabited", "focus": "", "exports": "None", "intel": {"pirate": "Mid", "enemy": "Low", "assets": []}, "description": "Waypoint System - Standard Search and Rescue station"}, "Waypoint 52": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}, "Waypoint 60": {"alignment": "USFP", "development": "Uninhabited", "focus": "", "exports": "None", "intel": {"pirate": "Mid", "enemy": "Low", "assets": []}, "description": "Waypoint system Standard S & R outpost pluse a minor comertical venture. as such the uninhabited Development status of the Waypoint 60 is streaching a point. rather to say that there is no recognised USFP member claim on the system."}, "Waypoint 89": {"alignment": "USFP", "development": "Unclaimed", "focus": "", "exports": "None", "intel": {}, "description": ""}};
+
+    // Recompute pan bounds based on current scale & viewport
+    function updatePanBounds() {
+      const mapW = map.clientWidth * scale;
+      const mapH = map.clientHeight * scale;
+      const margin = 400 * scale;  // 400px “buffer” at this zoom
+      PANX_MIN = maparea.clientWidth - mapW - margin;
+      PANX_MAX = margin;
+      PANY_MIN = maparea.clientHeight - mapH - margin;
+      PANY_MAX = margin;
+      console.log(`Bounds → X:[${PANX_MIN.toFixed(0)},${PANX_MAX.toFixed(0)}] Y:[${PANY_MIN.toFixed(0)},${PANY_MAX.toFixed(0)}]`);
+    }
+
+    // Initial bounds calculation
+    updatePanBounds();
+    let isPanning = false, startX = 0, startY = 0;
+
+    function applyTransform() { 
+      // Clamp panning to within 400px margin
+      panX = Math.min(PANX_MAX, Math.max(PANX_MIN, panX));
+      panY = Math.min(PANY_MAX, Math.max(PANY_MIN, panY));
+      map.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+     
+      // Dynamic label resizing with enforced min/max font sizes
+      document.querySelectorAll('.system-name').forEach(label => {
+      const minSize = 70;
+      const maxSize = 90;
+      // interpolate size based on zoom—use (scale - 1) so baseSize at scale=1
+      let newSize = minSize + (scale - 1) * (maxSize - minSize);
+      newSize = Math.max(minSize, Math.min(maxSize, newSize));
+      label.style.setProperty('font-size', `${newSize}px`, 'important');
+      // shift label upward by half the extra height
+      const offset = (newSize - minSize) / 2;
+      label.style.transform = `translateY(-${offset}px)`;
+      const halfWidth = label.offsetWidth / 2;
+      label.style.marginLeft = `-${halfWidth}px`;
+      });
+      // Icon scaling: keep icons a consistent on-screen size
+      
+      document.querySelectorAll('.icon').forEach(icon => {
+        // dynamic icon scaling: shrink when zooming out, grow up to a max when zooming in
+        const iconGrowFactor = 0.9; // max 20% growth
+        let iconScale = scale > 1
+          ? Math.min(scale, 1 + iconGrowFactor)
+          : 1 / scale;
+        icon.style.transform = `scale(${iconScale})`;
+      });
+    }
+
+    maparea.addEventListener('mousedown', e => {
+      e.preventDefault(); isPanning = true; startX = e.clientX - panX; startY = e.clientY - panY; maparea.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mouseup', () => { if (!isPanning) return; isPanning = false; maparea.style.cursor = 'grab'; });
+    document.addEventListener('mousemove', e => {
+      if (!isPanning) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      applyTransform();
+    });
+    
+     maparea.addEventListener('wheel', e => { e.preventDefault();
+       const rect = maparea.getBoundingClientRect();
+       const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+       const prev = scale;
+       scale *= e.deltaY > 0 ? 0.9 : 1.1;
+       const minS = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
+       const maxS = Math.min(maparea.clientWidth / 500, maparea.clientHeight / 500);
+       scale = Math.max(minS, Math.min(scale, maxS));
+       const factor = scale / prev;
+       panX -= (mx - panX) * (factor - 1);
+       panY -= (my - panY) * (factor - 1);
+
+       // recalc bounds now that scale has changed
+       updatePanBounds();
+       applyTransform();
+    });
+
+    function resetZoom() {
+       scale = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
+       panX = (maparea.clientWidth - map.clientWidth * scale) / 2;
+       panY = (maparea.clientHeight - map.clientHeight * scale) / 2;
+       updatePanBounds();   // make sure bounds reflect the new scale
+       applyTransform();
+    }
+
+    // Center map on load and on resize
+    window.addEventListener('load', resetZoom);
+    window.addEventListener('resize', resetZoom);
+    resetZoom();
+    
+    document.querySelectorAll('.system').forEach(el => {
+      const sys = el.getAttribute('data-system').replace(/ /g, '-');
+      el.addEventListener('mouseenter', () => {
+        // animate arrows and display metadata on hover
+        document.querySelectorAll(`.jump-from-${sys}`).forEach(line =>
+          line.classList.add('jump-arrow-active')
+        );
+        const name = el.getAttribute('data-system');
+        const m = systemMeta[name] || {};
+        document.getElementById('system-details').innerHTML =
+          `<h3>${name}</h3>` +
+          `<p>Alignment: ${m.alignment}</p>` +
+          `<p>Development Level: ${m.development}</p>` +
+          `<p>System Focus: ${m.focus}</p>` +
+          `<p>Exports: ${m.exports}</p>` +
+          `<p>Intel: ${JSON.stringify(m.intel)}</p>` +
+          `<p>${m.description}</p>`;
+      });
+      el.addEventListener('mouseleave', () => {
+        document.querySelectorAll(`.jump-from-${sys}`).forEach(line =>
+          line.classList.remove('jump-arrow-active')
+        );
+      });
+    });
+  
+  </script>
+</body>
+</html>

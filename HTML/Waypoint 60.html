@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waypoint 60.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h2 class="header">Waypoint 60</h2>
+        <h3 class="subheader">Alignment: USFP</h3>
+        <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"Rose Gate": {"type": "jumpnode", "x": 27925.46822756712, "y": 148.143205888201, "grid": "M13", "destinations": {"Egan Gate": "Danae", "Zephhyr Gate": "Brightfall", "Hydrogen Gate": "AlMare"}}, "Delphinium Gate": {"type": "jumpnode", "x": 258758.80156090047, "y": 233481.47653922156, "grid": "X24"}, "DS 82": {"type": "station", "x": 128495.1864807384, "y": 96577.0002112769, "grid": "Q18", "hull": "starbase_civil", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Happy Eater Trading": {"type": "station", "x": 142262.53098476873, "y": 91602.61851453013, "grid": "Q19", "description": "The Happy Eater Trading Co (HET) is an start up company takeing advantatge of Waypoint 60's growing importance as a net work hub. Bar, Crew rest facilitys and flea market with plenty of storage for transshiping.g", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "HET S07": {"type": "platform", "x": 140530.10581867257, "y": 89190.94249934955, "grid": "Q19"}, "HET S08": {"type": "platform", "x": 145016.37201005718, "y": 90873.29232111877, "grid": "Q19"}, "Happy Eater": {"type": "station", "x": -4682.0670437223525, "y": -33248.888158555805, "grid": "K11", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "IMO 31": {"type": "station", "x": -22770.69232738508, "y": -42777.71754905671, "grid": "J10", "hull": "starbase_industry", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "IMO 224": {"type": "station", "x": 300013.40642230265, "y": 260962.89563276587, "grid": "Z27", "hull": "starbase_command", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 74": {"type": "platform", "x": -20201.801305733625, "y": -43536.90138829946, "grid": "J10"}, "Vita Refinery": {"type": "station", "x": -18909.75664261486, "y": -45797.9795487573, "grid": "J11", "hull": "usfp_industrial_refinary", "facilities": [], "sides": ["USFP"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialRefinary256.png", "hullDescription": ""}, "WP 53": {"type": "platform", "x": 120996.99395249503, "y": 102178.18701477496, "grid": "R18"}, "SR 23": {"type": "sensor_relay", "x": 83149.57577681016, "y": 56962.06962415378, "grid": "O16"}, "SR 61": {"type": "sensor_relay", "x": 113184.2979990324, "y": 87344.01406859822, "grid": "Q17"}, "SR 50": {"type": "sensor_relay", "x": 143219.0202212546, "y": 117725.95851304267, "grid": "R19"}, "SR 70": {"type": "sensor_relay", "x": 173253.74244347683, "y": 148107.90295748712, "grid": "T20"}, "SR 17": {"type": "sensor_relay", "x": 203288.46466569908, "y": 178489.84740193156, "grid": "U22"}, "SR 80": {"type": "sensor_relay", "x": 233323.1868879213, "y": 208871.79184637603, "grid": "W23"}, "SR 32": {"type": "sensor_relay", "x": 166830.1313323657, "y": 96892.62517970933, "grid": "Q20"}, "SR 64": {"type": "sensor_relay", "x": 307663.464665699, "y": 239253.73629082047, "grid": "X27"}, "SR 95": {"type": "sensor_relay", "x": 290720.50574934203, "y": 274436.1530018818, "grid": "Z26"}, "SR 16": {"type": "sensor_relay", "x": 252650.0226376649, "y": 283125.4923390025, "grid": "A24"}, "SR 79": {"type": "sensor_relay", "x": 222119.8656100902, "y": 258778.5045511106, "grid": "Y23"}, "SR 73": {"type": "sensor_relay", "x": 222119.8656100902, "y": 219728.96803053035, "grid": "W23"}, "SR 60": {"type": "sensor_relay", "x": 252650.0226376649, "y": 195381.9802426384, "grid": "V24"}, "SR 58": {"type": "sensor_relay", "x": 290720.50574934203, "y": 204071.31957975912, "grid": "W26"}, "SR 59": {"type": "sensor_relay", "x": 67385.68688792126, "y": -5190.708153624009, "grid": "L15"}, "SR 24": {"type": "sensor_relay", "x": 50442.72797156427, "y": 29991.70855743733, "grid": "N14"}, "SR 44": {"type": "sensor_relay", "x": 12372.244859887116, "y": 38681.047894558054, "grid": "N12"}, "SR 65": {"type": "sensor_relay", "x": -18157.9121676876, "y": 14334.06010666611, "grid": "M11"}, "SR 41": {"type": "sensor_relay", "x": -18157.9121676876, "y": -24715.476413914123, "grid": "K11"}, "SR 51": {"type": "sensor_relay", "x": 12372.244859887105, "y": -49062.46420180607, "grid": "J12"}, "SR 26": {"type": "sensor_relay", "x": 50442.727971564265, "y": -40373.12486468536, "grid": "J14"}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var infoHtml = '<span style="font-size:20pt;">' + name + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+            }
+        } else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+            infoHtml += '<b>Type:</b> ' + obj.type + '<br>';
+            infoHtml += '<b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [-16510.740479002525, -76990.74047900252, -57224.98973252984, 3255.0102674701484, -16510.740479002525], "y": [432200.8420993046, 40520.84209930463, 37468.77764580518, 429148.7776458051, 432200.8420993046], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [70096.08533517751, -75343.91466482249, -47351.81554670989, 98088.1844532901, 70096.08533517751], "y": [411590.2335575346, 34310.23355753462, 23519.38618757519, 400799.3861875751, 411590.2335575346], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [217846.81981068163, 449686.8198106816, 352097.44997778605, 120257.44997778603, 217846.81981068163], "y": [-108240.4980009922, 215759.5019990078, 285590.117746102, -38409.882253897995, -108240.4980009922], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [214987.52270520345, 248118.6646805121, 231105.60510795546, 197974.4631326468, 214987.52270520345], "y": [105409.7252253504, 159017.53386732563, 169532.08587778418, 115924.27723580897, 105409.7252253504], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [60975.49445036344, 140175.49445036342, 147986.49138748684, 68786.49138748684, 60975.49445036344], "y": [219061.1834118271, 185461.1834118271, 203872.81904933226, 237472.81904933226, 219061.1834118271], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [138716.52134190977, -104883.47865809023, -127754.53550405946, 115845.46449594054, 138716.52134190977], "y": [-189832.32649477432, 10567.673505225652, -17233.671044066283, -217633.67104406626, -189832.32649477432], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [92352.0607307906, -109247.93926920937, -123390.07489294032, 78209.92510705965, 92352.0607307906], "y": [-218261.9309575548, -16661.93095755484, -30804.06658128579, -232404.06658128576, -218261.9309575548], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [27925.46822756712], "y": [148.143205888201], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["Rose Gate [M13]"], "hoverinfo": "text", "text": ["Rose Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}, {"type": "scatter", "x": [258758.80156090047], "y": [233481.47653922156], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["Delphinium Gate [X24]"], "hoverinfo": "text", "text": ["Delphinium Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}, {"type": "scatter", "x": [128495.1864807384], "y": [96577.0002112769], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 82 [Q18]"], "hoverinfo": "text", "text": ["DS 82"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [142262.53098476873], "y": [91602.61851453013], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Happy Eater Trading [Q19]"], "hoverinfo": "text", "text": ["Happy Eater Trading"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [140530.10581867257], "y": [89190.94249934955], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["HET S07 [Q19]"], "hoverinfo": "text"}, {"type": "scatter", "x": [145016.37201005718], "y": [90873.29232111877], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["HET S08 [Q19]"], "hoverinfo": "text"}, {"type": "scatter", "x": [-4682.0670437223525], "y": [-33248.888158555805], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Happy Eater [K11]"], "hoverinfo": "text", "text": ["Happy Eater"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [-22770.69232738508], "y": [-42777.71754905671], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["IMO 31 [J10]"], "hoverinfo": "text", "text": ["IMO 31"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [300013.40642230265], "y": [260962.89563276587], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["IMO 224 [Z27]"], "hoverinfo": "text", "text": ["IMO 224"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [-20201.801305733625], "y": [-43536.90138829946], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 74 [J10]"], "hoverinfo": "text"}, {"type": "scatter", "x": [-18909.75664261486], "y": [-45797.9795487573], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Vita Refinery [J11]"], "hoverinfo": "text", "text": ["Vita Refinery"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [120996.99395249503], "y": [102178.18701477496], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 53 [R18]"], "hoverinfo": "text"}, {"type": "scatter", "x": [83149.57577681016], "y": [56962.06962415378], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 23 [O16]"], "hoverinfo": "text"}, {"type": "scatter", "x": [113184.2979990324], "y": [87344.01406859822], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 61 [Q17]"], "hoverinfo": "text"}, {"type": "scatter", "x": [143219.0202212546], "y": [117725.95851304267], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 50 [R19]"], "hoverinfo": "text"}, {"type": "scatter", "x": [173253.74244347683], "y": [148107.90295748712], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 70 [T20]"], "hoverinfo": "text"}, {"type": "scatter", "x": [203288.46466569908], "y": [178489.84740193156], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 17 [U22]"], "hoverinfo": "text"}, {"type": "scatter", "x": [233323.1868879213], "y": [208871.79184637603], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 80 [W23]"], "hoverinfo": "text"}, {"type": "scatter", "x": [166830.1313323657], "y": [96892.62517970933], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 32 [Q20]"], "hoverinfo": "text"}, {"type": "scatter", "x": [307663.464665699], "y": [239253.73629082047], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 64 [X27]"], "hoverinfo": "text"}, {"type": "scatter", "x": [290720.50574934203], "y": [274436.1530018818], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 95 [Z26]"], "hoverinfo": "text"}, {"type": "scatter", "x": [252650.0226376649], "y": [283125.4923390025], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 16 [A24]"], "hoverinfo": "text"}, {"type": "scatter", "x": [222119.8656100902], "y": [258778.5045511106], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 79 [Y23]"], "hoverinfo": "text"}, {"type": "scatter", "x": [222119.8656100902], "y": [219728.96803053035], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 73 [W23]"], "hoverinfo": "text"}, {"type": "scatter", "x": [252650.0226376649], "y": [195381.9802426384], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 60 [V24]"], "hoverinfo": "text"}, {"type": "scatter", "x": [290720.50574934203], "y": [204071.31957975912], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 58 [W26]"], "hoverinfo": "text"}, {"type": "scatter", "x": [67385.68688792126], "y": [-5190.708153624009], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 59 [L15]"], "hoverinfo": "text"}, {"type": "scatter", "x": [50442.72797156427], "y": [29991.70855743733], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 24 [N14]"], "hoverinfo": "text"}, {"type": "scatter", "x": [12372.244859887116], "y": [38681.047894558054], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 44 [N12]"], "hoverinfo": "text"}, {"type": "scatter", "x": [-18157.9121676876], "y": [14334.06010666611], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 65 [M11]"], "hoverinfo": "text"}, {"type": "scatter", "x": [-18157.9121676876], "y": [-24715.476413914123], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 41 [K11]"], "hoverinfo": "text"}, {"type": "scatter", "x": [12372.244859887105], "y": [-49062.46420180607], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 51 [J12]"], "hoverinfo": "text"}, {"type": "scatter", "x": [50442.727971564265], "y": [-40373.12486468536], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 26 [J14]"], "hoverinfo": "text"}], "layout": {"title": "Waypoint 60", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Waypoint 60';
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Custom click: select nearest object within 10px of cursor
+    plotDiv.addEventListener('click', function(evt) {
+        var rect = plotDiv.getBoundingClientRect();
+        var px = evt.clientX - rect.left;
+        var py = evt.clientY - rect.top;
+        var xaxis = plotDiv._fullLayout.xaxis;
+        var yaxis = plotDiv._fullLayout.yaxis;
+        var l2px = xaxis.l2p.bind(xaxis);
+        var l2py = yaxis.l2p.bind(yaxis);
+        var minDist = Infinity, closest = null;
+        for (var name in objData) {
+            var pt = objData[name];
+            var xPx = l2px(pt.x);
+            var yPx = l2py(pt.y);
+            var dx = xPx - px, dy = yPx - py;
+            var d = Math.sqrt(dx*dx + dy*dy);
+            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
+            if (d < minDist) {
+                minDist = d;
+                closest = name;
+            }
+        }
+        if (minDist <= 35 && closest) {
+            highlight(closest);
+        }
+    });
+
+  var ctrl = document.getElementById('controls');
+
+  // Helper: create and append a single button
+  function addButton(label, fn, header, color) {
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('Delphinium Gate',function(){highlight('Delphinium Gate');},false,null);
+    addButton('Rose Gate',function(){highlight('Rose Gate');},false,null);
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+  addButton('--- Stations ---', null, true, null);
+  addButton('DS 82',function(){highlight('DS 82');},false,'blue');
+    addButton('Happy Eater',function(){highlight('Happy Eater');},false,'blue');
+    addButton('Happy Eater Trading',function(){highlight('Happy Eater Trading');},false,'blue');
+    addButton('IMO 224',function(){highlight('IMO 224');},false,'blue');
+    addButton('IMO 31',function(){highlight('IMO 31');},false,'blue');
+    addButton('Vita Refinery',function(){highlight('Vita Refinery');},false,'blue');
+    
+</script>
+</body>
+</html>

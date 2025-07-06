@@ -1,0 +1,909 @@
+{
+    "systemMapCoord": [
+        -28746.498051493283,
+        0,
+        13755.999922624893
+    ],
+    "systemalignment": "USFP",
+    "metadata": {
+        "skybox": "sky1.png",
+        "sysdescription": "Black Spire is an unusual Sytem that has 3 Black holes. Other then that the system bearly quilifes as an outpost, some mineing. The Ashes explorioty Gate has recently come online provideing a basis for the primary exploration of Vesper Point.",
+        "security": "Neutral",
+        "exports": [
+            "Mining",
+            "Research"
+        ],
+        "focus": "Research",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Outpost",
+        "visible": true
+    },
+    "objects": {
+        "Newton Gate": {
+            "coordinate": [
+                36666.66666666667,
+                0,
+                73333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Zephhyr Gate": "Brightfall"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Ashes": {
+            "coordinate": [
+                -42500.00000000001,
+                0,
+                -125000.00000000001
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Temple Point Gate": "Vesper Point"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "DS 15": {
+            "coordinate": [
+                -78117.28395061732,
+                0,
+                29367.283950617268
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "SM15A": {
+            "coordinate": [
+                -88244.59876543214,
+                0,
+                24062.499999999985
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "SM15B": {
+            "coordinate": [
+                -66060.95679012348,
+                0,
+                39494.598765432085
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "RS15": {
+            "coordinate": [
+                -89691.35802469139,
+                0,
+                46246.14197530863
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "RS16": {
+            "coordinate": [
+                173020.5887139283,
+                0,
+                82690.14347790078
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "RS17": {
+            "coordinate": [
+                111020.5887139283,
+                0,
+                -106309.8565220992
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 16": {
+            "coordinate": [
+                167020.5887139283,
+                0,
+                68690.14347790078
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 17": {
+            "coordinate": [
+                90020.5887139283,
+                0,
+                -88309.8565220992
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Port Cat": {
+            "coordinate": [
+                -18979.411286071696,
+                0,
+                282690.14347790077
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Port March": {
+            "coordinate": [
+                214967.75285949453,
+                0,
+                -309271.3689777973
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "DS 73": {
+            "coordinate": [
+                219484.87400294677,
+                0,
+                -307729.75775746093
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "usfp_industrial_assembly",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "DS 39": {
+            "coordinate": [
+                216997.45955918336,
+                0,
+                -312916.06009455916
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "usfp_industrial_assembly",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "DS 66": {
+            "coordinate": [
+                221008.41000154096,
+                0,
+                -310626.09121061885
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "pirate_cache_1",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "JP 34": {
+            "coordinate": [
+                -62801.26342609975,
+                0,
+                309728.4684381927
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Newton Gate": "Blackspire",
+                "JP 17": "Tiridian"
+            },
+            "state": "Untethered",
+            "drift": 0,
+            "hideonmap": true
+        }
+    },
+    "sensor_relay": {
+        "SR 31": {
+            "coordinate": [
+                41220.588713928235,
+                0,
+                82690.14347790078
+            ]
+        },
+        "SR 29": {
+            "coordinate": [
+                26053.92204726157,
+                0,
+                46523.47681123412
+            ]
+        },
+        "SR 95": {
+            "coordinate": [
+                10887.255380594903,
+                0,
+                10356.810144567455
+            ]
+        },
+        "SR 27": {
+            "coordinate": [
+                -19446.07795273843,
+                0,
+                -61976.523188765874
+            ]
+        }
+    },
+    "terrain": {
+        "1751110289634": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -107621.52695086921,
+                0,
+                49137.39683157737
+            ],
+            "end": [
+                -95347.10265124093,
+                0,
+                8922.506692005763
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110295735": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -95347.10265124093,
+                0,
+                7791.967611776844
+            ],
+            "end": [
+                -52871.13435121149,
+                0,
+                36055.44461749986
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110304096": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -51740.5952709826,
+                0,
+                37100.70874996297
+            ],
+            "end": [
+                -82997.7397611518,
+                0,
+                85939.99701585234
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110307981": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -86904.88282242294,
+                0,
+                88172.65019372155
+            ],
+            "end": [
+                -117045.70072365752,
+                0,
+                42124.178400168734
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "Huey": {
+            "type": "blackhole",
+            "name": "Huey",
+            "coordinate": [
+                -141379.4112860717,
+                0,
+                133890.14347790077
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "Louie": {
+            "type": "blackhole",
+            "name": "Louie",
+            "coordinate": [
+                137417.21854304636,
+                0,
+                -139900.66225165562
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "Dewey": {
+            "type": "blackhole",
+            "name": "Dewey",
+            "coordinate": [
+                181291.3907284768,
+                0,
+                123344.37086092714
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1751110480202": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                149020.5887139283,
+                0,
+                107690.14347790078
+            ],
+            "end": [
+                191020.5887139283,
+                0,
+                85690.14347790078
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110484434": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                181020.5887139283,
+                0,
+                96690.14347790078
+            ],
+            "end": [
+                233020.5887139283,
+                0,
+                124690.14347790078
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110489222": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                219020.5887139283,
+                0,
+                121690.14347790078
+            ],
+            "end": [
+                177020.5887139283,
+                0,
+                180690.1434779008
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110492605": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                184020.5887139283,
+                0,
+                173690.1434779008
+            ],
+            "end": [
+                125020.5887139283,
+                0,
+                166690.1434779008
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110502211": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                135020.5887139283,
+                0,
+                166690.1434779008
+            ],
+            "end": [
+                -25979.411286071696,
+                0,
+                215690.1434779008
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110509765": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                96020.5887139283,
+                0,
+                -232309.8565220992
+            ],
+            "end": [
+                128020.5887139283,
+                0,
+                -229309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110513808": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                117020.5887139283,
+                0,
+                -228309.8565220992
+            ],
+            "end": [
+                184020.5887139283,
+                0,
+                -218309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110517433": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                121020.5887139283,
+                0,
+                -194309.8565220992
+            ],
+            "end": [
+                170020.5887139283,
+                0,
+                -256309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110521893": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                100020.5887139283,
+                0,
+                -214309.8565220992
+            ],
+            "end": [
+                152020.5887139283,
+                0,
+                -221309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110527137": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                111020.5887139283,
+                0,
+                -204309.8565220992
+            ],
+            "end": [
+                -32979.41128607169,
+                0,
+                -172309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110537062": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -238979.4112860717,
+                0,
+                156690.1434779008
+            ],
+            "end": [
+                -238979.4112860717,
+                0,
+                58690.14347790079
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110539310": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -172979.4112860717,
+                0,
+                -18309.85652209921
+            ],
+            "end": [
+                -141979.4112860717,
+                0,
+                -46309.85652209921
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110545299": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -225979.4112860717,
+                0,
+                -176309.8565220992
+            ],
+            "end": [
+                -193979.4112860717,
+                0,
+                -186309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110548521": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -109979.4112860717,
+                0,
+                -180309.8565220992
+            ],
+            "end": [
+                -78979.4112860717,
+                0,
+                -225309.8565220992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110556577": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                23020.588713928304,
+                0,
+                -81309.8565220992
+            ],
+            "end": [
+                110020.5887139283,
+                0,
+                1690.14347790079
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110566806": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                142020.5887139283,
+                0,
+                15690.14347790079
+            ],
+            "end": [
+                194020.5887139283,
+                0,
+                -99309.8565220992
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1751110768208": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                197587.4148383363,
+                0,
+                -310366.8385645591
+            ],
+            "end": [
+                222017.11314613489,
+                0,
+                -299774.62619863165
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1751110785263": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                199363.30065628327,
+                0,
+                -310164.9104309448
+            ],
+            "end": [
+                215005.51929233203,
+                0,
+                -325612.41265243693
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110789361": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                212733.82778917142,
+                0,
+                -321263.74606067233
+            ],
+            "end": [
+                232270.37471635264,
+                0,
+                -316979.98494042666
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1751110798535": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                230299.52897393567,
+                0,
+                -318537.10064624884
+            ],
+            "end": [
+                233664.22861747412,
+                0,
+                -295926.3190416704
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1751110835341": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                231947.19336402378,
+                0,
+                -268998.3834136592
+            ],
+            "end": [
+                171183.30447513488,
+                0,
+                -306131.87106798013
+            ],
+            "density": 500,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1751110858225": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                242074.50817883862,
+                0,
+                -221737.58094452333
+            ],
+            "end": [
+                146106.14398130772,
+                0,
+                -287806.2537840295
+            ],
+            "density": 500,
+            "scatter": 23004,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1751110868989": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                86789.01435167808,
+                0,
+                -181228.3216852641
+            ],
+            "end": [
+                36152.44027760401,
+                0,
+                -202929.71057415297
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110874741": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                42903.98348748055,
+                0,
+                -166278.47600625173
+            ],
+            "end": [
+                -5803.57824091452,
+                0,
+                -194731.40810501718
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110880703": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                12039.785956616346,
+                0,
+                -164831.71674699246
+            ],
+            "end": [
+                17344.569907233632,
+                0,
+                -196660.42045069617
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1751110897749": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                220990.40324056696,
+                0,
+                -266683.5685988444
+            ],
+            "end": [
+                164277.440277604,
+                0,
+                -278836.34637662215
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751110905498": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                158490.40324056696,
+                0,
+                -155572.45748773325
+            ],
+            "end": [
+                170064.47731464103,
+                0,
+                -172933.56859884437
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
+    "traffic": {
+        "commercial": "light",
+        "civilian": "light",
+        "security": "none"
+    }
+}

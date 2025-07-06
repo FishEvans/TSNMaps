@@ -1,0 +1,662 @@
+{
+    "systemMapCoord": [
+        -5336.585878882106,
+        0,
+        12391.567298463833
+    ],
+    "systemalignment": "USFP",
+    "sensor_relay": {
+        "Relay 1": {
+            "coordinate": [
+                -63817.2109375,
+                0.0,
+                55910.40625
+            ],
+            "description": "--"
+        },
+        "Relay 2": {
+            "coordinate": [
+                -79021.421875,
+                0.0,
+                20999.77734375
+            ],
+            "description": ""
+        },
+        "Relay 3": {
+            "coordinate": [
+                -42044.1953125,
+                0.0,
+                26387.673828125
+            ]
+        },
+        "Relay 4": {
+            "coordinate": [
+                -27943.109375,
+                0.0,
+                -7239.5703125
+            ],
+            "description": ""
+        },
+        "Relay 5": {
+            "coordinate": [
+                7388.28125,
+                0.0,
+                -51331.65234375
+            ],
+            "description": ""
+        },
+        "Relay 6": {
+            "coordinate": [
+                40103.5234375,
+                0.0,
+                -51149.39453125
+            ],
+            "description": ""
+        },
+        "Relay 7": {
+            "coordinate": [
+                30626.1328125,
+                0.0,
+                -77212.234375
+            ],
+            "description": ""
+        },
+        "Relay 8": {
+            "coordinate": [
+                49216.4140625,
+                0.0,
+                -71197.734375
+            ],
+            "description": ""
+        },
+        "Relay 9": {
+            "coordinate": [
+                62885.7265625,
+                0.0,
+                -88056.5625
+            ],
+            "description": ""
+        },
+        "Relay 10": {
+            "coordinate": [
+                68535.7109375,
+                0.0,
+                -58713.08984375
+            ],
+            "description": ""
+        },
+        "Relay 11": {
+            "coordinate": [
+                -48473.6875,
+                0.0,
+                -77850.140625
+            ],
+            "description": ""
+        },
+        "Relay 12": {
+            "coordinate": [
+                -60593.8203125,
+                0.0,
+                -101817.015625
+            ],
+            "description": ""
+        },
+        "Relay 13": {
+            "coordinate": [
+                -28425.34375,
+                0.0,
+                -106373.453125
+            ],
+            "description": ""
+        },
+        "Relay 14": {
+            "coordinate": [
+                -13500.6328125,
+                0.0,
+                -25383.88671875
+            ],
+            "description": ""
+        }
+    },
+    "objects": {
+        "Relyn Station": {
+            "coordinate": [
+                -50898.5234375,
+                0.0,
+                47425.40234375
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 12,
+                "Nuke": 18,
+                "Mine": 20,
+                "EMP": 6
+            },
+            "teams": {
+                "Marines": 3,
+                "Combat Engineers": 3
+            },
+            "dockaccesscode": "23511",
+            "description": "Relyn Station was built in 2352 and serves as the primary command and control center of the Oberon System."
+        },
+        "Larosea Station": {
+            "coordinate": [
+                36804.828125,
+                0.0,
+                -70432.203125
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {
+                "DamCon": 4
+            },
+            "dockaccesscode": "17338"
+        },
+        "Azura": {
+            "coordinate": [
+                43127.4375,
+                0.0,
+                -59322.4375
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Orica": {
+            "coordinate": [
+                53262.5234375,
+                0.0,
+                -63930.703125
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Tirell": {
+            "coordinate": [
+                51764.8203125,
+                0.0,
+                -50293.69140625
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Aturin Gate": {
+            "coordinate": [
+                -45550.55859375,
+                0.0,
+                -93227.5390625
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Merex Gate": "Waypoint 46",
+                "Vermilion Gate": "Corus",
+                "Rock Breaker Gate": "Hypherion"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "AU 22": {
+            "coordinate": [
+                -65367.15234375,
+                0.0,
+                38574.65625
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_assembly",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "PU 13": {
+            "coordinate": [
+                -51892.9765625,
+                0.0,
+                29398.9921875
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_processor",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "RU 36": {
+            "coordinate": [
+                -68573.203125,
+                0.0,
+                30711.23046875
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_refinary",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "SM 02": {
+            "coordinate": [
+                -63461.60546875,
+                0.0,
+                19749.404296875
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "SM 01": {
+            "coordinate": [
+                -61316.63671875,
+                0.0,
+                20140.6640625
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "I 981": {
+            "coordinate": [
+                -59148.15625,
+                0.0,
+                27376.2890625
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_unit",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "RS 33 (Xenara)": {
+            "coordinate": [
+                46873.99609375,
+                177.78456115722656,
+                -93096.5703125
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "SM 43": {
+            "coordinate": [
+                56148.125,
+                0.0,
+                -56322.40234375
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "SM 2X": {
+            "coordinate": [
+                43321.09375,
+                0.0,
+                -89569.0234375
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        }
+    },
+    "terrain": {
+        "2810173012224": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -25951,
+                0,
+                -2879
+            ],
+            "end": [
+                -24024,
+                0,
+                3069
+            ],
+            "density": 94,
+            "scatter": 2935,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810173053248": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -67074,
+                0,
+                -90310
+            ],
+            "end": [
+                -60874,
+                0,
+                -80710
+            ],
+            "density": 51,
+            "scatter": 4635,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810173250048": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -68722,
+                0,
+                -93071
+            ],
+            "end": [
+                -87123,
+                0,
+                -89299
+            ],
+            "density": 88,
+            "scatter": 6687,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810173249536": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -71640,
+                0,
+                -84607
+            ],
+            "end": [
+                -81857,
+                0,
+                -70638
+            ],
+            "density": 117,
+            "scatter": 3111,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810173253312": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -86167,
+                0,
+                -79133
+            ],
+            "end": [
+                -73434,
+                0,
+                -91953
+            ],
+            "density": 129,
+            "scatter": 2143,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810173254976": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -82243,
+                0,
+                -77438
+            ],
+            "end": [
+                -72667,
+                0,
+                -87441
+            ],
+            "density": 70,
+            "scatter": 2143,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810169025984": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -92626,
+                0,
+                50885
+            ],
+            "end": [
+                -85262,
+                0,
+                47066
+            ],
+            "density": 75,
+            "scatter": 5160,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "2810173011776": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -32499,
+                0,
+                -3642
+            ],
+            "end": [
+                -28291,
+                0,
+                6801
+            ],
+            "density": 54,
+            "scatter": 3990,
+            "composition": []
+        },
+        "2810173000000": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                40910,
+                0,
+                -83714
+            ],
+            "end": [
+                61544,
+                0,
+                -103081
+            ],
+            "density": 166,
+            "scatter": 7105,
+            "composition": []
+        },
+        "2810173246144": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                45098,
+                0,
+                -101550
+            ],
+            "end": [
+                29324,
+                0,
+                -102712
+            ],
+            "density": 66,
+            "scatter": 1270,
+            "composition": []
+        },
+        "2810172999744": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                47517,
+                0,
+                -80356
+            ],
+            "end": [
+                66451,
+                0,
+                -75905
+            ],
+            "density": 34,
+            "scatter": 5008,
+            "composition": []
+        },
+        "2810173041600": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -48737,
+                0,
+                -67352
+            ],
+            "end": [
+                -60853,
+                0,
+                -72238
+            ],
+            "density": 86,
+            "scatter": 4899,
+            "composition": []
+        },
+        "2810173246976": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                1426,
+                0,
+                -39443
+            ],
+            "end": [
+                -6174,
+                0,
+                -60443
+            ],
+            "density": 125,
+            "scatter": 8212,
+            "composition": []
+        },
+        "2810173246912": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -76102,
+                0,
+                32400
+            ],
+            "end": [
+                -74964,
+                0,
+                53467
+            ],
+            "density": 90,
+            "scatter": 5875,
+            "composition": []
+        },
+        "2810173247424": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -94504,
+                0,
+                30671
+            ],
+            "end": [
+                -84851,
+                0,
+                42737
+            ],
+            "density": 129,
+            "scatter": 7246,
+            "composition": []
+        },
+        "4611686018427388820": {
+            "type": "blackhole",
+            "name": "Blackhole",
+            "coordinate": [
+                38790.0,
+                0.0,
+                -120662.0
+            ]
+        }
+    },
+    "traffic": {},
+    "sysdescription": "",
+    "metadata": {
+        "skybox": "sky1.png",
+        "sysdescription": "",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "intel": {},
+        "development": "Unclaimed",
+        "visible": true
+    }
+}
