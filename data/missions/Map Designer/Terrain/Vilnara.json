@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        5253.604247016917,
+        5253.604247016916,
         0,
-        11269.767710949256
+        11269.767710949254
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -10,13 +10,1219 @@
         "sysdescription": "",
         "security": "Neutral",
         "exports": [],
-        "focus": "",
-        "intel": {},
+        "focus": "Military",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": [
+                "Shipyard"
+            ]
+        },
         "development": "Unclaimed",
         "visible": true
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Saphire Jump Point": {
+            "coordinate": [
+                -1666.6666666666667,
+                0,
+                -0.0
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Antov Gate": "Freya"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Emerald Jump Point": {
+            "coordinate": [
+                100833.33333333334,
+                0,
+                -200833.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Transit Control": {
+            "coordinate": [
+                48333.333333333336,
+                0,
+                -87500.00000000001
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Concord Depot": {
+            "coordinate": [
+                -157849.72577065238,
+                0,
+                130643.37622408933
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 500,
+                "Nuke": 75,
+                "EMP": 156,
+                "Mine": 115,
+                "High Yield Warhead": 51,
+                "Warhead": 125,
+                "Torpedo Casing": 300,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 625
+            },
+            "teams": {
+                "DamCon": 10,
+                "Medics": 2,
+                "Combat Engineers": 10
+            },
+            "description": "entralized storage for torpedoes, mines, and shield capacitors. Security is tight."
+        },
+        "Munin": {
+            "coordinate": [
+                -154897.83442020536,
+                0,
+                134900.01655915842
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Small science station with long range sensors, several organisations have offices here including the Guild of shippers."
+        },
+        "Vilnara Comand": {
+            "coordinate": [
+                -153334.6791600441,
+                0,
+                125857.18261307199
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Command Complex, Includeed is a back up Command and control facility  for the Ashia Fleet Base."
+        },
+        "Seco Hall": {
+            "coordinate": [
+                -154269.31794991586,
+                0,
+                120529.74151080276
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Residentual complex for TSN Officers and dependents working localy"
+        },
+        "Newton Array": {
+            "coordinate": [
+                204336.15034613933,
+                0,
+                93492.10377176703
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Newton Array - Specilist in deep scanning and ship diagnostics part of the Basil Yards Group."
+        },
+        "Basil Yards": {
+            "coordinate": [
+                221914.86649110512,
+                0,
+                87650.87093076325
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_assembly",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Basil Yards is a civilian diagnostics and repair company."
+        },
+        "Manuel Towers": {
+            "coordinate": [
+                228644.97623047407,
+                0,
+                95637.51787863708
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Workers and dependents Acomidation"
+        },
+        "Prospero Refuleing": {
+            "coordinate": [
+                101156.49814480849,
+                0,
+                -70784.61962900579
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Ruby Medical Facility": {
+            "coordinate": [
+                -170794.21190935472,
+                0,
+                -232216.42816948087
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Medical Facilty, Joint venture between TSN and the Local Authoritys. Has an oversized burns and truma unit."
+        },
+        "DS 97": {
+            "coordinate": [
+                -233627.54524268807,
+                0,
+                -246549.76150281422
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 31": {
+            "coordinate": [
+                -172697.76129207076,
+                0,
+                -255029.6997744191
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "TSN Gregneck": {
+            "coordinate": [
+                -221853.60405613112,
+                0,
+                -213069.71606385673
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Engineering Training Facility for enlisted ranks"
+        },
+        "Osprey Entertainment": {
+            "coordinate": [
+                -207790.35388466337,
+                0,
+                -255812.8787867648
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Greybeard Industries": {
+            "coordinate": [
+                191666.6666666667,
+                0,
+                190000.00000000003
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "G Outfitting": {
+            "coordinate": [
+                189004.62962962964,
+                0,
+                211597.22222222225
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "A small but advanced comms and sensor station. Several Civilian organisations work out of here along side USFP civil intel;"
+        },
+        "G Fabrication": {
+            "coordinate": [
+                210416.6666666667,
+                0,
+                179189.81481481483
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Space Chief": {
+            "coordinate": [
+                10927.625703528387,
+                0,
+                -115532.83604842448
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "SQ 44": {
+            "coordinate": [
+                -4042.313854084765,
+                0,
+                -24523.194558941104
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "SQ 1123": {
+            "coordinate": [
+                60425.546656889186,
+                0,
+                -125271.66921029001
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 69": {
+            "coordinate": [
+                -156042.6157931304,
+                0,
+                136111.6478842543
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 50": {
+            "coordinate": [
+                -153682.2802432195,
+                0,
+                134793.58603115063
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 59": {
+            "coordinate": [
+                -148838.52913814705,
+                0,
+                128553.88650715185
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 96": {
+            "coordinate": [
+                -148838.52913814705,
+                0,
+                124737.44478184203
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 72": {
+            "coordinate": [
+                -152229.599634373,
+                0,
+                120781.8168787195
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 8": {
+            "coordinate": [
+                -157119.38554609678,
+                0,
+                120488.48020604948
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 43": {
+            "coordinate": [
+                -163349.16895639125,
+                0,
+                123665.24245094552
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 23": {
+            "coordinate": [
+                -164044.61906418425,
+                0,
+                127343.63985396009
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 3": {
+            "coordinate": [
+                -160748.02208761356,
+                0,
+                130824.31595947736
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 44": {
+            "coordinate": [
+                -159541.50148926824,
+                0,
+                132469.36917418675
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 49": {
+            "coordinate": [
+                -154829.30415933917,
+                0,
+                125425.74326823617
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 35": {
+            "coordinate": [
+                -151810.41846414693,
+                0,
+                130548.04702191045
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 21": {
+            "coordinate": [
+                -156065.39280582083,
+                0,
+                128873.72624735873
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "C TS 03": {
+            "coordinate": [
+                -163889.38359077784,
+                0,
+                124903.0509754345
+            ],
+            "sides": [
+                "TSN"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Alvarez Transfer Station: A massive cargo-transfer hub with standardized docking collars for freighters. The local customs corps are known to be thorough but fair."
+        },
+        "PR R1": {
+            "coordinate": [
+                110217.48849915138,
+                0,
+                -73434.8426920066
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_unit",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "PR R2": {
+            "coordinate": [
+                101322.40701591023,
+                0,
+                -63425.15734604833
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_unit",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "PR Processing": {
+            "coordinate": [
+                114225.41104414579,
+                0,
+                -62960.23660810276
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "PR S1": {
+            "coordinate": [
+                108427.57595917751,
+                0,
+                -67815.74045210308
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
+    "sensor_relay": {
+        "SR 65": {
+            "coordinate": [
+                -108334.67916004412,
+                0,
+                128567.63510370017
+            ]
+        },
+        "SR 21": {
+            "coordinate": [
+                -125277.63807640111,
+                0,
+                163750.0518147615
+            ]
+        },
+        "SR 84": {
+            "coordinate": [
+                -163348.12118807828,
+                0,
+                172439.39115188224
+            ]
+        },
+        "SR 58": {
+            "coordinate": [
+                -193878.27821565297,
+                0,
+                148092.4033639903
+            ]
+        },
+        "SR 60": {
+            "coordinate": [
+                -193878.27821565297,
+                0,
+                109042.86684341007
+            ]
+        },
+        "SR 27": {
+            "coordinate": [
+                -163348.12118807828,
+                0,
+                84695.8790555181
+            ]
+        },
+        "Concord": {
+            "coordinate": [
+                -153334.67916004412,
+                0,
+                128567.63510370017
+            ],
+            "description": "Command and Logistics hub for the TSN"
+        },
+        "SR 74": {
+            "coordinate": [
+                -206100.2119093548,
+                0,
+                -232540.20594725863
+            ]
+        },
+        "SR 35": {
+            "coordinate": [
+                -171100.2119093548,
+                0,
+                -205373.53928059197
+            ]
+        },
+        "SR 53": {
+            "coordinate": [
+                -136100.2119093548,
+                0,
+                -178206.8726139253
+            ]
+        },
+        "SR 37": {
+            "coordinate": [
+                -101100.21190935481,
+                0,
+                -151040.20594725863
+            ]
+        },
+        "SR 20": {
+            "coordinate": [
+                -66100.21190935481,
+                0,
+                -123873.53928059197
+            ]
+        },
+        "SR 97": {
+            "coordinate": [
+                38899.78809064522,
+                0,
+                -42373.53928059194
+            ]
+        },
+        "SR 90": {
+            "coordinate": [
+                73899.78809064519,
+                0,
+                -15206.872613925312
+            ]
+        },
+        "SR 68": {
+            "coordinate": [
+                108899.78809064519,
+                0,
+                11959.794052741374
+            ]
+        },
+        "SR 42": {
+            "coordinate": [
+                143899.7880906452,
+                0,
+                39126.46071940806
+            ]
+        },
+        "SR 86": {
+            "coordinate": [
+                178899.7880906452,
+                0,
+                66293.12738607469
+            ]
+        },
+        "SR 69": {
+            "coordinate": [
+                213899.7880906452,
+                0,
+                93459.79405274137
+            ]
+        },
+        "SR 99": {
+            "coordinate": [
+                105899.78809064519,
+                0,
+                -207540.20594725863
+            ]
+        },
+        "SR 25": {
+            "coordinate": [
+                79455.34364620075,
+                0,
+                -172984.65039170306
+            ]
+        },
+        "SR 63": {
+            "coordinate": [
+                53010.89920175631,
+                0,
+                -138429.0948361475
+            ]
+        },
+        "SR 11": {
+            "coordinate": [
+                26566.45475731186,
+                0,
+                -103873.53928059197
+            ]
+        },
+        "SR 76": {
+            "coordinate": [
+                -52766.87857602147,
+                0,
+                -206.87261392531218
+            ]
+        },
+        "SR 82": {
+            "coordinate": [
+                -79211.32302046593,
+                0,
+                34348.68294163028
+            ]
+        },
+        "SR 31": {
+            "coordinate": [
+                -105655.76746491034,
+                0,
+                68904.23849718581
+            ]
+        },
+        "SR 45": {
+            "coordinate": [
+                -132100.2119093548,
+                0,
+                103459.79405274137
+            ]
+        },
+        "SR 81": {
+            "coordinate": [
+                45149.78809064519,
+                0,
+                -64841.13187318455
+            ]
+        },
+        "SR 50": {
+            "coordinate": [
+                28206.829174288203,
+                0,
+                -29658.71516212321
+            ]
+        },
+        "SR 36": {
+            "coordinate": [
+                -9863.653937388954,
+                0,
+                -20969.37582500249
+            ]
+        },
+        "SR 75": {
+            "coordinate": [
+                -40393.81096496367,
+                0,
+                -45316.363612894434
+            ]
+        },
+        "SR 56": {
+            "coordinate": [
+                -40393.81096496367,
+                0,
+                -84365.90013347467
+            ]
+        },
+        "SR 15": {
+            "coordinate": [
+                -9863.653937388965,
+                0,
+                -108712.88792136661
+            ]
+        },
+        "SR 72": {
+            "coordinate": [
+                82197.11319352587,
+                0,
+                -66188.76133134642
+            ]
+        },
+        "PR Holding 1": {
+            "coordinate": [
+                96597.7261907824,
+                0,
+                -84608.15004876755
+            ]
+        },
+        "PR Holding 2": {
+            "coordinate": [
+                87555.48082041203,
+                0,
+                -46094.88273052338
+            ]
+        },
+        "Prospero Point": {
+            "coordinate": [
+                126068.74813865621,
+                0,
+                -68533.04716810911
+            ]
+        },
+        "SR 17": {
+            "coordinate": [
+                198046.09206726853,
+                0,
+                195525.00360063807
+            ]
+        },
+        "SR 94": {
+            "coordinate": [
+                243046.09206726853,
+                0,
+                195525.00360063807
+            ]
+        },
+        "SR 32": {
+            "coordinate": [
+                188032.65003923437,
+                0,
+                239396.75964882012
+            ]
+        },
+        "SR 14": {
+            "coordinate": [
+                157502.49301165968,
+                0,
+                215049.7718609282
+            ]
+        },
+        "SR 22": {
+            "coordinate": [
+                157502.49301165968,
+                0,
+                176000.23534034795
+            ]
+        },
+        "SR 33": {
+            "coordinate": [
+                188032.65003923437,
+                0,
+                151653.247552456
+            ]
+        },
+        "SR 28": {
+            "coordinate": [
+                226103.13315091154,
+                0,
+                160342.58688957672
+            ]
+        },
+        "SR 55": {
+            "coordinate": [
+                -60.33725943465774,
+                0,
+                18971.073416596057
+            ]
+        },
+        "SR 48": {
+            "coordinate": [
+                77502.0341397423,
+                0,
+                -111639.13748875375
+            ]
+        },
+        "Vilnara Cross": {
+            "coordinate": [
+                149.78809064519146,
+                0,
+                -64841.13187318455
+            ]
+        },
+        "Lee Hunt Nebular": {
+            "coordinate": [
+                227490.6307949754,
+                0,
+                229039.31166409462
+            ]
+        }
+    },
+    "terrain": {
+        "1752257543873": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                259899.78809064528,
+                0,
+                194793.1273860747
+            ],
+            "end": [
+                207399.78809064525,
+                0,
+                263959.7940527414
+            ],
+            "density": 600,
+            "scatter": 30000,
+            "composition": []
+        },
+        "1752257552227": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                283233.1214239786,
+                0,
+                197293.1273860747
+            ],
+            "end": [
+                257399.78809064528,
+                0,
+                72293.12738607467
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752257557392": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                149066.4547573119,
+                0,
+                -30206.872613925338
+            ],
+            "end": [
+                144066.4547573119,
+                0,
+                39793.127386074666
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752257560452": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                146566.4547573119,
+                0,
+                39793.127386074666
+            ],
+            "end": [
+                181566.4547573119,
+                0,
+                57293.127386074666
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752257565663": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                175733.12142397856,
+                0,
+                51459.79405274134
+            ],
+            "end": [
+                216566.45475731193,
+                0,
+                33959.79405274133
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752257569516": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                208233.12142397856,
+                0,
+                37293.127386074666
+            ],
+            "end": [
+                265733.1214239786,
+                0,
+                77293.12738607467
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752257587470": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                270899.78809064516,
+                0,
+                -46540.20594725864
+            ],
+            "end": [
+                214899.78809064522,
+                0,
+                -238540.20594725863
+            ],
+            "density": 700,
+            "scatter": 80000,
+            "composition": []
+        },
+        "1752258362019": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -244488.30590410222,
+                0,
+                -73948.37426499157
+            ],
+            "end": [
+                -149488.30590410222,
+                0,
+                -129948.37426499157
+            ],
+            "density": 125,
+            "scatter": 25000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752258367847": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -219488.30590410222,
+                0,
+                -38948.37426499157
+            ],
+            "end": [
+                -163488.30590410222,
+                0,
+                10051.625735008429
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1752258371711": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -51488.30590410222,
+                0,
+                157051.62573500842
+            ],
+            "end": [
+                -13488.305904102219,
+                0,
+                59051.62573500843
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1752258388808": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -79488.30590410222,
+                0,
+                -276948.37426499155
+            ],
+            "end": [
+                -55488.30590410222,
+                0,
+                -269948.37426499155
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752258397618": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -349093.10590410215,
+                0,
+                -319314.7742649917
+            ],
+            "end": [
+                -401347.8259041021,
+                0,
+                -374057.81426499167
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        }
+    },
     "traffic": {}
 }

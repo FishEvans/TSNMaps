@@ -232,7 +232,7 @@ def on_canvas_press(event, ctx):
             # insert as a jump_point object
             sm.data.setdefault('objects', {})[name] = {
                 'coordinate': [gx, 0, gz],
-                'type': 'jump_point',
+                'type': 'jumpnode',
                 'jumppointtype': 'Node',
                 'destinations': {},
                 'state': 'Tethered',

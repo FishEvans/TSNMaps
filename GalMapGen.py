@@ -167,15 +167,16 @@ def main():
                 cy = pos[2] if len(pos) > 2 else pos[1]
                 tx, ty = pos[0] * SCALE + OFFSET_X, cy * SCALE + OFFSET_Y
                 size = text.get("size", 12)
-                line_height = size * 1.2
+                # use em-units for line spacing so multi-line text scales correctly
+                line_height_em = 1.2
                 tspans = ''.join(
-                    f'<tspan x="{tx}" dy="{line_height if i else 0}">{line}</tspan>'
+                    f'<tspan x="{tx}" dy="{(line_height_em if i else 0)}em">{line}</tspan>'
                     for i, line in enumerate(text.get("lines", []))
-                    )
+                )
                 svg_lines.append(
-                    f'<text x="{tx}" y="{ty}" fill="{text.get("color", "white")}" '
+                    f'<text data-base-size="{size}" x="{tx}" y="{ty}" fill="{text.get("color","white")}" '
                     f'font-size="{size}">{tspans}</text>'
-                    )
+                )
         except json.JSONDecodeError:
             print("Warning: Could not parse GalMapInfo.json, skipping overlays.")
 
@@ -198,9 +199,10 @@ def main():
     # Controls HTML
     home_button_html = '<button onclick="resetZoom()" class="system-button" style="background-color:#222;width:100%;font-size:16pt;">Home</button>'
     system_list_html = ''.join(
-        f"<button class='system-button' onclick=\"document.location.href='{quote(s['name'])}.html'\">{s['name']}</button>"
+        f"<button class='system-button' data-system=\"{s['name']}\" onclick=\"document.location.href='{quote(s['name'])}.html'\">"
+        f"<img src=\"Images/Factions/{system_meta[s['name']]['alignment']}.png\" class=\"button-icon\" alt=\"{system_meta[s['name']]['alignment']}\" />{s['name']}</button>"
         for s in sorted(systems, key=lambda x: x['name'])
-        )
+    )
 
     # Compose final HTMLs
     # Serialize system metadata for JS
@@ -214,7 +216,8 @@ def main():
   <style>
     body {{ margin:0; background:black; color:white; display:flex; height:100vh; }}
     #controls {{ width:200px; background:#333; padding:10px; overflow-y:auto; }}
-    .system-button {{ width:100%; padding:2px; font-size:14pt; background:#444; color:white; border:none; margin-bottom:5px; cursor:pointer; text-align:left; }}
+    .system-button {{ width:100%; padding:2px; font-size:14pt; background:#444; color:white; border:none; margin-bottom:5px; cursor:pointer; text-align:left; display:flex; align-items:center; }}
+    .system-button .button-icon {{ height:1em; width:auto; margin-right:0.5em; }}
     #maparea {{ flex:1; position:relative; background:url("Images/starfield.jpg") center/cover; overflow:hidden; cursor: grab; }}
     #map {{ width: {pan_w}px; height: {pan_h}px; transform-origin: top left; cursor: grab; }}
     .map-container {{ position:absolute; top:0; left:0; }}
@@ -269,6 +272,11 @@ def main():
 <body>
   <div id="controls">
     <h2>Systems</h2>
+    <input type="text" id="system-search" placeholder="Search systems..." style="width:100%; padding:5px; margin-bottom:5px;" />
+    <div id="sort-options" style="margin-bottom:5px;">
+      <label><input type="radio" name="sort" value="name" checked /> A-Z</label>
+      <label style="margin-left:10px;"><input type="radio" name="sort" value="alignment" /> Alignment</label>
+    </div>
     {system_list_html}
   </div>
   <div id="maparea">
@@ -355,6 +363,16 @@ def main():
           : 1 / scale;
         icon.style.transform = `scale(${{iconScale}})`;
       }});
+      // Keep free‐floating text at least 24px on‐screen:
+      document.querySelectorAll('svg text[data-base-size]').forEach(el => {{
+        const baseSize   = parseFloat(el.getAttribute('data-base-size'));
+        const screenSize = Math.max(32, baseSize * scale);
+        // undo the map’s scale so font renders at `screenSize` px exactly
+        const attrSize   = screenSize / scale;
+        el.setAttribute('font-size', attrSize);
+      }}); 
+      
+      
     }}
 
     maparea.addEventListener('mousedown', e => {{
@@ -424,7 +442,42 @@ def main():
       }});
     }});
   
+  // system search filter
+  const searchInput = document.getElementById('system-search');
+  searchInput.addEventListener('input', () => {{
+    const term = searchInput.value.toLowerCase();
+    document.querySelectorAll('.system-button').forEach(btn => {{
+      const name = btn.getAttribute('data-system').toLowerCase();
+      btn.style.display = name.includes(term) ? '' : 'none';
+    }});
+  }});
+  // sort functionality
+  document.querySelectorAll('input[name="sort"]').forEach(radio => {{
+    radio.addEventListener('change', reorderButtons);
+  }});
+  function reorderButtons() {{
+    const container = document.getElementById('controls');
+    const sortBy = document.querySelector('input[name="sort"]:checked').value;
+    const buttons = Array.from(container.querySelectorAll('.system-button'));
+    buttons.sort((a, b) => {{
+      const nameA = a.getAttribute('data-system');
+      const nameB = b.getAttribute('data-system');
+      if (sortBy === 'name') {{
+        return nameA.localeCompare(nameB);
+      }}
+      const alignA = systemMeta[nameA].alignment || '';
+      const alignB = systemMeta[nameB].alignment || '';
+      if (alignA !== alignB) {{
+        return alignA.localeCompare(alignB);
+      }}
+      return nameA.localeCompare(nameB);
+    }});
+    buttons.forEach(btn => container.appendChild(btn));
+  }}
+  // initialize sort order
+  reorderButtons();
   </script>
+
 </body>
 </html>'''
 

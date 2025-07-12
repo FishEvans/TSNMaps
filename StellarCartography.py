@@ -949,14 +949,32 @@ class SystemMapEditor:
         except Exception as e:
             print(f"Failed to load system metadata from {file_path}: {e}")
 
-        # Now patch system with metadata values if not already set
-        system.setdefault("description", meta.get("sysdescription", ""))
-        system.setdefault("security", meta.get("security", "Neutral"))
-        system.setdefault("exports", meta.get("exports", []))
-        system.setdefault("focus", meta.get("focus", ""))
-        system.setdefault("intel", meta.get("intel", {}))
-        system.setdefault("development", meta.get("development", "Unclaimed"))
-        system.setdefault("visible", meta.get("visible", True))
+        # Fully reload this system's data from disk
+        objects = data.get("objects", {})
+        jump_points = [
+            {"name": key, **value}
+            for key, value in objects.items()
+            if value.get("type") in ("jumppoint", "jumpnode")
+        ]
+        meta = data.get("metadata", {})
+        self.systems[filename] = {
+            "coord": data.get("systemMapCoord", [0, 0, 0]),
+            "alignment": data.get("systemalignment", "Unknown"),
+            "description": meta.get("sysdescription", ""),
+            "security": meta.get("security", "Neutral"),
+            "exports": meta.get("exports", []),
+            "focus": meta.get("focus", ""),
+            "intel": meta.get("intel", {}),
+            "development": meta.get("development", "Unclaimed"),
+            "visible": meta.get("visible", True),
+            "jump_points": jump_points,
+            "canvas_items": [],
+            "warning_circle": None,
+            "link_lines": [],
+            "incoming_lines": []
+        }
+        system = self.systems[filename]
+        self.root.after(100, self.redraw_map)
         top = tk.Toplevel(self.root)
         top.title(f"Edit System: {filename}")
 
@@ -1063,6 +1081,7 @@ class SystemMapEditor:
             # Persist all changes
             self.save_system_properties(filename)
             top.destroy()
+            self.redraw_map()
 
         tk.Button(top, text="Save", command=save_system_changes).pack(pady=10)
 

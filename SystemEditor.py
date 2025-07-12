@@ -1072,7 +1072,7 @@ def open_system_editor(filename: str) -> None:
                         other_sm = SystemMap(os.path.join(data_base, sv.get()+'.json'))
                         gate_opts = sorted(
                             [k for k,v in other_sm.data.get('objects',{}).items()
-                             if v.get('type')=='jump_point']
+                             if v.get('type') in ('jumpnode','jumppoint')]
                         )
                     except:
                         pass
@@ -1104,7 +1104,7 @@ def open_system_editor(filename: str) -> None:
                         sm2 = SystemMap(os.path.join(data_base, sys_name + '.json'))
                         opts = sorted(
                             [k for k,v in sm2.data.get('objects',{}).items()
-                             if v.get('type')=='jump_point']
+                             if v.get('type') in ('jumpnode','jumppoint')]
                         )
                     except:
                         pass

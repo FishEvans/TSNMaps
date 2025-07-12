@@ -1,6 +1,6 @@
 {
     "systemMapCoord": [
-        9320.696439174328,
+        9320.696439174315,
         0,
         19795.245878563477
     ],
@@ -623,9 +623,9 @@
         },
         "A": {
             "coordinate": [
-                65678.16585183828,
+                126511.49918517159,
                 0,
-                -211289.3435235594
+                -374622.67685689277
             ],
             "sides": [
                 "pirate"
@@ -688,7 +688,7 @@
             "cargo": {},
             "teams": {},
             "description": "Bluefield Industrial Polishing Complex. ^Private Property",
-            "hideonmap": true
+            "hideonmap": false
         },
         "BF 03": {
             "coordinate": [
@@ -705,7 +705,7 @@
             "cargo": {},
             "teams": {},
             "description": "Bluefield Processing Unit, ^Private Property",
-            "hideonmap": true
+            "hideonmap": false
         }
     },
     "terrain": {
@@ -1216,6 +1216,45 @@
             "size": 1000,
             "strength": 500,
             "description": "This singularity is the focus of a number or research projects by notable scientist Dr. Rosenberg"
+        },
+        "1752258427766": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -18333.333333333336,
+                0,
+                -201666.6666666667
+            ],
+            "end": [
+                159166.6666666667,
+                0,
+                -359166.6666666667
+            ],
+            "density": 125,
+            "scatter": 40000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1752258452652": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -331666.6666666667,
+                0,
+                -342500.00000000006
+            ],
+            "end": [
+                -151666.6666666667,
+                0,
+                -403333.3333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
         }
     },
     "sensor_relay": {

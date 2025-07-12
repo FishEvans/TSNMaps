@@ -1,12 +1,12 @@
 {
     "systemMapCoord": [
-        -434.2906703535841,
+        -434.2906703535783,
         0,
-        15350.665952920586
+        15350.665952920584
     ],
     "systemalignment": "USFP",
     "metadata": {
-        "sysdescription": "System discovered in XXXX. Principally a Research system with light industry and a rear storage armory",
+        "sysdescription": "System discovered in 2355. Principally a Research system with light industry and a rear storage armory",
         "skybox": "sky1.png",
         "security": "Normal",
         "exports": [
@@ -551,7 +551,9 @@
             ],
             "type": "jumpnode",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Saphire Jump Point": "Vilnara"
+            },
             "state": "Tethered",
             "drift": 0
         },
