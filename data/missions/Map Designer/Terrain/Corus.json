@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -5652.723247526899,
+        3809.947923624401,
         0,
-        16396.388709761533
+        24787.020478535385
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -55,9 +55,9 @@
         },
         "Corus Gate Control": {
             "coordinate": [
-                -100000.00000000001,
+                -102411.26543209878,
                 0,
-                -34166.66666666667
+                -30308.64197530864
             ],
             "sides": [
                 "USFP"
@@ -68,8 +68,25 @@
                 "Docking",
                 "Refuel"
             ],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Homing": 49,
+                "Nuke": 1,
+                "EMP": 7,
+                "Mine": 4,
+                "High Yield Warhead": 17,
+                "Warhead": 55,
+                "Torpedo Casing": 59,
+                "Casing": 52,
+                "Navigational Array": 1,
+                "Tactical Array": 9,
+                "Guidance System": 66
+            },
+            "teams": {
+                "DamCon": 7,
+                "Medics": 1,
+                "Combat Engineers": 2
+            },
+            "description": ""
         },
         "Port Godunk": {
             "coordinate": [
@@ -82,9 +99,33 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Homing": 30,
+                "Nuke": 12,
+                "EMP": 12,
+                "Mine": 12,
+                "High Yield Warhead": 15,
+                "Warhead": 2,
+                "Torpedo Casing": 40,
+                "Casing": 16,
+                "Transmitter": 35,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Sensor Suite": 6,
+                "Guidance System": 60,
+                "Receiver": 15
+            },
+            "teams": {
+                "DamCon": 8,
+                "Medics": 2,
+                "Combat Engineers": 3,
+                "Marines": 12
+            },
+            "description": ""
         },
         "Fort Grey": {
             "coordinate": [
@@ -133,8 +174,33 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
         },
         "DW 16": {
             "coordinate": [
@@ -162,9 +228,30 @@
             ],
             "hull": "starbase_science",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 9,
+                "Life Support": 2,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 9,
+                "Receiver": 8,
+                "Analysis Suite": 7,
+                "Sensor Suite": 7,
+                "Guidance System": 16,
+                "Wild Animals": 14,
+                "Casing": 16,
+                "EMP": 8,
+                "Homing": 31
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": ""
         },
         "DW SM1": {
             "coordinate": [
@@ -270,12 +357,16 @@
                 "Warhead": 10,
                 "Life Support": 1,
                 "Micro Controller": 8,
-                "Power Relay": 16
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
             },
             "teams": {
-                "DamCon": 0,
+                "DamCon": 1,
                 "Medics": 0
-            }
+            },
+            "description": ""
         },
         "MM Processing": {
             "coordinate": [
@@ -289,8 +380,30 @@
             "hull": "usfp_industrial_processor",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": ""
         },
         "MM SM1": {
             "coordinate": [
@@ -304,8 +417,30 @@
             "hull": "usfp_industrial_storage",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Iron": 750,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 815,
+                "Ashfilum": 258,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 180,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
         },
         "DS 22": {
             "coordinate": [
@@ -319,8 +454,26 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Repair Materials": 18,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 21,
+                "Container": 32,
+                "Life Support": 3,
+                "Micro Controller": 6,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 3,
+                "Coffee": 7,
+                "Tea": 6,
+                "Alcohol": 3
+            },
+            "teams": {
+                "Diplomats": 0
+            },
+            "description": ""
         },
         "DS 80": {
             "coordinate": [
@@ -334,8 +487,26 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 12,
+                "Iso B Circuit": 28,
+                "Container": 24,
+                "Life Support": 2,
+                "Micro Controller": 9,
+                "Power Relay": 15,
+                "Aid Package": 14,
+                "Pets": 3,
+                "Torpedo Casing": 3,
+                "Casing": 5,
+                "Coffee": 5,
+                "Tea": 7,
+                "Alcohol": 4
+            },
+            "teams": {
+                "Diplomats": 0
+            },
+            "description": ""
         },
         "DS 70": {
             "coordinate": [
@@ -348,9 +519,29 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 23,
+                "Container": 25,
+                "Life Support": 0,
+                "Micro Controller": 8,
+                "Power Relay": 17,
+                "Aid Package": 17,
+                "Pets": 3,
+                "Torpedo Casing": 5,
+                "Casing": 5,
+                "Coffee": 6,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 0
+            },
+            "description": ""
         },
         "RS 15": {
             "coordinate": [

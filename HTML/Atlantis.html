@@ -20,9 +20,14 @@
 </head>
 <body>
     <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Atlantis</h2>
         <h3 class="subheader">Alignment: USFP</h3>
         <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
     </div>
     <div id="plot"></div>
     <div id="info">
@@ -54,6 +59,10 @@
     
     function highlight(name) {
         var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
         var annotation = {
             x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
             showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
@@ -62,7 +71,8 @@
 
         Plotly.relayout('plot', {annotations: [annotation]});
 
-        var infoHtml = '<span style="font-size:20pt;">' + name + '</span><br>';
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
         infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
 
         if (obj.type === 'station') {
@@ -117,6 +127,9 @@
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Atlantis';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -149,10 +162,11 @@
         }
     });
 
-  var ctrl = document.getElementById('controls');
+  var ctrl = document.getElementById('object-buttons');
 
   // Helper: create and append a single button
-  function addButton(label, fn, header, color) {
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
     var btn = document.createElement('button');
     btn.textContent = label;
     if (header) {
@@ -164,6 +178,42 @@
     }
     ctrl.appendChild(btn);
   }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
@@ -177,6 +227,20 @@
   addButton('--- Stations ---', null, true, null);
   
     
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
 </script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -31855.182707939184,
+        -32117.95544282902,
         0,
-        3548.6391366289918
+        4749.88592469546
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -62,7 +62,9 @@
             ],
             "hull": "starbase_science",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "High Yield Warhead": 10,
                 "Life Support": 3,
@@ -95,21 +97,25 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 150,
-                "Nuke": 25,
-                "EMP": 25,
-                "Mine": 20,
-                "High Yield Warhead": 5,
-                "Warhead": 25,
-                "Torpedo Casing": 100,
-                "Navigational Array": 1,
+                "Homing": 83,
+                "Nuke": 12,
+                "EMP": 13,
+                "Mine": 14,
+                "High Yield Warhead": 17,
+                "Warhead": 56,
+                "Torpedo Casing": 38,
+                "Casing": 17,
+                "Transmitter": 40,
+                "Navigational Array": 2,
                 "Tactical Array": 10,
-                "Guidance System": 60
+                "Sensor Suite": 5,
+                "Guidance System": 57,
+                "Receiver": 13
             },
             "teams": {
-                "DamCon": 10,
-                "Medics": 2,
-                "Combat Engineers": 10
+                "DamCon": 9,
+                "Medics": 1,
+                "Combat Engineers": 9
             },
             "description": "Dannae Command Base for TSN and local Security Operations"
         },
@@ -219,7 +225,8 @@
             "teams": {
                 "DamCon": 0,
                 "Medics": 0
-            }
+            },
+            "description": ""
         },
         "M 762": {
             "coordinate": [
@@ -255,7 +262,8 @@
             "teams": {
                 "DamCon": 0,
                 "Medics": 0
-            }
+            },
+            "description": ""
         },
         "M 521": {
             "coordinate": [
@@ -308,18 +316,6 @@
             "state": "Untethered",
             "drift": 60000,
             "hideonmap": true
-        },
-        "JP 59": {
-            "coordinate": [
-                34967.422144682416,
-                0,
-                318516.71600940445
-            ],
-            "type": "jumpnode",
-            "jumppointtype": "Node",
-            "destinations": {},
-            "state": "Tethered",
-            "drift": 0
         },
         "WP 84": {
             "coordinate": [
@@ -561,7 +557,9 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Repair Materials": 16,
                 "Medical Supplies": 30,
@@ -574,7 +572,8 @@
             },
             "teams": {
                 "Diplomats": 1
-            }
+            },
+            "description": ""
         },
         "USFP Inspections 23": {
             "coordinate": [
@@ -593,18 +592,24 @@
                 "Repair"
             ],
             "cargo": {
-                "Repair Materials": 16,
-                "Medical Supplies": 30,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
-                "Micro Controller": 8,
-                "Power Relay": 16,
-                "Aid Package": 16
+                "Homing": 50,
+                "Nuke": 2,
+                "EMP": 6,
+                "Mine": 6,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 60,
+                "Casing": 60,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 60
             },
             "teams": {
-                "Diplomats": 1
-            }
+                "DamCon": 8,
+                "Medics": 2,
+                "Combat Engineers": 2
+            },
+            "description": "Boarder Inspections and custom station 23."
         }
     },
     "sensor_relay": {

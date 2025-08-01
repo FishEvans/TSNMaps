@@ -1,6 +1,9 @@
 import os
 import tkinter as tk
 from tkinter import ttk
+
+import CenteringTool
+import ResizeTool
 from PIL import Image, ImageTk
 import random
 import math
@@ -29,12 +32,23 @@ class Toolbar:
         # Toolbar frame
         self.frame = parent
 
-        # Buttons: station, single relay, batch relay, asteroid, nebula, blackhole
-        icons = ['Station.png','Relay.png','RelayP.png','Asteroid.png','Nebular.png','Blackhole.png','Platform.png','Gate.png']
-        cmds  = [self.toggle_station_mode,self.toggle_sensor_mode,self.configure_multi_relay,
-                 self.toggle_asteroid_mode,self.toggle_nebula_mode,self.toggle_blackhole_mode,
-                 self.toggle_platform_mode,self.toggle_gate_mode]
-        refs  = ['station_btn','sensor_btn','multi_btn','asteroid_btn','nebula_btn','blackhole_btn','platform_btn','gate_btn']
+        # Buttons: station, single relay, batch relay, asteroid, nebula, blackhole, plus our new Center/Scale tool
+        icons = [
+            'Station.png','Relay.png','RelayP.png','Asteroid.png',
+            'Nebular.png','Blackhole.png','Platform.png','Gate.png',
+            'Center.png'
+        ]
+        cmds  = [
+            self.toggle_station_mode,self.toggle_sensor_mode,self.configure_multi_relay,
+            self.toggle_asteroid_mode,self.toggle_nebula_mode,self.toggle_blackhole_mode,
+            self.toggle_platform_mode,self.toggle_gate_mode,
+            self.open_center_dialog
+        ]
+        refs  = [
+            'station_btn','sensor_btn','multi_btn','asteroid_btn',
+            'nebula_btn','blackhole_btn','platform_btn','gate_btn',
+            'center_btn'
+        ]
         for icon, cmd, ref in zip(icons, cmds, refs):
             container = tk.Frame(self.frame, width=35, height=35)
             container.pack(side=tk.LEFT, padx=5)
@@ -60,6 +74,43 @@ class Toolbar:
         else:
             btn = tk.Button(parent, text='', command=command, bg='#333333', activebackground='#333333')
         return btn
+
+    def open_center_dialog(self):
+        # Dialog for centering and optional scaling
+        dlg = tk.Toplevel(self.frame)
+        dlg.title("Center and Scale System")
+        # Scale multiplier input
+        tk.Label(dlg, text="Scale multiplier:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
+        scale_var = tk.DoubleVar(value=1.0)
+        tk.Entry(dlg, textvariable=scale_var).grid(row=0, column=1, padx=5, pady=5)
+
+        def center_only():
+            try:
+                CenteringTool.shift_coordinates(self.sm.file_path)
+            except Exception as e:
+                tk.messagebox.showerror("Center Error", f"Failed to center system:\n{e}")
+            dlg.destroy()
+
+        def center_and_resize():
+            try:
+                # Center first
+                CenteringTool.shift_coordinates(self.sm.file_path)
+                # Then resize (stubbed)
+                ResizeTool.scale_system(self.sm.file_path, scale_var.get())
+            except Exception as e:
+                tk.messagebox.showerror("Center/Resize Error", f"Failed to center/resize system:\n{e}")
+            dlg.destroy()
+
+        # Action buttons
+        tk.Button(dlg, text="Center Only",      command=center_only)     .grid(row=1, column=0, padx=5, pady=10)
+        tk.Button(dlg, text="Center & Resize",  command=center_and_resize).grid(row=1, column=1, padx=5, pady=10)
+
+        # Center dialog relative to toolbar
+        dlg.update_idletasks()
+        w, h = dlg.winfo_width(), dlg.winfo_height()
+        px = self.frame.winfo_rootx() + self.frame.winfo_width() // 2
+        py = self.frame.winfo_rooty() + self.frame.winfo_height() // 2
+        dlg.geometry(f"+{px - w//2}+{py - h//2}")
 
     def gen_platform_name(self):
         """Produce a unique WP## name for platforms."""

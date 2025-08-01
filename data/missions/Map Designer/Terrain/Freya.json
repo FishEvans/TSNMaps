@@ -1,12 +1,12 @@
 {
     "systemMapCoord": [
-        -434.2906703535783,
+        13320.465006399725,
         0,
-        15350.665952920584
+        22662.1009875019
     ],
     "systemalignment": "USFP",
     "metadata": {
-        "sysdescription": "System discovered in 2355. Principally a Research system with light industry and a rear storage armory",
+        "sysdescription": "System discovered in XXXX. Principally a Research system with light industry and a rear storage armory",
         "skybox": "sky1.png",
         "security": "Normal",
         "exports": [
@@ -97,7 +97,7 @@
                 "Marines": 2,
                 "Combat Engineers": 4
             },
-            "description": "Station ZERO is a TSN Facility focused on stratigic analises. it contains a back up comand complex and advanced AI. Its unusual name is due to an administraive joke."
+            "description": "Station ZERO is a TSN Facility focused on strategic analysis. it contains a back up command complex and advanced AI. Its unusual name is due to an administrative joke."
         },
         "Dilko Gases": {
             "coordinate": [
@@ -182,7 +182,7 @@
             "teams": {
                 "Diplomats": 1
             },
-            "description": "Residentual Complex for Local Workers, Conditions are marginal and criminality rife onboard."
+            "description": "Residential Complex for Local Workers, Conditions are marginal and criminality rife onboard."
         },
         "Dilko Ore Processing": {
             "coordinate": [
@@ -230,7 +230,7 @@
             "teams": {
                 "Diplomats": 1
             },
-            "description": "Civilian faciltiys - Average."
+            "description": "Civilian facilities - Average."
         },
         "Direct Wearhouseing ": {
             "coordinate": [
@@ -282,7 +282,7 @@
                 "Medics": 2,
                 "Evacuees": 1
             },
-            "description": "Resturant at the end of the Universe, or posibly just your  balance"
+            "description": "Restaurant at the end of the Universe, or possibly just your  balance"
         },
         "3 Luck Casino Complex": {
             "coordinate": [
@@ -307,9 +307,9 @@
         },
         "Port Merry": {
             "coordinate": [
-                364583.3333333334,
+                376583.84416438045,
                 0,
-                -60555.55555555559
+                -50229.53460791041
             ],
             "sides": [
                 "Pirate"
@@ -319,7 +319,8 @@
             "facilities": [],
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": true,
+            "description": ""
         },
         "Sudan Gate": {
             "coordinate": [
@@ -330,7 +331,7 @@
             "type": "jumpnode",
             "jumppointtype": "Node",
             "destinations": {
-                "Maximillion Gate": "Corus"
+                "Unknown": "Unknown"
             },
             "state": "Tethered",
             "drift": 0
@@ -371,9 +372,9 @@
         },
         "RS 25": {
             "coordinate": [
-                -89473.1875,
-                0.0,
-                -70994.1953125
+                -95836.24905692729,
+                0,
+                -60947.25601208848
             ],
             "sides": [
                 "USFP"
@@ -387,7 +388,7 @@
             "teams": {
                 "Medics": 2
             },
-            "description": "Reaserch Station focusing on Gravity based tech and experimentation on the nearby Centrum Black hole. Head Scentist Dr Rosenberg."
+            "description": "Research Station focusing on Gravity based tech and experimentation on the nearby Centrum Black hole. Head Scientist Dr Rosenberg."
         },
         "SB 53 A": {
             "coordinate": [
@@ -441,21 +442,6 @@
             "teams": {},
             "hideonmap": true,
             "description": "This research outpost was abandoned after funding was dropped."
-        },
-        "JP 89": {
-            "coordinate": [
-                353835.99999999994,
-                0,
-                101013.33333333336
-            ],
-            "type": "jumppoint",
-            "jumppointtype": "Node",
-            "destinations": {
-                "Unknown": "Unknown"
-            },
-            "state": "Untethered",
-            "drift": 60000,
-            "hideonmap": true
         },
         "WP 15": {
             "coordinate": [
@@ -552,7 +538,7 @@
             "type": "jumpnode",
             "jumppointtype": "Node",
             "destinations": {
-                "Saphire Jump Point": "Vilnara"
+                "Unknown": "Unknown"
             },
             "state": "Tethered",
             "drift": 0
@@ -583,9 +569,9 @@
         },
         "Transit Auth R": {
             "coordinate": [
-                -199852.828125,
-                0.0,
-                -60284.640625
+                -203924.76441046846,
+                0,
+                -60635.04124965071
             ],
             "sides": [
                 "USFP"
@@ -603,7 +589,8 @@
                 "Marines": 2,
                 "Combat Engineers": 4
             },
-            "description": "Inspections, Patrol base for light security craft, Search and Rescue, Admin."
+            "description": "Inspections, Patrol base for light security craft, Search and Rescue, Admin.",
+            "hideonmap": false
         },
         "SB 53 Recreation": {
             "coordinate": [
@@ -633,7 +620,93 @@
             "teams": {
                 "Diplomats": 1
             },
-            "description": "Starbase 53 A Private complex for the moderatly wealthy. only down side is an active HOA."
+            "description": "Starbase 53 A Private complex for the moderately wealthy. only down side is an active HOA."
+        },
+        "A": {
+            "coordinate": [
+                126511.49918517159,
+                0,
+                -374622.67685689277
+            ],
+            "sides": [
+                "pirate"
+            ],
+            "hull": "pirate_cache_1",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "BF 04": {
+            "coordinate": [
+                182807.14725535153,
+                0,
+                -199626.6966675717
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 30,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Casing": 26,
+                "Torpedo Casing": 12
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 6,
+                "DamCon": 4
+            },
+            "description": "Bluefield Workers and R&R Complex inc Bluefield Central Hospital",
+            "hideonmap": true
+        },
+        "BF 13": {
+            "coordinate": [
+                172448.15332790356,
+                0,
+                -214439.93704844182
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Bluefield Industrial Polishing Complex. ^Private Property",
+            "hideonmap": false
+        },
+        "BF 03": {
+            "coordinate": [
+                190276.80682171803,
+                0,
+                -216925.18392431494
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_processor",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Bluefield Processing Unit, ^Private Property",
+            "hideonmap": false
         }
     },
     "terrain": {
@@ -891,18 +964,6 @@
             "scatter": 10000,
             "composition": []
         },
-        "56454": {
-            "type": "blackhole",
-            "name": "Centurian",
-            "coordinate": [
-                -40032.67973856209,
-                0,
-                -33496.73202614379
-            ],
-            "size": 1000,
-            "strength": 500,
-            "description": "This singularity is the focus of a number or research projects by notable scientist Dr. Rosenberg"
-        },
         "65465489": {
             "type": "asteroids",
             "seed": 2010,
@@ -960,6 +1021,261 @@
                 "Ast. Std Rand"
             ],
             "hideonmap": true
+        },
+        "1751739042866": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                8355.302640603551,
+                0,
+                -162795.7818930041
+            ],
+            "end": [
+                165833.33333333334,
+                0,
+                -253333.33333333334
+            ],
+            "density": 360,
+            "scatter": 35000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751739062003": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                66666.66666666667,
+                0,
+                -90833.33333333334
+            ],
+            "end": [
+                209166.6666666667,
+                0,
+                -186666.6666666667
+            ],
+            "density": 263,
+            "scatter": 16000,
+            "composition": []
+        },
+        "1751739077518": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                305833.3333333334,
+                0,
+                -90000.00000000001
+            ],
+            "end": [
+                226666.6666666667,
+                0,
+                -206666.6666666667
+            ],
+            "density": 251,
+            "scatter": 16000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751739094422": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                145000.0,
+                0,
+                -262500.0
+            ],
+            "end": [
+                188333.33333333334,
+                0,
+                -283333.3333333334
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751739106055": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                180000.00000000003,
+                0,
+                -268333.3333333334
+            ],
+            "end": [
+                223333.33333333334,
+                0,
+                -250833.33333333334
+            ],
+            "density": 125,
+            "scatter": 18000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751739114251": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                215000.00000000003,
+                0,
+                -250833.33333333334
+            ],
+            "end": [
+                232500.00000000003,
+                0,
+                -201666.6666666667
+            ],
+            "density": 125,
+            "scatter": 16000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1751739132469": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                197500.00000000003,
+                0,
+                -183333.33333333334
+            ],
+            "end": [
+                197500.00000000003,
+                0,
+                -285833.3333333334
+            ],
+            "density": 360,
+            "scatter": 25000,
+            "composition": []
+        },
+        "BH 84": {
+            "type": "blackhole",
+            "name": "1751739199388",
+            "coordinate": [
+                -44177.39540863309,
+                0,
+                -30608.31176094221
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "BH 88": {
+            "type": "blackhole",
+            "name": "1751739213202",
+            "coordinate": [
+                -36226.863858564495,
+                0,
+                -24462.264092903784
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "BH 89": {
+            "type": "blackhole",
+            "name": "1751739218731",
+            "coordinate": [
+                -47479.4358750254,
+                0,
+                -21649.121088788557
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "BH 90": {
+            "type": "blackhole",
+            "name": "1751739186255",
+            "coordinate": [
+                -57382.80317247117,
+                0,
+                -24710.64675894174
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "BH 91": {
+            "type": "blackhole",
+            "name": "1751739192787",
+            "coordinate": [
+                -57964.223270874616,
+                0,
+                -37114.2755248819
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "Centraly": {
+            "type": "blackhole",
+            "name": "Centurian",
+            "coordinate": [
+                -48350.91880128158,
+                0,
+                -33319.60030017444
+            ],
+            "size": 1000,
+            "strength": 500,
+            "description": "This singularity is the focus of a number or research projects by notable scientist Dr. Rosenberg"
+        },
+        "1752258427766": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -18333.333333333336,
+                0,
+                -201666.6666666667
+            ],
+            "end": [
+                159166.6666666667,
+                0,
+                -359166.6666666667
+            ],
+            "density": 350,
+            "scatter": 40000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1752258452652": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -244663.00922353673,
+                0,
+                -131243.1951311093
+            ],
+            "end": [
+                -50263.009223536756,
+                0,
+                -206843.1951311093
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1752930084001": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                283713.7435559239,
+                0,
+                186693.02746802458
+            ],
+            "end": [
+                368673.7435559239,
+                0,
+                347973.0274680246
+            ],
+            "density": 369,
+            "scatter": 25000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
         }
     },
     "sensor_relay": {
@@ -976,7 +1292,7 @@
                 0,
                 139533.17901234567
             ],
-            "description": "This Industrial Complex was built by the Mendeleyjev Mining Co and is regulated under the standard Private Facilitys rules"
+            "description": "This Industrial Complex was built by the Mendeleyjev Mining Co and is regulated under the standard Private facilities rules"
         },
         "SR 60": {
             "coordinate": [
@@ -1067,13 +1383,6 @@
                 -268032.4074074075,
                 0,
                 -69764.66049382719
-            ]
-        },
-        "SR 53": {
-            "coordinate": [
-                -284975.36632376444,
-                0,
-                -34582.24378276585
             ]
         },
         "SR 16": {
@@ -1362,11 +1671,49 @@
                 0,
                 249784.4762779665
             ]
+        },
+        "SR 92": {
+            "coordinate": [
+                136220.564700503,
+                0,
+                -182775.17003886605
+            ],
+            "hideonmap": true
+        },
+        "SR 99": {
+            "coordinate": [
+                97736.76840420668,
+                0,
+                -161073.78114997715
+            ],
+            "hideonmap": true
+        },
+        "SR 13": {
+            "coordinate": [
+                59252.97210791038,
+                0,
+                -139372.39226108824
+            ]
+        },
+        "Bluefield Industrial": {
+            "coordinate": [
+                174704.36099679928,
+                0,
+                -204476.55892775493
+            ]
+        },
+        "NAV HAZ 89": {
+            "coordinate": [
+                -50418.1902622716,
+                0,
+                -27117.785917204368
+            ],
+            "description": "NAVIGATIONAL HAZARD 89 STAY CLEAR. BLACK HOLES IN IMEDIAT VICINITY. STAY CLEAR"
         }
     },
     "traffic": {
-        "commercial": "none",
-        "civilian": "none",
-        "security": "none"
+        "commercial": "light",
+        "civilian": "light",
+        "security": "light"
     }
 }

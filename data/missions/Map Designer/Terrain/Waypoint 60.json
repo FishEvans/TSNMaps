@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -27925.468227567115,
+        -27775.312379058876,
         0,
-        3185.1901274451347
+        4086.125218494778
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -94,22 +94,30 @@
                 "Refuel"
             ],
             "cargo": {
-                "Repair Materials": 16,
-                "Medical Supplies": 30,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
-                "Micro Controller": 8,
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
                 "Power Relay": 16,
-                "Aid Package": 16,
-                "Casing": 90,
-                "Cabrite": 45,
-                "Transmitter": 16,
-                "Torpedo Casing": 15,
-                "Analysis Suite": 40
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
             },
             "teams": {
-                "Diplomats": 1
+                "DamCon": 2,
+                "Medics": 2
             },
             "description": "The Happy Eater Trading Co (HET) is an start up company takeing advantatge of Waypoint 60's growing importance as a net work hub. Bar, Crew rest facilitys and flea market with plenty of storage for transshiping.g"
         },
@@ -168,7 +176,8 @@
             },
             "teams": {
                 "Diplomats": 1
-            }
+            },
+            "description": ""
         },
         "IMO 31": {
             "coordinate": [
@@ -186,25 +195,29 @@
                 "Refuel"
             ],
             "cargo": {
-                "Iron": 750,
+                "Iron": 60,
                 "Tharium": 60,
                 "Reisium": 60,
                 "Alerite": 54,
-                "Cabrite": 815,
-                "Ashfilum": 258,
+                "Cabrite": 35,
+                "Ashfilum": 58,
                 "Denebite": 30,
                 "Aegirine": 151,
                 "Nuidinium": 159,
-                "Gredian": 180,
+                "Gredian": 10,
                 "Warhead": 10,
                 "Life Support": 1,
                 "Micro Controller": 8,
-                "Power Relay": 16
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
             },
             "teams": {
-                "DamCon": 0,
+                "DamCon": 1,
                 "Medics": 0
-            }
+            },
+            "description": ""
         },
         "IMO 224": {
             "coordinate": [
@@ -235,12 +248,16 @@
                 "Warhead": 10,
                 "Life Support": 1,
                 "Micro Controller": 8,
-                "Power Relay": 16
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
             },
             "teams": {
-                "DamCon": 0,
+                "DamCon": 1,
                 "Medics": 0
-            }
+            },
+            "description": "Inderpendent Mining Operation Claim 224. Big6 Mining Co, Monk Industries, Hamilton Ore Recovery."
         },
         "WP 74": {
             "coordinate": [
@@ -267,9 +284,15 @@
             ],
             "hull": "usfp_industrial_refinary",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Denebite": 65
+            },
+            "teams": {},
+            "description": ""
         },
         "JP 31": {
             "coordinate": [

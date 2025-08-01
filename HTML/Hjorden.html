@@ -20,9 +20,14 @@
 </head>
 <body>
     <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Hjorden</h2>
         <h3 class="subheader">Alignment: Hjorden</h3>
         <img src="Images/Factions/Hjorden.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
     </div>
     <div id="plot"></div>
     <div id="info">
@@ -31,7 +36,7 @@
         Select an object
     </div>
 <script>
-    var objData = {"Orate Gate": {"type": "jump_point", "x": 67739.77650148798, "y": 23951.23291178598, "grid": "N15"}};
+    var objData = {"Orate Gate": {"type": "jump_point", "x": 67617.04326460748, "y": 22267.36925569055, "grid": "N15", "hidden": false, "label": "Orate Gate"}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -54,6 +59,10 @@
     
     function highlight(name) {
         var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
         var annotation = {
             x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
             showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
@@ -62,7 +71,8 @@
 
         Plotly.relayout('plot', {annotations: [annotation]});
 
-        var infoHtml = '<span style="font-size:20pt;">' + name + '</span><br>';
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
         infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
 
         if (obj.type === 'station') {
@@ -113,10 +123,13 @@
     });
     
 
-    var fig = {"data": [{"type": "scatter", "x": [67739.77650148798], "y": [23951.23291178598], "mode": "markers+text", "marker": {"symbol": "circle", "size": 12, "color": "white"}, "hovertext": ["Orate Gate [N15]"], "hoverinfo": "text", "text": ["Orate Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}], "layout": {"title": "Hjorden", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [67617.04326460748], "y": [22267.36925569055], "mode": "markers+text", "marker": {"symbol": "circle", "size": 12, "color": "white"}, "hovertext": ["Orate Gate [N15]"], "hoverinfo": "text", "text": ["Orate Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [67617.04326460748], "y": [22267.36925569055], "mode": "markers+text", "marker": {"symbol": "circle", "size": 12, "color": "white"}, "hovertext": ["Orate Gate [N15]"], "hoverinfo": "text", "text": ["Orate Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}], "layout": {"title": "Hjorden", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Hjorden';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -149,10 +162,11 @@
         }
     });
 
-  var ctrl = document.getElementById('controls');
+  var ctrl = document.getElementById('object-buttons');
 
   // Helper: create and append a single button
-  function addButton(label, fn, header, color) {
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
     var btn = document.createElement('button');
     btn.textContent = label;
     if (header) {
@@ -164,6 +178,42 @@
     }
     ctrl.appendChild(btn);
   }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
@@ -177,6 +227,20 @@
   addButton('--- Stations ---', null, true, null);
   
     
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
 </script>
 </body>
 </html>

@@ -20,9 +20,14 @@
 </head>
 <body>
     <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Vesper Point</h2>
         <h3 class="subheader">Alignment: USFP</h3>
         <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
     </div>
     <div id="plot"></div>
     <div id="info">
@@ -31,7 +36,7 @@
         Select an object
     </div>
 <script>
-    var objData = {"Temple Point Gate": {"type": "jumppoint", "x": 124038.85686454723, "y": 60755.93010635867, "grid": "P18", "destinations": {"Ashes": "Blackspire", "Long Bar Gate": "Danae"}}, "Spirit Point": {"type": "station", "x": 105589.78279047314, "y": 45987.41158784015, "grid": "O17", "description": "Home of the Vesper Point Exploritory Team", "hull": "starbase_command", "facilities": [], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}};
+    var objData = {"Temple Point Gate": {"type": "jumppoint", "x": 126957.13578030645, "y": 56949.47934667309, "grid": "O18", "hidden": false, "label": "Temple Point Gate", "destinations": {"Ashes": "Blackspire", "Long Bar Gate": "Danae"}}, "JP 38": {"type": "jumppoint", "x": -175542.86421969358, "y": -206383.85398666025, "grid": "B03", "hidden": true, "label": "**JP 38**"}, "Spirit Point": {"type": "station", "x": 108508.06170623237, "y": 42180.96082815457, "grid": "O17", "hidden": false, "label": "Spirit Point", "description": "Home of the Vesper Point Exploritory Team", "hull": "starbase_command", "facilities": [], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -54,6 +59,10 @@
     
     function highlight(name) {
         var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
         var annotation = {
             x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
             showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
@@ -62,7 +71,8 @@
 
         Plotly.relayout('plot', {annotations: [annotation]});
 
-        var infoHtml = '<span style="font-size:20pt;">' + name + '</span><br>';
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
         infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
 
         if (obj.type === 'station') {
@@ -113,10 +123,13 @@
     });
     
 
-    var fig = {"data": [{"type": "scatter", "x": [-118620.08487966756, -98620.08487966756, -118302.20139123802, -138302.20139123802, -118620.08487966756], "y": [31480.100045164334, 142313.4333784977, 145865.09350088632, 35031.76016755299, 31480.100045164334], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-47752.09111759793, -114418.7577842646, -130836.86181997435, -64170.195153307664, -47752.09111759793], "y": [-10200.091678322002, 85633.24165501134, 74211.95189103935, -21621.381442293998, -10200.091678322002], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [156827.25546112805, 130993.92212779472, 118750.45826796639, 144583.7916012997, 156827.25546112805], "y": [155329.83384916448, 175329.83384916448, 159515.3596968862, 139515.3596968862, 155329.83384916448], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [49894.86058236494, 3228.1939156982703, 1516.1864800628096, 48182.85314672948, 49894.86058236494], "y": [112430.24954842523, 159930.24954842523, 158248.27733095884, 110748.27733095881, 112430.24954842523], "fill": "toself", "fillcolor": "rgba(128,0,128,0.5005869694840526)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.5005869694840526)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [159228.65837110777, 216728.65837110777, 201349.0553579867, 143849.0553579867, 159228.65837110777], "y": [-109803.46311395473, -40636.796447288034, -27851.343339994644, -97018.01000666132, -109803.46311395473], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [74723.29743938553, -50276.702560614474, -31645.5837102911, 93354.4162897089, 74723.29743938553], "y": [184272.94875481285, 143439.6154214795, 86405.57812457121, 127238.91145790457, 184272.94875481285], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [77027.66912857632, -57138.99753809036, -54783.28873281524, 79383.37793385144, 77027.66912857632], "y": [-172780.61401117657, -181113.94734450994, -219040.85910943948, -210707.5257761061, -172780.61401117657], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [79514.31858930562, 38680.98525597228, 24396.72847312214, 65230.06180645549, 79514.31858930562], "y": [-237244.78407004476, -195578.11740337813, -209576.6890505713, -251243.35571723792, -237244.78407004476], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [124553.20367389046, 46219.87034055712, 46857.8433885373, 125191.17672187065, 124553.20367389046], "y": [-3415.82547528515, -5915.82547528515, -25905.647645330857, -23405.647645330857, -3415.82547528515], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [55750.124194897326, -65916.54247176935, -62672.4104658029, 58994.25620086378, 55750.124194897326], "y": [37290.16495783997, 17290.164957839967, -2444.9714117893036, 17555.0285882107, 37290.16495783997], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [70620.8681444354, 61454.20147776874, 41623.51225132569, 50790.17891799236, 70620.8681444354], "y": [-55445.631908576615, 14554.368091423385, 11957.492121293937, -58042.50787870606, -55445.631908576615], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [124038.85686454723], "y": [60755.93010635867], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["Temple Point Gate [P18]"], "hoverinfo": "text", "text": ["Temple Point Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}, {"type": "scatter", "x": [105589.78279047314], "y": [45987.41158784015], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Spirit Point [O17]"], "hoverinfo": "text", "text": ["Spirit Point"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}], "layout": {"title": "Vesper Point", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-115701.80596390832, -95701.80596390832, -115383.92247547879, -135383.9224754788, -115701.80596390832], "y": [27673.649285478765, 138506.98261881212, 142058.64274120075, 31225.30940786742, 27673.649285478765], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-44833.812201838715, -111500.47886850536, -127918.58290421512, -61251.91623754845, -44833.812201838715], "y": [-14006.542438007586, 81826.79089532576, 70405.50113135377, -25427.832201979574, -14006.542438007586], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [159745.53437688728, 133912.20104355397, 121668.73718372562, 147502.07051705892, 159745.53437688728], "y": [151523.38308947888, 171523.38308947888, 155708.9089372006, 135708.9089372006, 151523.38308947888], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [52813.13949812417, 6146.472831457497, 4434.465395822037, 51101.13206248871, 52813.13949812417], "y": [108623.79878873964, 156123.79878873963, 154441.82657127324, 106941.82657127322, 108623.79878873964], "fill": "toself", "fillcolor": "rgba(128,0,128,0.5005869694840527)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.5005869694840527)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [162146.937286867, 219646.937286867, 204267.33427374595, 146767.33427374595, 162146.937286867], "y": [-113609.9138736403, -44443.2472069736, -31657.794099680214, -100824.46076634689, -113609.9138736403], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-179749.98730890738, -159749.98730890738, -179669.0744638131, -199669.0744638131, -179749.98730890738], "y": [-230615.79275555327, -8949.126088886565, -7151.915217767251, -228818.58188443398, -230615.79275555327], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-105393.75469150963, -145393.75469150965, -164025.30708121083, -124025.30708121085, -105393.75469150963], "y": [-223581.76246346656, -121081.76246346654, -128352.61217652068, -230852.6121765207, -223581.76246346656], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-45818.9312788107, -150818.9312788107, -148600.1304939098, -43600.13049390978, -45818.9312788107], "y": [-207247.98025588537, -213081.31358921868, -253019.7277174352, -247186.39438410188, -207247.98025588537], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-89795.2497194125, -103961.91638607916, -123790.47871997464, -109623.81205330798, -89795.2497194125], "y": [-185077.32080962064, -77577.32080962062, -80190.38716369988, -187690.38716369987, -185077.32080962064], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [77641.57635514476, -47358.42364485524, -28727.304794531865, 96272.69520546813, 77641.57635514476], "y": [180466.49799512725, 139633.16466179388, 82599.12736488561, 123432.46069821899, 180466.49799512725], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [79945.94804433554, -54220.718622331144, -51865.00981705602, 82301.65684961066, 79945.94804433554], "y": [-176587.06477086217, -184920.39810419548, -222847.30986912502, -214513.9765357917, -176587.06477086217], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [82432.59750506484, 41599.264171731505, 27315.007388881357, 68148.3407222147, 82432.59750506484], "y": [-241051.23482973035, -199384.56816306367, -213383.13981025683, -255049.80647692352, -241051.23482973035], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [127471.48258964969, 49138.149256316356, 49776.122304296536, 128109.45563762989, 127471.48258964969], "y": [-7222.276234970726, -9722.276234970726, -29712.098405016433, -27212.098405016433, -7222.276234970726], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [58668.403110656545, -62998.26355601014, -59754.13155004368, 61912.535116623, 58668.403110656545], "y": [33483.71419815439, 13483.714198154392, -6251.42217147488, 13748.57782852512, 33483.71419815439], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [73539.14706019462, 64372.48039352797, 44541.79116708492, 53708.45783375158, 73539.14706019462], "y": [-59252.08266826219, 10747.917331737808, 8151.0413616083615, -61848.95863839164, -59252.08266826219], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [126957.13578030645], "y": [56949.47934667309], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["Temple Point Gate [O18]"], "hoverinfo": "text", "text": ["Temple Point Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}, {"type": "scatter", "x": [126957.13578030645], "y": [56949.47934667309], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["Temple Point Gate [O18]"], "hoverinfo": "text", "text": ["Temple Point Gate"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}, {"type": "scatter", "x": [-175542.86421969358], "y": [-206383.85398666025], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["JP 38 [B03]"], "hoverinfo": "text", "text": ["**JP 38**"], "textposition": "top center", "textfont": {"color": "white", "size": 20}, "gmOnly": true}, {"type": "scatter", "x": [-175542.86421969358], "y": [-206383.85398666025], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["JP 38 [B03]"], "hoverinfo": "text", "text": ["**JP 38**"], "textposition": "top center", "textfont": {"color": "white", "size": 20}, "gmOnly": true}, {"type": "scatter", "x": [108508.06170623237], "y": [42180.96082815457], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Spirit Point [O17]"], "hoverinfo": "text", "text": ["Spirit Point"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}, {"type": "scatter", "x": [108508.06170623237], "y": [42180.96082815457], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Spirit Point [O17]"], "hoverinfo": "text", "text": ["Spirit Point"], "textposition": "top center", "textfont": {"color": "white", "size": 14}}], "layout": {"title": "Vesper Point", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Vesper Point';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -149,10 +162,11 @@
         }
     });
 
-  var ctrl = document.getElementById('controls');
+  var ctrl = document.getElementById('object-buttons');
 
   // Helper: create and append a single button
-  function addButton(label, fn, header, color) {
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
     var btn = document.createElement('button');
     btn.textContent = label;
     if (header) {
@@ -164,19 +178,70 @@
     }
     ctrl.appendChild(btn);
   }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  addButton('Temple Point Gate',function(){highlight('Temple Point Gate');},false,null);
+  addButton('JP 38',function(){highlight('JP 38');},false,null,true)
+    addButton('Temple Point Gate',function(){highlight('Temple Point Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
   addButton('--- Stations ---', null, true, null);
-  addButton('Spirit Point',function(){highlight('Spirit Point');},false,'blue');
+  addButton('Spirit Point',function(){highlight('Spirit Point');},false,'blue',false)
     
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
 </script>
 </body>
 </html>

@@ -869,8 +869,11 @@ def open_system_editor(filename: str) -> None:
 
             # ——— Randomize handler ———
             def randomize():
-                for iv,qv in rows:
-                    if iv.get().strip() and qv.get() > 0:
+                # Randomize each row’s quantity by ±10%
+                for entry in rows:
+                    iv = entry.get('iv')
+                    qv = entry.get('qv')
+                    if iv and qv and iv.get().strip() and qv.get() > 0:
                         base = qv.get()
                         delta = max(1, int(base * 0.1))
                         qv.set(random.randint(base - delta, base + delta))

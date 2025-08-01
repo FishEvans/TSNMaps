@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -10170.63649915765,
+        -5285.691357561155,
         0,
-        15468.79079732178
+        23842.982468630027
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -80,9 +80,38 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 38,
+                "EMP": 13,
+                "Mine": 13,
+                "High Yield Warhead": 16,
+                "Warhead": 61,
+                "Torpedo Casing": 36,
+                "Casing": 49,
+                "Transmitter": 54,
+                "Navigational Array": 7,
+                "Tharium Plating": 80,
+                "Tactical Array": 1,
+                "Sensor Suite": 8,
+                "Guidance System": 57,
+                "Receiver": 24,
+                "Power Relay": 62,
+                "Iso B Circuit": 54,
+                "Micro Controller": 49,
+                "Black Box": 12,
+                "Repair Materials": 79
+            },
+            "teams": {
+                "DamCon": 10,
+                "Medics": 3,
+                "Combat Engineers": 3
+            },
+            "description": ""
         },
         "Marmonto R&D": {
             "coordinate": [
@@ -96,8 +125,27 @@
             "hull": "starbase_science",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "High Yield Warhead": 11,
+                "Life Support": 3,
+                "Medical Supplies": 17,
+                "Micro Controller": 25,
+                "Power Relay": 17,
+                "Transmitter": 8,
+                "Receiver": 5,
+                "Analysis Suite": 7,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 14,
+                "Casing": 14,
+                "EMP": 10,
+                "Homing": 38
+            },
+            "teams": {
+                "DamCon": 3,
+                "Medics": 3
+            },
+            "description": ""
         },
         "JP 61": {
             "coordinate": [
@@ -194,8 +242,33 @@
             "hull": "usfp_industrial_assembly",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Homing": 35,
+                "EMP": 12,
+                "Mine": 12,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 40,
+                "Casing": 50,
+                "Transmitter": 60,
+                "Navigational Array": 8,
+                "Tharium Plating": 85,
+                "Tactical Array": 2,
+                "Sensor Suite": 8,
+                "Guidance System": 60,
+                "Receiver": 25,
+                "Power Relay": 62,
+                "Iso B Circuit": 52,
+                "Micro Controller": 52,
+                "Black Box": 12,
+                "Repair Materials": 83
+            },
+            "teams": {
+                "DamCon": 8,
+                "Medics": 2,
+                "Combat Engineers": 3
+            },
+            "description": ""
         },
         "MY AY Roma": {
             "coordinate": [
@@ -206,11 +279,33 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "usfp_industrial_assembly",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Iron": 47,
+                "Tharium": 49,
+                "Reisium": 54,
+                "Alerite": 44,
+                "Cabrite": 28,
+                "Ashfilum": 51,
+                "Denebite": 28,
+                "Aegirine": 172,
+                "Nuidinium": 118,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 0,
+                "Micro Controller": 6,
+                "Power Relay": 15,
+                "Casing": 13,
+                "Homing": 32,
+                "Torpedo Casing": 11
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
         },
         "MY Recycleing": {
             "coordinate": [
@@ -224,8 +319,30 @@
             "hull": "usfp_industrial_processor",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Iron": 61,
+                "Tharium": 59,
+                "Reisium": 51,
+                "Alerite": 45,
+                "Cabrite": 35,
+                "Ashfilum": 66,
+                "Denebite": 32,
+                "Aegirine": 160,
+                "Nuidinium": 162,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 9,
+                "Power Relay": 18,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
         },
         "WP 90": {
             "coordinate": [
@@ -294,9 +411,13 @@
             ],
             "hull": "usfp_industrial_refinary",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "Dilko M989": {
             "coordinate": [
@@ -309,9 +430,34 @@
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Iron": 797,
+                "Tharium": 58,
+                "Reisium": 57,
+                "Alerite": 48,
+                "Cabrite": 716,
+                "Ashfilum": 253,
+                "Denebite": 33,
+                "Aegirine": 136,
+                "Nuidinium": 147,
+                "Gredian": 159,
+                "Warhead": 8,
+                "Life Support": 0,
+                "Micro Controller": 8,
+                "Power Relay": 14,
+                "Casing": 14,
+                "Homing": 34,
+                "Torpedo Casing": 9
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
         },
         "Nixi Foundry": {
             "coordinate": [
@@ -324,9 +470,14 @@
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "DS 72": {
             "coordinate": [
@@ -341,7 +492,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "DS 70": {
             "coordinate": [
@@ -356,7 +508,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "DS 61": {
             "coordinate": [
@@ -370,8 +523,26 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 8,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 3,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 7,
+                "Tea": 4,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 2
+            },
+            "description": ""
         },
         "DS 25": {
             "coordinate": [
@@ -385,8 +556,26 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 12,
+                "Iso B Circuit": 23,
+                "Container": 29,
+                "Life Support": 0,
+                "Micro Controller": 9,
+                "Power Relay": 17,
+                "Aid Package": 15,
+                "Pets": 6,
+                "Torpedo Casing": 5,
+                "Casing": 5,
+                "Coffee": 7,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 0
+            },
+            "description": ""
         },
         "DS 31": {
             "coordinate": [
@@ -399,9 +588,31 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 17,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 28,
+                "Container": 27,
+                "Life Support": 0,
+                "Micro Controller": 9,
+                "Power Relay": 14,
+                "Aid Package": 16,
+                "Pets": 2,
+                "Torpedo Casing": 7,
+                "Casing": 6,
+                "Coffee": 3,
+                "Tea": 4,
+                "Alcohol": 5,
+                "Homing": 8
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
         },
         "Hypherion Armory": {
             "coordinate": [
@@ -420,22 +631,25 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 150,
-                "Nuke": 25,
-                "EMP": 25,
+                "Homing": 153,
+                "Nuke": 23,
+                "EMP": 27,
                 "Mine": 20,
-                "High Yield Warhead": 5,
-                "Warhead": 25,
-                "Torpedo Casing": 100,
-                "Navigational Array": 1,
-                "Tactical Array": 10,
-                "Guidance System": 60
+                "High Yield Warhead": 14,
+                "Warhead": 50,
+                "Torpedo Casing": 102,
+                "Navigational Array": 3,
+                "Tactical Array": 9,
+                "Guidance System": 61,
+                "Medical Supplies": 12,
+                "Repair Materials": 4
             },
             "teams": {
                 "DamCon": 10,
-                "Medics": 2,
+                "Medics": 4,
                 "Combat Engineers": 10
-            }
+            },
+            "description": ""
         },
         "NanoGel Reasearch": {
             "coordinate": [
@@ -451,8 +665,27 @@
             "facilities": [
                 "Docking"
             ],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 2,
+                "Medical Supplies": 14,
+                "Micro Controller": 23,
+                "Power Relay": 15,
+                "Transmitter": 8,
+                "Receiver": 4,
+                "Analysis Suite": 9,
+                "Sensor Suite": 7,
+                "Guidance System": 13,
+                "Wild Animals": 15,
+                "Casing": 17,
+                "EMP": 9,
+                "Homing": 33
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": ""
         },
         "WP 63": {
             "coordinate": [
