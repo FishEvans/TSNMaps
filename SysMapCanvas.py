@@ -27,7 +27,62 @@ def on_canvas_press(event, ctx):
     drag_data = ctx['drag_data']
     screen_to_coord = ctx['screen_to_coord']
     win = ctx['win']
-  
+
+    # ── Measurement tool: right‐click to place two points, draw line & show distance ──
+    if event.num == 3:
+        # retrieve or init point list
+        pts = ctx.get('measure_points', [])
+        # if already two points, clear previous measurement
+        if len(pts) >= 2:
+            pts = []
+            map_canvas.delete('measure_point', 'measure_line', 'measure_label')
+
+        # convert click to world coords
+        xw, zw = screen_to_coord(event.x, event.y)
+        # draw point marker
+        map_canvas.create_oval(
+            event.x - 3, event.y - 3,
+            event.x + 3, event.y + 3,
+            fill='yellow', tags='measure_point'
+        )
+        pts.append((xw, zw, event.x, event.y))
+
+        # once two points are set, draw line and label distance
+        if len(pts) == 2:
+            x1, z1, px1, py1 = pts[0]
+            x2, z2, px2, py2 = pts[1]
+            # line between points
+            map_canvas.create_line(px1, py1, px2, py2,
+                                   fill='Dark Green', width=2, tags='measure_line')
+
+            # calculate distance using current zoom scale:
+            # pixel distance divided by ctx['map_scale'] = world units
+            scale = ctx.get('map_scale', 1.0) or 1.0
+            dist_px = math.hypot(px2 - px1, py2 - py1)
+            dist = dist_px / scale
+            # compute travel time: 100K units = 60 seconds
+            travel_time = dist / 100000.0 * 17.8
+            secs_total = int(round(travel_time))
+            mins = secs_total // 60
+            secs = secs_total % 60
+            # format in thousands (e.g. 1.5K) and append time mm:ss
+            label = f"{dist/1000:.1f}K ({mins}:{secs:02d})"
+            # midpoint for label placement
+            mx = (px1 + px2) / 2
+            my = (py1 + py2) / 2
+            map_canvas.create_text(
+                mx, my,
+                text=label,
+                fill='Red',
+                font=('Arial', 14, 'bold'),
+                tags='measure_label'
+            )
+
+        # store for next click
+        ctx['measure_points'] = pts
+        return
+
+
     if toolbar.blackhole_mode:
         ctx['push_undo']()
         # get map coords
@@ -486,7 +541,33 @@ def on_canvas_drag(event, ctx):
         ctx['pan_y']     = pan_y
         ctx['map_scale'] = map_scale
         draw_map(ctx)
-        
+        # Draw concentric range circles under all elements
+        def _draw_range_rings(ctx):
+            map_canvas = ctx['map_canvas']
+            # Remove any previous rings
+            map_canvas.delete('range_ring')
+            pan_x = ctx['pan_x']; pan_y = ctx['pan_y']; scale = ctx['map_scale']
+            # Screen center corresponds to world (0,0)
+            x0 = pan_x; y0 = pan_y
+            for radius, outline, width in [
+                (200000, 'white', 1),
+                (500000, 'white', 1),
+                (999999, 'red',   3),
+            ]:
+                rpx = radius * scale
+                map_canvas.create_oval(
+                    x0 - rpx, y0 - rpx,
+                    x0 + rpx, y0 + rpx,
+                    outline=outline, width=width,
+                    tags='range_ring'
+                )
+            # Keep rings beneath everything else
+            map_canvas.tag_lower('range_ring')
+
+        _draw_range_rings(ctx)
+        return
+
+
 def on_map_zoom(event, ctx):
     # Unpack context for zoom
     pan_x = ctx['pan_x']
@@ -504,3 +585,28 @@ def on_map_zoom(event, ctx):
     ctx['pan_y'] = pan_y
     ctx['map_scale'] = map_scale
     draw_map(ctx)
+
+    # Draw concentric range circles under all elements
+    def _draw_range_rings(ctx):
+        map_canvas = ctx['map_canvas']
+        # Remove any previous rings
+        map_canvas.delete('range_ring')
+        pan_x = ctx['pan_x']; pan_y = ctx['pan_y']; scale = ctx['map_scale']
+        # Screen center corresponds to world (0,0)
+        x0 = pan_x; y0 = pan_y
+        for radius, outline, width in [
+            (200000, 'white', 1),
+            (500000, 'white', 1),
+            (999999, 'red',   3),
+        ]:
+            rpx = radius * scale
+            map_canvas.create_oval(
+                x0 - rpx, y0 - rpx,
+                x0 + rpx, y0 + rpx,
+                outline=outline, width=width,
+                tags='range_ring'
+            )
+        # Keep rings beneath everything else
+        map_canvas.tag_lower('range_ring')
+
+    _draw_range_rings(ctx)

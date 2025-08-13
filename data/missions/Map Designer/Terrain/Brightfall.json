@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
         -28174.82698124704,
-        0,
-        11568.762538189287
+        0.0,
+        11568.762538189281
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -190,7 +190,8 @@
                 "Casing": 6,
                 "Coffee": 7,
                 "Tea": 7,
-                "Alcohol": 4
+                "Alcohol": 4,
+                "Guidance System": 8
             },
             "teams": {
                 "Diplomats": 0
@@ -291,7 +292,9 @@
             ],
             "hull": "starbase_command",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Homing": 51,
                 "Nuke": 1,
@@ -302,10 +305,10 @@
                 "Torpedo Casing": 69,
                 "Navigational Array": 0,
                 "Tactical Array": 9,
-                "Guidance System": 67
+                "Guidance System": 67,
+                "Casing": 55
             },
             "teams": {
-                "Caseing": 55,
                 "DamCon": 8,
                 "Medics": 3,
                 "Combat Engineers": 1
@@ -553,6 +556,21 @@
                 "Medics": 1
             },
             "description": ""
+        },
+        "DS 13": {
+            "coordinate": [
+                -70000.0,
+                0,
+                165833.33333333334
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
         }
     },
     "sensor_relay": {

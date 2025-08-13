@@ -90,9 +90,13 @@
             if (obj.hullDescription) {
                 infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
             }
-        } else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
-            infoHtml += '<b>Type:</b> ' + obj.type + '<br>';
-            infoHtml += '<b>Destinations:</b><br>';
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
             for (const [target, label] of Object.entries(obj.destinations)) {
                 if (typeof target === 'string' && typeof label === 'string') {
                     let file = label + '.html';
@@ -101,6 +105,16 @@
                 }
             }
             }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }

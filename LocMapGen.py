@@ -7,6 +7,8 @@ import argparse
 from pathlib import Path
 import math
 import re
+import random
+import string
 
 # Helper to locate resources when running as a module or frozen executable
 def get_base_path():
@@ -201,9 +203,13 @@ HTML_TEMPLATE = '''
             if (obj.hullDescription) {{
                 infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
             }}
-        }} else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {{
-            infoHtml += '<b>Type:</b> ' + obj.type + '<br>';
-            infoHtml += '<b>Destinations:</b><br>';
+        }} 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {{
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
             for (const [target, label] of Object.entries(obj.destinations)) {{
                 if (typeof target === 'string' && typeof label === 'string') {{
                     let file = label + '.html';
@@ -212,6 +218,16 @@ HTML_TEMPLATE = '''
                 }}
             }}
             }}
+        else if (obj.type === 'sensor_relay') {{
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }}
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {{
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }}
         else {{
             infoHtml += '<b>Type:</b> ' + obj.type;
         }}
@@ -526,7 +542,7 @@ class MapViewer:
             elif typ == 'sensor_relay':
                 symbol = 'circle'
                 
-                if re.match(r'^(?:SR[- ]?\d+|Sensor Relay \d+)$', name):
+                if re.match(r'^(?:SR[- ]?\d+|Sensor Relay \d+|WB[- ]?\d+)$', name):
                     size = 3
                     mode = 'markers'
                 else:

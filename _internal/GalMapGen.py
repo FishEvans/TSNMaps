@@ -124,17 +124,18 @@ def main():
     for s in systems:
         print(f"[DEBUG] {s['name']} → {len(s['destinations'])} raw dests")
         px, py = coords[s["name"]]["x"], coords[s["name"]]["y"]
+        # build system icon, hiding if not visible by default+
         # build system icon, hiding if not visible by default
         vis = system_meta[s["name"]]["visible"]
         cls = "system" + ("" if vis else " hidden-system")
-        sty = f"left:{px}px;top:{py}px;" + ("" if vis else "display:none;")
+        style_attr = f"left:{px}px; top:{py}px;{'display:none;' if not vis else ''}"
         system_divs.append(
-    f'<a href="{quote(s["name"])}.html" class="system" data-system="{s["name"]}" style="left:{px}px;top:{py}px;">'                                
-    f'<div class="icon">'
-    f'<img src="Images/Factions/{s["alignment"]}.png" class="alignment-img" />'
-    f'<img src="Images/ring.png" class="tint-img" />'
-    f'</div>'
-    f'<div class="system-name">{s["name"]}</div></a>'
+            f'<a href="{quote(s["name"])}.html" class="{cls}" data-system="{s["name"]}" style="{style_attr}">'
+            f'<div class="icon">'
+            f'<img src="Images/Factions/{s["alignment"]}.png" class="alignment-img" />'
+            f'<img src="Images/ring.png" class="tint-img" />'
+            f'</div>'
+            f'<div class="system-name">{s["name"]}</div></a>'
 )
         for d in s.get("destinations", []):
             tgt = coords.get(d["target"])
@@ -204,11 +205,10 @@ def main():
     home_button_html = '<button onclick="resetZoom()" class="system-button" style="background-color:#222;width:100%;font-size:16pt;">Home</button>'
 
     system_list_html = ''.join(
-        f"<button class='system-button' data-system=\"{s['name']}\" "
-        f"style=\"{'' if system_meta[s['name']]['visible'] else 'display:none;'}\" "
+        f"<button class='system-button' data-system=\"{s['name']}\" data-visible=\"{'true' if system_meta[s['name']]['visible'] else 'false'}\" "
+        f"style=\"{'display:none;' if not system_meta[s['name']]['visible'] else ''}\" "
         f"onclick=\"document.location.href='{quote(s['name'])}.html'\">"
-        f"<img src=\"Images/Factions/{system_meta[s['name']]['alignment']}.png\" "
-        f"class=\"button-icon\" alt=\"{system_meta[s['name']]['alignment']}\" />"
+        f"<img src=\"Images/Factions/{system_meta[s['name']]['alignment']}.png\" class=\"button-icon\" alt=\"{system_meta[s['name']]['alignment']}\" />"
         f"{s['name']}</button>"
         for s in sorted(systems, key=lambda x: x['name'])
     )
@@ -336,6 +336,14 @@ def main():
         if (oniBtn) {{
       oniBtn.addEventListener('click', toggleOniAuth);
     }}
+    
+  // On initial load, hide any GM-only systems if not in ONI (GM) mode
+  if (!isGM()) {{
+    // hide map icons
+    document.querySelectorAll('.hidden-system').forEach(el => el.style.display = 'none');
+    // hide sidebar buttons for invisible systems
+    document.querySelectorAll('.system-button[data-visible="false"]').forEach(btn => btn.style.display = 'none');
+  }}
 
     const map     = document.getElementById('map');
     const maparea = document.getElementById('maparea');
@@ -496,13 +504,24 @@ def main():
   
   // system search filter
   const searchInput = document.getElementById('system-search');
-  searchInput.addEventListener('input', () => {{
-    const term = searchInput.value.toLowerCase();
-    document.querySelectorAll('.system-button').forEach(btn => {{
-      const name = btn.getAttribute('data-system').toLowerCase();
-      btn.style.display = name.includes(term) ? '' : 'none';
+  if (searchInput) {{
+    searchInput.addEventListener('input', () => {{
+      const term = searchInput.value.toLowerCase();
+      document.querySelectorAll('.system-button[data-system]').forEach(btn => {{
+        const nameAttr = btn.getAttribute('data-system');
+        if (!nameAttr) return;
+        const isVisibleFlag = btn.getAttribute('data-visible') === 'true';
+        // always hide GM-only systems when not in GM mode
+        if (!isGM() && !isVisibleFlag) {{
+          btn.style.display = 'none';
+          return;
+        }}
+        const name = nameAttr.toLowerCase();
+        btn.style.display = name.includes(term) ? '' : 'none';
+      }});
     }});
-  }});
+  }}
+
   // sort functionality
   document.querySelectorAll('input[name="sort"]').forEach(radio => {{
     radio.addEventListener('change', reorderButtons);
@@ -510,9 +529,11 @@ def main():
   function reorderButtons() {{
     const container = document.getElementById('controls');
     const sortBy = document.querySelector('input[name="sort"]:checked').value;
-    // only sort the actual system buttons (ignore login/home buttons)
-const buttons = Array.from(container.querySelectorAll('.system-button[data-system]'))
-  .filter(btn => btn.getAttribute('data-system'));
+    let buttons = Array.from(container.querySelectorAll('.system-button[data-system]'));
+    if (!isGM()) {{
+      buttons = buttons.filter(btn => btn.getAttribute('data-visible') === 'true');
+    }}
+
     buttons.sort((a, b) => {{
       const nameA = a.getAttribute('data-system');
       const nameB = b.getAttribute('data-system');

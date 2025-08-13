@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        13320.465006399725,
+        13320.46500639972,
         0,
-        22662.1009875019
+        22662.10098750189
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -36,7 +36,11 @@
             ],
             "hull": "starbase_command",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
             "cargo": {
                 "Repair Materials": 50,
                 "Aid Package": 50,
@@ -58,7 +62,7 @@
                 "Marines": 2,
                 "Combat Engineers": 4
             },
-            "description": ""
+            "description": "Freya Armory, Rear Lines Ammunitioning and Supply Depot, Constructed in the First Hegemony War."
         },
         "ZERO": {
             "coordinate": [
@@ -117,7 +121,8 @@
             "cargo": {},
             "teams": {
                 "Medics": 2
-            }
+            },
+            "description": ""
         },
         "Mendleyjev Mining Co": {
             "coordinate": [
@@ -152,7 +157,8 @@
             "teams": {
                 "DamCon": 0,
                 "Medics": 0
-            }
+            },
+            "description": ""
         },
         "Mendeleyjev Complex": {
             "coordinate": [
@@ -200,7 +206,8 @@
             "teams": {
                 "DamCon": 6,
                 "Medics": 2
-            }
+            },
+            "description": ""
         },
         "Greystone Complex": {
             "coordinate": [
@@ -244,8 +251,7 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [
-                "Docking",
-                "Refuel"
+                "Docking"
             ],
             "cargo": {
                 "Casing": 90,
@@ -258,7 +264,8 @@
             "teams": {
                 "DamCon": 1,
                 "Medics": 1
-            }
+            },
+            "description": ""
         },
         "Milliways Resort": {
             "coordinate": [
@@ -351,7 +358,8 @@
             "cargo": {},
             "teams": {
                 "Medics": 2
-            }
+            },
+            "description": ""
         },
         "Dilko RS F 02": {
             "coordinate": [
@@ -368,7 +376,8 @@
             "cargo": {},
             "teams": {
                 "Medics": 2
-            }
+            },
+            "description": ""
         },
         "RS 25": {
             "coordinate": [
@@ -1284,7 +1293,9 @@
                 119349.4764714959,
                 0,
                 43170.609644969074
-            ]
+            ],
+            "description": "Greystone Industrial Zone.",
+            "hideonmap": false
         },
         "Mendeleyjev": {
             "coordinate": [

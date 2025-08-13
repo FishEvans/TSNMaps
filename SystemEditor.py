@@ -274,6 +274,7 @@ def open_system_editor(filename: str) -> None:
     global sm_win
     win = tk.Toplevel()
     sm_win = win
+
     # ── Skybox metadata dropdown ─────────────────────────────────────────
     # Values come from cargo-teams.json -> 'skyboxes'
     skybox_list = ct_config.get('skyboxes', [])
@@ -452,6 +453,43 @@ def open_system_editor(filename: str) -> None:
             elems_frame.grid()
             mapel_header.config(text="▼ Map Elements")
     mapel_header.bind("<Button-1>", toggle_map_elements)
+
+    # Ordering helper: sort A–Z before 0–9, case-insensitive
+    def _az09_key(name: str):
+        if name is None:
+            return (1, "")
+        s = str(name)
+        return (1 if (s[:1].isdigit()) else 0, s.casefold())
+
+    # Find stations that have cargo/team validation errors
+    def _stations_with_cargo_errors():
+        cargo_set = set(ct_config.get('cargo', []))
+        team_set  = set(ct_config.get('teams', []))
+        bad = set()
+        if not (cargo_set or team_set):
+            return bad
+        for obj_name in sm.list_objects():
+            obj = sm.get_object(obj_name)
+            if obj.get('type', '').lower() != 'station':
+                continue
+            carg = obj.get('cargo') or {}
+            tms  = obj.get('teams') or {}
+            for item, qty in carg.items():
+                if (item in team_set) or (item not in cargo_set) or (not isinstance(qty, int)) or (qty < 0):
+                    bad.add(obj_name); break
+            if obj_name in bad:
+                continue
+            for item, qty in tms.items():
+                if (item in cargo_set) or (item not in team_set) or (not isinstance(qty, int)) or (qty < 0):
+                    bad.add(obj_name); break
+        return bad
+
+    # Ordering helper: sort A–Z before 0–9, case-insensitive
+    def _az09_key(name: str):
+        if name is None:
+            return (1, "")
+        s = str(name)
+        return (1 if (s[:1].isdigit()) else 0, s.casefold())
     # List sections
     def make_list(label_text, items, col, callback, parent=None):
         nonlocal row
@@ -467,18 +505,42 @@ def open_system_editor(filename: str) -> None:
         return lb
 
     relays = sm.list_sensor_relays().items()
-    objs = sm.list_objects()
+
+    # We’ll populate the Objects list dynamically so we can bubble up
+    # stations with cargo errors and color them red.
+    objs = []  # will be filled by refresh_objects_list()
     obj_lb = make_list("Objects:", objs, 0, lambda name: name, parent=elems_frame)
+
+    def refresh_objects_list():
+        """Rebuild the Objects list with stations that have cargo errors at the top (in red)."""
+        nonlocal objs
+        err_stations = _stations_with_cargo_errors()
+        all_objs = list(sm.list_objects())
+        top  = sorted([n for n in all_objs if n in err_stations], key=_az09_key)
+        rest = sorted([n for n in all_objs if n not in err_stations], key=_az09_key)
+        # repopulate listbox
+        obj_lb.delete(0, tk.END)
+        for name in objs:
+            obj_lb.insert(tk.END, name)
+        # color/embolden error stations
+        for idx, name in enumerate(objs):
+            if name in err_stations:
+                try:
+                    obj_lb.itemconfig(idx, fg='red', font=('Arial', 9, 'bold'))
+                except Exception:
+                    # itemconfig might not support font on some Tk variants; ensure at least red
+                    obj_lb.itemconfig(idx, fg='red')
+
+    # initial populate
+    refresh_objects_list()
+
     obj_lb.bind('<<ListboxSelect>>', lambda e: show_object(objs[obj_lb.curselection()[0]]) if obj_lb.curselection() else None)
     # Relays list between Objects and Terrain
-    relay_keys = list(sm.list_sensor_relays().keys())
-    special = sorted([r for r in relay_keys if not (r.startswith('SR-') or r.startswith('Relay '))])
-    standard = sorted([r for r in relay_keys if (r.startswith('SR-') or r.startswith('Relay '))])
-    relay_order = special + standard
+    relay_order = sorted(list(sm.list_sensor_relays().keys()), key=_az09_key)
     relay_lb = make_list("Relays:", relay_order, 1, lambda r: r, parent=elems_frame)
     relay_lb.bind('<<ListboxSelect>>', lambda e: show_relay(relay_order[relay_lb.curselection()[0]]) if relay_lb.curselection() else None)
     # Define terrain list keys
-    terrain_keys = sm.list_terrain()
+    terrain_keys = sorted(sm.list_terrain(), key=_az09_key)
     # Terrain list()
     ter_lb = make_list("Terrain:", terrain_keys, 2, lambda k: k, parent=elems_frame)  # column 4 for even spacing
     # Bind terrain list selection to display details
@@ -1432,6 +1494,10 @@ def open_system_editor(filename: str) -> None:
             draw_map(ctx)
         except Exception as e:
             messagebox.showerror("Error", f"Reload failed: {e}")
+            return
+        # Re-run validation after a reload
+        validate_and_report()
+        # Refresh object list ordering/coloring after reload
 
     # ─── Load Different System ────────────────────────────────────────────────
     def load_different_system():
@@ -1451,6 +1517,56 @@ def open_system_editor(filename: str) -> None:
         win.destroy()
         open_system_editor(newfname)
 
+
+    # ─── Validation: Cargo & Teams against cargo_teams.json ─────────────
+    def validate_and_report():
+        """
+        Validate every object's cargo and teams against cargo_teams.json.
+        - Flags unknown item names.
+        - Flags items placed under the wrong section (cargo vs teams).
+        - Flags non-integer or negative quantities.
+        Shows a summary warning on problems; silent if all OK.
+        """
+        cargo_set = set(ct_config.get('cargo', []))
+        team_set  = set(ct_config.get('teams', []))
+        issues    = []
+        # Nothing to validate against? Skip quietly.
+        if not cargo_set and not team_set:
+            return
+        for obj_name in sm.list_objects():
+            obj   = sm.get_object(obj_name)
+            carg  = obj.get('cargo') or {}
+            tms   = obj.get('teams') or {}
+            # Cargo checks
+            for item, qty in carg.items():
+                if item in team_set:
+                    issues.append(f"{obj_name}: '{item}' is a TEAM but appears under cargo.")
+                elif item not in cargo_set:
+                    issues.append(f"{obj_name}: Unknown cargo item '{item}'.")
+                if not isinstance(qty, int) or qty < 0:
+                    issues.append(f"{obj_name}: Cargo '{item}' has invalid qty {qty} (non-negative integer required).")
+            # Team checks
+            for item, qty in tms.items():
+                if item in cargo_set:
+                    issues.append(f"{obj_name}: '{item}' is CARGO but appears under teams.")
+                elif item not in team_set:
+                    issues.append(f"{obj_name}: Unknown team '{item}'.")
+                if not isinstance(qty, int) or qty < 0:
+                    issues.append(f"{obj_name}: Team '{item}' has invalid qty {qty} (non-negative integer required).")
+        if issues:
+            # If message too long for a messagebox, print full list and summarize.
+            report = "\n".join(issues)
+            if len(report) > 1800:
+                print("Cargo/Teams validation issues:\n" + report)
+                messagebox.showwarning(
+                    "Cargo/Teams Validation",
+                    f"{len(issues)} issues found. Full list printed to console."
+                )
+            else:
+                messagebox.showwarning("Cargo/Teams Validation", "Issues found:\n\n" + report)
+        else:
+            # Optional: log OK to console
+            print("Cargo/Teams validation: OK")
 
     def show_info():
         info_win = tk.Toplevel(win)
@@ -1629,15 +1745,32 @@ def open_system_editor(filename: str) -> None:
             if color == 'cyan':
                 map_canvas.create_text(sx, sy-10,
                     text=rname, fill='cyan', font=('Arial',8), tags=('relay_pt', rname))
-        # draw objects
-        for name in objs:
-            coord = sm.get_object(name).get('coordinate', [0,0,0])
+        # draw objects (jumpnodes/jumppoints in green)
+        # Use the *live* object names from the SystemMap so newly created items
+        # always appear, regardless of how the sidebar list is sorted/colored.
+        for name in sm.list_objects():
+            obj = sm.get_object(name)
+            coord = obj.get('coordinate', [0,0,0])
+            otype = obj.get('type','').lower()
+            # use green for jumpnode/jumppoint, white otherwise
+            color = 'light green' if otype in ('jumpnode','jumppoint') else 'white'
             sx, sy = coord_to_screen(coord[0], coord[2])
-            r = 5
-            map_canvas.create_oval(sx-r, sy-r, sx+r, sy+r,
-                fill='white', tags=('obj', name))
-            map_canvas.create_text(sx, sy-10,
-                text=name, fill='white', font=('Arial',8), tags=('obj', name))
+            # enlarge jumpnode/jumppoint markers
+            if otype in ('jumpnode','jumppoint'):
+                r = 8
+            else:
+                r = 5
+            map_canvas.create_oval(
+                sx-r, sy-r, sx+r, sy+r,
+                fill=color, tags=('obj', name)
+            )
+            map_canvas.create_text(
+                sx, sy-10,
+                text=name, fill=color,
+                # bold and slightly larger for jump nodes
+                font=('Arial',10,'bold') if otype in ('jumpnode','jumppoint') else ('Arial',8),
+                tags=('obj', name)
+            )
         # draw terrain as boxes
         for key in terrain_keys:
             feat = sm.get_terrain_feature(key)
@@ -1777,19 +1910,43 @@ def open_system_editor(filename: str) -> None:
         'show_terrain': show_terrain,
         'draw_map': draw_map,
         'drag_data': drag_data,
-        'screen_to_coord': screen_to_coord,
+        # placeholders; filled just below with closures bound to this ctx
+        'screen_to_coord': None,
+        'coord_to_screen': None,
         'win': win,
         'pan_x': pan_x,
         'pan_y': pan_y,
         'map_scale': map_scale,
         'push_undo':  push_undo
     }
+
+    # Create transform functions that always read the *current* pan/zoom from ctx.
+    # Using closures here avoids the default-arg capture bug that set _ctx=None.
+    def _make_transforms(_ctx):
+        def coord_to_screen(x, z):
+            return (
+                x * _ctx['map_scale'] + _ctx['pan_x'],
+               -z * _ctx['map_scale'] + _ctx['pan_y']
+            )
+        def screen_to_coord(sx, sy):
+            return (
+                (sx - _ctx['pan_x']) / _ctx['map_scale'],
+               -(sy - _ctx['pan_y']) / _ctx['map_scale']
+            )
+        return coord_to_screen, screen_to_coord
+    _cts, _stc = _make_transforms(ctx)
+    ctx['coord_to_screen'], ctx['screen_to_coord'] = _cts, _stc
+
     map_canvas.bind('<ButtonPress-1>', lambda e, _ctx=ctx: SysMapCanvas.on_canvas_press(e, _ctx))
+    map_canvas.bind('<ButtonPress-3>', lambda e, _ctx=ctx: SysMapCanvas.on_canvas_press(e, _ctx))
     map_canvas.bind('<B1-Motion>', lambda e, _ctx=ctx: SysMapCanvas.on_canvas_drag(e, _ctx))
     map_canvas.bind('<ButtonRelease-1>', on_canvas_release)
     map_canvas.bind('<MouseWheel>', lambda e, _ctx=ctx: SysMapCanvas.on_map_zoom(e, _ctx))
     map_canvas.bind('<Configure>', on_canvas_resize)
     draw_map(ctx)
+    # Run validation once the editor window is up
+    validate_and_report()
+    refresh_objects_list()
     global g_ctx
     g_ctx = ctx    
 
