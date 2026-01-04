@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -20704.00447524466,
+        -19310.462753141208,
         0,
-        22293.914542983803
+        29150.139815732815
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -12,10 +12,315 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Tethys Gate": {
+            "coordinate": [
+                -84305.55555555555,
+                0,
+                86944.44444444444
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Rhea Gate": "Tethys"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Waypoint 33 Gate": {
+            "coordinate": [
+                -16249.999999999993,
+                0,
+                -80995.37037037041
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Crab Gate": "Waypoint 33"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Titan Gate": {
+            "coordinate": [
+                115115.74074074077,
+                0,
+                -34120.370370370394
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Titan Gate": "Titan"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Rhea Command": {
+            "coordinate": [
+                -1203.7037037036946,
+                0,
+                601.8518518518309
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 16": {
+            "coordinate": [
+                2736.0360939643724,
+                0,
+                7820.912637174204
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 39": {
+            "coordinate": [
+                -5357.331675811579,
+                0,
+                -6133.169724508471
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "QRF 94": {
+            "coordinate": [
+                5526.852566300907,
+                0,
+                -3063.271604938282
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "QRF 55": {
+            "coordinate": [
+                -10101.719678783687,
+                0,
+                6983.667695473243
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Altiris Center": {
+            "coordinate": [
+                -40503.75800182896,
+                0,
+                46541.816700960226
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Maltic Market": {
+            "coordinate": [
+                40514.760516689574,
+                0,
+                -40263.73885459534
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {
+                "Analysis Suite": 3,
+                "Ashfilum": 14,
+                "Life Support": 3,
+                "Micro Controller": 23,
+                "Medical Supplies": 25,
+                "Power Relay": 17,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Black Box": 9,
+                "Sensor Suite": 7,
+                "Guidance System": 15,
+                "Torpedo Casing": 15,
+                "Pets": 3,
+                "Casing": 14,
+                "EMP": 10,
+                "Homing": 34,
+                "Coolant": 15,
+                "Tea": 13,
+                "Coffee": 14,
+                "Alcohol": 15
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 2
+            },
+            "description": ""
+        }
+    },
+    "sensor_relay": {
+        "SR 59": {
+            "coordinate": [
+                -70648.14814814815,
+                0,
+                62523.14814814814
+            ]
+        },
+        "SR 38": {
+            "coordinate": [
+                -56566.358024691355,
+                0,
+                25100.308641975294
+            ]
+        },
+        "SR 21": {
+            "coordinate": [
+                -42484.567901234564,
+                0,
+                -12322.53086419755
+            ]
+        },
+        "SR 32": {
+            "coordinate": [
+                -28402.777777777774,
+                0,
+                -49745.3703703704
+            ]
+        },
+        "SR 54": {
+            "coordinate": [
+                -49814.81481481481,
+                0,
+                79305.55555555555
+            ]
+        },
+        "SR 67": {
+            "coordinate": [
+                -15237.268518518511,
+                0,
+                56157.407407407394
+            ]
+        },
+        "SR 42": {
+            "coordinate": [
+                19340.27777777779,
+                0,
+                33009.25925925924
+            ]
+        },
+        "SR 86": {
+            "coordinate": [
+                53917.824074074095,
+                0,
+                9861.11111111108
+            ]
+        },
+        "SR 20": {
+            "coordinate": [
+                88495.3703703704,
+                0,
+                -13287.037037037066
+            ]
+        },
+        "SR 55": {
+            "coordinate": [
+                17314.81481481483,
+                0,
+                -67106.48148148152
+            ]
+        },
+        "SR 64": {
+            "coordinate": [
+                48275.46296296298,
+                0,
+                -59583.333333333365
+            ]
+        },
+        "SR 30": {
+            "coordinate": [
+                79236.11111111114,
+                0,
+                -52060.18518518521
+            ]
+        }
+    },
+    "terrain": {
+        "1766362750559": {
+            "type": "planet",
+            "name": "Planet Rhea",
+            "coordinate": [
+                53194.44444444446,
+                0,
+                49791.66666666666
+            ]
+        },
+        "1766362940619": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -88246.81355738452,
+                0,
+                42683.7920096022
+            ],
+            "end": [
+                -40021.504915409205,
+                0,
+                102483.1747256516
+            ],
+            "density": 225,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766362949999": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -29411.937014174633,
+                0,
+                82710.79818244171
+            ],
+            "end": [
+                -99338.63454503885,
+                0,
+                47506.322873799734
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

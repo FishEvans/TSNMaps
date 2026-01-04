@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renaera.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">Renaera</h2>
+        <h3 class="subheader">Alignment: Ximni</h3>
+        <img src="Images/Factions/Ximni.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"1761415819123": {"type": "blackhole", "x": -26040.025189775468, "y": -92617.05940198779, "grid": "H10"}, "Renaera": {"type": "planet", "x": -39444.44444444445, "y": -19305.555555555566, "grid": "L10", "hidden": false}, "Portal of Renewal": {"type": "jumpnode", "x": 80000.0, "y": 39914.48354050214, "grid": "N16", "hidden": false, "label": "Portal of Renewal", "destinations": {"Renaera Portal": "Isscar", "JP 56": "Kudos"}}, "Old Zenth": {"type": "station", "x": -1551.586791266572, "y": -4464.663351623235, "grid": "L11", "hidden": false, "label": "Old Zenth", "description": "Before the Folly of the first Age Old Zenth was the capital of Renaera. This staion in Geostationary Orbit of the site is part museum, part alter and part tourist attraction", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Egress Yards 2": {"type": "station", "x": -32130.3768242265, "y": 5400.463558337133, "grid": "M10", "hidden": false, "label": "Egress Yards 2", "hull": "xim_avenger", "facilities": [], "sides": ["Ximni"], "hullName": "Avenger", "hullImage": "Images/Ships/ximni_avenger256.png", "hullDescription": "Ximni single seat fighter."}, "Egress Yards 1": {"type": "station", "x": -14791.666666666677, "y": -32859.17435890109, "grid": "K11", "hidden": false, "label": "Egress Yards 1", "description": "Abandoned Yards, Irriadiated", "hull": "hegemony_drydock", "facilities": [], "sides": ["Ximni"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": ""}, "Old Zenth SM1": {"type": "station", "x": 920.8185372411139, "y": -1464.12188330684, "grid": "L12", "hidden": false, "label": "Old Zenth SM1", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["Ximni"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": ""}, "Old Zenth SM2": {"type": "station", "x": -6322.632084265281, "y": -2320.8741073559836, "grid": "L11", "hidden": false, "label": "Old Zenth SM2", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["Ximni"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": ""}, "Renewal Traffic": {"type": "station", "x": 72895.60467246253, "y": 32469.65318117742, "grid": "N15", "hidden": false, "label": "Renewal Traffic", "hull": "starbase_command", "facilities": ["Docking", "Repair", "Refuel"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 7": {"type": "platform", "x": 73720.44343850297, "y": 32287.359221827373, "grid": "N15", "hidden": false, "label": "WP 7"}, "DS 77": {"type": "station", "x": 80107.9231055248, "y": 36181.08653637171, "grid": "N16", "hidden": false, "label": "DS 77", "hull": "hegemony_generator", "facilities": [], "sides": ["Ximni"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 29": {"type": "station", "x": -94323.20420212118, "y": 139489.42207949373, "grid": "S07", "hidden": false, "label": "DS 29", "hull": "starbase_industry", "facilities": [], "sides": ["Ximni"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 68": {"type": "station", "x": -172656.53753545452, "y": -43843.911253839615, "grid": "J03", "hidden": false, "label": "DS 68", "hull": "starbase_science", "facilities": [], "sides": ["Ximni"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": ""}, "DS 59": {"type": "station", "x": 109843.46246454549, "y": -104577.24458717297, "grid": "G17", "hidden": false, "label": "DS 59", "hull": "starbase_kralien", "facilities": [], "sides": ["Ximni"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Echo Ring": {"type": "station", "x": -59281.50383424916, "y": 282.8914917687155, "grid": "M09", "hidden": false, "label": "Echo Ring", "hull": "starbase_command", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 40": {"type": "platform", "x": -60026.72234486126, "y": -876.9077346553184, "grid": "L08", "hidden": false, "label": "WP 40"}, "WP 32": {"type": "platform", "x": -57913.91402718956, "y": 218.62250413741316, "grid": "M09", "hidden": false, "label": "WP 32"}, "WP 6": {"type": "platform", "x": -59478.957225464896, "y": 1653.2454358897999, "grid": "M09", "hidden": false, "label": "WP 6"}, "WP 26": {"type": "platform", "x": -60626.6555708668, "y": 557.7151970970682, "grid": "M08", "hidden": false, "label": "WP 26"}, "WP 50": {"type": "platform", "x": -57444.40106770696, "y": 1470.657062757678, "grid": "M09", "hidden": false, "label": "WP 50"}, "WP 79": {"type": "platform", "x": -60626.6555708668, "y": -1085.5801610920294, "grid": "L08", "hidden": false, "label": "WP 79"}, "WP 74": {"type": "platform", "x": -60548.40341095303, "y": 1940.1700222402771, "grid": "M08", "hidden": false, "label": "WP 74"}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [-54714.415472550005, -10547.748805883333, -21118.91786078334, -65285.58452745001, -54714.415472550005], "y": [76511.0309104591, 104011.0309104591, 120988.96908954093, 93488.96908954093, 76511.0309104591], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-39444.44444444445], "y": [-19305.555555555566], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Renaera"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Renaera [L10]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [41896.657507705706, 25500.052569434087, 11154.46495224955, 27551.069890521165, 41896.657507705706], "y": [-90471.73342355283, -73592.87539886148, -87528.58908412646, -104407.44710881781, -90471.73342355283], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-75551.84163192648, -53850.4527430376, -72496.5729451553, -94197.9618340442, -75551.84163192648], "y": [-97680.52301079573, -41739.16498610436, -34505.756287006974, -90447.11431169836, -97680.52301079573], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-48062.92213656998, -41311.37892669343, -60922.992440511836, -67674.53565038838, -48062.92213656998], "y": [-119655.3812471968, -85897.66519781407, -81975.34249505038, -115733.05854443311, -119655.3812471968], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [25295.510169304558, 28671.28177424283, 48492.495006700075, 45116.7234017618, 25295.510169304558], "y": [-36563.06223945255, -61640.22273327971, -58971.98249044893, -33894.821996621766, -36563.06223945255], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [19614.021258543235, -42596.62688960493, -39383.114847970704, 22827.533300177452, 19614.021258543235], "y": [-102519.36324589254, -112646.67806070737, -132386.8234593176, -122259.50864450276, -102519.36324589254], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [144842.10531675132, 92758.77198341799, 91465.18998271016, 143548.52331604346, 144842.10531675132], "y": [88079.59433892243, 91455.36594386068, 71497.24364722554, 68121.47204228728, 88079.59433892243], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [22833.957540687137, 29103.247664143928, 9480.282203218734, 3210.9920797619434, 22833.957540687137], "y": [52537.5671757943, 84366.270879498, 88231.40043998328, 56402.69673627956, 52537.5671757943], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [72740.97970652676, 46217.05995344034, 60846.40818552729, 87370.32793861371, 72740.97970652676], "y": [3418.5255921477556, -25034.40650661768, -38671.93451958009, -10219.002420814653, 3418.5255921477556], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [108522.91690814953, 90197.29962419892, 107529.74876168229, 125855.36604563291, 108522.91690814953], "y": [55601.75171334836, 23773.04800964465, 13793.75911230574, 45622.46281600944, 55601.75171334836], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-85515.38356729504, -78763.84035741849, -97737.50631842876, -104489.0495283053, -85515.38356729504], "y": [12245.354295868543, 32499.983925498178, 38824.53924583494, 18569.909616205303, 12245.354295868543], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-26040.025189775468], "y": [-92617.05940198779], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["1761415819123"], "textposition": "top center", "hovertext": ["1761415819123 [H10]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [80000.0], "y": [39914.48354050214], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Portal of Renewal [N16]"], "hoverinfo": "text", "text": ["Portal of Renewal"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-1551.586791266572], "y": [-4464.663351623235], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth [L11]"], "hoverinfo": "text", "text": ["Old Zenth"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-32130.3768242265], "y": [5400.463558337133], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Egress Yards 2 [M10]"], "hoverinfo": "text", "text": ["Egress Yards 2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-14791.666666666677], "y": [-32859.17435890109], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Egress Yards 1 [K11]"], "hoverinfo": "text", "text": ["Egress Yards 1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [920.8185372411139], "y": [-1464.12188330684], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth SM1 [L12]"], "hoverinfo": "text", "text": ["Old Zenth SM1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-6322.632084265281], "y": [-2320.8741073559836], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth SM2 [L11]"], "hoverinfo": "text", "text": ["Old Zenth SM2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [72895.60467246253], "y": [32469.65318117742], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Renewal Traffic [N15]"], "hoverinfo": "text", "text": ["Renewal Traffic"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [73720.44343850297], "y": [32287.359221827373], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 7 [N15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [80107.9231055248], "y": [36181.08653637171], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 77 [N16]"], "hoverinfo": "text", "text": ["DS 77"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-94323.20420212118], "y": [139489.42207949373], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 29 [S07]"], "hoverinfo": "text", "text": ["DS 29"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-172656.53753545452], "y": [-43843.911253839615], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 68 [J03]"], "hoverinfo": "text", "text": ["DS 68"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [109843.46246454549], "y": [-104577.24458717297], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 59 [G17]"], "hoverinfo": "text", "text": ["DS 59"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-59281.50383424916], "y": [282.8914917687155], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Echo Ring [M09]"], "hoverinfo": "text", "text": ["Echo Ring"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-60026.72234486126], "y": [-876.9077346553184], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 40 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57913.91402718956], "y": [218.62250413741316], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 32 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-59478.957225464896], "y": [1653.2454358897999], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 6 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60626.6555708668], "y": [557.7151970970682], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 26 [M08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57444.40106770696], "y": [1470.657062757678], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 50 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60626.6555708668], "y": [-1085.5801610920294], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 79 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60548.40341095303], "y": [1940.1700222402771], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 74 [M08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Renaera", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Renaera';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+        }
+    });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [1];
+        var bhIdx = [12];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('Portal of Renewal',function(){highlight('Portal of Renewal');},false,null,false)
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+    addButton('--- Planets ---', null, true, null);
+    addButton('Renaera',function(){highlight('Renaera');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('DS 29',function(){highlight('DS 29');},false,'red',false)
+    addButton('DS 59',function(){highlight('DS 59');},false,'red',false)
+    addButton('DS 68',function(){highlight('DS 68');},false,'red',false)
+    addButton('DS 77',function(){highlight('DS 77');},false,'red',false)
+    addButton('Echo Ring',function(){highlight('Echo Ring');},false,'red',false)
+    addButton('Egress Yards 1',function(){highlight('Egress Yards 1');},false,'red',false)
+    addButton('Egress Yards 2',function(){highlight('Egress Yards 2');},false,'red',false)
+    addButton('Old Zenth',function(){highlight('Old Zenth');},false,'red',false)
+    addButton('Old Zenth SM1',function(){highlight('Old Zenth SM1');},false,'red',false)
+    addButton('Old Zenth SM2',function(){highlight('Old Zenth SM2');},false,'red',false)
+    addButton('Renewal Traffic',function(){highlight('Renewal Traffic');},false,'red',false)
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

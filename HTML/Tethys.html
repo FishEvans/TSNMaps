@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Triton Gate": {"type": "jumpnode", "x": 0.0, "y": 200833.33333333334, "grid": "W12", "hidden": false, "label": "Triton Gate", "destinations": {"Tethys Gate": "Triton"}}, "Rhea Gate": {"type": "jumpnode", "x": 149166.6666666667, "y": -39166.66666666667, "grid": "K19", "hidden": false, "label": "Rhea Gate", "destinations": {"Tethys Gate": "Rhea"}}, "Tethys Command": {"type": "station", "x": 1806.9154061164497, "y": 15454.338300632124, "grid": "M12", "hidden": false, "label": "Tethys Command", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 12": {"type": "platform", "x": -3917.5111011489084, "y": 18964.21957198578, "grid": "M11", "hidden": false, "label": "WP 12"}, "WP 80": {"type": "platform", "x": 1794.1703925120485, "y": 9098.587901116854, "grid": "M12", "hidden": false, "label": "WP 80"}, "WP 96": {"type": "platform", "x": 7311.135471616381, "y": 19094.03051502353, "grid": "M12", "hidden": false, "label": "WP 96"}, "QRF 36": {"type": "platform", "x": 1826.8900876717703, "y": 12191.723247613541, "grid": "M12", "hidden": false, "label": "QRF 36"}, "SY 19": {"type": "station", "x": 1599.4603981235898, "y": 22249.001077076715, "grid": "N12", "hidden": false, "label": "SY 19", "hull": "usfp_shipyard", "facilities": ["Repair"], "sides": ["USFP"], "hullName": "Ship Yard", "hullImage": "Images/Ships/TSN Mod/USFP/ShipYard256.png", "hullDescription": ""}, "Intrin Stores": {"type": "station", "x": 294.4445713137888, "y": 56545.11358467104, "grid": "O12", "hidden": false, "label": "Intrin Stores", "hull": "starbase_civil", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Kotrin Markets": {"type": "station", "x": -399.9998731306557, "y": -30260.441970884523, "grid": "K11", "hidden": false, "label": "Kotrin Markets", "hull": "starbase_civil", "facilities": ["Refuel", "Docking"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Waypoint 46 Gate": {"type": "jumpnode", "x": -200000.00000000003, "y": -96666.66666666667, "grid": "H01", "hidden": false, "label": "Waypoint 46 Gate", "destinations": {"Harmion Gate": "Waypoint 46"}}, "SR 54": {"type": "sensor_relay", "x": -833.3333333333334, "y": 170000.00000000003, "grid": "U11", "hidden": false, "label": "SR 54"}, "SR 27": {"type": "sensor_relay", "x": -555.5555555555557, "y": 126666.66666666669, "grid": "S11", "hidden": false, "label": "SR 27"}, "SR 11": {"type": "sensor_relay", "x": -277.7777777777778, "y": 83333.33333333334, "grid": "Q11", "hidden": false, "label": "SR 11"}, "SR 53": {"type": "sensor_relay", "x": -160000.0, "y": -66666.66666666667, "grid": "I04", "hidden": false, "label": "SR 53"}, "SR 72": {"type": "sensor_relay", "x": -128750.0, "y": -51875.0, "grid": "J05", "hidden": false, "label": "SR 72"}, "SR 47": {"type": "sensor_relay", "x": -97500.0, "y": -37083.333333333336, "grid": "K07", "hidden": false, "label": "SR 47"}, "SR 35": {"type": "sensor_relay", "x": -66250.0, "y": -22291.66666666667, "grid": "K08", "hidden": false, "label": "SR 35"}, "SR 91": {"type": "sensor_relay", "x": -35000.0, "y": -7500.0, "grid": "L10", "hidden": false, "label": "SR 91"}, "SR 81": {"type": "sensor_relay", "x": 107500.00000000001, "y": -23333.333333333336, "grid": "K17", "hidden": false, "label": "SR 81"}, "SR 30": {"type": "sensor_relay", "x": 72916.66666666667, "y": -7500.000000000001, "grid": "L15", "hidden": false, "label": "SR 30"}, "SR 69": {"type": "sensor_relay", "x": 37500.0, "y": 4166.666666666667, "grid": "M13", "hidden": false, "label": "SR 69"}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Tethys", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [43347.836978496336, 53764.50364516301, 24191.052164131215, 13774.385497464546, 43347.836978496336], "y": [101080.20452536595, 162191.31563647708, 167232.2448661984, 106121.13375508728, 101080.20452536595], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-36461.65211644108, 42010.57010578114, 31778.319036846395, -46693.90318537582, -36461.65211644108], "y": [73527.90581081384, 102000.12803303606, 130201.2102474172, 101728.98802519498, 73527.90581081384], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-49791.78907003079, -21319.56684780857, -47947.09956511945, -76419.32178734167, -49791.78907003079], "y": [32107.659595439196, 86968.77070655032, 100788.1231294585, 45927.01201834738, 32107.659595439196], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-58644.89824600063, -129478.23157933398, -130066.21261137183, -59232.87927803849, -58644.89824600063], "y": [-22514.76442624096, -20431.431092907624, -40422.786182194686, -42506.11951552802, -22514.76442624096], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [32354.397367427653, 108048.84181187212, 103240.04733075548, 27545.602886311022, 32354.397367427653], "y": [-29717.082682768058, -10967.082682768056, 8446.198740999082, -10303.801259000922, -29717.082682768058], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [0.0], "y": [200833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Triton Gate [W12]"], "hoverinfo": "text", "text": ["Triton Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [149166.6666666667], "y": [-39166.66666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Rhea Gate [K19]"], "hoverinfo": "text", "text": ["Rhea Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [1806.9154061164497], "y": [15454.338300632124], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Tethys Command [M12]"], "hoverinfo": "text", "text": ["Tethys Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-3917.5111011489084], "y": [18964.21957198578], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 12 [M11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [1794.1703925120485], "y": [9098.587901116854], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 80 [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [7311.135471616381], "y": [19094.03051502353], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 96 [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [1826.8900876717703], "y": [12191.723247613541], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 36 [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [1599.4603981235898], "y": [22249.001077076715], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["SY 19 [N12]"], "hoverinfo": "text", "text": ["SY 19"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [294.4445713137888], "y": [56545.11358467104], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Intrin Stores [O12]"], "hoverinfo": "text", "text": ["Intrin Stores"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-399.9998731306557], "y": [-30260.441970884523], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Kotrin Markets [K11]"], "hoverinfo": "text", "text": ["Kotrin Markets"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-200000.00000000003], "y": [-96666.66666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Waypoint 46 Gate [H01]"], "hoverinfo": "text", "text": ["Waypoint 46 Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-833.3333333333334], "y": [170000.00000000003], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 54 [U11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-555.5555555555557], "y": [126666.66666666669], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 27 [S11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-277.7777777777778], "y": [83333.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 11 [Q11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-160000.0], "y": [-66666.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 53 [I04]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-128750.0], "y": [-51875.0], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 72 [J05]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-97500.0], "y": [-37083.333333333336], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 47 [K07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-66250.0], "y": [-22291.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 35 [K08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-35000.0], "y": [-7500.0], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 91 [L10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [107500.00000000001], "y": [-23333.333333333336], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 81 [K17]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [72916.66666666667], "y": [-7500.000000000001], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 30 [L15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [37500.0], "y": [4166.666666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 69 [M13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Tethys", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Tethys';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,21 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Rhea Gate',function(){highlight('Rhea Gate');},false,null,false)
+    addButton('Triton Gate',function(){highlight('Triton Gate');},false,null,false)
+    addButton('Waypoint 46 Gate',function(){highlight('Waypoint 46 Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Intrin Stores',function(){highlight('Intrin Stores');},false,'blue',false)
+    addButton('Kotrin Markets',function(){highlight('Kotrin Markets');},false,'blue',false)
+    addButton('SY 19',function(){highlight('SY 19');},false,'blue',false)
+    addButton('Tethys Command',function(){highlight('Tethys Command');},false,'blue',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

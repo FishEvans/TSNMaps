@@ -1,23 +1,21 @@
 {
     "systemMapCoord": [
-        3809.947923624399,
+        7606.872296223169,
         0,
-        24787.020478535374
+        28200.244057422562
     ],
     "systemalignment": "USFP",
     "metadata": {
-        "sysdescription": "Corus is home to the planet Corus (not implimented yet) and has a number of obiting stations. notably it is the HQ system for the Corus Cargo Co. Fort Grey is a TSN Marine training facility. Corus is an abundant farming world and is noted for haveing an extensive railway network.",
-        "security": "Normal",
+        "sysdescription": "Corus is home to the planet Corus and has a number of obiting stations. notably it is the HQ system for the Corus Cargo Co. Fort Grey is a TSN Marine training facility. Corus is an abundant farming world and is noted for haveing an extensive railway network.",
+        "security": "Low",
         "exports": [
             "Agriculture"
         ],
         "focus": "Agriculture",
         "intel": {
-            "pirate": "Low",
+            "pirate": "High",
             "enemy": "Low",
-            "assets": [
-                "Shipyard"
-            ]
+            "assets": []
         },
         "development": "Colony",
         "visible": true,
@@ -134,7 +132,7 @@
                 -90855.05572702333
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_command",
             "type": "station",
@@ -173,7 +171,9 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "High Yield Warhead": 3,
                 "Warhead": 13,
@@ -204,7 +204,7 @@
         },
         "DW 16": {
             "coordinate": [
-                66764.63846480782,
+                67462.34258289194,
                 0,
                 -117309.87160638801
             ],
@@ -213,9 +213,33 @@
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": ""
         },
         "CC R&D": {
             "coordinate": [
@@ -296,7 +320,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "CC SM2": {
             "coordinate": [
@@ -311,7 +336,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "MM Refinery": {
             "coordinate": [
@@ -324,9 +350,13 @@
             ],
             "hull": "usfp_industrial_refinary",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "MM Ops": {
             "coordinate": [
@@ -379,7 +409,9 @@
             ],
             "hull": "usfp_industrial_processor",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Iron": 60,
                 "Tharium": 60,
@@ -444,16 +476,19 @@
         },
         "DS 22": {
             "coordinate": [
-                -239799.71960698528,
+                -241414.77543588373,
                 0,
-                60092.959704359324
+                68975.76676330084
             ],
             "sides": [
                 "USFP"
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
             "cargo": {
                 "Repair Materials": 18,
                 "Medical Supplies": 9,
@@ -471,22 +506,25 @@
                 "Alcohol": 3
             },
             "teams": {
-                "Diplomats": 0
+                "Diplomats": 0,
+                "DamCon": 1
             },
             "description": ""
         },
         "DS 80": {
             "coordinate": [
-                -263430.1208415532,
+                -261815.06501265476,
                 0,
-                60092.959704359324
+                67522.21651729224
             ],
             "sides": [
                 "USFP"
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Repair Materials": 16,
                 "Medical Supplies": 12,
@@ -501,7 +539,8 @@
                 "Casing": 5,
                 "Coffee": 5,
                 "Tea": 7,
-                "Alcohol": 4
+                "Alcohol": 4,
+                "Guidance System": 10
             },
             "teams": {
                 "Diplomats": 0
@@ -512,7 +551,7 @@
             "coordinate": [
                 -251856.0467674791,
                 0,
-                95297.4350130013
+                91259.79544075516
             ],
             "sides": [
                 "USFP"
@@ -536,7 +575,8 @@
                 "Casing": 5,
                 "Coffee": 6,
                 "Tea": 5,
-                "Alcohol": 5
+                "Alcohol": 5,
+                "Warhead": 7
             },
             "teams": {
                 "Diplomats": 0
@@ -554,9 +594,78 @@
             ],
             "hull": "starbase_science",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "PU 22": {
+            "coordinate": [
+                -245140.22843184308,
+                0,
+                70719.12082351625
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_assembly",
+            "type": "platform",
             "cargo": {},
             "teams": {}
+        },
+        "RS 15 Storage": {
+            "coordinate": [
+                -93684.16982219329,
+                0,
+                105057.09610347389
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 750,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 815,
+                "Ashfilum": 258,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 180,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Power Relay": 12,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {},
+            "description": ""
         }
     },
     "sensor_relay": {
@@ -625,7 +734,7 @@
         },
         "SR 76": {
             "coordinate": [
-                29927.319530178254,
+                20000.319530178254,
                 0,
                 -98169.76337448557
             ]
@@ -815,6 +924,15 @@
             "scatter": 25000,
             "composition": []
         },
+        "1749846452805": {
+            "type": "planet",
+            "name": "Corus Prime",
+            "coordinate": [
+                29927.319530178254,
+                0,
+                -98169.76337448557
+            ]
+        },
         "1749846477046": {
             "type": "nebulas",
             "seed": 2010,
@@ -902,6 +1020,53 @@
             ],
             "density": 200,
             "scatter": 18000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759588604358": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                56560.43965997409,
+                0,
+                61087.6709491529
+            ],
+            "density": 100,
+            "scatter": 25000
+        },
+        "1759588628014": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -79943.2338344005,
+                0,
+                107350.57863225882
+            ],
+            "end": [
+                -94474.45725689706,
+                0,
+                121561.59800811618
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1759588635250": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -125954.86706485317,
+                0,
+                108500.5769175812
+            ],
+            "end": [
+                -129303.84683165702,
+                0,
+                95439.55582704622
+            ],
+            "density": 125,
+            "scatter": 10000,
             "composition": [
                 "Ast. Std Rand"
             ]

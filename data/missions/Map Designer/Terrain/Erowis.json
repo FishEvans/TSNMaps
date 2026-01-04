@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        2607.3478372728755,
+        656.3894263280315,
         0,
-        -17963.936430823025
+        -22200.303266017545
     ],
     "systemalignment": "Torgoth",
     "metadata": {
@@ -15,8 +15,330 @@
         "development": "Unclaimed",
         "visible": true
     },
-    "objects": {},
+    "objects": {
+        "Drenan Gate": {
+            "coordinate": [
+                -118333.33333333334,
+                0,
+                70000.0
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Erowis Gate": "Drenan"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Drenan Gatekeeper": {
+            "coordinate": [
+                -59166.66666666667,
+                0,
+                40833.333333333336
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Ashtarna Drydock": {
+            "coordinate": [
+                -69166.66666666667,
+                0,
+                21805.55555555554
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Iniyi Trading Post": {
+            "coordinate": [
+                40663.58024691358,
+                0,
+                50655.86419753087
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Cloaked Base 1": {
+            "coordinate": [
+                35000.0,
+                0,
+                88333.33333333334
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Cloaked Base 2": {
+            "coordinate": [
+                63337.191358024684,
+                0,
+                27403.54938271606
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Krellis Gate": {
+            "coordinate": [
+                145000.0,
+                0,
+                -68333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Erowis Gate": "Krellis"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Krellis Gatekeeper": {
+            "coordinate": [
+                119598.76543209876,
+                0,
+                -42673.61111111112
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Erowis Master": {
+            "coordinate": [
+                -40000.0,
+                0,
+                -46666.66666666667
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Op Refinery": {
+            "coordinate": [
+                -142982.25308641978,
+                0,
+                -39764.66049382717
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Thith Denabite": {
+            "coordinate": [
+                -128513.8888888889,
+                0,
+                -77074.84567901236
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1766425279112": {
+            "type": "planet",
+            "name": "Planet Erowis",
+            "coordinate": [
+                -17125.77160493822,
+                0,
+                -74251.54320987655
+            ]
+        },
+        "1766425358583": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -159872.68518518517,
+                0,
+                -17827.93209876543
+            ],
+            "end": [
+                -118881.17283950614,
+                0,
+                -93059.41358024692
+            ],
+            "density": 125,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766425385543": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -122256.94444444441,
+                0,
+                102735.33950617287
+            ],
+            "end": [
+                -33040.123456790076,
+                0,
+                60779.32098765435
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766425404347": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -40273.919753086375,
+                0,
+                62708.333333333365
+            ],
+            "end": [
+                38815.58641975315,
+                0,
+                55956.79012345682
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766425409755": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                30135.03086419759,
+                0,
+                55956.79012345682
+            ],
+            "end": [
+                94274.69135802476,
+                0,
+                74282.40740740745
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766425425059": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                20489.969135802527,
+                0,
+                105146.60493827164
+            ],
+            "end": [
+                72091.04938271611,
+                0,
+                10142.746913580268
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766425457867": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                74020.06172839513,
+                0,
+                -5771.604938271587
+            ],
+            "end": [
+                87040.89506172846,
+                0,
+                -23132.7160493827
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766425473299": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                135748.45679012354,
+                0,
+                -55443.672839506165
+            ],
+            "end": [
+                163719.13580246922,
+                0,
+                -97881.94444444444
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766425492331": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -124568.67283950612,
+                0,
+                -9783.950617283948
+            ],
+            "end": [
+                -176568.67283950612,
+                0,
+                -84783.95061728395
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        }
+    },
     "traffic": {}
 }

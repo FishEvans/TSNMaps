@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcturus.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">Arcturus</h2>
+        <h3 class="subheader">Alignment: Hjorden</h3>
+        <img src="Images/Factions/Hjorden.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"Planet Arcturus": {"type": "planet", "x": -67731.48148148153, "y": 81755.4012345679, "grid": "Q08", "hidden": false}, "Hjorden Gate": {"type": "jumpnode", "x": -142500.0, "y": -65000.00000000001, "grid": "I04", "hidden": false, "label": "Hjorden Gate", "destinations": {"Antara Slipway": "Hjorden"}}, "Eyukua Gate": {"type": "jumpnode", "x": 91666.66666666667, "y": 125833.33333333334, "grid": "S16", "hidden": false, "label": "Eyukua Gate", "destinations": {"Arcturus Gate": "Eyukua"}}, "Outpost 91": {"type": "station", "x": -141060.95679012348, "y": -31269.290123456783, "grid": "K04", "hidden": false, "label": "Outpost 91", "hull": "starbase_civil", "facilities": [], "sides": ["Hjorden"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "SR 31": {"type": "sensor_relay", "x": -39398.148148148204, "y": -47411.26543209878, "grid": "J10", "hidden": false, "label": "SR 31"}, "SR 49": {"type": "sensor_relay", "x": -48806.10569741839, "y": -6192.31021593076, "grid": "L09", "hidden": false, "label": "SR 49"}, "SR 86": {"type": "sensor_relay", "x": -75166.61697156851, "y": 26862.725402364056, "grid": "N08", "hidden": false, "label": "SR 86"}, "SR 19": {"type": "sensor_relay", "x": -113258.65942229834, "y": 45206.88622517447, "grid": "O06", "hidden": false, "label": "SR 19"}, "SR 64": {"type": "sensor_relay", "x": -155537.63687399807, "y": 45206.88622517447, "grid": "O04", "hidden": false, "label": "SR 64"}, "SR 29": {"type": "sensor_relay", "x": -193629.67932472788, "y": 26862.725402364056, "grid": "N02", "hidden": false, "label": "SR 29"}, "SR 53": {"type": "sensor_relay", "x": -219990.19059887802, "y": -6192.3102159307455, "grid": "L01", "hidden": false, "label": "SR 53"}, "SR 35": {"type": "sensor_relay", "x": -229398.1481481482, "y": -47411.265432098764, "grid": "J00", "hidden": false, "label": "SR 35"}, "SR 84": {"type": "sensor_relay", "x": -219990.19059887802, "y": -88630.22064826678, "grid": "H01", "hidden": false, "label": "SR 84"}, "SR 57": {"type": "sensor_relay", "x": -193629.6793247279, "y": -121685.2562665616, "grid": "F02", "hidden": false, "label": "SR 57"}, "SR 17": {"type": "sensor_relay", "x": -155537.6368739981, "y": -140029.41708937203, "grid": "E04", "hidden": false, "label": "SR 17"}, "SR 73": {"type": "sensor_relay", "x": -113258.65942229844, "y": -140029.41708937206, "grid": "E06", "hidden": false, "label": "SR 73"}, "SR 82": {"type": "sensor_relay", "x": -75166.61697156852, "y": -121685.25626656161, "grid": "F08", "hidden": false, "label": "SR 82"}, "SR 85": {"type": "sensor_relay", "x": -48806.10569741836, "y": -88630.22064826674, "grid": "H09", "hidden": false, "label": "SR 85"}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [-67731.48148148153], "y": [81755.4012345679], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Arcturus"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Arcturus [Q08]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-53564.81481481486, -141898.1481481482, -141898.1481481482, -53564.81481481486, -53564.81481481486], "y": [165088.73456790124, 165088.73456790124, 145088.73456790124, 145088.73456790124, 165088.73456790124], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [126252.56137404572, 68652.56137404572, 37417.8089963245, 95017.8089963245, 126252.56137404572], "y": [-39216.2533698992, 32783.7466301008, 7795.94472792383, -64204.05527207617, -39216.2533698992], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-48850.84212323351, -181952.69397508536, -181778.78750639656, -48676.93565454471, -48850.84212323351], "y": [-95180.08792693749, -96337.4953343449, -116336.73923355639, -115179.33182614898, -95180.08792693749], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-11130.166657668902, -51259.79628729871, -84462.42593492394, -44332.79630529414, -11130.166657668902], "y": [-153757.9544384674, -94026.39888291182, -116333.02087017465, -176064.5764257302, -153757.9544384674], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [17265.639983722547, -42734.36001627746, -44395.26961335226, 15604.730386647747, 17265.639983722547], "y": [-157445.80784965, -152445.80784965, -172376.72301454758, -177376.72301454758, -157445.80784965], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-37566.21479961491, -138399.54813294826, -138730.08149668147, -37896.74816334813, -37566.21479961491], "y": [-126579.29784583546, -124912.63117916883, -144909.89968502882, -146576.56635169545, -126579.29784583546], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-101282.1832923338, -158782.1832923338, -158347.44633729593, -100847.44633729593, -101282.1832923338], "y": [-135746.17381662564, -136579.50714995895, -166576.35704757195, -165743.02371423863, -135746.17381662564], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [30124.117373319637, -7315.8826266803635, 6826.252997050583, 44266.252997050586, 30124.117373319637], "y": [-90719.0865091222, -128159.0865091222, -142301.22213285315, -104861.22213285315, -90719.0865091222], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [110642.52979389038, 51602.52979389038, 57347.84057647984, 116387.84057647984, 110642.52979389038], "y": [-29787.7954406022, -41307.7954406022, -70752.51320137316, -59232.51320137316, -29787.7954406022], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-19710.10541358709, 63809.894586412905, 27860.47578395731, -55659.524216042686, -19710.10541358709], "y": [5794.293257825444, 92194.29325782544, 126945.39810019919, 40545.39810019919, 5794.293257825444], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [15771.248359684672, -25228.751640315328, -46940.877989314424, -5940.877989314424, 15771.248359684672], "y": [680.975682604947, 43680.97568260495, 22978.715675419757, -20021.284324580243, 680.975682604947], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [32144.039838496363, 2144.039838496363, -6313.669468126114, 23686.330531873886, 32144.039838496363], "y": [-11608.322921034993, 2391.6770789650063, -15731.985720940302, -29731.9857209403, -11608.322921034993], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [65015.39118349429, 19015.391183494292, 12814.979186875955, 58814.97918687596, 65015.39118349429], "y": [94837.14407382713, 109837.14407382713, 90822.54728419756, 75822.54728419756, 94837.14407382713], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-114928.03284780747, -163539.14395891858, -161257.15233737807, -112646.04122626696, -114928.03284780747], "y": [-3267.838743619239, -6045.61652139702, -45980.46989835608, -43202.6921205783, -3267.838743619239], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-90430.55555555578, -125731.48148148171, -125731.48148148171, -90430.55555555578, -90430.55555555578], "y": [-78767.6728395062, -78767.6728395062, -88767.6728395062, -88767.6728395062, -78767.6728395062], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-142500.0], "y": [-65000.00000000001], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Hjorden Gate [I04]"], "hoverinfo": "text", "text": ["Hjorden Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [91666.66666666667], "y": [125833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Eyukua Gate [S16]"], "hoverinfo": "text", "text": ["Eyukua Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-141060.95679012348], "y": [-31269.290123456783], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Outpost 91 [K04]"], "hoverinfo": "text", "text": ["Outpost 91"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-39398.148148148204], "y": [-47411.26543209878], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 31 [J10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-48806.10569741839], "y": [-6192.31021593076], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 49 [L09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-75166.61697156851], "y": [26862.725402364056], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 86 [N08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-113258.65942229834], "y": [45206.88622517447], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 19 [O06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-155537.63687399807], "y": [45206.88622517447], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 64 [O04]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-193629.67932472788], "y": [26862.725402364056], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 29 [N02]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-219990.19059887802], "y": [-6192.3102159307455], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 53 [L01]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-229398.1481481482], "y": [-47411.265432098764], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 35 [J00]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-219990.19059887802], "y": [-88630.22064826678], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 84 [H01]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-193629.6793247279], "y": [-121685.2562665616], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 57 [F02]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-155537.6368739981], "y": [-140029.41708937203], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 17 [E04]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-113258.65942229844], "y": [-140029.41708937206], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 73 [E06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-75166.61697156852], "y": [-121685.25626656161], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 82 [F08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-48806.10569741836], "y": [-88630.22064826674], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 85 [H09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Arcturus", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Arcturus';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+        }
+    });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('Eyukua Gate',function(){highlight('Eyukua Gate');},false,null,false)
+    addButton('Hjorden Gate',function(){highlight('Hjorden Gate');},false,null,false)
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Arcturus',function(){highlight('Planet Arcturus');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Outpost 91',function(){highlight('Outpost 91');},false,'red',false)
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

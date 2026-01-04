@@ -1,0 +1,784 @@
+{
+    "systemMapCoord": [
+        54438.765644308914,
+        0,
+        -14523.306818662182
+    ],
+    "systemalignment": "Ximni",
+    "metadata": {
+        "skybox": "sky1.png",
+        "sysdescription": "The Memoras Free Zone is the Confederation\u2019s great bazaar \u2014 a chaotic frontier world where trade, innovation, and revelry blur together. Located on the edge of Ximni-controlled space, Memoras orbits a binary star that floods the skies in constant aurorae. The world\u2019s capital, Doxx City, is infamous for its floating taverns, neon airships, and open-air trade domes. Merchants from across the USFP and even the Hegemony conduct business here, protected by local neutrality laws. Memoras is also home to the Circle of Xim, a semi-religious order of storytellers and philosophers who record and judge acts of courage across the Confederation.",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Unclaimed",
+        "visible": true
+    },
+    "objects": {
+        "Hoprate Portal": {
+            "coordinate": [
+                -93746.41584743185,
+                0,
+                185833.80070206526
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Isscar Portal Nexus": "Isscar"
+            },
+            "state": "Tethered",
+            "drift": 43000
+        },
+        "Botath Portal": {
+            "coordinate": [
+                50038.95533264748,
+                0,
+                26761.7002934004
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Banner Portal": "Tjorath",
+                "Great Xim Gateway": "Castor"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Welcome Arsonal": {
+            "coordinate": [
+                34528.34522174292,
+                0,
+                23924.079593629907
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 43": {
+            "coordinate": [
+                27977.150397268237,
+                0,
+                32825.1788574403
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 71": {
+            "coordinate": [
+                -507.97294661754455,
+                0,
+                100456.12280318691
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "DS 91": {
+            "coordinate": [
+                -92325.83488648952,
+                0,
+                135620.41035462724
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": ""
+        },
+        "DS 98": {
+            "coordinate": [
+                -85348.79370564819,
+                0,
+                45756.11994539083
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 32": {
+            "coordinate": [
+                -83549.29850108952,
+                0,
+                128658.83781961381
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "DS91 SM": {
+            "coordinate": [
+                -88332.95030576864,
+                0,
+                133741.741524323
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 32 SM": {
+            "coordinate": [
+                -86069.40319152009,
+                0,
+                126122.33162710858
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [
+                "Refuel"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "Blue Residential": {
+            "coordinate": [
+                -7030.314461979722,
+                0,
+                95407.75369514215
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "WP 32": {
+            "coordinate": [
+                34709.81277095275,
+                0,
+                22751.70741034429
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 43": {
+            "coordinate": [
+                33251.693323983585,
+                0,
+                24374.845012139598
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 53": {
+            "coordinate": [
+                35529.39459302557,
+                0,
+                24685.099175765703
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Doxx Transpher": {
+            "coordinate": [
+                -49951.43899768866,
+                0,
+                -55752.66319769327
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2,
+                "Diplomats": 3
+            },
+            "description": ""
+        },
+        "DS 56": {
+            "coordinate": [
+                -80526.28467670099,
+                0,
+                -77454.05208658216
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "Electrophyer 15": {
+            "coordinate": [
+                -107877.3904552428,
+                0,
+                172372.7500831847
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
+    "sensor_relay": {
+        "SR 55": {
+            "coordinate": [
+                38066.62981972903,
+                0,
+                88326.56461845896
+            ]
+        },
+        "SR 69": {
+            "coordinate": [
+                28658.672270458846,
+                0,
+                129545.51983462698
+            ]
+        },
+        "SR 11": {
+            "coordinate": [
+                2298.160996308725,
+                0,
+                162600.55545292178
+            ]
+        },
+        "SR 71": {
+            "coordinate": [
+                -35793.8814544211,
+                0,
+                180944.7162757322
+            ]
+        },
+        "SR 89": {
+            "coordinate": [
+                -78072.85890612083,
+                0,
+                180944.7162757322
+            ]
+        },
+        "SR 78": {
+            "coordinate": [
+                -116164.90135685065,
+                0,
+                162600.55545292178
+            ]
+        },
+        "SR 65": {
+            "coordinate": [
+                -142525.41263100077,
+                0,
+                129545.51983462699
+            ]
+        },
+        "SR 84": {
+            "coordinate": [
+                -151933.37018027098,
+                0,
+                88326.56461845897
+            ]
+        },
+        "SR 39": {
+            "coordinate": [
+                -142525.4126310008,
+                0,
+                47107.609402290946
+            ]
+        },
+        "SR 28": {
+            "coordinate": [
+                -116164.90135685066,
+                0,
+                14052.573783996137
+            ]
+        },
+        "SR 46": {
+            "coordinate": [
+                -78072.85890612085,
+                0,
+                -4291.587038814294
+            ]
+        },
+        "SR 40": {
+            "coordinate": [
+                -35793.88145442121,
+                0,
+                -4291.5870388143085
+            ]
+        },
+        "SR 66": {
+            "coordinate": [
+                2298.160996308703,
+                0,
+                14052.573783996122
+            ]
+        },
+        "SR 36": {
+            "coordinate": [
+                28658.672270458876,
+                0,
+                47107.609402291
+            ]
+        },
+        "Free Trade Zone": {
+            "coordinate": [
+                -56933.37018027097,
+                0,
+                88326.56461845896
+            ]
+        }
+    },
+    "terrain": {
+        "1763226070764": {
+            "type": "planet",
+            "name": "Memoras",
+            "coordinate": [
+                -48891.70351360428,
+                0,
+                -84599.361307467
+            ]
+        },
+        "1763226409454": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -6306.418350112043,
+                0,
+                -16991.31090050153
+            ],
+            "end": [
+                37881.50912854976,
+                0,
+                -11564.72331540271
+            ],
+            "density": 3000,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226412596": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                34264.67299854536,
+                0,
+                -16288.893403486332
+            ],
+            "end": [
+                90206.03102323672,
+                0,
+                -6161.578588671516
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1763226418966": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -46271.59243355342,
+                0,
+                14093.051040958117
+            ],
+            "end": [
+                -43378.0739150349,
+                0,
+                36276.69301626676
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226421875": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -86736.19862925525,
+                0,
+                -20479.8314909222
+            ],
+            "end": [
+                2435.969294841648,
+                0,
+                -16288.893403486332
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226425950": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -80511.5615693559,
+                0,
+                -21593.677354103616
+            ],
+            "end": [
+                -132668.3864031274,
+                0,
+                7428.333232443153
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226435579": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -137417.42576688676,
+                0,
+                34347.68067058775
+            ],
+            "end": [
+                -134800.26009727336,
+                0,
+                23708.09598773961
+            ],
+            "density": 125,
+            "scatter": 3000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226447505": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -135381.6801956768,
+                0,
+                26421.389780289017
+            ],
+            "end": [
+                -129373.67251217454,
+                0,
+                6653.106434571893
+            ],
+            "density": 125,
+            "scatter": 6000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226669508": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                21758.511517635252,
+                0,
+                -129803.21394700877
+            ],
+            "end": [
+                82869.62262874637,
+                0,
+                -134664.3250581199
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1763226675819": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -89352.59959347587,
+                0,
+                195891.2304974357
+            ],
+            "end": [
+                -60880.37737125364,
+                0,
+                202835.67494188013
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1763226680088": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -9491.488482364752,
+                0,
+                205613.45271965791
+            ],
+            "end": [
+                16897.40040652414,
+                0,
+                166724.56383076904
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1763226692250": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                94675.17818430193,
+                0,
+                9085.67494188013
+            ],
+            "end": [
+                101619.62262874637,
+                0,
+                50057.89716410235
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
+    "traffic": {}
+}

@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        24698.592228271864,
+        24698.59222827187,
         0,
-        -7294.6129793766895
+        -7294.612979376684
     ],
     "systemalignment": "Unknown",
     "metadata": {
@@ -10,12 +10,584 @@
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "Vrae Gate": {
+            "coordinate": [
+                66947.7623456791,
+                0,
+                -162593.69855967077
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Khoros Gate": "Vrae"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Eulis Gate": {
+            "coordinate": [
+                -140912.07765432086,
+                0,
+                -1537.6345596707974
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Khoros Gate": "Eulis"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Mria Gate": {
+            "coordinate": [
+                156947.76234567913,
+                0,
+                184406.30144032923
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Khoros Gate": "Mria"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Khoros Directorate": {
+            "coordinate": [
+                -145985.38580246907,
+                0,
+                289630.7458847737
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Mining Collective": {
+            "coordinate": [
+                -152518.7191358024,
+                0,
+                209497.4125514404
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Ingal Post": {
+            "coordinate": [
+                136281.28086419764,
+                0,
+                160797.4125514404
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Korath Foundry": {
+            "coordinate": [
+                -141487.27469135798,
+                0,
+                -216380.88374485594
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "WP 38": {
+            "coordinate": [
+                -141204.41820643656,
+                0,
+                -218602.10284427443
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 23": {
+            "coordinate": [
+                -141756.04489457514,
+                0,
+                -214188.62698359703
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Joab Minerals": {
+            "coordinate": [
+                -136262.09169738198,
+                0,
+                -231152.13555578902
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kilti Ores": {
+            "coordinate": [
+                -151079.25989402804,
+                0,
+                -205361.6320352753
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Misha Denabite": {
+            "coordinate": [
+                -136846.09588511172,
+                0,
+                -197268.26426549934
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1766373870580": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                73333.33333333334,
+                0,
+                162500.0
+            ],
+            "end": [
+                58333.333333333336,
+                0,
+                184166.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373876869": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                60833.333333333336,
+                0,
+                180833.33333333334
+            ],
+            "end": [
+                35833.333333333336,
+                0,
+                194166.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373881957": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                42500.00000000001,
+                0,
+                190833.33333333334
+            ],
+            "end": [
+                11666.666666666668,
+                0,
+                190000.00000000003
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373889280": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                20000.0,
+                0,
+                191666.6666666667
+            ],
+            "end": [
+                -10000.0,
+                0,
+                173333.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373894237": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -5000.0,
+                0,
+                178333.33333333334
+            ],
+            "end": [
+                -12500.000000000002,
+                0,
+                146666.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373911285": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -12500.000000000002,
+                0,
+                151666.6666666667
+            ],
+            "end": [
+                13262.577160493895,
+                0,
+                -150542.77263374478
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373949273": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -67755.94135802465,
+                0,
+                -158945.55041152256
+            ],
+            "end": [
+                -56922.60802469131,
+                0,
+                -180612.21707818922
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373959193": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -59422.60802469131,
+                0,
+                -177278.88374485588
+            ],
+            "end": [
+                -43589.27469135798,
+                0,
+                -194778.8837448559
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373970457": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -46089.27469135798,
+                0,
+                -190612.21707818922
+            ],
+            "end": [
+                -19422.60802469131,
+                0,
+                -194778.8837448559
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373988481": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -27755.941358024644,
+                0,
+                -195612.21707818922
+            ],
+            "end": [
+                1410.725308642024,
+                0,
+                -188112.21707818922
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766373995128": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -6089.274691357977,
+                0,
+                -190612.21707818922
+            ],
+            "end": [
+                15577.391975308692,
+                0,
+                -168112.21707818922
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766374003345": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                8910.725308642024,
+                0,
+                -173112.21707818922
+            ],
+            "end": [
+                13841.280864197597,
+                0,
+                -146491.84670781886
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766374031216": {
+            "type": "blackhole",
+            "name": "1766374031216",
+            "coordinate": [
+                33947.76234567911,
+                0,
+                143406.30144032923
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766374046113": {
+            "type": "blackhole",
+            "name": "1766374046113",
+            "coordinate": [
+                -25052.23765432089,
+                0,
+                -149593.69855967077
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766374133241": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -194329.50018095077,
+                0,
+                96179.80232389248
+            ],
+            "end": [
+                -135052.2376543209,
+                0,
+                240406.30144032923
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766374147528": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -91412.23765432092,
+                0,
+                273566.3014403293
+            ],
+            "end": [
+                39627.762345679075,
+                0,
+                300926.3014403293
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766374158928": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                84267.76234567908,
+                0,
+                298046.3014403293
+            ],
+            "end": [
+                166347.76234567908,
+                0,
+                234686.30144032926
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766374171065": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -161684.36248890686,
+                0,
+                -188058.5699067888
+            ],
+            "end": [
+                -105812.23765432092,
+                0,
+                -253473.6985596707
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766374182936": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -41012.237654320925,
+                0,
+                -266433.6985596707
+            ],
+            "end": [
+                74187.76234567908,
+                0,
+                -252033.6985596707
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766374188736": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                121707.76234567908,
+                0,
+                -226113.6985596707
+            ],
+            "end": [
+                193030.49981904923,
+                0,
+                -75180.1976761075
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766374231896": {
+            "type": "planet",
+            "name": "Planet Khoros",
+            "coordinate": [
+                -126685.38580246909,
+                0,
+                266997.4125514404
+            ],
+            "description": ""
+        },
+        "1766374291616": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -160018.7191358024,
+                0,
+                243664.07921810707
+            ],
+            "end": [
+                -154185.3858024691,
+                0,
+                125330.74588477373
+            ],
+            "density": 225,
+            "scatter": 17000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766374409124": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -136278.94135802463,
+                0,
+                -175292.920781893
+            ],
+            "end": [
+                -143802.08950617278,
+                0,
+                -263834.58744855964
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        35327.03775771986,
+        38761.28751152048,
         0,
-        23688.534545708135
+        25185.51520762119
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -12,10 +12,235 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Enyalius Gate": {
+            "coordinate": [
+                -139000.0,
+                0,
+                -46666.666666666686
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Toray Gate": "Enyalius"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Keltor Gate": {
+            "coordinate": [
+                152000.0,
+                0,
+                86666.66666666669
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Toray Gate": "Keltor"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Gate Control": {
+            "coordinate": [
+                10313.657407407383,
+                0,
+                24053.497942386868
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 60": {
+            "coordinate": [
+                11477.901694990554,
+                0,
+                31843.75079383225
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 29": {
+            "coordinate": [
+                9221.991713185187,
+                0,
+                17336.156498469492
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        }
+    },
+    "sensor_relay": {
+        "SR 33": {
+            "coordinate": [
+                -102325.23148148152,
+                0,
+                -19918.724279835373
+            ]
+        },
+        "SR 89": {
+            "coordinate": [
+                -65991.89814814819,
+                0,
+                -6585.390946502041
+            ]
+        },
+        "SR 23": {
+            "coordinate": [
+                -29658.56481481486,
+                0,
+                6747.9423868312915
+            ]
+        },
+        "SR 68": {
+            "coordinate": [
+                43008.101851851796,
+                0,
+                33414.60905349796
+            ]
+        },
+        "SR 12": {
+            "coordinate": [
+                79341.43518518517,
+                0,
+                46747.9423868313
+            ]
+        },
+        "SR 27": {
+            "coordinate": [
+                115674.76851851848,
+                0,
+                60081.27572016463
+            ]
+        }
+    },
+    "terrain": {
+        "1766364775567": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -132163.72730433627,
+                0,
+                25279.64576426996
+            ],
+            "end": [
+                -19663.727304336266,
+                0,
+                -42220.35423573005
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766364786370": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -81330.39397100294,
+                0,
+                26946.31243093663
+            ],
+            "end": [
+                -77997.06063766961,
+                0,
+                -36387.02090239671
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766364799634": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                53669.60602899708,
+                0,
+                74446.31243093662
+            ],
+            "end": [
+                132836.27269566376,
+                0,
+                40279.64576426996
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766364805842": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                87002.9393623304,
+                0,
+                88612.9790976033
+            ],
+            "end": [
+                92836.27269566375,
+                0,
+                11946.312430936625
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766364827394": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -132785.51228376018,
+                0,
+                108186.66736920825
+            ],
+            "end": [
+                81103.37660512874,
+                0,
+                138047.77848031936
+            ],
+            "density": 125,
+            "scatter": 7000,
+            "composition": []
+        },
+        "1766364837649": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -126535.51228376017,
+                0,
+                122770.00070254158
+            ],
+            "end": [
+                74158.93216068429,
+                0,
+                122770.00070254158
+            ],
+            "density": 125,
+            "scatter": 5000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -9268.28294690597,
+        -9268.28294690598,
         0,
-        17787.4143805985
+        17787.41438059853
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -12,10 +12,409 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Triton Gate": {
+            "coordinate": [
+                0.0,
+                0,
+                200833.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tethys Gate": "Triton"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Rhea Gate": {
+            "coordinate": [
+                149166.6666666667,
+                0,
+                -39166.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tethys Gate": "Rhea"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Tethys Command": {
+            "coordinate": [
+                1806.9154061164497,
+                0,
+                15454.338300632124
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 81,
+                "Nuke": 12,
+                "EMP": 12,
+                "Mine": 12,
+                "High Yield Warhead": 15,
+                "Warhead": 54,
+                "Torpedo Casing": 44,
+                "Casing": 16,
+                "Transmitter": 35,
+                "Scorch": 50,
+                "Tactical Array": 9,
+                "Sensor Suite": 5,
+                "Guidance System": 59,
+                "Receiver": 15
+            },
+            "teams": {
+                "DamCon": 9,
+                "Medics": 3,
+                "Marines": 11
+            },
+            "description": ""
+        },
+        "WP 12": {
+            "coordinate": [
+                -3917.5111011489084,
+                0,
+                18964.21957198578
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 80": {
+            "coordinate": [
+                1794.1703925120485,
+                0,
+                9098.587901116854
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 96": {
+            "coordinate": [
+                7311.135471616381,
+                0,
+                19094.03051502353
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "QRF 36": {
+            "coordinate": [
+                1826.8900876717703,
+                0,
+                12191.723247613541
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "SY 19": {
+            "coordinate": [
+                1599.4603981235898,
+                0,
+                22249.001077076715
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Intrin Stores": {
+            "coordinate": [
+                294.4445713137888,
+                0,
+                56545.11358467104
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "Kotrin Markets": {
+            "coordinate": [
+                -399.9998731306557,
+                0,
+                -30260.441970884523
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 10,
+                "Life Support": 3,
+                "Medical Supplies": 15,
+                "Micro Controller": 25,
+                "Power Relay": 17,
+                "Transmitter": 9,
+                "Receiver": 7,
+                "Analysis Suite": 8,
+                "Sensor Suite": 7,
+                "Guidance System": 15,
+                "Computer Core": 2,
+                "AMC": 1,
+                "FCS": 2,
+                "Nuidinium": 34
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 1
+            },
+            "description": ""
+        },
+        "Waypoint 46 Gate": {
+            "coordinate": [
+                -200000.00000000003,
+                0,
+                -96666.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Harmion Gate": "Waypoint 46"
+            },
+            "state": "Tethered",
+            "drift": 0
+        }
+    },
+    "sensor_relay": {
+        "SR 54": {
+            "coordinate": [
+                -833.3333333333334,
+                0,
+                170000.00000000003
+            ]
+        },
+        "SR 27": {
+            "coordinate": [
+                -555.5555555555557,
+                0,
+                126666.66666666669
+            ]
+        },
+        "SR 11": {
+            "coordinate": [
+                -277.7777777777778,
+                0,
+                83333.33333333334
+            ]
+        },
+        "SR 53": {
+            "coordinate": [
+                -160000.0,
+                0,
+                -66666.66666666667
+            ]
+        },
+        "SR 72": {
+            "coordinate": [
+                -128750.0,
+                0,
+                -51875.0
+            ]
+        },
+        "SR 47": {
+            "coordinate": [
+                -97500.0,
+                0,
+                -37083.333333333336
+            ]
+        },
+        "SR 35": {
+            "coordinate": [
+                -66250.0,
+                0,
+                -22291.66666666667
+            ]
+        },
+        "SR 91": {
+            "coordinate": [
+                -35000.0,
+                0,
+                -7500.0
+            ]
+        },
+        "SR 81": {
+            "coordinate": [
+                107500.00000000001,
+                0,
+                -23333.333333333336
+            ]
+        },
+        "SR 30": {
+            "coordinate": [
+                72916.66666666667,
+                0,
+                -7500.000000000001
+            ]
+        },
+        "SR 69": {
+            "coordinate": [
+                37500.0,
+                0,
+                4166.666666666667
+            ]
+        }
+    },
+    "terrain": {
+        "1766363370595": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                38977.77790464711,
+                0,
+                164711.78025133774
+            ],
+            "end": [
+                28561.111237980444,
+                0,
+                103600.66914022663
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766363381527": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                36894.444571313776,
+                0,
+                116100.66914022663
+            ],
+            "end": [
+                -41577.77765090845,
+                0,
+                87628.44691800441
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766363392102": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -34633.333206464005,
+                0,
+                93878.44691800441
+            ],
+            "end": [
+                -63105.55542868623,
+                0,
+                39017.335806893294
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766363402822": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -129772.2220953529,
+                0,
+                -30427.108637551155
+            ],
+            "end": [
+                -58938.88876201957,
+                0,
+                -32510.44197088449
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766363412614": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                105644.44457131378,
+                0,
+                -1260.4419708844875
+            ],
+            "end": [
+                29950.000126869334,
+                0,
+                -20010.44197088449
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -22,8 +30,8 @@
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Vrae</h2>
-        <h3 class="subheader">Alignment: Arvonians</h3>
-        <img src="Images/Factions/Arvonians.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+        <h3 class="subheader">Alignment: Arvonian</h3>
+        <img src="Images/Factions/Arvonian.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
         <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
         <div id="object-buttons">
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Planet Vrae II": {"type": "planet", "x": 21666.666666666668, "y": 106666.66666666667, "grid": "R13", "hidden": false}, "Planet Vrae III": {"type": "planet", "x": -67500.0, "y": -180000.00000000003, "grid": "D08", "hidden": false}, "Ka'Morlin Gate": {"type": "jumpnode", "x": -95000.00000000001, "y": 193333.33333333334, "grid": "V07", "hidden": false, "label": "Ka'Morlin Gate"}, "Khoros Gate": {"type": "jumpnode", "x": 194166.6666666667, "y": 105833.33333333334, "grid": "R21", "hidden": false, "label": "Khoros Gate", "destinations": {"Vrae Gate": "Khoros"}}, "Jhohara Gate": {"type": "jumpnode", "x": 18333.333333333336, "y": -27500.000000000004, "grid": "K12", "hidden": false, "label": "Jhohara Gate", "destinations": {"Vrae Gate": "Jhohara"}}, "Il Is'Kar Gate": {"type": "jumpnode", "x": 112500.00000000001, "y": -188333.33333333334, "grid": "C17", "hidden": false, "label": "Il Is'Kar Gate"}, "Athorn Gate": {"type": "jumpnode", "x": -185000.00000000003, "y": -84166.66666666667, "grid": "H02", "hidden": false, "label": "Athorn Gate", "destinations": {"Vrae Gate": "Athorn"}}, "D 4": {"type": "station", "x": -33333.333333333336, "y": 149166.6666666667, "grid": "T10", "hidden": false, "label": "D 4", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "R 7": {"type": "station", "x": -63333.333333333336, "y": 60833.333333333336, "grid": "P08", "hidden": false, "label": "R 7", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "W 8": {"type": "station", "x": -110000.00000000001, "y": -32500.000000000004, "grid": "K06", "hidden": false, "label": "W 8", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "N 5": {"type": "station", "x": -36666.66666666667, "y": -125000.00000000001, "grid": "F10", "hidden": false, "label": "N 5", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "K 2": {"type": "station", "x": 80000.0, "y": -85000.00000000001, "grid": "H16", "hidden": false, "label": "K 2", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "C 8": {"type": "station", "x": 75833.33333333334, "y": 65833.33333333334, "grid": "P15", "hidden": false, "label": "C 8", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "E 6": {"type": "station", "x": 165833.33333333334, "y": 5833.333333333334, "grid": "M20", "hidden": false, "label": "E 6", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "H 9": {"type": "station", "x": -165833.33333333334, "y": 108333.33333333334, "grid": "R03", "hidden": false, "label": "H 9", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "M 7": {"type": "station", "x": 71666.66666666667, "y": 154166.6666666667, "grid": "T15", "hidden": false, "label": "M 7", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonians"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "P 3": {"type": "station", "x": -138333.33333333334, "y": -140000.0, "grid": "F05", "hidden": false, "label": "P 3", "hull": "", "facilities": [], "sides": ["Arvonians"]}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Vrae", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [21666.666666666668], "y": [106666.66666666667], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Vrae II"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Vrae II [R13]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-67500.0], "y": [-180000.00000000003], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Vrae III"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Vrae III [D08]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-160.74014863672164, -135160.74014863672, -159839.25985136328, -24839.259851363277, -160.74014863672164], "y": [49073.17660830067, 154906.50994163402, 123426.82339169936, 17593.490058366013, 49073.17660830067], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [90270.51159625521, -13062.821737078128, 16396.15507041147, 119729.48840374482, 90270.51159625521], "y": [-60637.35879952332, -173137.35879952332, -200195.97453381005, -87695.97453381006, -60637.35879952332], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [200159.7003988859, 70159.70039888588, 49840.29960111412, 179840.29960111415, 200159.7003988859], "y": [14727.318067676064, 91393.98473434274, 56939.348598990604, -19727.318067676064, 14727.318067676064], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-73949.24375542384, -121449.24375542384, -138550.75624457616, -91050.75624457616, -73949.24375542384], "y": [-74814.96695807617, 3518.3663752571665, -6851.6997085905095, -85185.03304192383, -74814.96695807617], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [101773.19455187045, 45106.527885203766, 28226.805448129577, 84893.47211479624, 101773.19455187045], "y": [125363.6501201918, 214530.3167868585, 203803.0165464749, 114636.3498798082, 125363.6501201918], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-140681.07245901393, -184847.73912568061, -200152.26087431944, -155985.59420765276, -140681.07245901393], "y": [87270.94962442745, 139770.94962442745, 126895.71704223924, 74395.71704223924, 87270.94962442745], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-95000.00000000001], "y": [193333.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Ka'Morlin Gate [V07]"], "hoverinfo": "text", "text": ["Ka'Morlin Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [194166.6666666667], "y": [105833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Khoros Gate [R21]"], "hoverinfo": "text", "text": ["Khoros Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [18333.333333333336], "y": [-27500.000000000004], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Jhohara Gate [K12]"], "hoverinfo": "text", "text": ["Jhohara Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [112500.00000000001], "y": [-188333.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Il Is'Kar Gate [C17]"], "hoverinfo": "text", "text": ["Il Is'Kar Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-185000.00000000003], "y": [-84166.66666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Athorn Gate [H02]"], "hoverinfo": "text", "text": ["Athorn Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-33333.333333333336], "y": [149166.6666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["D 4 [T10]"], "hoverinfo": "text", "text": ["D 4"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-63333.333333333336], "y": [60833.333333333336], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["R 7 [P08]"], "hoverinfo": "text", "text": ["R 7"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-110000.00000000001], "y": [-32500.000000000004], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["W 8 [K06]"], "hoverinfo": "text", "text": ["W 8"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-36666.66666666667], "y": [-125000.00000000001], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["N 5 [F10]"], "hoverinfo": "text", "text": ["N 5"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [80000.0], "y": [-85000.00000000001], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["K 2 [H16]"], "hoverinfo": "text", "text": ["K 2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [75833.33333333334], "y": [65833.33333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["C 8 [P15]"], "hoverinfo": "text", "text": ["C 8"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [165833.33333333334], "y": [5833.333333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["E 6 [M20]"], "hoverinfo": "text", "text": ["E 6"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-165833.33333333334], "y": [108333.33333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["H 9 [R03]"], "hoverinfo": "text", "text": ["H 9"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [71666.66666666667], "y": [154166.6666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["M 7 [T15]"], "hoverinfo": "text", "text": ["M 7"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-138333.33333333334], "y": [-140000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["P 3 [F05]"], "hoverinfo": "text", "text": ["P 3"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Vrae", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Vrae';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0, 1];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,30 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Athorn Gate',function(){highlight('Athorn Gate');},false,null,false)
+    addButton('Il Is'Kar Gate',function(){highlight('Il Is'Kar Gate');},false,null,false)
+    addButton('Jhohara Gate',function(){highlight('Jhohara Gate');},false,null,false)
+    addButton('Ka'Morlin Gate',function(){highlight('Ka'Morlin Gate');},false,null,false)
+    addButton('Khoros Gate',function(){highlight('Khoros Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Vrae II',function(){highlight('Planet Vrae II');},false,null,false)
+    addButton('Planet Vrae III',function(){highlight('Planet Vrae III');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('C 8',function(){highlight('C 8');},false,'red',false)
+    addButton('D 4',function(){highlight('D 4');},false,'red',false)
+    addButton('E 6',function(){highlight('E 6');},false,'red',false)
+    addButton('H 9',function(){highlight('H 9');},false,'red',false)
+    addButton('K 2',function(){highlight('K 2');},false,'red',false)
+    addButton('M 7',function(){highlight('M 7');},false,'red',false)
+    addButton('N 5',function(){highlight('N 5');},false,'red',false)
+    addButton('P 3',function(){highlight('P 3');},false,'red',false)
+    addButton('R 7',function(){highlight('R 7');},false,'red',false)
+    addButton('W 8',function(){highlight('W 8');},false,'red',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

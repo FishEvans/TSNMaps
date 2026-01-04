@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -2324.4567903818747,
+        -4893.372512772199,
         0,
-        18064.379131711965
+        21084.165584171526
     ],
     "systemalignment": "USFP",
     "sensor_relay": {
@@ -190,7 +190,7 @@
                 105195.30332111627
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_command",
             "type": "station",
@@ -200,14 +200,26 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 12,
-                "Nuke": 18,
-                "Mine": 20,
-                "EMP": 6
+                "Homing": 75,
+                "Nuke": 12,
+                "EMP": 12,
+                "Mine": 12,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 40,
+                "Casing": 16,
+                "Transmitter": 35,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Sensor Suite": 6,
+                "Guidance System": 60,
+                "Receiver": 15
             },
             "teams": {
-                "Marines": 3,
-                "Combat Engineers": 3
+                "DamCon": 4,
+                "Medics": 2,
+                "Combat Engineers": 3,
+                "Marines": 4
             },
             "dockaccesscode": "23511",
             "description": "Relyn Station was built in 2352 and serves as the primary command and control center of the Oberon System."
@@ -219,20 +231,40 @@
                 -70432.203125
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_industry",
             "type": "station",
             "facilities": [
                 "Docking",
                 "Refuel",
                 "Repair"
             ],
-            "cargo": {},
-            "teams": {
-                "DamCon": 4
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
             },
-            "dockaccesscode": "17338"
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "dockaccesscode": "17338",
+            "description": ""
         },
         "Azura": {
             "coordinate": [
@@ -245,9 +277,27 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 14,
+                "Medical Supplies": 7,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 0,
+                "Micro Controller": 5,
+                "Power Relay": 14,
+                "Aid Package": 19,
+                "Pets": 5,
+                "Torpedo Casing": 7,
+                "Casing": 8,
+                "Coffee": 6,
+                "Tea": 3,
+                "Alcohol": 11
+            },
+            "teams": {},
+            "description": ""
         },
         "Orica": {
             "coordinate": [
@@ -260,9 +310,29 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 14,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 26,
+                "Container": 26,
+                "Life Support": 0,
+                "Micro Controller": 7,
+                "Power Relay": 16,
+                "Aid Package": 15,
+                "Pets": 3,
+                "Torpedo Casing": 4,
+                "Casing": 8,
+                "Coffee": 6,
+                "Tea": 6,
+                "Alcohol": 3
+            },
+            "teams": {
+                "Diplomats": 2
+            },
+            "description": ""
         },
         "Tirell": {
             "coordinate": [
@@ -275,9 +345,28 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {},
+            "description": ""
         },
         "Aturin Gate": {
             "coordinate": [
@@ -313,7 +402,7 @@
         },
         "PU 13": {
             "coordinate": [
-                -68637.87539651922,
+                -68832.59181107584,
                 0,
                 96099.50587634319
             ],
@@ -329,9 +418,9 @@
         },
         "RU 36": {
             "coordinate": [
-                -63270.65182756056,
+                -65282.72144464567,
                 0,
-                97411.74415759319
+                101241.16697720678
             ],
             "sides": [
                 "USFP"
@@ -386,9 +475,32 @@
             ],
             "hull": "usfp_industrial_unit",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
             "description": ""
         },
         "RS 33 (Xenara)": {
@@ -402,9 +514,30 @@
             ],
             "hull": "starbase_science",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
         },
         "SM 43": {
             "coordinate": [
@@ -419,7 +552,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "SM 2X": {
             "coordinate": [
@@ -434,7 +568,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "Transit Auth": {
             "coordinate": [
@@ -453,24 +588,193 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 50,
+                "Homing": 51,
                 "Nuke": 2,
-                "EMP": 6,
+                "EMP": 5,
                 "Mine": 6,
-                "High Yield Warhead": 15,
-                "Warhead": 60,
-                "Torpedo Casing": 60,
-                "Casing": 60,
-                "Navigational Array": 1,
-                "Tactical Array": 10,
-                "Guidance System": 60
+                "High Yield Warhead": 16,
+                "Warhead": 55,
+                "Torpedo Casing": 54,
+                "Casing": 64,
+                "Navigational Array": 0,
+                "Tactical Array": 9,
+                "Guidance System": 62
             },
             "teams": {
-                "DamCon": 8,
-                "Medics": 2,
-                "Combat Engineers": 2
+                "DamCon": 9,
+                "Medics": 3,
+                "Combat Engineers": 1
             },
             "description": ""
+        },
+        "Point Cutless": {
+            "coordinate": [
+                163082.43827160477,
+                0,
+                252240.2469135803
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Unteathered",
+            "drift": 75000,
+            "hideonmap": true
+        },
+        "DS 69": {
+            "coordinate": [
+                164278.37748714318,
+                0,
+                314354.19535386586
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "DS 60": {
+            "coordinate": [
+                165964.18451870733,
+                0,
+                317152.96003126015
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_cache_1",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "DS 46": {
+            "coordinate": [
+                168680.40189818013,
+                0,
+                317260.7595117613
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "WP 20": {
+            "coordinate": [
+                165534.3382568864,
+                0,
+                315701.0600460396
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 62": {
+            "coordinate": [
+                167779.61717287428,
+                0,
+                317815.9584823805
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 16": {
+            "coordinate": [
+                164745.3394099862,
+                0,
+                318209.3253153689
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 22": {
+            "coordinate": [
+                167314.52317198584,
+                0,
+                316116.20337699115
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 35": {
+            "coordinate": [
+                166313.44754434424,
+                0,
+                318886.6492347369
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 24": {
+            "coordinate": [
+                163944.1460358441,
+                0,
+                316604.29457058536
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 6": {
+            "coordinate": [
+                164585.20994960674,
+                0,
+                318859.3044521893
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
         }
     },
     "terrain": {
@@ -483,9 +787,9 @@
                 -19952.63203017826
             ],
             "end": [
-                22804.980424096986,
+                23291.784979423737,
                 0,
-                9350.940929355356
+                5604.670781892926
             ],
             "density": 94,
             "scatter": 2935,
@@ -592,14 +896,14 @@
             "type": "nebulas",
             "seed": 2010,
             "start": [
-                -32499,
+                -40204.8713991771,
                 0,
-                -3642
+                -12881.69753086428
             ],
             "end": [
-                -28291,
+                -27344.789094650347,
                 0,
-                6801
+                11230.95679012338
             ],
             "density": 54,
             "scatter": 3990,
@@ -660,9 +964,9 @@
             "type": "nebulas",
             "seed": 2010,
             "start": [
-                -47523.594678783695,
+                -28952.299382716188,
                 0,
-                -60977.63417352532
+                -22928.636831275802
             ],
             "end": [
                 -102223.59753657978,
@@ -724,15 +1028,6 @@
             "scatter": 7246,
             "composition": []
         },
-        "4611686018427388820": {
-            "type": "blackhole",
-            "name": "Blackhole",
-            "coordinate": [
-                478.4486454047058,
-                0,
-                -157539.88411636942
-            ]
-        },
         "1753439038099": {
             "type": "nebulas",
             "seed": 2010,
@@ -759,12 +1054,12 @@
                 78005.0261488341
             ],
             "end": [
-                -114782.27166209418,
+                -111739.07921810717,
                 0,
-                47864.208247599534
+                22081.651234567827
             ],
-            "density": 125,
-            "scatter": 10000,
+            "density": 400,
+            "scatter": 19000,
             "composition": [
                 "Ast. Std Rand"
             ]
@@ -778,11 +1073,11 @@
                 -26371.50991655229
             ],
             "end": [
-                -126503.70084590763,
+                -94860.22119341581,
                 0,
-                -16603.652263374417
+                -3236.6358024692154
             ],
-            "density": 3645,
+            "density": 3000,
             "scatter": 40000,
             "composition": [
                 "Ast. Std Rand"
@@ -804,17 +1099,277 @@
             "density": 125,
             "scatter": 10000,
             "composition": []
+        },
+        "1761331251498": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                198453.1790123456,
+                0,
+                191597.4691358024
+            ],
+            "end": [
+                94424.11522633732,
+                0,
+                150280.59670781888
+            ],
+            "density": 257,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1761331270000": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                190119.84567901224,
+                0,
+                188264.1358024691
+            ],
+            "end": [
+                230953.1790123456,
+                0,
+                217430.80246913576
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1761331273886": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                221786.51234567893,
+                0,
+                209097.4691358024
+            ],
+            "end": [
+                240119.84567901224,
+                0,
+                252430.80246913576
+            ],
+            "density": 300,
+            "scatter": 12000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1761331278871": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                236786.51234567893,
+                0,
+                246597.4691358024
+            ],
+            "end": [
+                227619.84567901224,
+                0,
+                295764.1358024691
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1761331282545": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                225119.84567901224,
+                0,
+                287430.8024691358
+            ],
+            "end": [
+                199286.5123456789,
+                0,
+                316597.4691358024
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1761331286180": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                193453.1790123456,
+                0,
+                319097.4691358024
+            ],
+            "end": [
+                129286.5123456789,
+                0,
+                322430.8024691358
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1761331291857": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                134286.5123456789,
+                0,
+                319097.4691358024
+            ],
+            "end": [
+                94286.5123456789,
+                0,
+                281597.4691358024
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1761331294919": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                99286.5123456789,
+                0,
+                284097.4691358024
+            ],
+            "end": [
+                90953.17901234557,
+                0,
+                238264.1358024691
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1761331298578": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                87619.84567901224,
+                0,
+                243264.1358024691
+            ],
+            "end": [
+                108453.17901234557,
+                0,
+                199930.80246913576
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1761331303500": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                105119.84567901224,
+                0,
+                211597.4691358024
+            ],
+            "end": [
+                137619.84567901224,
+                0,
+                184930.80246913576
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1761331344482": {
+            "type": "blackhole",
+            "name": "1761331344482",
+            "coordinate": [
+                177210.89506172828,
+                0,
+                269638.2355967078
+            ],
+            "size": 6000,
+            "strength": 1000,
+            "hideonmap": true
+        },
+        "1761331355729": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                24095.54012345666,
+                0,
+                163944.43415637856
+            ],
+            "end": [
+                59058.88888888877,
+                0,
+                106475.94135802463
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1761331360641": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                98844.7685185184,
+                0,
+                149878.7191358024
+            ],
+            "end": [
+                -2830.2572016462263,
+                0,
+                100849.65534979418
+            ],
+            "density": 300,
+            "scatter": 19000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Sirens Call": {
+            "type": "blackhole",
+            "name": "Blackhole",
+            "coordinate": [
+                -6665.751813145356,
+                0,
+                -157774.18394713756
+            ],
+            "size": 6000,
+            "strength": 500
         }
     },
-    "traffic": {},
+    "traffic": {
+        "commercial": "light",
+        "civilian": "light",
+        "security": "light"
+    },
     "sysdescription": "",
     "metadata": {
-        "skybox": "sky1.png",
+        "skybox": "sky-bored-alice.png",
         "sysdescription": "",
         "security": "Neutral",
         "exports": [],
-        "focus": "",
-        "intel": {},
+        "focus": "Military",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": [
+                "Armory"
+            ]
+        },
         "development": "Unclaimed",
         "visible": true
     }

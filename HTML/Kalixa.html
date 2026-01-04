@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -22,8 +30,8 @@
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Kalixa</h2>
-        <h3 class="subheader">Alignment: Unknown</h3>
-        <img src="Images/Factions/Unknown.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+        <h3 class="subheader">Alignment: Kraliens</h3>
+        <img src="Images/Factions/Kraliens.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
         <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
         <div id="object-buttons">
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Planet Kalixa II": {"type": "planet", "x": -833.3333333333334, "y": 50000.00000000001, "grid": "O11", "hidden": false}, "Cronus Gate": {"type": "jumpnode", "x": -60833.333333333336, "y": 175833.33333333334, "grid": "U08", "hidden": false, "label": "Cronus Gate", "destinations": {"Kalixa Gate": "Cronus"}}, "Antara Gate": {"type": "jumpnode", "x": -30833.333333333336, "y": -85833.33333333334, "grid": "H10", "hidden": false, "label": "Antara Gate", "destinations": {"Antara Gate": "Antara"}}, "Waypoint 78 Gate": {"type": "jumpnode", "x": 117175.92592592596, "y": 70324.07407407407, "grid": "P17", "hidden": false, "label": "Waypoint 78 Gate"}, "H 98": {"type": "station", "x": 22194.46587791495, "y": 88244.59876543214, "grid": "Q13", "hidden": true, "label": "**H 98**", "hull": "starbase_skaraan", "facilities": [], "sides": ["Hegemony"], "hullName": "Skaraan Base", "hullImage": "Images/Ships/skaraan_station256.png", "hullDescription": ""}, "R 81": {"type": "station", "x": 57847.22222222223, "y": 60740.74074074077, "grid": "P14", "hidden": true, "label": "**R 81**", "hull": "starbase_torgoth", "facilities": [], "sides": ["Hegemony"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Z 32": {"type": "station", "x": 39618.055555555555, "y": 19652.777777777785, "grid": "M13", "hidden": true, "label": "**Z 32**", "hull": "starbase_kralien", "facilities": [], "sides": ["Hegemony"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "G 15": {"type": "station", "x": -67459.27640603569, "y": 42765.98936899864, "grid": "O08", "hidden": true, "label": "**G 15**", "hull": "starbase_arvonian", "facilities": [], "sides": ["Hegemony"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Kalixa", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-833.3333333333334], "y": [50000.00000000001], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Kalixa II"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Kalixa II [O11]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-38336.01469528799, -76669.34802862133, -66663.98530471201, -28330.651971378666, -38336.01469528799], "y": [139062.9079996436, 99896.2413329769, 90103.7586670231, 129270.42533368978, 139062.9079996436], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [8395.692602250218, -34104.307397749784, -37562.35926891689, 4937.640731083115, 8395.692602250218], "y": [126783.10174728934, 137616.43508062267, 124050.23158604403, 113216.89825271071, 126783.10174728934], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [34335.88191594314, -3997.4514173901985, 3997.4514173901985, 42330.784750723535, 34335.88191594314], "y": [154913.0030791651, 128246.33641249841, 116753.66358750159, 143420.33025416828, 154913.0030791651], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [76346.90122504707, 33846.90122504708, 31153.098774952923, 73653.09877495293, 76346.90122504707], "y": [146035.86291440678, 154369.1962477401, 140630.8037522599, 132297.4704189266, 146035.86291440678], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-40282.99292322594, -65745.95588618891, -58374.41448418149, -32911.45152121853, -40282.99292322594], "y": [128911.03054999416, 101133.25277221638, 94376.00648704292, 122153.7842648207, 128911.03054999416], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [7699.982746555469, -36860.20243862973, -38649.05682062956, 5911.128364555637, 7699.982746555469], "y": [120035.09029124031, 128136.94214309216, 118298.24304209309, 110196.39119024124, 120035.09029124031], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [34809.335196482825, -2806.405544257927, 2528.6277664801314, 40144.36850722088, 34809.335196482825], "y": [143071.5824120801, 119344.73056022824, 110886.75092125328, 134613.6027731051, 143071.5824120801], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [73949.28553710502, 35176.137388956886, 33990.5292777098, 72763.67742585795, 73949.28553710502], "y": [136284.17841029158, 140913.80803992125, 130984.34010822696, 126354.71047859729, 136284.17841029158], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-48825.109519842226, -86440.85026058297, -77031.37196163928, -39415.63122089853, -48825.109519842226], "y": [-7594.59057920709, -41738.10909772562, -52104.48349486697, -17960.96497634844, -7594.59057920709], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [9297.944152553402, -45678.90769929846, -49506.27748588675, 5470.57436596511, 9297.944152553402], "y": [-23405.553153224297, -7780.553153224296, -21247.22462455347, -36872.22462455347, -23405.553153224297], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [33425.622810264, -2454.0068193656352, 5648.451263810073, 41528.08089343971, 33425.622810264], "y": [2768.735198331715, -22694.22776463125, -34111.3277909243, -8648.364827961328, 2768.735198331715], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-47919.75280298798, -80905.8639140991, -74464.5064562713, -41478.39534516019, -47919.75280298798], "y": [-19948.592157562893, -47726.36993534067, -55375.481916511184, -27597.7041387334, -19948.592157562893], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [8435.494002586605, -45383.95044185785, -47486.41992851254, 6333.0245159319065, 8435.494002586605], "y": [-32773.79548056486, -21199.721406490786, -30976.204519435127, -42550.27859350921, -32773.79548056486], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [87858.04894953396, 36932.123023608016, 33391.95105046606, 84317.876976392, 87858.04894953396], "y": [-13528.42302078479, -218.2378355996043, -13763.243645881865, -27073.42883106705, -13528.42302078479], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [33036.95278417325, 629.545376765835, 6037.121289900822, 38444.52869730824, 33036.95278417325], "y": [-10886.700215709816, -31720.033549043153, -40131.818302808686, -19298.48496947535, -10886.700215709816], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [85551.69320563223, 34047.06357600259, 31647.380868441844, 83152.01049807148, 85551.69320563223], "y": [-24127.57782300633, -11396.09634152484, -21103.90365847515, -33835.385139956634, -24127.57782300633], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-60833.333333333336], "y": [175833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Cronus Gate [U08]"], "hoverinfo": "text", "text": ["Cronus Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-30833.333333333336], "y": [-85833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Antara Gate [H10]"], "hoverinfo": "text", "text": ["Antara Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [117175.92592592596], "y": [70324.07407407407], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Waypoint 78 Gate [P17]"], "hoverinfo": "text", "text": ["Waypoint 78 Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [22194.46587791495], "y": [88244.59876543214], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["H 98 [Q13]"], "hoverinfo": "text", "text": ["**H 98**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [57847.22222222223], "y": [60740.74074074077], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["R 81 [P14]"], "hoverinfo": "text", "text": ["**R 81**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [39618.055555555555], "y": [19652.777777777785], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Z 32 [M13]"], "hoverinfo": "text", "text": ["**Z 32**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-67459.27640603569], "y": [42765.98936899864], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["G 15 [O08]"], "hoverinfo": "text", "text": ["**G 15**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Kalixa", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Kalixa';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,21 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Antara Gate',function(){highlight('Antara Gate');},false,null,false)
+    addButton('Cronus Gate',function(){highlight('Cronus Gate');},false,null,false)
+    addButton('Waypoint 78 Gate',function(){highlight('Waypoint 78 Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Kalixa II',function(){highlight('Planet Kalixa II');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('G 15',function(){highlight('G 15');},false,'red',true)
+    addButton('H 98',function(){highlight('H 98');},false,'red',true)
+    addButton('R 81',function(){highlight('R 81');},false,'red',true)
+    addButton('Z 32',function(){highlight('Z 32');},false,'red',true)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

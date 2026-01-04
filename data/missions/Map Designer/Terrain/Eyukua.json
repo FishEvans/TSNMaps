@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -36903.89219068466,
+        -36903.89219068465,
         0,
-        -22967.157127823655
+        -22967.15712782365
     ],
     "systemalignment": "Unknown",
     "metadata": {
@@ -10,12 +10,970 @@
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1-rainbow.png"
     },
-    "objects": {},
+    "objects": {
+        "Arcturus Gate": {
+            "coordinate": [
+                -163333.33333333334,
+                0,
+                -162500.0
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eyukua Gate": "Arcturus"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Waypoint 78 Gate": {
+            "coordinate": [
+                -9166.666666666668,
+                0,
+                185000.00000000003
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "P 67": {
+            "coordinate": [
+                -187007.97846364888,
+                0,
+                -9948.04948559662
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "H 35": {
+            "coordinate": [
+                -165220.94142661183,
+                0,
+                -67420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "W 01": {
+            "coordinate": [
+                -130220.94142661183,
+                0,
+                -50420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "I 99": {
+            "coordinate": [
+                -95859.8303155007,
+                0,
+                -97522.1235596707
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "H 46": {
+            "coordinate": [
+                -77038.03648834027,
+                0,
+                -183647.18405349785
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "D 76": {
+            "coordinate": [
+                -38125.99945130322,
+                0,
+                -232235.14701646086
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "R 22": {
+            "coordinate": [
+                -44716.31179698221,
+                0,
+                -42748.975411522566
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "J 01": {
+            "coordinate": [
+                143400.0807956104,
+                0,
+                148497.10606995897
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "N 26": {
+            "coordinate": [
+                48779.05857338817,
+                0,
+                -109420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "K 95": {
+            "coordinate": [
+                79779.05857338817,
+                0,
+                -127420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "F 83": {
+            "coordinate": [
+                20779.05857338817,
+                0,
+                -158420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "G 25": {
+            "coordinate": [
+                72779.05857338817,
+                0,
+                -175420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "R 25": {
+            "coordinate": [
+                36779.05857338817,
+                0,
+                -204420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L 02": {
+            "coordinate": [
+                83779.05857338817,
+                0,
+                -223420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "W 66": {
+            "coordinate": [
+                -41220.94142661183,
+                0,
+                -138420.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "D 42": {
+            "coordinate": [
+                11001.280795610393,
+                0,
+                -62948.04948559664
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L 90": {
+            "coordinate": [
+                116112.39190672152,
+                0,
+                -16586.93837448553
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "C 31": {
+            "coordinate": [
+                140667.94746227705,
+                0,
+                -57670.27170781884
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "G 03": {
+            "coordinate": [
+                113862.39190672147,
+                0,
+                -166392.49393004106
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "SK 01": {
+            "coordinate": [
+                176811.1919067215,
+                0,
+                -38686.22726337435
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L 12": {
+            "coordinate": [
+                -63405.47475994517,
+                0,
+                159885.99495884785
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "S 90": {
+            "coordinate": [
+                -24655.474759945173,
+                0,
+                144330.43940329232
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "D 17": {
+            "coordinate": [
+                30900.08079561039,
+                0,
+                153358.21718107007
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "H 81": {
+            "coordinate": [
+                -87988.80809327851,
+                0,
+                121413.77273662561
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "E 43": {
+            "coordinate": [
+                189156.25363511653,
+                0,
+                186768.71100823057
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "C 87": {
+            "coordinate": [
+                103122.30301783262,
+                0,
+                188774.88384773675
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "Hegemony_Transport",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "W 26": {
+            "coordinate": [
+                61455.636351165944,
+                0,
+                183219.3282921812
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "F 99": {
+            "coordinate": [
+                177427.8585733882,
+                0,
+                123497.10606995897
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "G 69": {
+            "coordinate": [
+                176482.64252400547,
+                0,
+                89353.58755144043
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "C 82": {
+            "coordinate": [
+                167242.673388203,
+                0,
+                63466.24187242811
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L 80": {
+            "coordinate": [
+                -178018.40685871066,
+                0,
+                161814.55668724293
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1766408205744": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                66666.66666666667,
+                0,
+                60833.333333333336
+            ],
+            "end": [
+                160833.33333333334,
+                0,
+                161666.6666666667
+            ],
+            "density": 125,
+            "scatter": 50000,
+            "composition": []
+        },
+        "1766408224352": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                866.6666666666742,
+                0,
+                115566.66666666664
+            ],
+            "end": [
+                27266.66666666667,
+                0,
+                30366.66666666665
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408230256": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                173666.66666666666,
+                0,
+                25566.66666666665
+            ],
+            "end": [
+                106466.66666666667,
+                0,
+                -45233.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408249192": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                50066.66666666667,
+                0,
+                -14033.333333333348
+            ],
+            "end": [
+                74066.66666666667,
+                0,
+                -89633.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408263056": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                161426.66666666666,
+                0,
+                -76433.33333333331
+            ],
+            "end": [
+                118226.66666666666,
+                0,
+                -144113.3333333333
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408272479": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                17426.66666666666,
+                0,
+                -83633.33333333331
+            ],
+            "end": [
+                103826.66666666666,
+                0,
+                -242033.3333333333
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408286695": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                98066.66666666666,
+                0,
+                -246353.3333333333
+            ],
+            "end": [
+                -74733.33333333334,
+                0,
+                -62033.33333333332
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408308648": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -220452.5333333334,
+                0,
+                -98348.79999999987
+            ],
+            "end": [
+                -110452.53333333341,
+                0,
+                -125848.79999999987
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408317044": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -122952.53333333341,
+                0,
+                -124182.13333333321
+            ],
+            "end": [
+                -38785.866666666734,
+                0,
+                -201682.13333333321
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408324335": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -47119.20000000007,
+                0,
+                -212515.46666666656
+            ],
+            "end": [
+                -175452.5333333334,
+                0,
+                -190848.79999999987
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408346456": {
+            "type": "blackhole",
+            "name": "1766408346456",
+            "coordinate": [
+                -138661.44537037038,
+                0,
+                -136634.22952674885
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766408352352": {
+            "type": "blackhole",
+            "name": "1766408352352",
+            "coordinate": [
+                -130623.89393004117,
+                0,
+                -186199.13007544572
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766408359068": {
+            "type": "blackhole",
+            "name": "1766408359068",
+            "coordinate": [
+                -197268.5912894376,
+                0,
+                -151034.84252400536
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766408665419": {
+            "type": "blackhole",
+            "name": "1766408665419",
+            "coordinate": [
+                -18752.14142661184,
+                0,
+                -182810.67170781878
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766408698532": {
+            "type": "blackhole",
+            "name": "1766408698532",
+            "coordinate": [
+                177227.85857338816,
+                0,
+                -121464.00504115212
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "1766408874152": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -154472.14142661187,
+                0,
+                142591.55051440338
+            ],
+            "end": [
+                -28405.474759945173,
+                0,
+                14191.550514403418
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766408882239": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -198018.40685871063,
+                0,
+                52647.89002057626
+            ],
+            "end": [
+                -79238.80809327851,
+                0,
+                -7475.11615226325
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766408898807": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                47078.47585733874,
+                0,
+                138594.32829218116
+            ],
+            "end": [
+                66368.59931412886,
+                0,
+                168494.01965020588
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766408903327": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                65886.34622770912,
+                0,
+                163671.48878600835
+            ],
+            "end": [
+                122792.21042523999,
+                0,
+                185855.13076131698
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766408910767": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                116040.66721536344,
+                0,
+                184408.37150205774
+            ],
+            "end": [
+                155585.4203017832,
+                0,
+                178139.08137860094
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766408937695": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                151245.1425240054,
+                0,
+                179585.8406378602
+            ],
+            "end": [
+                191754.40178326468,
+                0,
+                146792.63076131698
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766408944407": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                188378.63017832642,
+                0,
+                154508.68014403302
+            ],
+            "end": [
+                200434.95733882024,
+                0,
+                112552.6616255145
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766408957799": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                195612.4264746227,
+                0,
+                121715.47026748981
+            ],
+            "end": [
+                189343.13635116591,
+                0,
+                63362.84681069968
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766409007247": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                149489.74128943752,
+                0,
+                -103091.62849794232
+            ],
+            "end": [
+                4350.852400548612,
+                0,
+                2463.9270576132494
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766409078707": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -50371.369821673594,
+                0,
+                -166980.5173868312
+            ],
+            "end": [
+                -147871.3698216736,
+                0,
+                -93647.18405349784
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766409093283": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -76204.70315500692,
+                0,
+                27186.149279835496
+            ],
+            "end": [
+                -197871.3698216736,
+                0,
+                106352.81594650217
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

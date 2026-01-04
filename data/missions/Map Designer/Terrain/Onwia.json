@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        4324.399134240049,
+        1035.6406700758746,
         0,
-        -29172.96350219693
+        -30956.696906489367
     ],
     "systemalignment": "Kraliens",
     "metadata": {
@@ -12,10 +12,301 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "Onwia Ship Fields": {
+            "coordinate": [
+                -66666.66666666667,
+                0,
+                45833.333333333336
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Ximni Factories": {
+            "coordinate": [
+                -3333.3333333333335,
+                0,
+                54166.66666666667
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Ximni  Ores": {
+            "coordinate": [
+                5833.333333333334,
+                0,
+                -5000.0
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Grand Terminal": {
+            "coordinate": [
+                -58333.333333333336,
+                0,
+                3333.3333333333335
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Drenan Gate": {
+            "coordinate": [
+                45833.333333333336,
+                0,
+                -50000.00000000001
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Onwia Gate": "Drenan"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Gzhar": {
+            "coordinate": [
+                -25667.283950617253,
+                0,
+                -114785.3858024691
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Ishka Gasses": {
+            "coordinate": [
+                -32901.08024691355,
+                0,
+                -94691.50720164606
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "hegemony_gasextractor",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Anza Markets": {
+            "coordinate": [
+                118179.11522633744,
+                0,
+                112730.68930041158
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "K'za Skaraan Base": {
+            "coordinate": [
+                -139847.2080246913,
+                0,
+                116525.56111111135
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Ya er Military Base": {
+            "coordinate": [
+                109337.8086419753,
+                0,
+                125992.64917695479
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Li Andra Denabite": {
+            "coordinate": [
+                149927.44341563786,
+                0,
+                137647.09876543217
+            ],
+            "sides": [
+                "Kraliens"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1766451456245": {
+            "type": "planet",
+            "name": "Planet Onwia",
+            "coordinate": [
+                -27500.000000000004,
+                0,
+                30833.333333333336
+            ]
+        },
+        "1766451675265": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -174166.6666666667,
+                0,
+                195000.00000000003
+            ],
+            "end": [
+                4875.411522633782,
+                0,
+                -187525.22633744855
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766451691217": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                87500.00000000001,
+                0,
+                123333.33333333334
+            ],
+            "end": [
+                -63443.77572016459,
+                0,
+                -191945.8796296296
+            ],
+            "density": 125,
+            "scatter": 22000,
+            "composition": []
+        },
+        "1766451714525": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                150000.0,
+                0,
+                217500.00000000003
+            ],
+            "end": [
+                165000.0,
+                0,
+                -156666.6666666667
+            ],
+            "density": 125,
+            "scatter": 25000,
+            "composition": []
+        },
+        "1766451728105": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -150000.0,
+                0,
+                148333.33333333334
+            ],
+            "end": [
+                -130833.33333333334,
+                0,
+                85833.33333333334
+            ],
+            "density": 125,
+            "scatter": 14000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766451739538": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                123333.33333333334,
+                0,
+                177500.00000000003
+            ],
+            "end": [
+                179166.6666666667,
+                0,
+                98333.33333333334
+            ],
+            "density": 225,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766451752609": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -40833.333333333336,
+                0,
+                -59166.66666666667
+            ],
+            "end": [
+                -9994.058641975274,
+                0,
+                -157786.28600823044
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

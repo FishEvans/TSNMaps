@@ -1,24 +1,27 @@
 {
     "systemMapCoord": [
-        20585.864768934098,
+        20585.864768934087,
         0,
-        15032.747860505018
+        15032.747860505006
     ],
     "systemalignment": "USFP",
     "metadata": {
         "skybox": "sky1.png",
-        "sysdescription": "",
-        "security": "Neutral",
-        "exports": [],
+        "sysdescription": "Vilnara An estabished Industrial system with some key engineering and Shipyard facilitys Including an extensive fleet base",
+        "security": "Normal",
+        "exports": [
+            "Industry"
+        ],
         "focus": "Military",
         "intel": {
-            "pirate": "Low",
+            "pirate": "High",
             "enemy": "Low",
             "assets": [
-                "Shipyard"
+                "Shipyard",
+                "Fortification"
             ]
         },
-        "development": "Unclaimed",
+        "development": "Colony",
         "visible": true
     },
     "objects": {
@@ -31,7 +34,8 @@
             "type": "jumpnode",
             "jumppointtype": "Node",
             "destinations": {
-                "Antov Gate": "Freya"
+                "Antov Gate": "Freya",
+                "Clearstop": "Vanir"
             },
             "state": "Tethered",
             "drift": 0
@@ -44,7 +48,10 @@
             ],
             "type": "jumpnode",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Leopard": "Tyr",
+                "Vilnara Gate": "Loria"
+            },
             "state": "Tethered",
             "drift": 0
         },
@@ -89,7 +96,7 @@
                 130643.37622408933
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_industry",
             "type": "station",
@@ -126,7 +133,7 @@
                 134900.01655915842
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_science",
             "type": "station",
@@ -144,7 +151,7 @@
                 125857.18261307199
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_command",
             "type": "station",
@@ -164,7 +171,7 @@
                 120529.74151080276
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_civil",
             "type": "station",
@@ -187,7 +194,8 @@
             "hull": "starbase_science",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel"
             ],
             "cargo": {
                 "High Yield Warhead": 10,
@@ -227,8 +235,32 @@
                 "Refuel",
                 "Repair"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Homing": 35,
+                "EMP": 12,
+                "Mine": 12,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 40,
+                "Casing": 50,
+                "Transmitter": 60,
+                "Navigational Array": 8,
+                "Tharium Plating": 85,
+                "Tactical Array": 2,
+                "Sensor Suite": 8,
+                "Guidance System": 60,
+                "Receiver": 25,
+                "Power Relay": 62,
+                "Iso B Circuit": 52,
+                "Micro Controller": 52,
+                "Black Box": 12,
+                "Repair Materials": 83
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2,
+                "Combat Engineers": 3
+            },
             "description": "Basil Yards is a civilian diagnostics and repair company."
         },
         "Manuel Towers": {
@@ -246,23 +278,23 @@
                 "Docking"
             ],
             "cargo": {
-                "Repair Materials": 16,
+                "Repair Materials": 17,
                 "Medical Supplies": 10,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
+                "Iso B Circuit": 20,
+                "Container": 27,
+                "Life Support": 0,
                 "Micro Controller": 8,
-                "Power Relay": 16,
+                "Power Relay": 17,
                 "Aid Package": 16,
                 "Pets": 4,
-                "Torpedo Casing": 5,
-                "Casing": 6,
-                "Coffee": 5,
-                "Tea": 5,
-                "Alcohol": 5
+                "Torpedo Casing": 6,
+                "Casing": 7,
+                "Coffee": 6,
+                "Tea": 6,
+                "Alcohol": 6
             },
             "teams": {
-                "Diplomats": 1
+                "DamCon": 1
             },
             "description": "Workers and dependents Acomidation"
         },
@@ -303,27 +335,81 @@
         },
         "Ruby Medical Facility": {
             "coordinate": [
-                -170794.21190935472,
+                -187073.97466465118,
                 0,
                 -232216.42816948087
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [
                 "Docking"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 25,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 10,
+                "Evacuees": 4
+            },
             "description": "Medical Facilty, Joint venture between TSN and the Local Authoritys. Has an oversized burns and truma unit."
         },
         "DS 97": {
             "coordinate": [
-                -233627.54524268807,
+                -227619.53755918582,
                 0,
-                -246549.76150281422
+                -235115.16623421316
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "DS 31": {
+            "coordinate": [
+                -182775.70966439712,
+                0,
+                -244176.52460422146
             ],
             "sides": [
                 "USFP"
@@ -331,33 +417,35 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
-        },
-        "DS 31": {
-            "coordinate": [
-                -172697.76129207076,
-                0,
-                -255029.6997744191
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_command",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
             "description": ""
         },
         "TSN Gregneck": {
             "coordinate": [
-                -221853.60405613112,
+                -217008.43656943573,
                 0,
-                -213069.71606385673
+                -219852.95054523024
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_command",
             "type": "station",
@@ -365,15 +453,32 @@
                 "Docking",
                 "Refuel"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Homing": 49,
+                "Nuke": 5,
+                "EMP": 5,
+                "Mine": 6,
+                "High Yield Warhead": 10,
+                "Warhead": 20,
+                "Torpedo Casing": 20,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 60,
+                "Medical Supplies": 8,
+                "Repair Materials": 55
+            },
+            "teams": {
+                "DamCon": 20,
+                "Medics": 3,
+                "Combat Engineers": 10
+            },
             "description": "Engineering Training Facility for enlisted ranks"
         },
         "Osprey Entertainment": {
             "coordinate": [
-                -207790.35388466337,
+                -206433.70698838867,
                 0,
-                -255812.8787867648
+                -248254.41750752003
             ],
             "sides": [
                 "USFP"
@@ -381,8 +486,25 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 1,
+                "Iso B Circuit": 22,
+                "Container": 26,
+                "Life Support": 0,
+                "Micro Controller": 9,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 3,
+                "Torpedo Casing": 6,
+                "Casing": 5,
+                "Coffee": 4,
+                "Tea": 5,
+                "Alcohol": 7
+            },
+            "teams": {
+                "Diplomats": 5
+            },
             "description": ""
         },
         "Greybeard Industries": {
@@ -425,9 +547,9 @@
             "teams": {
                 "DamCon": 8,
                 "Medics": 2,
-                "Combat Engineers": 9
+                "Combat Engineers": 5
             },
-            "description": ""
+            "description": "Greybeard Industries, Suppliers of the finest Starship Engineering Components and ship serviceing."
         },
         "G Outfitting": {
             "coordinate": [
@@ -473,19 +595,42 @@
         },
         "G Fabrication": {
             "coordinate": [
-                210416.6666666667,
+                202887.63197047726,
                 0,
-                179189.81481481483
+                183084.1431059473
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "usfp_industrial_assembly",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": ""
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": "Greybeard Ind. Fabrication Facility."
         },
         "Space Chief": {
             "coordinate": [
@@ -510,17 +655,17 @@
                 "Micro Controller": 8,
                 "Power Relay": 16,
                 "Aid Package": 16,
-                "Pets": 4,
+                "Pets": 1,
                 "Torpedo Casing": 5,
                 "Casing": 6,
-                "Coffee": 5,
-                "Tea": 5,
-                "Alcohol": 16
+                "Coffee": 60,
+                "Tea": 60,
+                "Alcohol": 24
             },
             "teams": {
-                "Diplomats": 1
+                "Diplomats": 6
             },
-            "description": ""
+            "description": "Catering and Refuleing for Spacers"
         },
         "SQ 44": {
             "coordinate": [
@@ -650,9 +795,9 @@
         },
         "WP 23": {
             "coordinate": [
-                -164044.61906418425,
+                202204.86841752264,
                 0,
-                127343.63985396009
+                178823.17525801258
             ],
             "sides": [
                 "USFP"
@@ -706,9 +851,9 @@
         },
         "WP 35": {
             "coordinate": [
-                -151810.41846414693,
+                -151466.10896052636,
                 0,
-                130548.04702191045
+                130798.4539336345
             ],
             "sides": [
                 "USFP"
@@ -720,14 +865,14 @@
         },
         "WP 21": {
             "coordinate": [
-                -156065.39280582083,
+                184734.49630848464,
                 0,
-                128873.72624735873
+                211392.6370174294
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "defense_platform_fighter",
+            "hull": "defense_platform_beam",
             "type": "platform",
             "cargo": {},
             "teams": {}
@@ -739,7 +884,7 @@
                 124903.0509754345
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "usfp_industrial_storage",
             "type": "station",
@@ -764,7 +909,7 @@
             "facilities": [],
             "cargo": {},
             "teams": {},
-            "description": ""
+            "description": "Prospero Refuling - Industrial Processing, No Access."
         },
         "PR R2": {
             "coordinate": [
@@ -780,7 +925,7 @@
             "facilities": [],
             "cargo": {},
             "teams": {},
-            "description": ""
+            "description": "Prospero Refuling - Industrial Processing, No Access."
         },
         "PR Processing": {
             "coordinate": [
@@ -791,23 +936,17 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "usfp_industrial_processor",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel"
             ],
             "cargo": {
-                "Iron": 60,
-                "Tharium": 60,
-                "Reisium": 60,
-                "Alerite": 54,
-                "Cabrite": 35,
-                "Ashfilum": 58,
                 "Denebite": 30,
                 "Aegirine": 151,
                 "Nuidinium": 159,
                 "Gredian": 10,
-                "Warhead": 10,
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
@@ -817,9 +956,9 @@
             },
             "teams": {
                 "DamCon": 1,
-                "Medics": 0
+                "Medics": 1
             },
-            "description": ""
+            "description": "Prospero Processing, Auxiliary Fule Facility and Processing."
         },
         "PR S1": {
             "coordinate": [
@@ -835,7 +974,168 @@
             "facilities": [],
             "cargo": {},
             "teams": {},
+            "description": "Prospero Refuling - Bulk Storage Facility, No Access."
+        },
+        "Slips 1 to 6": {
+            "coordinate": [
+                188798.30576684722,
+                0,
+                200087.24621514019
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
             "description": ""
+        },
+        "Slips 7 to 12": {
+            "coordinate": [
+                202930.0442697087,
+                0,
+                189320.20735581714
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Slips 13 to 18": {
+            "coordinate": [
+                201445.8378713923,
+                0,
+                198924.55556053968
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 22": {
+            "coordinate": [
+                183186.73447245697,
+                0,
+                188142.5624805787
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 24": {
+            "coordinate": [
+                206477.41387228988,
+                0,
+                195014.75380499708
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 25": {
+            "coordinate": [
+                195733.3255876959,
+                0,
+                202476.1829620525
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 26": {
+            "coordinate": [
+                195621.1689329113,
+                0,
+                187936.94194680688
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Basil Slipways": {
+            "coordinate": [
+                216755.86364184832,
+                0,
+                98250.00426684832
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Repair"
+            ],
+            "cargo": {
+                "High Yield Warhead": 2,
+                "Warhead": 12,
+                "Torpedo Casing": 40,
+                "Casing": 50,
+                "Transmitter": 5,
+                "Navigational Array": 8,
+                "Tharium Plating": 85,
+                "Tactical Array": 2,
+                "Sensor Suite": 8,
+                "Guidance System": 60,
+                "Receiver": 25,
+                "Power Relay": 62,
+                "Iso B Circuit": 52,
+                "Micro Controller": 15,
+                "Black Box": 4,
+                "Repair Materials": 83
+            },
+            "teams": {
+                "DamCon": 4,
+                "Medics": 2,
+                "Combat Engineers": 4
+            },
+            "description": ""
+        },
+        "JP 72": {
+            "coordinate": [
+                -32783.58011302421,
+                0,
+                -434851.17068345257
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Point Cutless": "Oberon"
+            },
+            "state": "Unteathered",
+            "drift": 60000,
+            "hideonmap": true
         }
     },
     "sensor_relay": {
@@ -1160,14 +1460,16 @@
                 149.78809064519146,
                 0,
                 -64841.13187318455
-            ]
+            ],
+            "description": "Vilnara Cross is a Crossroads between most of the station clusters, can be quite busy."
         },
         "Lee Hunt Nebular": {
             "coordinate": [
-                227490.6307949754,
+                223150.35301719763,
                 0,
-                229039.31166409462
-            ]
+                231450.5770961934
+            ],
+            "description": "In Memoriam - May you drift in splendor and wounder at the stars"
         }
     },
     "terrain": {
@@ -1357,17 +1659,17 @@
             "type": "asteroids",
             "seed": 2010,
             "start": [
-                -79488.30590410222,
+                -155725.04623679954,
                 0,
-                -276948.37426499155
+                -358625.2694808463
             ],
             "end": [
-                -55488.30590410222,
+                -49728.02455746863,
                 0,
-                -269948.37426499155
+                -291656.7262390081
             ],
-            "density": 125,
-            "scatter": 10000,
+            "density": 600,
+            "scatter": 30000,
             "composition": [
                 "Ast. Std Rand"
             ]
@@ -1388,7 +1690,50 @@
             "density": 125,
             "scatter": 10000,
             "composition": []
+        },
+        "1760210630177": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                70310.2919475822,
+                0,
+                47744.98516136144
+            ],
+            "density": 15,
+            "scatter": 18000
+        },
+        "1760781994191": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -162608.31598417033,
+                0,
+                -391929.75693512155
+            ],
+            "end": [
+                11002.795126940819,
+                0,
+                -364923.58409561537
+            ],
+            "density": 689,
+            "scatter": 25000,
+            "composition": []
+        },
+        "1761331073878": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -45422.13081365453,
+                0,
+                -386410.6510792625
+            ],
+            "density": 5,
+            "scatter": 1500
         }
     },
-    "traffic": {}
+    "traffic": {
+        "commercial": "medium",
+        "civilian": "medium",
+        "security": "light"
+    }
 }

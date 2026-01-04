@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"1766374031216": {"type": "blackhole", "x": 33947.76234567911, "y": 143406.30144032923, "grid": "T13"}, "1766374046113": {"type": "blackhole", "x": -25052.23765432089, "y": -149593.69855967077, "grid": "E10"}, "Planet Khoros": {"type": "planet", "x": -126685.38580246909, "y": 266997.4125514404, "grid": "Z05", "hidden": false}, "Vrae Gate": {"type": "jumpnode", "x": 66947.7623456791, "y": -162593.69855967077, "grid": "D15", "hidden": false, "label": "Vrae Gate", "destinations": {"Khoros Gate": "Vrae"}}, "Eulis Gate": {"type": "jumpnode", "x": -140912.07765432086, "y": -1537.6345596707974, "grid": "L04", "hidden": false, "label": "Eulis Gate", "destinations": {"Khoros Gate": "Eulis"}}, "Mria Gate": {"type": "jumpnode", "x": 156947.76234567913, "y": 184406.30144032923, "grid": "V19", "hidden": false, "label": "Mria Gate", "destinations": {"Khoros Gate": "Mria"}}, "Khoros Directorate": {"type": "station", "x": -145985.38580246907, "y": 289630.7458847737, "grid": "A04", "hidden": true, "label": "**Khoros Directorate**", "hull": "starbase_torgoth", "facilities": [], "sides": ["Hegemony"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Mining Collective": {"type": "station", "x": -152518.7191358024, "y": 209497.4125514404, "grid": "W04", "hidden": true, "label": "**Mining Collective**", "hull": "starbase_torgoth", "facilities": [], "sides": ["Hegemony"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Ingal Post": {"type": "station", "x": 136281.28086419764, "y": 160797.4125514404, "grid": "U18", "hidden": false, "label": "Ingal Post", "hull": "starbase_kralien", "facilities": [], "sides": ["Hegemony"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Korath Foundry": {"type": "station", "x": -141487.27469135798, "y": -216380.88374485594, "grid": "B04", "hidden": true, "label": "**Korath Foundry**", "hull": "starbase_kralien", "facilities": [], "sides": ["Hegemony"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "WP 38": {"type": "platform", "x": -141204.41820643656, "y": -218602.10284427443, "grid": "B04", "hidden": true, "label": "**WP 38**"}, "WP 23": {"type": "platform", "x": -141756.04489457514, "y": -214188.62698359703, "grid": "B04", "hidden": true, "label": "**WP 23**"}, "Joab Minerals": {"type": "station", "x": -136262.09169738198, "y": -231152.13555578902, "grid": "A05", "hidden": false, "label": "Joab Minerals", "hull": "pirate_military_base", "facilities": [], "sides": ["Hegemony"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Kilti Ores": {"type": "station", "x": -151079.25989402804, "y": -205361.6320352753, "grid": "B04", "hidden": true, "label": "**Kilti Ores**", "hull": "pirate_military_base", "facilities": [], "sides": ["Hegemony"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Misha Denabite": {"type": "station", "x": -136846.09588511172, "y": -197268.26426549934, "grid": "C05", "hidden": true, "label": "**Misha Denabite**", "hull": "pirate_military_base", "facilities": [], "sides": ["Hegemony"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Khoros", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [50111.41141689556, 65111.41141689556, 81555.25524977113, 66555.25524977113, 50111.41141689556], "y": [178474.5668783636, 156807.90021169692, 168192.09978830308, 189858.76645496977, 178474.5668783636], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [31127.450980392157, 56127.450980392154, 65539.21568627452, 40539.21568627452, 31127.450980392157], "y": [185343.137254902, 172009.80392156861, 189656.862745098, 202990.19607843139, 185343.137254902], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [11936.83828014581, 42770.17161347915, 42229.828386520865, 11396.495053187522, 11936.83828014581], "y": [180003.6503012715, 180836.9836346048, 200829.68303206188, 199996.34969872856, 180003.6503012715], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-4785.499905460247, 25214.50009453975, 14785.499905460249, -15214.50009453975, -4785.499905460247], "y": [164800.51499681373, 183133.8483301471, 200199.48500318627, 181866.1516698529, 164800.51499681373], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-2769.1971250999068, 4730.802874900094, -14730.802874900091, -22230.802874900095, -2769.1971250999068], "y": [144362.00282787456, 176028.6694945412, 180637.99717212544, 148971.3305054588, 144362.00282787456], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [23226.438391148848, -2536.1387693450506, -22463.861230654955, 3298.7159298389433, 23226.438391148848], "y": [-149693.37909936206, 152516.06020104943, 150817.27313228394, -151392.16616812756, -149693.37909936206], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-47978.336114692145, -58811.66944802549, -76700.2132680238, -65866.87993469046, -47978.336114692145], "y": [-176140.08112318962, -154473.414456523, -163417.68636652213, -185084.35303318876, -176140.08112318962], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-36173.91690012027, -52007.2502334536, -66837.96581592903, -51004.6324825957, -36173.91690012027], "y": [-188069.75050516461, -170569.75050516461, -183988.01698454714, -201488.01698454714, -188069.75050516461], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-17878.839221955208, -44545.50588862188, -47633.04349409408, -20966.376827427415, -17878.839221955208], "y": [-184898.7634073449, -180732.09674067821, -200492.33741570023, -204659.0040823669, -184898.7634073449], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-1079.6850894641607, -30246.35175613083, -25265.53095991846, 3901.135706748209, -1079.6850894641607], "y": [-178427.28775222073, -185927.28775222073, -205297.1464041577, -197797.1464041577, -178427.28775222073], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [8374.189840393883, -13292.476826272785, 1113.927443556834, 22780.5941102235, 8374.189840393883], "y": [-161175.80020753053, -183675.80020753053, -197548.6339488479, -175048.6339488479, -161175.80020753053], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [4008.517518251132, -922.0380373044409, 18743.488654588487, 23674.044210144064, 4008.517518251132], "y": [-144670.64793156963, -171291.01830193997, -174933.4158544384, -148313.04548406808, -144670.64793156963], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-153550.7683150765, -212828.03084170635, -175830.96952019513, -116553.70699356528, -153550.7683150765], "y": [248009.21952439964, 103782.72040796289, 88576.88423982207, 232803.38335625883, 248009.21952439964], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [35540.08634128843, -95499.91365871158, -87324.56164993027, 43715.43835006972, 35540.08634128843], "y": [320504.11809293716, 293144.11809293716, 253988.48478772145, 281348.4847877214, 320504.11809293716], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [178568.80589754588, 96488.80589754587, 72046.71879381228, 154126.71879381227, 178568.80589754588], "y": [250518.1078597931, 313878.10785979306, 282214.4950208655, 218854.4950208655, 250518.1078597931], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-90604.38549859043, -146476.51033317638, -176892.21464463734, -121020.08981005142, -90604.38549859043], "y": [-240484.42479977774, -175069.2961468958, -201047.84366668173, -266462.9723195637, -240484.42479977774], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [71707.0676538949, -43492.932346105095, -38531.542962536754, 76668.45703746325, 71707.0676538949], "y": [-232188.14102539734, -246588.14102539734, -286279.2560939441, -271879.2560939441, -232188.14102539734], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [174947.77499195893, 103625.03751858878, 139790.48717276938, 211113.22464613954, 174947.77499195893], "y": [-66635.31249093784, -217568.81337450104, -234658.58374484038, -83725.0828612772, -66635.31249093784], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-126685.38580246909], "y": [266997.4125514404], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Khoros"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Khoros [Z05]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-137206.0038564154, -143039.3371897487, -176998.10108185612, -171164.7677485228, -137206.0038564154], "y": [126167.75767084681, 244501.09100418017, 242827.06743203403, 124493.73409870068, 126167.75767084681], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-128855.94392304635, -121332.7957748982, -151225.08694115106, -158748.2350892992, -128855.94392304635], "y": [-265104.5213869952, -176562.85472032859, -174022.98684345745, -262564.6535101241, -265104.5213869952], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [33947.76234567911], "y": [143406.30144032923], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["1766374031216"], "textposition": "top center", "hovertext": ["1766374031216 [T13]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [-25052.23765432089], "y": [-149593.69855967077], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["1766374046113"], "textposition": "top center", "hovertext": ["1766374046113 [E10]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [66947.7623456791], "y": [-162593.69855967077], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Vrae Gate [D15]"], "hoverinfo": "text", "text": ["Vrae Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-140912.07765432086], "y": [-1537.6345596707974], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Eulis Gate [L04]"], "hoverinfo": "text", "text": ["Eulis Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [156947.76234567913], "y": [184406.30144032923], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Mria Gate [V19]"], "hoverinfo": "text", "text": ["Mria Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-145985.38580246907], "y": [289630.7458847737], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Khoros Directorate [A04]"], "hoverinfo": "text", "text": ["**Khoros Directorate**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-152518.7191358024], "y": [209497.4125514404], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Mining Collective [W04]"], "hoverinfo": "text", "text": ["**Mining Collective**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [136281.28086419764], "y": [160797.4125514404], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ingal Post [U18]"], "hoverinfo": "text", "text": ["Ingal Post"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-141487.27469135798], "y": [-216380.88374485594], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Korath Foundry [B04]"], "hoverinfo": "text", "text": ["**Korath Foundry**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-141204.41820643656], "y": [-218602.10284427443], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 38 [B04]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-141756.04489457514], "y": [-214188.62698359703], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 23 [B04]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-136262.09169738198], "y": [-231152.13555578902], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Joab Minerals [A05]"], "hoverinfo": "text", "text": ["Joab Minerals"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-151079.25989402804], "y": [-205361.6320352753], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Kilti Ores [B04]"], "hoverinfo": "text", "text": ["**Kilti Ores**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-136846.09588511172], "y": [-197268.26426549934], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Misha Denabite [C05]"], "hoverinfo": "text", "text": ["**Misha Denabite**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Khoros", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Khoros';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [18];
+        var bhIdx = [21, 22];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,24 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Eulis Gate',function(){highlight('Eulis Gate');},false,null,false)
+    addButton('Mria Gate',function(){highlight('Mria Gate');},false,null,false)
+    addButton('Vrae Gate',function(){highlight('Vrae Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Khoros',function(){highlight('Planet Khoros');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Ingal Post',function(){highlight('Ingal Post');},false,'red',false)
+    addButton('Joab Minerals',function(){highlight('Joab Minerals');},false,'red',false)
+    addButton('Khoros Directorate',function(){highlight('Khoros Directorate');},false,'red',true)
+    addButton('Kilti Ores',function(){highlight('Kilti Ores');},false,'red',true)
+    addButton('Korath Foundry',function(){highlight('Korath Foundry');},false,'red',true)
+    addButton('Mining Collective',function(){highlight('Mining Collective');},false,'red',true)
+    addButton('Misha Denabite',function(){highlight('Misha Denabite');},false,'red',true)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

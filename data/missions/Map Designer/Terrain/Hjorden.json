@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -37617.04326460747,
+        -37617.04326460746,
         0,
-        -3934.035922357216
+        -3934.035922357222
     ],
     "systemalignment": "Hjorden",
     "metadata": {
@@ -16,20 +16,755 @@
         "skybox": "sky1.png"
     },
     "objects": {
-        "Orate Gate": {
+        "Arrin Gate": {
             "coordinate": [
-                30000.000000000004,
-                0,
-                18333.333333333336
+                -137211.49158498127,
+                0.0,
+                -156130.97423756373
             ],
-            "type": "jump_point",
+            "type": "jumpnode",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Arrin Gate": "Arrin"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Nanara": {
+            "coordinate": [
+                3770.6293432548046,
+                0.0,
+                151492.43562218995
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Lagora": {
+            "coordinate": [
+                -136076.25381337153,
+                0.0,
+                81675.74277394354
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Pantera": {
+            "coordinate": [
+                -138043.8464059641,
+                0.0,
+                1785.696477647325
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Alpha": {
+            "coordinate": [
+                157054.31888896035,
+                0.0,
+                -3308.503625233385
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": "The Alpha is a Tradeing and Customs post operated by the Hjorden, almost all trade with the USFP Stops here for inspections"
+        },
+        "Quill": {
+            "coordinate": [
+                -22835.023090820578,
+                0.0,
+                -146587.21192416002
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "X 53": {
+            "coordinate": [
+                -42036.57636626452,
+                0.0,
+                153208.61720278137
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "L 01": {
+            "coordinate": [
+                -22655.906419483028,
+                0.0,
+                159022.81818681583
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "S 54": {
+            "coordinate": [
+                -7635.887210727371,
+                0.0,
+                173073.8038982324
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Z 12": {
+            "coordinate": [
+                -5697.820216049222,
+                0.0,
+                190758.66522467055
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "G 82": {
+            "coordinate": [
+                -170419.48315865046,
+                0.0,
+                189129.9912450228
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L 94": {
+            "coordinate": [
+                -156903.55898312465,
+                0.0,
+                181706.41942860762
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "K 77": {
+            "coordinate": [
+                -164994.13593642824,
+                0.0,
+                165017.33692403516
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "H 20": {
+            "coordinate": [
+                -185489.89210926776,
+                0.0,
+                175868.0313684796
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "X 02": {
+            "coordinate": [
+                -128495.23529485299,
+                0.0,
+                22619.02981098067
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Q 78": {
+            "coordinate": [
+                -120467.06099787084,
+                0.0,
+                12608.259492050624
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "T 75": {
+            "coordinate": [
+                -151729.7871209847,
+                0.0,
+                -12380.487935932917
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "E 24": {
+            "coordinate": [
+                -159634.71896254848,
+                0.0,
+                -25339.70004155706
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "S 12": {
+            "coordinate": [
+                5144.596666738122,
+                0.0,
+                3172.9778562480897
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "D 46": {
+            "coordinate": [
+                123579.9711809128,
+                0.0,
+                -14801.617973989283
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "F 01": {
+            "coordinate": [
+                128157.81193935602,
+                0,
+                -19024.14645007483
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "A 10": {
+            "coordinate": [
+                175517.68343180825,
+                0.0,
+                -29772.387334366897
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L 33": {
+            "coordinate": [
+                184262.3682288095,
+                0.0,
+                -24322.23905642718
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "D 56": {
+            "coordinate": [
+                -29810.05844410268,
+                0.0,
+                -134374.33761751183
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "C 72": {
+            "coordinate": [
+                -33280.968178644,
+                0.0,
+                -146688.39926331525
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Mandible Path": {
+            "coordinate": [
+                193138.50841501873,
+                0.0,
+                16469.025762436268
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Hjorden Gate": "Cerberus"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Antara Slipway": {
+            "coordinate": [
+                -32780.29158498127,
+                0.0,
+                176571.98576243618
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Hjorden Gate": "Arcturus"
+            },
             "state": "Tethered",
             "drift": 0
         }
     },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1754768011623": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -16098.495504329458,
+                0.0,
+                213242.64556601044
+            ],
+            "end": [
+                22481.751409250803,
+                0.0,
+                198775.05297341783
+            ],
+            "density": 125,
+            "scatter": 3000,
+            "composition": []
+        },
+        "1754768025079": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                64678.8964709792,
+                0.0,
+                180690.5622326771
+            ],
+            "end": [
+                28509.914989497716,
+                0.0,
+                97501.90482526967
+            ],
+            "density": 225,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768177138": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -76759.1241837419,
+                0.0,
+                214054.2149961658
+            ],
+            "end": [
+                -152713.98529485302,
+                0.0,
+                129418.79832949911
+            ],
+            "density": 225,
+            "scatter": 7000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768192202": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -186712.82788744563,
+                0.0,
+                216224.3538850547
+            ],
+            "end": [
+                -208414.2167763345,
+                0.0,
+                199586.62240357322
+            ],
+            "density": 125,
+            "scatter": 3000,
+            "composition": []
+        },
+        "1754768513447": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                121785.28641368014,
+                0.0,
+                107425.24816684291
+            ],
+            "end": [
+                186889.4530803468,
+                0.0,
+                200017.8407594355
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768536111": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                120338.52715442088,
+                0.0,
+                -50994.890722046
+            ],
+            "end": [
+                196293.388265532,
+                0.0,
+                49554.877796472516
+            ],
+            "density": 125,
+            "scatter": 25000,
+            "composition": []
+        },
+        "1754768664314": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -46038.78766039397,
+                0.0,
+                -166012.25183315715
+            ],
+            "end": [
+                -27230.9172900236,
+                0.0,
+                -97291.18701834232
+            ],
+            "density": 25,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768700330": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                129247.55010966785,
+                0.0,
+                -209974.3538850547
+            ],
+            "end": [
+                208414.2167763345,
+                0.0,
+                -96432.68721838803
+            ],
+            "density": 75,
+            "scatter": 25000,
+            "composition": []
+        },
+        "1754768746487": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                8414.216776334506,
+                0.0,
+                -176641.02055172133
+            ],
+            "end": [
+                34455.88344300117,
+                0.0,
+                -180807.68721838802
+            ],
+            "density": 225,
+            "scatter": 3000,
+            "composition": []
+        },
+        "1754768771162": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -162419.11655699887,
+                0.0,
+                -90182.68721838802
+            ],
+            "end": [
+                -114502.44989033218,
+                0.0,
+                -127682.68721838803
+            ],
+            "density": 225,
+            "scatter": 4000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768782319": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -205127.44989033218,
+                0.0,
+                -130807.68721838802
+            ],
+            "end": [
+                -169710.78322366552,
+                0.0,
+                -163099.3538850547
+            ],
+            "density": 125,
+            "scatter": 4000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768794522": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -108252.44989033217,
+                0.0,
+                -162057.68721838802
+            ],
+            "end": [
+                -79085.78322366551,
+                0.0,
+                -191224.3538850547
+            ],
+            "density": 125,
+            "scatter": 3000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768807582": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -166585.78322366552,
+                0.0,
+                -191224.3538850547
+            ],
+            "end": [
+                -129085.78322366552,
+                0.0,
+                -216224.3538850547
+            ],
+            "density": 125,
+            "scatter": 4000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768829182": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -198877.44989033215,
+                0.0,
+                52525.64611494531
+            ],
+            "end": [
+                -166585.78322366552,
+                0.0,
+                20233.979448278653
+            ],
+            "density": 125,
+            "scatter": 6000,
+            "composition": []
+        },
+        "1754768862082": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                4555.88344300097,
+                0.0,
+                49672.86833716757
+            ],
+            "end": [
+                58375.32788744541,
+                0.0,
+                43596.47944827868
+            ],
+            "density": 125,
+            "scatter": 14000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754768880394": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -31034.394334776815,
+                0.0,
+                -27584.076107276887
+            ],
+            "end": [
+                -19749.672112554592,
+                0.0,
+                8874.257226056456
+            ],
+            "density": 125,
+            "scatter": 4000,
+            "composition": []
+        }
+    },
     "traffic": {}
 }

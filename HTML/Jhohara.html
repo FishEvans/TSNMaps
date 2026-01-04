@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -22,8 +30,8 @@
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Jhohara</h2>
-        <h3 class="subheader">Alignment: Arvonians</h3>
-        <img src="Images/Factions/Arvonians.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+        <h3 class="subheader">Alignment: Arvonian</h3>
+        <img src="Images/Factions/Arvonian.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
         <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
         <div id="object-buttons">
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"1766412380025": {"type": "blackhole", "x": -187500.00000000003, "y": 42500.00000000001, "grid": "O02"}, "Mastigophorous": {"type": "station", "x": -160833.3333333333, "y": -18333.333333333336, "grid": "L03", "hidden": false, "label": "Mastigophorous", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Mintou": {"type": "station", "x": -127500.00000000001, "y": 154166.6666666667, "grid": "T05", "hidden": false, "label": "Mintou", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Setmari Gate": {"type": "jumpnode", "x": -36666.66666666667, "y": 115833.33333333334, "grid": "R10", "hidden": false, "label": "Setmari Gate", "destinations": {"Setmari Gate": "Setmari"}}, "Molokore Mining": {"type": "station", "x": 3333.3333333333335, "y": 137500.0, "grid": "S12", "hidden": false, "label": "Molokore Mining", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Minara": {"type": "station", "x": -26666.666666666668, "y": 162500.0, "grid": "U10", "hidden": false, "label": "Minara", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Molokore Fabricators": {"type": "station", "x": 45833.333333333336, "y": 119166.66666666667, "grid": "R14", "hidden": false, "label": "Molokore Fabricators", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Randomi Ores": {"type": "station", "x": 55000.00000000001, "y": 160833.33333333334, "grid": "U14", "hidden": false, "label": "Randomi Ores", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Rhonkar Minerals": {"type": "station", "x": 78159.7222222222, "y": 175343.36419753087, "grid": "U15", "hidden": false, "label": "Rhonkar Minerals", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Iliagram": {"type": "station", "x": 44961.41975308644, "y": 189413.5802469136, "grid": "V14", "hidden": false, "label": "Iliagram", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Vrae Gate": {"type": "jumpnode", "x": 69714.50617283955, "y": 52743.055555555526, "grid": "O15", "hidden": false, "label": "Vrae Gate", "destinations": {"Jhohara Gate": "Vrae"}}, "Malla Palla": {"type": "station", "x": 163881.1728395062, "y": 63576.38888888886, "grid": "P20", "hidden": false, "label": "Malla Palla", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Melintari": {"type": "station", "x": 92214.50617283955, "y": -51423.611111111146, "grid": "J16", "hidden": false, "label": "Melintari", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Rintas": {"type": "station", "x": 158881.1728395062, "y": -60590.27777777782, "grid": "I19", "hidden": false, "label": "Rintas", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "Eulis Gate": {"type": "jumpnode", "x": -33618.8271604938, "y": -75590.27777777781, "grid": "I10", "hidden": false, "label": "Eulis Gate", "destinations": {"Jhohara Gate": "Eulis"}}, "Menapi Research": {"type": "station", "x": -138618.82716049382, "y": 44409.7222222222, "grid": "O05", "hidden": false, "label": "Menapi Research", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "E DP 1": {"type": "station", "x": -71118.8271604938, "y": -1423.611111111143, "grid": "L08", "hidden": false, "label": "E DP 1", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "E DP 2": {"type": "station", "x": -36118.8271604938, "y": -15590.27777777781, "grid": "L10", "hidden": false, "label": "E DP 2", "hull": "", "facilities": [], "sides": ["Arvonians"]}, "E DP 3": {"type": "station", "x": -3618.827160493794, "y": -25590.27777777781, "grid": "K11", "hidden": false, "label": "E DP 3", "hull": "", "facilities": [], "sides": ["Arvonians"]}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Jhohara", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [169758.30809026404, -183575.02524306934, -168091.64142359735, 185241.69190973602, 169758.30809026404], "y": [202607.55076626258, 54274.21743292922, 17392.449233737465, 165725.7825670708, 202607.55076626258], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [174346.2330631872, -157320.43360347956, -171012.89972985382, 160653.76693681293, 174346.2330631872], "y": [-58708.27062656224, 62125.0627067711, 24541.603959895583, -96291.72937343776, -58708.27062656224], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [96268.43699571239, 27935.10366237904, 38731.563004287615, 107064.89633762096, 96268.43699571239], "y": [89510.3222012168, 77010.3222012168, 17989.677798783217, 30489.677798783217, 89510.3222012168], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-32118.822646134635, -70452.15597946798, -121214.51068719871, -82881.17735386537, -32118.822646134635], "y": [26826.95193987863, 87660.28527321196, 55673.04806012137, -5160.285273211966, 26826.95193987863], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [4489.296021445269, -23844.037311888063, -61155.96268811193, -32822.629354778604, 4489.296021445269], "y": [6374.652250709921, 79707.98558404324, 65292.01441595675, -8041.318917376578, 6374.652250709921], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [79928.19578809351, -73436.00174277074, -56563.998257229294, 96800.19927363495, 79928.19578809351], "y": [200313.56112460865, 128967.1105073247, 92699.55615934201, 164046.00677662596, 200313.56112460865], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-187500.00000000003], "y": [42500.00000000001], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["1766412380025"], "textposition": "top center", "hovertext": ["1766412380025 [O02]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [-160833.3333333333], "y": [-18333.333333333336], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Mastigophorous [L03]"], "hoverinfo": "text", "text": ["Mastigophorous"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-127500.00000000001], "y": [154166.6666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Mintou [T05]"], "hoverinfo": "text", "text": ["Mintou"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-36666.66666666667], "y": [115833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Setmari Gate [R10]"], "hoverinfo": "text", "text": ["Setmari Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [3333.3333333333335], "y": [137500.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Molokore Mining [S12]"], "hoverinfo": "text", "text": ["Molokore Mining"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-26666.666666666668], "y": [162500.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Minara [U10]"], "hoverinfo": "text", "text": ["Minara"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [45833.333333333336], "y": [119166.66666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Molokore Fabricators [R14]"], "hoverinfo": "text", "text": ["Molokore Fabricators"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [55000.00000000001], "y": [160833.33333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Randomi Ores [U14]"], "hoverinfo": "text", "text": ["Randomi Ores"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [78159.7222222222], "y": [175343.36419753087], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Rhonkar Minerals [U15]"], "hoverinfo": "text", "text": ["Rhonkar Minerals"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [44961.41975308644], "y": [189413.5802469136], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Iliagram [V14]"], "hoverinfo": "text", "text": ["Iliagram"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [69714.50617283955], "y": [52743.055555555526], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Vrae Gate [O15]"], "hoverinfo": "text", "text": ["Vrae Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [163881.1728395062], "y": [63576.38888888886], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Malla Palla [P20]"], "hoverinfo": "text", "text": ["Malla Palla"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [92214.50617283955], "y": [-51423.611111111146], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Melintari [J16]"], "hoverinfo": "text", "text": ["Melintari"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [158881.1728395062], "y": [-60590.27777777782], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Rintas [I19]"], "hoverinfo": "text", "text": ["Rintas"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-33618.8271604938], "y": [-75590.27777777781], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Eulis Gate [I10]"], "hoverinfo": "text", "text": ["Eulis Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-138618.82716049382], "y": [44409.7222222222], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Menapi Research [O05]"], "hoverinfo": "text", "text": ["Menapi Research"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-71118.8271604938], "y": [-1423.611111111143], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["E DP 1 [L08]"], "hoverinfo": "text", "text": ["E DP 1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-36118.8271604938], "y": [-15590.27777777781], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["E DP 2 [L10]"], "hoverinfo": "text", "text": ["E DP 2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-3618.827160493794], "y": [-25590.27777777781], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["E DP 3 [K11]"], "hoverinfo": "text", "text": ["E DP 3"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Jhohara", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Jhohara';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [];
+        var bhIdx = [6];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,32 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Eulis Gate',function(){highlight('Eulis Gate');},false,null,false)
+    addButton('Setmari Gate',function(){highlight('Setmari Gate');},false,null,false)
+    addButton('Vrae Gate',function(){highlight('Vrae Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('E DP 1',function(){highlight('E DP 1');},false,'red',false)
+    addButton('E DP 2',function(){highlight('E DP 2');},false,'red',false)
+    addButton('E DP 3',function(){highlight('E DP 3');},false,'red',false)
+    addButton('Iliagram',function(){highlight('Iliagram');},false,'red',false)
+    addButton('Malla Palla',function(){highlight('Malla Palla');},false,'red',false)
+    addButton('Mastigophorous',function(){highlight('Mastigophorous');},false,'red',false)
+    addButton('Melintari',function(){highlight('Melintari');},false,'red',false)
+    addButton('Menapi Research',function(){highlight('Menapi Research');},false,'red',false)
+    addButton('Minara',function(){highlight('Minara');},false,'red',false)
+    addButton('Mintou',function(){highlight('Mintou');},false,'red',false)
+    addButton('Molokore Fabricators',function(){highlight('Molokore Fabricators');},false,'red',false)
+    addButton('Molokore Mining',function(){highlight('Molokore Mining');},false,'red',false)
+    addButton('Randomi Ores',function(){highlight('Randomi Ores');},false,'red',false)
+    addButton('Rhonkar Minerals',function(){highlight('Rhonkar Minerals');},false,'red',false)
+    addButton('Rintas',function(){highlight('Rintas');},false,'red',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

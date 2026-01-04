@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Planet Erowis": {"type": "planet", "x": -17125.77160493822, "y": -74251.54320987655, "grid": "I11", "hidden": false}, "Drenan Gate": {"type": "jumpnode", "x": -118333.33333333334, "y": 70000.0, "grid": "P06", "hidden": false, "label": "Drenan Gate", "destinations": {"Erowis Gate": "Drenan"}}, "Drenan Gatekeeper": {"type": "station", "x": -59166.66666666667, "y": 40833.333333333336, "grid": "O09", "hidden": false, "label": "Drenan Gatekeeper", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Ashtarna Drydock": {"type": "station", "x": -69166.66666666667, "y": 21805.55555555554, "grid": "N08", "hidden": false, "label": "Ashtarna Drydock", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Iniyi Trading Post": {"type": "station", "x": 40663.58024691358, "y": 50655.86419753087, "grid": "O14", "hidden": false, "label": "Iniyi Trading Post", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Cloaked Base 1": {"type": "station", "x": 35000.0, "y": 88333.33333333334, "grid": "Q13", "hidden": false, "label": "Cloaked Base 1", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Cloaked Base 2": {"type": "station", "x": 63337.191358024684, "y": 27403.54938271606, "grid": "N15", "hidden": false, "label": "Cloaked Base 2", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Krellis Gate": {"type": "jumpnode", "x": 145000.0, "y": -68333.33333333334, "grid": "I19", "hidden": false, "label": "Krellis Gate", "destinations": {"Erowis Gate": "Krellis"}}, "Krellis Gatekeeper": {"type": "station", "x": 119598.76543209876, "y": -42673.61111111112, "grid": "J17", "hidden": false, "label": "Krellis Gatekeeper", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Erowis Master": {"type": "station", "x": -40000.0, "y": -46666.66666666667, "grid": "J10", "hidden": false, "label": "Erowis Master", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Op Refinery": {"type": "station", "x": -142982.25308641978, "y": -39764.66049382717, "grid": "K04", "hidden": false, "label": "Op Refinery", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Thith Denabite": {"type": "station", "x": -128513.8888888889, "y": -77074.84567901236, "grid": "I05", "hidden": false, "label": "Thith Denabite", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Erowis", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-17125.77160493822], "y": [-74251.54320987655], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Erowis"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Erowis [I11]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-92537.8547775313, -133529.36712321034, -186216.00324716, -145224.49090148095, -92537.8547775313], "y": [-78705.68258494012, -3474.2011034586376, -32181.66309407223, -107413.14457555373, -78705.68258494012], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-28784.50892296127, -118001.3299106156, -126512.55897827321, -37295.737990618894, -28784.50892296127], "y": [69828.6162607386, 111784.63477925712, 93686.04423308861, 51730.0257145701, 69828.6162607386], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [39666.151408590704, -39423.35476424882, -41124.48474192393, 37965.02143091559, 39666.151408590704], "y": [65920.55142126819, 72672.09463114473, 52744.57203552199, 45993.028825645444, 65920.55142126819], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [91527.48007905098, 27387.819585223806, 32882.24214317137, 97021.90263699855, 91527.48007905098], "y": [83897.64688381567, 65572.02959986505, 46341.5506470486, 64667.16793099922, 83897.64688381567], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [89665.98006670736, 38064.899819793776, 2915.038451811284, 54516.118698724866, 89665.98006670736], "y": [19688.52144752475, 114692.37947221613, 95600.83040432716, 596.9723796357848, 19688.52144752475], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [95040.89506172846, 82020.06172839514, 66020.06172839514, 79040.89506172846, 95040.89506172846], "y": [-17132.7160493827, 228.39506172841266, -11771.604938271586, -29132.7160493827, -17132.7160493827], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [180418.2998948059, 152447.62088246024, 119049.29269778685, 147019.97171013252, 180418.2998948059], "y": [-86875.67720176798, -44437.40559682972, -66449.94008218263, -108888.2116871209, -86875.67720176798], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-160132.72221150825, -108132.72221150824, -141004.623467504, -193004.623467504, -160132.72221150825], "y": [-96179.54305269581, -21179.543052695808, 1611.6418181279168, -73388.35818187208, -96179.54305269581], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-118333.33333333334], "y": [70000.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Drenan Gate [P06]"], "hoverinfo": "text", "text": ["Drenan Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-59166.66666666667], "y": [40833.333333333336], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Drenan Gatekeeper [O09]"], "hoverinfo": "text", "text": ["Drenan Gatekeeper"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-69166.66666666667], "y": [21805.55555555554], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ashtarna Drydock [N08]"], "hoverinfo": "text", "text": ["Ashtarna Drydock"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [40663.58024691358], "y": [50655.86419753087], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Iniyi Trading Post [O14]"], "hoverinfo": "text", "text": ["Iniyi Trading Post"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [35000.0], "y": [88333.33333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Cloaked Base 1 [Q13]"], "hoverinfo": "text", "text": ["Cloaked Base 1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [63337.191358024684], "y": [27403.54938271606], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Cloaked Base 2 [N15]"], "hoverinfo": "text", "text": ["Cloaked Base 2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [145000.0], "y": [-68333.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Krellis Gate [I19]"], "hoverinfo": "text", "text": ["Krellis Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [119598.76543209876], "y": [-42673.61111111112], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Krellis Gatekeeper [J17]"], "hoverinfo": "text", "text": ["Krellis Gatekeeper"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-40000.0], "y": [-46666.66666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Erowis Master [J10]"], "hoverinfo": "text", "text": ["Erowis Master"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-142982.25308641978], "y": [-39764.66049382717], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Op Refinery [K04]"], "hoverinfo": "text", "text": ["Op Refinery"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-128513.8888888889], "y": [-77074.84567901236], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Thith Denabite [I05]"], "hoverinfo": "text", "text": ["Thith Denabite"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Erowis", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Erowis';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,25 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Drenan Gate',function(){highlight('Drenan Gate');},false,null,false)
+    addButton('Krellis Gate',function(){highlight('Krellis Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Erowis',function(){highlight('Planet Erowis');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Ashtarna Drydock',function(){highlight('Ashtarna Drydock');},false,'red',false)
+    addButton('Cloaked Base 1',function(){highlight('Cloaked Base 1');},false,'red',false)
+    addButton('Cloaked Base 2',function(){highlight('Cloaked Base 2');},false,'red',false)
+    addButton('Drenan Gatekeeper',function(){highlight('Drenan Gatekeeper');},false,'red',false)
+    addButton('Erowis Master',function(){highlight('Erowis Master');},false,'red',false)
+    addButton('Iniyi Trading Post',function(){highlight('Iniyi Trading Post');},false,'red',false)
+    addButton('Krellis Gatekeeper',function(){highlight('Krellis Gatekeeper');},false,'red',false)
+    addButton('Op Refinery',function(){highlight('Op Refinery');},false,'red',false)
+    addButton('Thith Denabite',function(){highlight('Thith Denabite');},false,'red',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

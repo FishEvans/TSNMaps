@@ -32,6 +32,18 @@ STATION_SIDE_COLORS = {
 }
 DEFAULT_STATION_COLOR = 'red'
 
+# Optional color mapping for planet classes. Keys should match the
+# 'class' value in planet objects. Fallback color used when no class
+# or no mapping entry exists.
+PLANET_CLASS_COLORS = {
+    'Terrestrial': '#9acd32',
+    'Gas Giant': '#ffd27f',
+    'Ice': '#bfefff',
+    'Desert': '#f4a460',
+    'Ocean': '#4fc3f7'
+}
+PLANET_CLASS_FALLBACK = '#98FB98'  # pale green
+
 # Grid reference generator
 def get_grid_reference(x, z):
     grid_size = 20000
@@ -121,6 +133,14 @@ HTML_TEMPLATE = '''
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body {{ margin: 0; background: black; color: white; display: flex; height: 100vh; }}
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {{
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }}
+        .desc-text {{ font-size: var(--desc-font-size); margin-top: 8px; }}
+        .hull-desc {{ font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }}
         #controls {{ flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }}
         #plot {{ flex: 3; min-width: 400px; }}
         #info {{ flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }}
@@ -201,7 +221,7 @@ HTML_TEMPLATE = '''
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }}
             if (obj.hullDescription) {{
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }}
         }} 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {{
@@ -228,13 +248,18 @@ HTML_TEMPLATE = '''
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }}
+        else if (obj.type === 'planet') {{
+            if (obj['class']) {{
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }}
+        }}
         else {{
             infoHtml += '<b>Type:</b> ' + obj.type;
         }}
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {{
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }}
@@ -262,32 +287,62 @@ HTML_TEMPLATE = '''
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {{
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {{
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${{name}}: data=(${{pt.x}}, ${{pt.y}}) -> screen=(${{xPx.toFixed(1)}}, ${{yPx.toFixed(1)}}), cursor=(${{px.toFixed(1)}}, ${{py.toFixed(1)}}), dx=${{dx.toFixed(1)}}, dy=${{dy.toFixed(1)}}, d=${{d.toFixed(1)}}`);
-            if (d < minDist) {{
-                minDist = d;
-                closest = name;
-            }}
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {{
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {{
+            picked = p.hovertext.split(' [')[0];
+        }} else if (p.text && typeof p.text === 'string') {{
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }}
-        if (minDist <= 35 && closest) {{
-            highlight(closest);
+        if (picked && objData[picked]) {{
+            highlight(picked);
         }}
     }});
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {{
+        var refSpan = null;
+        var planetIdx = {planet_trace_indices};
+        var bhIdx = {blackhole_trace_indices};
+        function rescaleMarkers() {{
+            try {{
+                var full = plotDiv._fullLayout || {{}};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {{
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }}
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {{
+                    Plotly.restyle(plotDiv, {{'marker.size': [markerSizes], 'textfont.size': [textSizes]}}, indices);
+                }}
+            }} catch (e) {{ console.error(e); }}
+        }}
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    }})();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -351,8 +406,11 @@ function addButton(label, fn, header, color, isHidden) {{
   addButton('--- Nav Points/POI ---', null, true, null);
   {relay_buttons}
 
-  addButton('--- Stations ---', null, true, null);
-  {station_buttons}
+    addButton('--- Planets ---', null, true, null);
+    {planet_buttons}
+
+    addButton('--- Stations ---', null, true, null);
+    {station_buttons}
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {{
@@ -394,7 +452,10 @@ class MapViewer:
         self.objects = self.system_data.get('objects', {})
         self.terrain = self.system_data.get('terrain', {})
         self.system_file = system_file
-        self.offset = self.system_data.get('systemMapCoord', [0, 0, 0])
+        # Local system maps should NOT be offset by systemMapCoord.
+        # That offset is only for positioning systems on the galactic map.
+        # Force zero offset here so local maps render in their native coordinates. This note left more for absentmined AI's (third time its tried to implament this!)
+        self.offset = [0, 0, 0]
 
         if 'sensor_relay' in self.system_data:
             for name, coord in self.system_data['sensor_relay'].items():
@@ -413,9 +474,9 @@ class MapViewer:
                 self.objects[name] = entry
 
     def project(self, coord):
-        ox, oy, oz = self.offset
+        # For local system maps, return raw X,Z without any offset.
         x, y, z = coord
-        return x - ox, z - oz
+        return x, z
 
     def get_station_color(self, obj):
         for side, color in STATION_SIDE_COLORS.items():
@@ -436,50 +497,161 @@ class MapViewer:
         print(f"[DEBUG] sys_name={sys_name}, alignment={alignment}")
         print(f"[DEBUG] Loaded objects: {list(self.objects.keys())}")
         terrain_traces = []
-       # data = terrain_traces[:]
+           # data = terrain_traces[:]
         obj_data = {}
-        gates, stations, relays = [], [], []
+        gates, stations, relays, planets = [], [], [], []
 
-        for r in self.terrain.values():
+        # --- Terrain rendering ---
+        # Support:
+        #  - asteroids / nebulas : rectangular "lane" between start/end with width from scatter
+        #  - debris_field        : circular area centered at coordinate with radius = scatter
+        for key, r in self.terrain.items():
+            ttype = r.get('type', '')
             hidden = is_hidden(r)
-            if 'start' not in r or 'end' not in r:
+
+            # ---------- Rectangular "lane" style (asteroids / nebulas) ----------
+            if ttype in ('asteroids', 'nebulas'):
+                if 'start' not in r or 'end' not in r:
+                    continue
+
+                x1, y1 = self.project(r['start'])
+                x2, y2 = self.project(r['end'])
+                length = math.hypot(x2 - x1, y2 - y1)
+                width = 2 * r.get('scatter', 0)
+                area = length * width
+                density = r.get('density', 0)
+                eff_den = density * 1e8 / area if area else density
+                alpha = max(0.4, min(1, eff_den / 200))
+                # base colors (RGBA will be set below)
+                if ttype == 'asteroids':
+                    rgb = '165,42,42'       # brown-ish
+                else:
+                    rgb = '128,0,128'       # purple
+                # Orientation vectors for rectangle corners
+                ux, uy = ((x2 - x1) / length, (y2 - y1) / length) if length else (1, 0)
+                vx, vy = -uy, ux
+                cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+                hl, hw = length / 2, width / 2
+                corners_x = [
+                    cx + ux * hl + vx * hw, cx - ux * hl + vx * hw,
+                    cx - ux * hl - vx * hw, cx + ux * hl - vx * hw
+                ]
+                corners_y = [
+                    cy + uy * hl + vy * hw, cy - uy * hl + vy * hw,
+                    cy - uy * hl - vy * hw, cy + uy * hl - vy * hw
+                ]
+
+                if hidden:
+                    fill = 'rgba(255,255,0,0.6)'  # yellow tint for GM-only
+                    line_color = 'yellow'
+                    line_width = 2
+                else:
+                    fill = f'rgba({rgb},{alpha})'
+                    line_color = fill
+                    line_width = 0
+
+                terrain_trace = {
+                    'type': 'scatter',
+                    'x': corners_x + [corners_x[0]],
+                    'y': corners_y + [corners_y[0]],
+                    'fill': 'toself',
+                    'fillcolor': fill,
+                    'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
+                    'hoverinfo': 'none'
+                }
+                if hidden:
+                    terrain_trace['gmOnly'] = True
+                terrain_traces.append(terrain_trace)
                 continue
 
-            x1, y1 = self.project(r['start'])
-            x2, y2 = self.project(r['end'])
-            length = math.hypot(x2 - x1, y2 - y1)
-            width = 2 * r.get('scatter', 0)
-            area = length * width
-            density = r.get('density', 0)
-            eff_den = density * 1e8 / area if area else density
-            alpha = max(0.4, min(1, eff_den / 200))
-            rgb = ('165,42,42' if r['type'] == 'asteroids' else '128,0,128' if r['type'] == 'nebulas' else '0,0,0')
-            ux, uy = ((x2 - x1) / length, (y2 - y1) / length) if length else (1, 0)
-            vx, vy = -uy, ux
-            cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
-            hl, hw = length / 2, width / 2
-            corners_x = [cx + ux * hl + vx * hw, cx - ux * hl + vx * hw, cx - ux * hl - vx * hw, cx + ux * hl - vx * hw]
-            corners_y = [cy + uy * hl + vy * hw, cy - uy * hl + vy * hw, cy - uy * hl - vy * hw, cy + uy * hl - vy * hw]
-            if hidden:
-                fill = 'rgba(255,255,0,0.6)'  # yellow tint for GM-only
-                line_color = 'yellow'
-                line_width = 2
-            else:
-                fill = f'rgba({rgb},{alpha})'
-                line_color = fill
-                line_width = 0
-            terrain_trace = {
-                'type': 'scatter',
-                'x': corners_x + [corners_x[0]],
-                'y': corners_y + [corners_y[0]],
-                'fill': 'toself',
-                'fillcolor': fill,
-                'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
-                'hoverinfo': 'none'
-            }
-            if hidden:
-                terrain_trace['gmOnly'] = True
-            terrain_traces.append(terrain_trace)
+            # ---------- Circular debris field (center + radius) ----------
+            if ttype == 'debris_field':
+                coord = r.get('coordinate')
+                radius = float(r.get('scatter', 0) or 0)
+                if not (isinstance(coord, (list, tuple)) and len(coord) >= 2 and radius > 0):
+                    continue
+
+                x0, y0 = self.project(coord)
+
+                # Alpha scaling similar to lanes, but using circle area
+                density = r.get('density', 0)
+                area = math.pi * radius * radius
+                eff_den = density * 1e8 / area if area else density
+                alpha = max(0.4, min(1, eff_den / 200))
+
+                if hidden:
+                    fill = 'rgba(255,255,0,0.6)'   # GM-only highlight
+                    line_color = 'yellow'
+                    line_width = 2
+                else:
+                    # Dark grey fill for visible debris
+                    fill = f'rgba(64,64,64,{alpha})'
+                    line_color = fill
+                    line_width = 0
+
+                # Approximate circle with polygon
+                N = 48
+                angles = [2 * math.pi * i / N for i in range(N)]
+                xs = [x0 + radius * math.cos(a) for a in angles]
+                ys = [y0 + radius * math.sin(a) for a in angles]
+
+                terrain_trace = {
+                    'type': 'scatter',
+                    'x': xs + [xs[0]],
+                    'y': ys + [ys[0]],
+                    'fill': 'toself',
+                    'fillcolor': fill,
+                    'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
+                    'hoverinfo': 'none'
+                }
+                if hidden:
+                    terrain_trace['gmOnly'] = True
+                terrain_traces.append(terrain_trace)
+                continue
+
+            # ---------- Planet rendering (point objects with optional class/description) ----------
+            if ttype == 'planet':
+                coord = r.get('coordinate')
+                if not (isinstance(coord, (list, tuple)) and len(coord) >= 2):
+                    continue
+                x0, y0 = self.project(coord)
+                display = r.get('name', key)
+                grid_ref = get_grid_reference(x0, y0)
+                hidden = is_hidden(r)
+
+                # visual styling
+                # choose color based on class, fallback to pale green
+                cls = r.get('class')
+                if hidden:
+                    fill_color = 'yellow'
+                else:
+                    fill_color = PLANET_CLASS_COLORS.get(cls, PLANET_CLASS_FALLBACK)
+                # increase icon size by 10x (user request)
+                size = 50
+                text_size = 14
+
+                trace = {
+                    'type': 'scatter',
+                    'x': [x0], 'y': [y0],
+                    'mode': 'markers+text',
+                    'marker': {'symbol': 'circle', 'size': size, 'color': fill_color},
+                    'text': [display],
+                    'textposition': 'top center',
+                    'textfont': {'color': 'white', 'size': text_size},
+                    'hovertext': [f"{display} [{grid_ref}]"],
+                    'hoverinfo': 'text'
+                }
+                if hidden:
+                    trace['gmOnly'] = True
+
+                terrain_traces.append(trace)
+                terrain_traces[-1]['meta'] = {'base_marker_size': size, 'base_text_size': text_size}
+                # We'll expose planets into obj_data later (alongside blackholes)
+                # store a lightweight marker in a temp list for later processing
+                # use the display name as the key
+                r['_planet_display_name'] = display
+                planets.append(display)
+                continue
 
         data = []
         data.extend(terrain_traces)
@@ -494,22 +666,44 @@ class MapViewer:
             coord = r.get('coordinate')
             if isinstance(coord, (list, tuple)) and len(coord) >= 2:
                 x, y = self.project(coord)
-                name = r.get('name', key)
+                display = key
                 grid_ref = get_grid_reference(x, y)
                 # add scatter marker+label for the black hole
-                data.append({
+                bh_trace = {
                     'type': 'scatter',
                     'x': [x], 'y': [y],
                     'mode': 'markers+text',
-                    'marker': {'symbol': 'star', 'size': 14, 'color': 'yellow'},
-                    'text': [name],
+                    'marker': {'symbol': 'star', 'size': 40, 'color': 'yellow'},
+                    'text': [display],
                     'textposition': 'top center',
-                    'hovertext': [f"{name} [{grid_ref}]"],
+                    'hovertext': [f"{display} [{grid_ref}]"],
                     'hoverinfo': 'text'
-                })
+                }
+                bh_trace['meta'] = {'base_marker_size': 140, 'base_text_size': 14}
+                data.append(bh_trace)
                 # expose it to the JS highlight/info panel
-                obj_data[name] = {'type': 'blackhole', 'x': x, 'y': y, 'grid': grid_ref}
-                blackholes.append(name)
+                obj_data[display] = {'type': 'blackhole', 'x': x, 'y': y, 'grid': grid_ref}
+                blackholes.append(display)
+        # ——— Expose planets from terrain into obj_data so they appear in the info panel ———
+        for key, r in self.terrain.items():
+            if r.get('type') != 'planet':
+                continue
+            coord = r.get('coordinate')
+            if not (isinstance(coord, (list, tuple)) and len(coord) >= 2):
+                continue
+            x, y = self.project(coord)
+            display = r.get('name', key)
+            hidden = is_hidden(r)
+            grid_ref = get_grid_reference(x, y)
+            entry = {'type': 'planet', 'x': x, 'y': y, 'grid': grid_ref, 'hidden': hidden}
+            if r.get('description'):
+                entry['description'] = r.get('description')
+            if r.get('class'):
+                entry['class'] = r.get('class')
+            obj_data[display] = entry
+            # ensure planet is listed for sidebar buttons
+            if display not in planets:
+                planets.append(display)
         print(f"[DEBUG] obj_data initialized, will populate entries based on objects")
 
         for name, obj in self.objects.items():
@@ -528,12 +722,16 @@ class MapViewer:
             color = 'white'
             size = 12
             text_size = 14
+            marker_line = None
+            text_color = 'white'
 
             if typ in ('jumppoint', 'jumpnode'):
                 symbol = 'circle-open'
                 size = 16
                 text_size = 20
-                color = 'lightblue'
+                color = '#50CC50'
+                marker_line = {'color': '#50CC50', 'width': 5}  # bolder circle outline
+                text_color = '#50CC50'  # gate label color
                 gates.append(name)
             elif typ == 'station':
                 symbol = 'square'
@@ -567,17 +765,24 @@ class MapViewer:
                 'hovertext': [f"{name} [{grid_ref}]"],
                 'hoverinfo': 'text'
             }
+
+            # apply outline styling for open symbols (e.g., jumppoint/jumpnode)
+            if marker_line is not None:
+                trace['marker']['line'] = marker_line
+
             display_name = f"**{name}**" if hidden else name
             if 'text' in mode:
                 trace.update({
                     'text': [display_name],
                     'textposition': 'top center',
-                    'textfont': {'color': 'white', 'size': text_size}
+                    'textfont': {'color': text_color, 'size': text_size}
                 })
-            data.append(trace)
+            #data.append(trace)
 
             if hidden:
                 trace['gmOnly'] = True
+            # attach meta so JS can rescale markers on zoom
+            trace['meta'] = {'base_marker_size': size, 'base_text_size': text_size}
             data.append(trace)
 
             entry = {
@@ -654,6 +859,23 @@ class MapViewer:
     ]
 }
         fig_json = {'data': data, 'layout': layout}
+        # compute trace indices for planets and blackholes so JS can efficiently rescale only them
+        planet_trace_indices = []
+        blackhole_trace_indices = []
+        # data is terrain_traces followed by object traces; find traces by matching text label or star symbol
+        for i, t in enumerate(data):
+            try:
+                txt = None
+                if isinstance(t.get('text'), (list, tuple)) and t.get('text'):
+                    txt = t.get('text')[0]
+                if txt and txt in planets:
+                    planet_trace_indices.append(i)
+                    continue
+                # blackholes use 'star' symbol
+                if t.get('marker', {}).get('symbol') == 'star':
+                    blackhole_trace_indices.append(i)
+            except Exception:
+                continue
         station_buttons = '\n    '.join([
             f"addButton('{s}',function(){{highlight('{s}');}},false,'{c}',{str(obj_data[s]['hidden']).lower()})"
             for s, c in stations
@@ -661,6 +883,10 @@ class MapViewer:
         relay_buttons = '\n    '.join([
             f"addButton('{r}',function(){{highlight('{r}');}},false,null,{str(obj_data[r]['hidden']).lower()})"
             for r in relays
+        ])
+        planet_buttons = '\n    '.join([
+            f"addButton('{p}',function(){{highlight('{p}');}},false,null,{str(obj_data[p]['hidden']).lower()})"
+            for p in planets if p in obj_data
         ])
         gate_buttons = '\n    '.join([
             f"addButton('{g}',function(){{highlight('{g}');}},false,null,{str(obj_data[g]['hidden']).lower()})"
@@ -687,7 +913,10 @@ class MapViewer:
                 obj_data=json.dumps(obj_data),
                 gate_buttons=gate_buttons,
                 station_buttons=station_buttons,
-                relay_buttons=relay_buttons
+                relay_buttons=relay_buttons,
+                planet_buttons=planet_buttons,
+                planet_trace_indices=json.dumps(planet_trace_indices),
+                blackhole_trace_indices=json.dumps(blackhole_trace_indices)
             )
 
 

@@ -1,0 +1,288 @@
+{
+    "systemMapCoord": [
+        62059.543319204844,
+        0,
+        9886.687050234748
+    ],
+    "systemalignment": "USFP",
+    "metadata": {
+        "sysdescription": "",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Unclaimed",
+        "visible": true,
+        "skybox": "sky1-rainbow.png"
+    },
+    "objects": {
+        "Keltor Gate": {
+            "coordinate": [
+                -138333.33333333334,
+                0,
+                171666.6666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Kratos Gate": "Keltor"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Castor Gate": {
+            "coordinate": [
+                90833.33333333334,
+                0,
+                -84166.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Orantiv Jump Point": "Castor"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Gate Command": {
+            "coordinate": [
+                -15000.000000000002,
+                0,
+                24166.666666666668
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 148,
+                "Nuke": 27,
+                "EMP": 25,
+                "Mine": 21,
+                "High Yield Warhead": 14,
+                "Warhead": 64,
+                "Torpedo Casing": 91,
+                "Navigational Array": 0,
+                "Tactical Array": 11,
+                "Guidance System": 61,
+                "Medical Supplies": 13,
+                "Repair Materials": 5
+            },
+            "teams": {
+                "DamCon": 9,
+                "Medics": 1,
+                "Combat Engineers": 9
+            },
+            "description": ""
+        },
+        "Kratos High Offices": {
+            "coordinate": [
+                -5950.681584362143,
+                0,
+                36456.18998628257
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 75": {
+            "coordinate": [
+                -23150.193258459076,
+                0,
+                23503.325065570567
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 60": {
+            "coordinate": [
+                -8610.039437585727,
+                0,
+                29374.892832647492
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 48": {
+            "coordinate": [
+                -12762.154166984203,
+                0,
+                17529.42736117465
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Transit Trades": {
+            "coordinate": [
+                -7723.1799808210135,
+                0,
+                12684.259874479276
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 27,
+                "Container": 27,
+                "Life Support": 2,
+                "Micro Controller": 9,
+                "Power Relay": 16,
+                "Aid Package": 17,
+                "Pets": 4,
+                "Torpedo Casing": 4,
+                "Casing": 7,
+                "Coffee": 6,
+                "Tea": 6,
+                "Alcohol": 6
+            },
+            "teams": {
+                "Diplomats": 2
+            },
+            "description": ""
+        }
+    },
+    "sensor_relay": {
+        "SR 87": {
+            "coordinate": [
+                -116666.66666666667,
+                0,
+                142500.0
+            ]
+        },
+        "SR 23": {
+            "coordinate": [
+                -90595.2380952381,
+                0,
+                113452.38095238095
+            ]
+        },
+        "SR 93": {
+            "coordinate": [
+                -64523.809523809534,
+                0,
+                84404.76190476191
+            ]
+        },
+        "SR 90": {
+            "coordinate": [
+                -38452.38095238096,
+                0,
+                55357.142857142855
+            ]
+        },
+        "SR 88": {
+            "coordinate": [
+                13690.476190476184,
+                0,
+                -2738.0952380952367
+            ]
+        },
+        "SR 22": {
+            "coordinate": [
+                39761.90476190475,
+                0,
+                -31785.71428571429
+            ]
+        },
+        "SR 32": {
+            "coordinate": [
+                65833.33333333333,
+                0,
+                -60833.33333333334
+            ]
+        }
+    },
+    "terrain": {
+        "1766365776037": {
+            "type": "planet",
+            "name": "Planet Kratos III",
+            "coordinate": [
+                24166.666666666668,
+                0,
+                80000.0
+            ]
+        },
+        "1766365914449": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -144364.62499761852,
+                0,
+                184435.49310874238
+            ],
+            "end": [
+                -61031.29166428517,
+                0,
+                68602.15977540905
+            ],
+            "density": 225,
+            "scatter": 25000,
+            "composition": []
+        },
+        "1766365937113": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -149364.62499761852,
+                0,
+                146102.15977540906
+            ],
+            "end": [
+                -70197.95833095183,
+                0,
+                127768.82644207572
+            ],
+            "density": 125,
+            "scatter": 5000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
+    "traffic": {
+        "commercial": "light",
+        "civilian": "light"
+    }
+}

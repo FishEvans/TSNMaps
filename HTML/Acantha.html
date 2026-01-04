@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {"JP 29": {"type": "jumpnode", "x": 38955.08285417974, "y": 55437.13487558291, "grid": "O13", "hidden": false, "label": "JP 29"}};
+    var objData = {"Tilminra Gate": {"type": "jumpnode", "x": -132500.0, "y": 132500.0, "grid": "S05", "hidden": false, "label": "Tilminra Gate", "destinations": {"Acantha Gate": "Tilminra"}}, "Krellis Gate": {"type": "jumpnode", "x": 97500.00000000001, "y": -140000.0, "grid": "F16", "hidden": false, "label": "Krellis Gate", "destinations": {"Acantha Gate": "Krellis"}}, "Ashia Gate": {"type": "jumpnode", "x": 21666.666666666668, "y": 20000.0, "grid": "N13", "hidden": false, "label": "Ashia Gate", "destinations": {"Ashia Gate": "Ashia"}}, "Nautri Ores": {"type": "station", "x": -60000.00000000001, "y": 118333.33333333334, "grid": "R09", "hidden": false, "label": "Nautri Ores", "hull": "usfp_industrial_refinary", "facilities": [], "sides": ["USFP"], "hullName": "Refinary Unit", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialRefinary256.png", "hullDescription": ""}, "Multada Denabite": {"type": "station", "x": -140000.0, "y": 41666.66666666667, "grid": "O05", "hidden": false, "label": "Multada Denabite", "hull": "usfp_industrial_processor", "facilities": [], "sides": ["USFP"], "hullName": "Processor Unit", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialProcessor256.png", "hullDescription": ""}, "Potzhu Construction": {"type": "station", "x": -114166.66666666667, "y": 26666.666666666668, "grid": "N06", "hidden": false, "label": "Potzhu Construction", "hull": "starbase_industry", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "Potzhu Shipyards": {"type": "station", "x": -130833.33333333334, "y": 1666.6666666666667, "grid": "M05", "hidden": false, "label": "Potzhu Shipyards", "hull": "usfp_shipyard", "facilities": [], "sides": ["USFP"], "hullName": "Ship Yard", "hullImage": "Images/Ships/TSN Mod/USFP/ShipYard256.png", "hullDescription": ""}, "Raschad": {"type": "station", "x": -80000.0, "y": 104166.66666666667, "grid": "R08", "hidden": false, "label": "Raschad", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Onzi Oasis": {"type": "station", "x": -91179.97338820303, "y": -71523.00041152255, "grid": "I07", "hidden": false, "label": "Onzi Oasis", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Betos Bazaar": {"type": "station", "x": -24513.30672153636, "y": -119856.33374485589, "grid": "G10", "hidden": false, "label": "Betos Bazaar", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Ni'yata": {"type": "station", "x": 37630.1117741198, "y": 37642.666026520455, "grid": "N13", "hidden": false, "label": "Ni'yata", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Ozkal": {"type": "station", "x": -7860.196724965713, "y": 24525.828606538736, "grid": "N11", "hidden": false, "label": "Ozkal", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Utimni": {"type": "station", "x": 28978.580709876547, "y": -3940.499411293917, "grid": "L13", "hidden": false, "label": "Utimni", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Ladna Labs": {"type": "station", "x": 112047.29998856885, "y": 13046.061802697848, "grid": "M17", "hidden": false, "label": "Ladna Labs", "hull": "starbase_science", "facilities": [], "sides": ["USFP"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": ""}, "Nessin": {"type": "station", "x": 71075.07776634663, "y": 17907.17291380896, "grid": "M15", "hidden": false, "label": "Nessin", "hull": "starbase_science", "facilities": [], "sides": ["USFP"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": ""}, "Nuzeli Mining": {"type": "station", "x": 44639.89258116153, "y": -136217.26981595787, "grid": "F14", "hidden": false, "label": "Nuzeli Mining", "hull": "starbase_industry", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "Yimsu": {"type": "station", "x": 105926.22231367184, "y": -84308.08343049833, "grid": "H17", "hidden": false, "label": "Yimsu", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "SR 24": {"type": "sensor_relay", "x": -116666.66666666667, "y": 112500.00000000001, "grid": "R06", "hidden": false, "label": "SR 24"}, "SR 88": {"type": "sensor_relay", "x": -89285.71428571429, "y": 80476.19047619049, "grid": "Q07", "hidden": false, "label": "SR 88"}, "SR 47": {"type": "sensor_relay", "x": -61904.76190476191, "y": 48452.38095238096, "grid": "O08", "hidden": false, "label": "SR 47"}, "SR 95": {"type": "sensor_relay", "x": -34523.80952380953, "y": 16428.571428571435, "grid": "M10", "hidden": false, "label": "SR 95"}, "SR 36": {"type": "sensor_relay", "x": -7142.857142857145, "y": -15595.238095238092, "grid": "L11", "hidden": false, "label": "SR 36"}, "SR 83": {"type": "sensor_relay", "x": 20238.09523809525, "y": -47619.04761904762, "grid": "J13", "hidden": false, "label": "SR 83"}, "SR 69": {"type": "sensor_relay", "x": 47619.04761904762, "y": -79642.85714285714, "grid": "I14", "hidden": false, "label": "SR 69"}, "SR 82": {"type": "sensor_relay", "x": 75000.00000000001, "y": -111666.66666666667, "grid": "G15", "hidden": false, "label": "SR 82"}, "SR 61": {"type": "sensor_relay", "x": 36298.42167352533, "y": 106193.57366255154, "grid": "R13", "hidden": true, "label": "**SR 61**"}, "CR 42": {"type": "sensor_relay", "x": 86562.69636488338, "y": 86708.61995884783, "grid": "Q16", "hidden": false, "label": "CR 42"}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [{"type": "scatter", "x": [38955.08285417974], "y": [55437.13487558291], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["JP 29 [O13]"], "hoverinfo": "text", "text": ["JP 29"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}, {"type": "scatter", "x": [38955.08285417974], "y": [55437.13487558291], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "lightblue"}, "hovertext": ["JP 29 [O13]"], "hoverinfo": "text", "text": ["JP 29"], "textposition": "top center", "textfont": {"color": "white", "size": 20}}], "layout": {"title": "Acantha", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-156449.24099976252, -24782.57433309583, -45217.42566690417, -176884.09233357085, -156449.24099976252], "y": [6518.005065504352, 129018.00506550436, 150981.99493449565, 28481.994934495633, 6518.005065504352], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-128334.15505978197, -129167.48839311535, -149165.84494021803, -148332.51160688465, -128334.15505978197], "y": [15128.19459325066, 80128.19459325066, 79871.80540674934, 14871.80540674934, 15128.19459325066], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-50003.75093786641, -51670.41760453307, -71662.91572880028, -69996.24906213362, -50003.75093786641], "y": [81107.20317065206, 141940.5365039854, 141392.79682934796, 80559.46349601462, 81107.20317065206], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [170966.2468112398, 36933.153532776065, 10974.046467223769, 145007.13974568748, 170966.2468112398], "y": [29526.481911939605, 143858.2823234622, 113425.98434320457, -905.8160683180249, 29526.481911939605], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [46981.779951800505, 21107.08002038757, 26800.119979612267, 52674.8199110252, 46981.779951800505], "y": [117337.06664751595, 99419.4354746764, 91198.1645253237, 109115.79569816325, 117337.06664751595], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [79229.86933456048, 105730.3837378527, 100243.0028190746, 73742.48841578238, 79229.86933456048], "y": [71069.02900696687, 88463.69464482697, 96823.6378654613, 79428.9722276012, 71069.02900696687], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [59280.416833797026, -97386.24983286967, -79973.69694353642, 76692.96972313027, 59280.416833797026], "y": [7358.442162586847, -104308.22450407983, -128737.77631896526, -17071.109652298597, 7358.442162586847], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-89201.57780940387, -67534.91114273721, -96491.70230033553, -118158.36896700218, -89201.57780940387], "y": [-192110.899214114, -112110.899214114, -104268.43494226446, -184268.43494226446, -192110.899214114], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-61718.16110915652, 67448.50555751017, 50191.54766608381, -78975.11900058288, -61718.16110915652], "y": [-136292.8557930413, -45459.52245970794, -20919.811696670462, -111753.1450300038, -136292.8557930413], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-70115.11996818638, -48448.45330151971, -77244.8268082197, -98911.49347488639, -70115.11996818638], "y": [-192395.87893871844, -118229.21227205177, -109816.78855099333, -183983.45521766003, -192395.87893871844], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [126469.17557479591, 58135.84224146257, 54504.21098213138, 122837.54431546472, 126469.17557479591], "y": [-1633.3122482646522, 6700.021085068683, -23079.355241447098, -31412.688574780434, -1633.3122482646522], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [110916.46341368194, 51749.79674701525, 49223.58980991205, 108390.25647657872, 110916.46341368194], "y": [-25742.94270032859, -20742.94270032859, -50636.39145604983, -55636.39145604983, -25742.94270032859], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [130923.00429294948, 60594.429190068804, 50788.62243315961, 121117.1975360403, 130923.00429294948], "y": [-118065.81448061217, -104000.09946003603, -153029.13324458204, -167094.8482651582, -118065.81448061217], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [104427.00702717471, 46489.65706146825, 60204.82288823478, 118142.17285394126, 104427.00702717471], "y": [-95784.07660303355, -150372.44680193617, -164929.03384506874, -110340.66364616613, -95784.07660303355], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-132500.0], "y": [132500.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Tilminra Gate [S05]"], "hoverinfo": "text", "text": ["Tilminra Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [97500.00000000001], "y": [-140000.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Krellis Gate [F16]"], "hoverinfo": "text", "text": ["Krellis Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [21666.666666666668], "y": [20000.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Ashia Gate [N13]"], "hoverinfo": "text", "text": ["Ashia Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-60000.00000000001], "y": [118333.33333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Nautri Ores [R09]"], "hoverinfo": "text", "text": ["Nautri Ores"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-140000.0], "y": [41666.66666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Multada Denabite [O05]"], "hoverinfo": "text", "text": ["Multada Denabite"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-114166.66666666667], "y": [26666.666666666668], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Potzhu Construction [N06]"], "hoverinfo": "text", "text": ["Potzhu Construction"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-130833.33333333334], "y": [1666.6666666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Potzhu Shipyards [M05]"], "hoverinfo": "text", "text": ["Potzhu Shipyards"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-80000.0], "y": [104166.66666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Raschad [R08]"], "hoverinfo": "text", "text": ["Raschad"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-91179.97338820303], "y": [-71523.00041152255], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Onzi Oasis [I07]"], "hoverinfo": "text", "text": ["Onzi Oasis"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-24513.30672153636], "y": [-119856.33374485589], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Betos Bazaar [G10]"], "hoverinfo": "text", "text": ["Betos Bazaar"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [37630.1117741198], "y": [37642.666026520455], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Ni'yata [N13]"], "hoverinfo": "text", "text": ["Ni'yata"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-7860.196724965713], "y": [24525.828606538736], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Ozkal [N11]"], "hoverinfo": "text", "text": ["Ozkal"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [28978.580709876547], "y": [-3940.499411293917], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Utimni [L13]"], "hoverinfo": "text", "text": ["Utimni"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [112047.29998856885], "y": [13046.061802697848], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Ladna Labs [M17]"], "hoverinfo": "text", "text": ["Ladna Labs"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [71075.07776634663], "y": [17907.17291380896], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Nessin [M15]"], "hoverinfo": "text", "text": ["Nessin"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [44639.89258116153], "y": [-136217.26981595787], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Nuzeli Mining [F14]"], "hoverinfo": "text", "text": ["Nuzeli Mining"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [105926.22231367184], "y": [-84308.08343049833], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Yimsu [H17]"], "hoverinfo": "text", "text": ["Yimsu"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-116666.66666666667], "y": [112500.00000000001], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 24 [R06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-89285.71428571429], "y": [80476.19047619049], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 88 [Q07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-61904.76190476191], "y": [48452.38095238096], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 47 [O08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-34523.80952380953], "y": [16428.571428571435], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 95 [M10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-7142.857142857145], "y": [-15595.238095238092], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 36 [L11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [20238.09523809525], "y": [-47619.04761904762], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 83 [J13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [47619.04761904762], "y": [-79642.85714285714], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 69 [I14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [75000.00000000001], "y": [-111666.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 82 [G15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [36298.42167352533], "y": [106193.57366255154], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 61 [R13]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [86562.69636488338], "y": [86708.61995884783], "mode": "markers+text", "marker": {"symbol": "circle", "size": 6, "color": "#FF13F0"}, "hovertext": ["CR 42 [Q16]"], "hoverinfo": "text", "text": ["CR 42"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 6, "base_text_size": 14}}], "layout": {"title": "Acantha", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Acantha';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,31 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  addButton('JP 29',function(){highlight('JP 29');},false,null,false)
+  addButton('Ashia Gate',function(){highlight('Ashia Gate');},false,null,false)
+    addButton('Krellis Gate',function(){highlight('Krellis Gate');},false,null,false)
+    addButton('Tilminra Gate',function(){highlight('Tilminra Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
-  
+  addButton('CR 42',function(){highlight('CR 42');},false,null,false)
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Betos Bazaar',function(){highlight('Betos Bazaar');},false,'blue',false)
+    addButton('Ladna Labs',function(){highlight('Ladna Labs');},false,'blue',false)
+    addButton('Multada Denabite',function(){highlight('Multada Denabite');},false,'blue',false)
+    addButton('Nautri Ores',function(){highlight('Nautri Ores');},false,'blue',false)
+    addButton('Nessin',function(){highlight('Nessin');},false,'blue',false)
+    addButton('Ni'yata',function(){highlight('Ni'yata');},false,'blue',false)
+    addButton('Nuzeli Mining',function(){highlight('Nuzeli Mining');},false,'blue',false)
+    addButton('Onzi Oasis',function(){highlight('Onzi Oasis');},false,'blue',false)
+    addButton('Ozkal',function(){highlight('Ozkal');},false,'blue',false)
+    addButton('Potzhu Construction',function(){highlight('Potzhu Construction');},false,'blue',false)
+    addButton('Potzhu Shipyards',function(){highlight('Potzhu Shipyards');},false,'blue',false)
+    addButton('Raschad',function(){highlight('Raschad');},false,'blue',false)
+    addButton('Utimni',function(){highlight('Utimni');},false,'blue',false)
+    addButton('Yimsu',function(){highlight('Yimsu');},false,'blue',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

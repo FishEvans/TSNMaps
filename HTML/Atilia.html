@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atilia.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">Atilia</h2>
+        <h3 class="subheader">Alignment: USFP</h3>
+        <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"Planet Atilia": {"type": "planet", "x": 78694.7499406646, "y": 42622.83221487869, "grid": "O15", "hidden": false}, "Helios Gate": {"type": "jumpnode", "x": 81169.80329768718, "y": 177115.29328580515, "grid": "U16", "hidden": false, "label": "Helios Gate", "destinations": {"Menice": "Helios"}}, "Tibur Gate": {"type": "jumpnode", "x": -73333.33333333334, "y": -86666.66666666667, "grid": "H08", "hidden": false, "label": "Tibur Gate", "destinations": {"Atilia Gate": "Tibur"}}, "Gate Control": {"type": "station", "x": 3333.333333333334, "y": 46827.06007129232, "grid": "O12", "hidden": false, "label": "Gate Control", "description": "Gate Control is hyper-vigilant because of the damage suffered during the last war.", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 16": {"type": "platform", "x": -2654.776336351147, "y": 42150.777520366646, "grid": "O11", "hidden": false, "label": "WP 16"}, "WP 39": {"type": "platform", "x": 4121.531350022879, "y": 53814.81838705991, "grid": "O12", "hidden": false, "label": "WP 39"}, "Tias Emporium": {"type": "station", "x": -23324.759945130296, "y": 33712.47356538637, "grid": "N10", "hidden": false, "label": "Tias Emporium", "hull": "starbase_civil", "facilities": ["Refuel", "Repair"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Elias Resorts": {"type": "station", "x": 47071.80391232284, "y": 58620.76014200073, "grid": "O14", "hidden": false, "label": "Elias Resorts", "hull": "starbase_civil", "facilities": ["Repair", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Atilia Core": {"type": "station", "x": 70135.63073702547, "y": 97221.52946864035, "grid": "Q15", "hidden": false, "label": "Atilia Core", "hull": "starbase_command", "facilities": [], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 15": {"type": "platform", "x": 85573.76213134419, "y": 170557.9974470355, "grid": "U16", "hidden": false, "label": "WP 15"}, "WP 43": {"type": "platform", "x": 73712.79212391394, "y": 176837.3345097927, "grid": "U15", "hidden": false, "label": "WP 43"}, "WP 56": {"type": "platform", "x": 84410.9219345373, "y": 183814.37569063404, "grid": "V16", "hidden": false, "label": "WP 56"}, "QRF 97": {"type": "platform", "x": 74259.93714861518, "y": 164626.2562887868, "grid": "U15", "hidden": false, "label": "QRF 97"}, "WP 90": {"type": "platform", "x": 80316.3965069844, "y": 175617.60845767907, "grid": "U16", "hidden": false, "label": "WP 90"}, "WP 93": {"type": "platform", "x": -75172.77750696713, "y": -79667.12066445229, "grid": "I08", "hidden": false, "label": "WP 93"}, "WP 33": {"type": "platform", "x": -65886.20649080099, "y": -88549.9277233938, "grid": "H08", "hidden": false, "label": "WP 33"}, "WP 88": {"type": "platform", "x": -78537.47715050558, "y": -92318.39132415687, "grid": "H08", "hidden": false, "label": "WP 88"}, "WP 44": {"type": "platform", "x": -72158.10009023566, "y": -85478.54888674345, "grid": "H08", "hidden": false, "label": "WP 44"}, "QRF 92": {"type": "platform", "x": -63348.97372256236, "y": -76738.58578952066, "grid": "I08", "hidden": false, "label": "QRF 92"}, "WP 58": {"type": "platform", "x": 9401.561964055069, "y": 42493.168119413465, "grid": "O12", "hidden": false, "label": "WP 58"}, "WP 26": {"type": "platform", "x": 52485.249845469414, "y": 53793.32193736506, "grid": "O14", "hidden": false, "label": "WP 26"}, "WP 57": {"type": "platform", "x": 56777.76358312814, "y": 48397.882564524065, "grid": "O14", "hidden": false, "label": "WP 57"}, "SR 17": {"type": "sensor_relay", "x": 59166.66666666667, "y": 146666.6666666667, "grid": "T14", "hidden": false, "label": "SR 17"}, "SR 42": {"type": "sensor_relay", "x": 40416.66666666667, "y": 112361.11111111112, "grid": "R14", "hidden": false, "label": "SR 42"}, "SR 54": {"type": "sensor_relay", "x": 21666.66666666667, "y": 78055.55555555556, "grid": "P13", "hidden": false, "label": "SR 54"}, "SR 97": {"type": "sensor_relay", "x": -15833.333333333328, "y": 9444.444444444438, "grid": "M11", "hidden": false, "label": "SR 97"}, "SR 67": {"type": "sensor_relay", "x": -34583.33333333333, "y": -24861.111111111124, "grid": "K10", "hidden": false, "label": "SR 67"}, "SR 84": {"type": "sensor_relay", "x": -53333.33333333333, "y": -59166.666666666686, "grid": "J09", "hidden": false, "label": "SR 84"}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [-6950.682774094894, -60950.682774094916, -94357.51736689004, -40357.517366890024, -6950.682774094894], "y": [-46728.635207007, 35271.364792993, 13271.742012371808, -68728.2579876282, -46728.635207007], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-6664.841209827871, -8664.841209827871, -48643.35893115705, -46643.35893115705, -6664.841209827871], "y": [-105073.06106090237, -44073.061060902364, -45383.83213373283, -106383.83213373282, -105073.06106090237], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-80768.93866816928, 3231.0613318307087, 13460.73852718436, -70539.26147281565, -80768.93866816928], "y": [-33321.37544141467, -83321.37544141467, -66135.51775322053, -16135.51775322053, -33321.37544141467], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [78694.7499406646], "y": [42622.83221487869], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Atilia"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Atilia [O15]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [59200.29692283196, 59029.194150308176, 58518.813448613335, 57677.8875730577, 56520.80499852073, 55067.363728656666, 53342.432546562915, 51375.52550300638, 49200.29692283196, 46853.96557013376, 44376.677824882376, 41810.820767232995, 39200.29692283196, 36589.77307843093, 34023.91602078155, 31546.628275530173, 29200.296922831967, 27025.06834265755, 25058.16129910101, 23333.23011700726, 21879.78884714319, 20722.70627260623, 19881.7803970506, 19371.399695355754, 19200.296922831963, 19371.399695355754, 19881.780397050596, 20722.706272606225, 21879.788847143187, 23333.23011700726, 25058.161299101004, 27025.068342657545, 29200.296922831956, 31546.628275530173, 34023.91602078155, 36589.77307843093, 39200.296922831956, 41810.82076723299, 44376.67782488237, 46853.96557013375, 49200.29692283196, 51375.52550300636, 53342.43254656291, 55067.363728656666, 56520.80499852073, 57677.8875730577, 58518.81344861332, 59029.194150308176, 59200.29692283196], "y": [141318.12542475536, 143928.6492691564, 146494.50632680577, 148971.79407205715, 151318.12542475536, 153493.35400492977, 155460.2610484863, 157185.19223058005, 158638.63350044412, 159795.7160749811, 160636.64195053672, 161147.02265223156, 161318.12542475536, 161147.02265223156, 160636.64195053672, 159795.7160749811, 158638.63350044412, 157185.19223058005, 155460.2610484863, 153493.35400492977, 151318.12542475536, 148971.79407205715, 146494.50632680577, 143928.6492691564, 141318.12542475536, 138707.60158035433, 136141.74452270495, 133664.45677745357, 131318.12542475536, 129142.89684458094, 127175.98980102442, 125451.05861893066, 123997.6173490666, 122840.53477452962, 121999.608898974, 121489.22819727915, 121318.12542475536, 121489.22819727915, 121999.608898974, 122840.53477452962, 123997.61734906658, 125451.05861893065, 127175.9898010244, 129142.89684458094, 131318.12542475536, 133664.45677745357, 136141.74452270492, 138707.60158035433, 141318.12542475536], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-60277.43842708007, -60303.10384295864, -60379.66094821287, -60505.79982954621, -60679.36221572676, -60897.378406206364, -61156.11808352043, -61451.15414005391, -61777.43842708007, -62129.3881299848, -62500.981291772514, -62885.85985041992, -63277.43842708007, -63669.01700374023, -64053.89556238763, -64425.48872417534, -64777.43842708007, -65103.72271410623, -65398.75877063972, -65657.49844795378, -65875.5146384334, -66049.07702461393, -66175.21590594728, -66251.7730112015, -66277.43842708008, -66251.7730112015, -66175.21590594728, -66049.07702461393, -65875.5146384334, -65657.49844795378, -65398.75877063972, -65103.72271410623, -64777.43842708007, -64425.48872417534, -64053.89556238763, -63669.01700374023, -63277.43842708007, -62885.85985041992, -62500.981291772514, -62129.38812998481, -61777.43842708007, -61451.15414005391, -61156.11808352043, -60897.37840620637, -60679.36221572676, -60505.79982954621, -60379.66094821287, -60303.10384295864, -60277.43842708007], "y": [-70444.99795885639, -70053.41938219624, -69668.54082354883, -69296.94766176112, -68944.99795885639, -68618.71367183022, -68323.67761529675, -68064.93793798269, -67846.92174750307, -67673.35936132252, -67547.22047998918, -67470.66337473496, -67444.99795885639, -67470.66337473496, -67547.22047998918, -67673.35936132252, -67846.92174750307, -68064.93793798269, -68323.67761529675, -68618.71367183022, -68944.99795885639, -69296.94766176112, -69668.54082354883, -70053.41938219623, -70444.99795885639, -70836.57653551655, -71221.45509416395, -71593.04825595165, -71944.99795885639, -72271.28224588255, -72566.31830241602, -72825.05797973009, -73043.0741702097, -73216.63655639025, -73342.7754377236, -73419.33254297782, -73444.99795885639, -73419.33254297782, -73342.7754377236, -73216.63655639025, -73043.0741702097, -72825.05797973009, -72566.31830241602, -72271.28224588255, -71944.99795885639, -71593.04825595165, -71221.45509416395, -70836.57653551655, -70444.99795885639], "fill": "toself", "fillcolor": "rgba(64,64,64,0.5305164769729845)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.5305164769729845)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-54630.66240493799, -54656.32782081656, -54732.88492607079, -54859.023807404126, -55032.58619358468, -55250.60238406428, -55509.342061378346, -55804.37811791183, -56130.66240493799, -56482.61210784272, -56854.20526963043, -57239.083828277835, -57630.66240493799, -58022.240981598145, -58407.11954024555, -58778.712702033255, -59130.66240493799, -59456.94669196415, -59751.982748497634, -60010.72242581169, -60228.7386162913, -60402.30100247185, -60528.43988380519, -60604.99698905942, -60630.66240493799, -60604.99698905942, -60528.43988380519, -60402.30100247185, -60228.7386162913, -60010.7224258117, -59751.982748497634, -59456.94669196415, -59130.66240493799, -58778.712702033255, -58407.11954024555, -58022.240981598145, -57630.66240493799, -57239.083828277835, -56854.20526963043, -56482.612107842724, -56130.66240493799, -55804.37811791183, -55509.342061378346, -55250.60238406429, -55032.58619358468, -54859.023807404126, -54732.88492607079, -54656.32782081656, -54630.66240493799], "y": [-74663.85360758324, -74272.27503092309, -73887.39647227568, -73515.80331048797, -73163.85360758324, -72837.56932055707, -72542.5332640236, -72283.79358670954, -72065.77739622993, -71892.21501004937, -71766.07612871603, -71689.5190234618, -71663.85360758324, -71689.5190234618, -71766.07612871603, -71892.21501004937, -72065.77739622993, -72283.79358670954, -72542.5332640236, -72837.56932055707, -73163.85360758324, -73515.80331048797, -73887.39647227568, -74272.27503092308, -74663.85360758324, -75055.4321842434, -75440.3107428908, -75811.9039046785, -76163.85360758324, -76490.1378946094, -76785.17395114288, -77043.91362845694, -77261.92981893655, -77435.4922051171, -77561.63108645045, -77638.18819170467, -77663.85360758324, -77638.18819170467, -77561.63108645045, -77435.4922051171, -77261.92981893655, -77043.91362845694, -76785.17395114288, -76490.1378946094, -76163.85360758324, -75811.9039046785, -75440.3107428908, -75055.4321842434, -74663.85360758324], "fill": "toself", "fillcolor": "rgba(64,64,64,0.5305164769729845)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.5305164769729845)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-51981.607689749246, -52024.383382880194, -52151.978558303905, -52362.210027192814, -52651.480670827055, -53014.84098829307, -53446.07378381651, -53937.80054470564, -54481.607689749246, -55068.1905279238, -55687.51246423664, -56328.97672864899, -56981.607689749246, -57634.238650849504, -58275.70291526185, -58895.02485157469, -59481.607689749246, -60025.41483479285, -60517.141595681984, -60948.37439120542, -61311.734708671436, -61601.00535230568, -61811.23682119459, -61938.8319966183, -61981.607689749246, -61938.8319966183, -61811.23682119459, -61601.00535230568, -61311.73470867144, -60948.37439120542, -60517.141595681984, -60025.41483479285, -59481.607689749246, -58895.02485157469, -58275.70291526185, -57634.238650849504, -56981.607689749246, -56328.97672864899, -55687.51246423664, -55068.1905279238, -54481.607689749246, -53937.80054470565, -53446.07378381651, -53014.84098829307, -52651.480670827055, -52362.210027192814, -52151.978558303905, -52024.383382880194, -51981.607689749246], "y": [-67654.06268354479, -67001.43172244454, -66359.96745803219, -65740.64552171934, -65154.06268354479, -64610.25553850119, -64118.52877761205, -63687.29598208862, -63323.9356646226, -63034.66502098836, -62824.43355209945, -62696.83837667574, -62654.06268354479, -62696.83837667574, -62824.43355209945, -63034.66502098836, -63323.9356646226, -63687.29598208862, -64118.52877761205, -64610.25553850119, -65154.06268354479, -65740.64552171934, -66359.96745803219, -67001.43172244453, -67654.06268354479, -68306.69364464506, -68948.1579090574, -69567.47984537024, -70154.06268354479, -70697.86982858839, -71189.59658947753, -71620.82938500096, -71984.18970246699, -72273.46034610123, -72483.69181499013, -72611.28699041385, -72654.06268354479, -72611.28699041385, -72483.69181499013, -72273.46034610123, -71984.18970246699, -71620.82938500096, -71189.59658947753, -70697.8698285884, -70154.06268354479, -69567.47984537024, -68948.1579090574, -68306.69364464506, -67654.06268354479], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [81169.80329768718], "y": [177115.29328580515], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Helios Gate [U16]"], "hoverinfo": "text", "text": ["Helios Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-73333.33333333334], "y": [-86666.66666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Tibur Gate [H08]"], "hoverinfo": "text", "text": ["Tibur Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [3333.333333333334], "y": [46827.06007129232], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Gate Control [O12]"], "hoverinfo": "text", "text": ["Gate Control"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-2654.776336351147], "y": [42150.777520366646], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 16 [O11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [4121.531350022879], "y": [53814.81838705991], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 39 [O12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-23324.759945130296], "y": [33712.47356538637], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Tias Emporium [N10]"], "hoverinfo": "text", "text": ["Tias Emporium"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [47071.80391232284], "y": [58620.76014200073], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Elias Resorts [O14]"], "hoverinfo": "text", "text": ["Elias Resorts"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [70135.63073702547], "y": [97221.52946864035], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Atilia Core [Q15]"], "hoverinfo": "text", "text": ["Atilia Core"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [85573.76213134419], "y": [170557.9974470355], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 15 [U16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [73712.79212391394], "y": [176837.3345097927], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 43 [U15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [84410.9219345373], "y": [183814.37569063404], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 56 [V16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [74259.93714861518], "y": [164626.2562887868], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 97 [U15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [80316.3965069844], "y": [175617.60845767907], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 90 [U16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-75172.77750696713], "y": [-79667.12066445229], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 93 [I08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-65886.20649080099], "y": [-88549.9277233938], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 33 [H08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-78537.47715050558], "y": [-92318.39132415687], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 88 [H08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-72158.10009023566], "y": [-85478.54888674345], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 44 [H08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-63348.97372256236], "y": [-76738.58578952066], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 92 [I08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [9401.561964055069], "y": [42493.168119413465], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 58 [O12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [52485.249845469414], "y": [53793.32193736506], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 26 [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [56777.76358312814], "y": [48397.882564524065], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 57 [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [59166.66666666667], "y": [146666.6666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 17 [T14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [40416.66666666667], "y": [112361.11111111112], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 42 [R14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [21666.66666666667], "y": [78055.55555555556], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 54 [P13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-15833.333333333328], "y": [9444.444444444438], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 97 [M11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-34583.33333333333], "y": [-24861.111111111124], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 67 [K10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-53333.33333333333], "y": [-59166.666666666686], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 84 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Atilia", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Atilia';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+        }
+    });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [3];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('Helios Gate',function(){highlight('Helios Gate');},false,null,false)
+    addButton('Tibur Gate',function(){highlight('Tibur Gate');},false,null,false)
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Atilia',function(){highlight('Planet Atilia');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Atilia Core',function(){highlight('Atilia Core');},false,'blue',false)
+    addButton('Elias Resorts',function(){highlight('Elias Resorts');},false,'blue',false)
+    addButton('Gate Control',function(){highlight('Gate Control');},false,'blue',false)
+    addButton('Tias Emporium',function(){highlight('Tias Emporium');},false,'blue',false)
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        26921.667504710527,
+        30595.600900864087,
         0,
-        -14794.609098284036
+        -8671.386771361438
     ],
     "systemalignment": "Unknown",
     "metadata": {
@@ -16,10 +16,360 @@
             "assets": []
         },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "Burin Gate": {
+            "coordinate": [
+                -142500.0,
+                0,
+                150833.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Burin Gate": "Burin"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Vrae Gate": {
+            "coordinate": [
+                111114.66666666667,
+                0,
+                -78676.00000000001
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Athorn Gate": "Vrae"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Helios Gate": {
+            "coordinate": [
+                -151666.6666666667,
+                0,
+                -129166.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Helios Gate": "Helios"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Kracha": {
+            "coordinate": [
+                113902.20023764088,
+                0,
+                145217.2603089333
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Pirate base",
+            "hideonmap": true
+        },
+        "WP 15": {
+            "coordinate": [
+                107188.36300932555,
+                0,
+                147014.62203413612
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 30": {
+            "coordinate": [
+                119272.4567901233,
+                0,
+                141983.19753086418
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Ishka": {
+            "coordinate": [
+                30180.27177335248,
+                0,
+                -273724.37277212134
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "WP 29": {
+            "coordinate": [
+                37540.57941258537,
+                0,
+                -271686.0846216023
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 22": {
+            "coordinate": [
+                23683.4004006366,
+                0,
+                -276531.2521082976
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 59": {
+            "coordinate": [
+                31535.470215944024,
+                0,
+                -277627.25914149685
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_fighter_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Generator 26": {
+            "coordinate": [
+                31437.721865136624,
+                0,
+                -281523.55327677645
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Gas Extractor 29": {
+            "coordinate": [
+                34648.59344176379,
+                0,
+                -280498.017194626
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_gasextractor",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "WP 33": {
+            "coordinate": [
+                32979.76200339417,
+                0,
+                -281202.17518073827
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Jump Point": {
+            "coordinate": [
+                33545.089001973254,
+                0,
+                -282286.83003562834
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "jump_node",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1766372727638": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -129166.66666666667,
+                0,
+                85833.33333333334
+            ],
+            "end": [
+                108333.33333333334,
+                0,
+                33333.333333333336
+            ],
+            "density": 225,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766372737601": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -40000.0,
+                0,
+                99166.66666666667
+            ],
+            "end": [
+                -172500.00000000003,
+                0,
+                -11666.666666666668
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766372765418": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -145000.0,
+                0,
+                47500.00000000001
+            ],
+            "end": [
+                -13333.333333333334,
+                0,
+                85833.33333333334
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766372784997": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -109093.33333333346,
+                0,
+                -170499.9999999999
+            ],
+            "end": [
+                -14166.666666666668,
+                0,
+                -59166.66666666667
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766372801461": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -76666.66666666667,
+                0,
+                -79166.66666666667
+            ],
+            "end": [
+                129946.66666666653,
+                0,
+                -141699.9999999999
+            ],
+            "density": 225,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766372823189": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -90833.33333333334,
+                0,
+                -111666.66666666667
+            ],
+            "end": [
+                21666.666666666668,
+                0,
+                -66666.66666666667
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766372852449": {
+            "type": "planet",
+            "name": "Planet Athorn VIII",
+            "coordinate": [
+                -50000.00000000001,
+                0,
+                -10000.0
+            ]
+        },
+        "1766373762900": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                21423.73343229217,
+                0,
+                -280039.742806942
+            ],
+            "end": [
+                42582.91714744526,
+                0,
+                -277313.7130031493
+            ],
+            "density": 225,
+            "scatter": 10000,
+            "composition": []
+        }
+    },
     "traffic": {}
 }

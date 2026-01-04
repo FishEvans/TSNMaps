@@ -2,7 +2,7 @@
     "systemMapCoord": [
         -45996.59857263771,
         0,
-        -3326.3280900192403
+        -3326.3280900192362
     ],
     "systemalignment": "Hjorden",
     "metadata": {
@@ -15,7 +15,22 @@
         "development": "Unclaimed",
         "visible": true
     },
-    "objects": {},
+    "objects": {
+        "Hearthland Gate": {
+            "coordinate": [
+                68333.33333333334,
+                0,
+                -16666.666666666668
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Arrin Gate": "Hjorden"
+            },
+            "state": "Tethered",
+            "drift": 0
+        }
+    },
     "sensor_relay": {},
     "terrain": {},
     "traffic": {}

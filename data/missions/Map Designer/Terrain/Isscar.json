@@ -1,0 +1,571 @@
+{
+    "systemMapCoord": [
+        60564.87071120573,
+        0,
+        -24205.123218093595
+    ],
+    "systemalignment": "Ximni",
+    "metadata": {
+        "skybox": "sky1-blue.png",
+        "sysdescription": "Serving as the political and logistical heart of the Ximni Confederation, Isscar became the de facto capital when the population of Renaera could no longer sustain open governance. The temperate world of Issen Prime hosts the Confederation Forum \u2014 an immense orbital complex where votes are transmitted in real time from across the Confederation. Isscar\u2019s orbital lanes are crowded with freighters and jump couriers, and the system\u2019s twin suns make navigation challenging, leading to frequent \u201cshadow drift\u201d incidents when ships miscalculate their approach vectors. The Isscar Jump Nexus is a key Jump Point.",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "Agriculture",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": [
+                "Fortification"
+            ]
+        },
+        "development": "Regional Capital",
+        "visible": true
+    },
+    "objects": {
+        "Renaera Portal": {
+            "coordinate": [
+                148333.3333333333,
+                0,
+                46000.0
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Portal of Renewal": "Renaera"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Isscar Portal Nexus": {
+            "coordinate": [
+                -70578.70370370372,
+                0,
+                82268.51851851853
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Banner Portal": "Tjorath",
+                "Gateforge Portal": "Fymla",
+                "Hoprate Portal": "Memoras",
+                "Portal Of Plenty": "Chawaras"
+            },
+            "state": "Tethered",
+            "drift": 35000
+        },
+        "DS 47": {
+            "coordinate": [
+                64537.03703703704,
+                0,
+                84675.92592592597
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 60": {
+            "coordinate": [
+                64537.03703703704,
+                0,
+                27962.962962962996
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 74": {
+            "coordinate": [
+                -63356.4814814815,
+                0,
+                -112083.33333333333
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_drydock",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Electrophyer 6 4": {
+            "coordinate": [
+                -43101.85185185187,
+                0,
+                103194.4444444445
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Electrophyer 5 3": {
+            "coordinate": [
+                -85347.22222222225,
+                0,
+                51111.111111111146
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Electrophyer 4 4": {
+            "coordinate": [
+                -44837.96296296298,
+                0,
+                59212.962962963
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Electrophyer 3 5": {
+            "coordinate": [
+                -99814.81481481485,
+                0,
+                102037.03703703708
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 21": {
+            "coordinate": [
+                35833.333333333336,
+                0,
+                -144166.6666666667
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 12": {
+            "coordinate": [
+                65000.00000000001,
+                0,
+                -144166.6666666667
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 48": {
+            "coordinate": [
+                41666.66666666667,
+                0,
+                -178333.33333333334
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 11": {
+            "coordinate": [
+                33333.333333333336,
+                0,
+                -59166.66666666667
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Tat 2 Eni": {
+            "coordinate": [
+                -139641.20370370374,
+                0,
+                -1805.5555555555147
+            ],
+            "sides": [
+                "Ximni"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": "Comand HQ for the Ximmni High command"
+        },
+        "Electrophyer 13": {
+            "coordinate": [
+                129351.85185185187,
+                0,
+                61527.77777777782
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "hegemony_generator",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
+    "sensor_relay": {},
+    "terrain": {
+        "1762545204979": {
+            "type": "planet",
+            "name": "Fall Rise",
+            "coordinate": [
+                74722.22222222225,
+                0,
+                57361.11111111113
+            ]
+        },
+        "1762545905259": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -74166.66666666667,
+                0,
+                169166.6666666667
+            ],
+            "end": [
+                -181666.6666666667,
+                0,
+                70000.0
+            ],
+            "density": 560,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1762545927648": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -173333.33333333334,
+                0,
+                79166.66666666667
+            ],
+            "end": [
+                -109166.66666666667,
+                0,
+                -218333.33333333334
+            ],
+            "density": 6000,
+            "scatter": 100000,
+            "composition": []
+        },
+        "1762545939219": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                40000.0,
+                0,
+                -105000.00000000001
+            ],
+            "end": [
+                91666.66666666667,
+                0,
+                -134166.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762545949794": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                48333.333333333336,
+                0,
+                -116666.66666666667
+            ],
+            "end": [
+                1666.6666666666667,
+                0,
+                -130833.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762545954664": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                7500.000000000001,
+                0,
+                -128333.33333333334
+            ],
+            "end": [
+                22500.000000000004,
+                0,
+                -189166.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762545963692": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                19166.666666666668,
+                0,
+                -185833.33333333334
+            ],
+            "end": [
+                77500.0,
+                0,
+                -110833.33333333334
+            ],
+            "density": 625,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1762545978662": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                97500.00000000001,
+                0,
+                -95833.33333333334
+            ],
+            "end": [
+                -39166.66666666667,
+                0,
+                -94166.66666666667
+            ],
+            "density": 625,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1762545992190": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                80000.0,
+                0,
+                -90833.33333333334
+            ],
+            "end": [
+                158333.33333333334,
+                0,
+                -20833.333333333336
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1762545995743": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                91666.66666666667,
+                0,
+                168333.33333333334
+            ],
+            "end": [
+                105833.33333333334,
+                0,
+                154166.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762545999588": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                106666.66666666667,
+                0,
+                159166.6666666667
+            ],
+            "end": [
+                140833.33333333334,
+                0,
+                142500.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762546004776": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                85833.33333333334,
+                0,
+                159166.6666666667
+            ],
+            "end": [
+                36666.66666666667,
+                0,
+                154166.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762546008761": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                62500.00000000001,
+                0,
+                156666.6666666667
+            ],
+            "end": [
+                132500.0,
+                0,
+                125000.00000000001
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1762546013155": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                50833.333333333336,
+                0,
+                156666.6666666667
+            ],
+            "end": [
+                152500.0,
+                0,
+                191666.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1762546017435": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                144166.6666666667,
+                0,
+                194166.6666666667
+            ],
+            "end": [
+                161666.6666666667,
+                0,
+                113333.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1762546023780": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -36666.66666666667,
+                0,
+                165833.33333333334
+            ],
+            "end": [
+                68333.33333333334,
+                0,
+                156666.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        }
+    },
+    "traffic": {
+        "security": "heavy",
+        "civilian": "heavy",
+        "commercial": "heavy"
+    }
+}

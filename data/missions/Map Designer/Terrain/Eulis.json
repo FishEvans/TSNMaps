@@ -1,21 +1,611 @@
 {
     "systemMapCoord": [
-        20608.0300271961,
+        20608.030027196124,
         0,
-        -12681.715183994844
+        -12681.715183994847
     ],
-    "systemalignment": "Unknown",
+    "systemalignment": "League Of Traders",
     "metadata": {
-        "sysdescription": "",
+        "sysdescription": "system under the League Of Traders Democray",
         "security": "Neutral",
         "exports": [],
-        "focus": "",
-        "intel": {},
+        "focus": "Agriculture",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": [
+                "Shipyard",
+                "Listening Post",
+                "Fortification"
+            ]
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Jhohara Gate": {
+            "coordinate": [
+                -39166.66666666667,
+                0,
+                163333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eulis Gate": "Jhohara"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Khoros Gate": {
+            "coordinate": [
+                183333.33333333334,
+                0,
+                37500.0
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eulis Gate": "Khoros"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Sumri Gate": {
+            "coordinate": [
+                -144166.66666666666,
+                0,
+                10833.333333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eulis Gate": "Sumri"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Reema Gate": {
+            "coordinate": [
+                -90000.00000000001,
+                0,
+                -131666.6666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eulis Gate": "Reema"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Mria Gate": {
+            "coordinate": [
+                154166.6666666667,
+                0,
+                -125833.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eulis Gate": "Mria"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Marge Security": {
+            "coordinate": [
+                33333.333333333336,
+                0,
+                -55000.00000000001
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Neutral base using pirate design"
+        },
+        "WP 9": {
+            "coordinate": [
+                33117.37292598097,
+                0,
+                -49783.3767565082
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 34": {
+            "coordinate": [
+                33655.72486894712,
+                0,
+                -61627.11950176356
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Campton Industries": {
+            "coordinate": [
+                45023.857194695665,
+                0,
+                -37513.406517278934
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Carilon Shipwrights": {
+            "coordinate": [
+                14213.243340100324,
+                0,
+                -77366.26574224465
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Baratron Refinery": {
+            "coordinate": [
+                19305.30009593023,
+                0,
+                5117.5519875221
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "SY 2C": {
+            "coordinate": [
+                11665.25395674659,
+                0,
+                -81634.20983217689
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "SY 1C": {
+            "coordinate": [
+                18798.417201048112,
+                0,
+                -80961.26990346919
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Jartak Inspections": {
+            "coordinate": [
+                -32995.063173831215,
+                0,
+                136316.13883327643
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Bratmech Cartel": {
+            "coordinate": [
+                -37836.884161485534,
+                0,
+                122118.60796907889
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Trellis Confederacy": {
+            "coordinate": [
+                -69279.78539605343,
+                0,
+                -77109.78709264954
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Canton Traders": {
+            "coordinate": [
+                -93836.11255654729,
+                0,
+                -34825.83647536558
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Sultam Customs": {
+            "coordinate": [
+                -105100.47298178733,
+                0,
+                -5286.6739525032
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Reticle Inspections": {
+            "coordinate": [
+                -73854.59594798904,
+                0,
+                -112795.35450805878
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Veich Market": {
+            "coordinate": [
+                -57457.99100971744,
+                0,
+                -102668.03969324396
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Madisom Customs": {
+            "coordinate": [
+                129173.95343472704,
+                0,
+                -100256.7742611452
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Ketan Customs": {
+            "coordinate": [
+                161002.65713843075,
+                0,
+                15966.21956601532
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Staraway Systems": {
+            "coordinate": [
+                153198.64479275173,
+                0,
+                -41213.56438460197
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        }
+    },
+    "sensor_relay": {
+        "SR 91": {
+            "coordinate": [
+                -119166.66666666667,
+                0,
+                19166.666666666668
+            ]
+        },
+        "SR 34": {
+            "coordinate": [
+                -79404.76190476191,
+                0,
+                21666.666666666668
+            ]
+        },
+        "SR 88": {
+            "coordinate": [
+                -39642.857142857145,
+                0,
+                24166.666666666668
+            ]
+        },
+        "SR 12": {
+            "coordinate": [
+                119.04761904761835,
+                0,
+                26666.666666666668
+            ]
+        },
+        "SR 63": {
+            "coordinate": [
+                39880.95238095238,
+                0,
+                29166.66666666667
+            ]
+        },
+        "SR 98": {
+            "coordinate": [
+                79642.85714285717,
+                0,
+                31666.66666666667
+            ]
+        },
+        "SR 82": {
+            "coordinate": [
+                119404.76190476191,
+                0,
+                34166.66666666667
+            ]
+        },
+        "SR 44": {
+            "coordinate": [
+                159166.6666666667,
+                0,
+                36666.66666666667
+            ]
+        },
+        "SR 42": {
+            "coordinate": [
+                -130000.00000000001,
+                0,
+                -15833.333333333334
+            ]
+        },
+        "SR 26": {
+            "coordinate": [
+                -115416.66666666669,
+                0,
+                -57916.66666666668
+            ]
+        },
+        "SR 18": {
+            "coordinate": [
+                -100833.33333333334,
+                0,
+                -100000.00000000001
+            ]
+        },
+        "SR 40": {
+            "coordinate": [
+                -30000.000000000004,
+                0,
+                -89583.33333333334
+            ]
+        },
+        "SR 95": {
+            "coordinate": [
+                79301.69753086418,
+                0,
+                -36358.02469135803
+            ]
+        },
+        "SR 19": {
+            "coordinate": [
+                108252.31481481482,
+                0,
+                -18001.54320987655
+            ]
+        },
+        "SR 52": {
+            "coordinate": [
+                139131.9444444444,
+                0,
+                2283.950617283946
+            ]
+        },
+        "SR 11": {
+            "coordinate": [
+                179166.6666666667,
+                0,
+                -833.3333333333334
+            ]
+        },
+        "SR 50": {
+            "coordinate": [
+                173055.55555555556,
+                0,
+                -31944.444444444445
+            ]
+        },
+        "SR 65": {
+            "coordinate": [
+                166944.44444444447,
+                0,
+                -63055.55555555556
+            ]
+        },
+        "SR 49": {
+            "coordinate": [
+                160833.33333333334,
+                0,
+                -94166.66666666667
+            ]
+        },
+        "SR 24": {
+            "coordinate": [
+                129166.66666666667,
+                0,
+                -125833.33333333334
+            ]
+        },
+        "SR 22": {
+            "coordinate": [
+                86666.66666666667,
+                0,
+                -127083.33333333334
+            ]
+        },
+        "SR 96": {
+            "coordinate": [
+                44166.66666666667,
+                0,
+                -128333.33333333334
+            ]
+        },
+        "SR 43": {
+            "coordinate": [
+                1666.6666666666715,
+                0,
+                -129583.33333333334
+            ]
+        },
+        "SR 16": {
+            "coordinate": [
+                -40833.33333333333,
+                0,
+                -130833.33333333334
+            ]
+        },
+        "SR 73": {
+            "coordinate": [
+                -65138.8888888889,
+                0,
+                -21388.88888888889
+            ]
+        },
+        "SR 83": {
+            "coordinate": [
+                -26944.444444444453,
+                0,
+                -36111.11111111111
+            ]
+        },
+        "SR 55": {
+            "coordinate": [
+                7916.666666666667,
+                0,
+                -54166.66666666667
+            ]
+        },
+        "SR 81": {
+            "coordinate": [
+                60632.71604938273,
+                0,
+                -72079.47530864198
+            ]
+        },
+        "SR 68": {
+            "coordinate": [
+                97862.65432098767,
+                0,
+                -87283.95061728398
+            ]
+        }
+    },
+    "terrain": {
+        "1766375193716": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -30881.171097485407,
+                0,
+                17688.282440196996
+            ],
+            "end": [
+                96514.01923173272,
+                0,
+                -18078.82146926803
+            ],
+            "density": 125,
+            "scatter": 25000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375411647": {
+            "type": "planet",
+            "name": "Planet Eulis",
+            "coordinate": [
+                -79159.37989860633,
+                0,
+                -51549.21253275013
+            ]
+        }
+    },
     "traffic": {}
 }

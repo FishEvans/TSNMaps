@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -28174.82698124704,
-        0.0,
-        11568.762538189281
+        -28955.21034562497,
+        0,
+        16418.28773110931
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -66,7 +66,8 @@
                 "Casing": 7,
                 "Coffee": 5,
                 "Tea": 7,
-                "Alcohol": 6
+                "Alcohol": 6,
+                "Guidance System": 9
             },
             "teams": {
                 "Diplomats": 3
@@ -101,18 +102,17 @@
                 "Casing": 7,
                 "Coffee": 4,
                 "Tea": 6,
-                "Alcohol": 5
+                "Alcohol": 5,
+                "Guidance System": 6
             },
-            "teams": {
-                "Diplomats": 0
-            },
+            "teams": {},
             "description": ""
         },
         "DS 85": {
             "coordinate": [
-                31596.252679552996,
+                33372.8140913413,
                 0,
-                -112247.07621376461
+                -104817.81940083171
             ],
             "sides": [
                 "USFP"
@@ -122,8 +122,26 @@
             "facilities": [
                 "Docking"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5,
+                "Guidance System": 6
+            },
+            "teams": {
+                "Diplomats": 1
+            },
             "description": ""
         },
         "DS 77": {
@@ -155,10 +173,11 @@
                 "Coffee": 5,
                 "Tea": 6,
                 "Alcohol": 6,
-                "Homing": 30
+                "Homing": 30,
+                "Guidance System": 4
             },
             "teams": {
-                "Diplomats": 0
+                "Diplomats": 1
             },
             "description": ""
         },
@@ -193,9 +212,7 @@
                 "Alcohol": 4,
                 "Guidance System": 8
             },
-            "teams": {
-                "Diplomats": 0
-            },
+            "teams": {},
             "description": ""
         },
         "DS 74": {
@@ -226,7 +243,8 @@
                 "Casing": 6,
                 "Coffee": 3,
                 "Tea": 6,
-                "Alcohol": 7
+                "Alcohol": 7,
+                "Guidance System": 5
             },
             "teams": {
                 "Diplomats": 2
@@ -244,7 +262,9 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Repair Materials": 16,
                 "Medical Supplies": 11,
@@ -259,7 +279,8 @@
                 "Casing": 5,
                 "Coffee": 5,
                 "Tea": 4,
-                "Alcohol": 4
+                "Alcohol": 4,
+                "Guidance System": 4
             },
             "teams": {
                 "Diplomats": 1
@@ -277,9 +298,30 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5,
+                "Guidance System": 6
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
         },
         "Traffic Control": {
             "coordinate": [
@@ -293,7 +335,9 @@
             "hull": "starbase_command",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel",
+                "Repair"
             ],
             "cargo": {
                 "Homing": 51,
@@ -317,9 +361,9 @@
         },
         "Port Rum": {
             "coordinate": [
-                -171594.14014711874,
+                -183399.6957026743,
                 0,
-                107412.18019982662
+                119217.73575538216
             ],
             "sides": [
                 "Pirate"
@@ -334,9 +378,9 @@
         },
         "Port Shadow": {
             "coordinate": [
-                186739.1931862146,
+                225628.0820751035,
                 0,
-                -26615.59757795118
+                -33560.042022395624
             ],
             "sides": [
                 "USFP"
@@ -353,7 +397,7 @@
             "coordinate": [
                 -134094.14014711874,
                 0,
-                -180087.81980017343
+                -188768.375355729
             ],
             "sides": [
                 "Pirate"
@@ -368,9 +412,9 @@
         },
         "D": {
             "coordinate": [
-                49933.63763065905,
+                69865.15769238745,
                 0,
-                149773.29131093773
+                171216.9427169734
             ],
             "sides": [
                 "USFP"
@@ -385,9 +429,9 @@
         },
         "C": {
             "coordinate": [
-                58961.41540843682,
+                62286.922548164,
                 0,
-                -157171.15313350674
+                -235712.1708423164
             ],
             "sides": [
                 "Pirate"
@@ -432,7 +476,8 @@
                 "Power Relay": 14,
                 "Casing": 14,
                 "Homing": 30,
-                "Torpedo Casing": 9
+                "Torpedo Casing": 9,
+                "High Yield Warhead": 3
             },
             "teams": {
                 "DamCon": 1,
@@ -451,7 +496,10 @@
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
             "cargo": {
                 "Iron": 55,
                 "Tharium": 66,
@@ -469,7 +517,8 @@
                 "Power Relay": 16,
                 "Casing": 17,
                 "Homing": 36,
-                "Torpedo Casing": 8
+                "Torpedo Casing": 8,
+                "High Yield Warhead": 4
             },
             "teams": {
                 "DamCon": 2,
@@ -509,7 +558,8 @@
                 "Power Relay": 14,
                 "Casing": 14,
                 "Homing": 34,
-                "Torpedo Casing": 8
+                "Torpedo Casing": 8,
+                "High Yield Warhead": 4
             },
             "teams": {
                 "DamCon": 0,
@@ -519,9 +569,9 @@
         },
         "MF Diaspria": {
             "coordinate": [
-                30390.619963503614,
+                37038.18975524967,
                 0,
-                -72863.07415615144
+                -78851.70116970692
             ],
             "sides": [
                 "USFP"
@@ -549,7 +599,8 @@
                 "Power Relay": 17,
                 "Casing": 15,
                 "Homing": 37,
-                "Torpedo Casing": 9
+                "Torpedo Casing": 9,
+                "Guidance System": 7
             },
             "teams": {
                 "DamCon": 1,
@@ -566,11 +617,22 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Homing": 1,
+                "EMP": 2,
+                "Mine": 2,
+                "High Yield Warhead": 3,
+                "Warhead": 2,
+                "Navigational Array": 1,
+                "Guidance System": 10,
+                "Medical Supplies": 1,
+                "Repair Materials": 5
+            },
+            "teams": {},
+            "description": "DS 13, Abandoned and offline"
         }
     },
     "sensor_relay": {
@@ -1221,9 +1283,9 @@
             "type": "nebulas",
             "seed": 2010,
             "start": [
-                -145899.6957026743,
+                -177232.83020674667,
                 0,
-                131023.29131093773
+                150837.39243348033
             ],
             "end": [
                 -190344.14014711874,
@@ -1362,9 +1424,9 @@
                 -138421.15313350674
             ],
             "end": [
-                154794.74874177016,
+                158183.83645992,
                 0,
-                -63421.15313350674
+                -65134.829788741896
             ],
             "density": 125,
             "scatter": 10000,
@@ -1379,9 +1441,9 @@
                 -72448.93091128452
             ],
             "end": [
-                189516.97096399238,
+                192211.6142376978,
                 0,
-                17134.402422048825
+                16809.614655702553
             ],
             "density": 125,
             "scatter": 15000,
@@ -1391,9 +1453,9 @@
             "type": "nebulas",
             "seed": 2010,
             "start": [
-                177016.97096399238,
+                179711.6142376978,
                 0,
-                -14810.042022395624
+                -12357.052010964115
             ],
             "end": [
                 140905.8598528813,
@@ -1408,9 +1470,9 @@
             "type": "asteroids",
             "seed": 2010,
             "start": [
-                23544.748741770152,
+                39063.120760274265,
                 0,
-                -164810.04202239565
+                -193890.8016938264
             ],
             "end": [
                 91600.30429732571,
@@ -1446,14 +1508,14 @@
             "type": "asteroids",
             "seed": 2010,
             "start": [
-                28405.85985288126,
+                46378.28090436445,
                 0,
-                150467.73575538216
+                164726.28132236924
             ],
             "end": [
-                70072.52651954793,
+                104711.6142376978,
                 0,
-                131717.73575538216
+                162642.9479890359
             ],
             "density": 125,
             "scatter": 10000,
@@ -1461,6 +1523,60 @@
                 "Ast. Std Rand"
             ],
             "hideonmap": true
+        },
+        "1758375688939": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                169989.39201547558,
+                0,
+                -29023.718677630783
+            ],
+            "end": [
+                260267.16979325336,
+                0,
+                -33884.829788741896
+            ],
+            "density": 125,
+            "scatter": 16000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1758375713238": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                52647.571027821235,
+                0,
+                -248236.6816405937
+            ],
+            "end": [
+                83029.51547226569,
+                0,
+                -208209.67546775425
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1758375722961": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                59399.11423769778,
+                0,
+                -229911.06435664312
+            ],
+            "end": [
+                51200.81176856198,
+                0,
+                -199529.1199121987
+            ],
+            "density": 25,
+            "scatter": 10000,
+            "composition": []
         }
     },
     "traffic": {

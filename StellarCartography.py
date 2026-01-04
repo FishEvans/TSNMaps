@@ -9,6 +9,7 @@ import SystemEditor  # New module for dedicated system editing
 import sys
 import SystemTemplates
 import copy
+import re
 
 # Helper to locate resources in bundled or source context
 def get_base_path():
@@ -30,7 +31,8 @@ class SystemMapEditor:
     • Left Click & Drag – Move systems and text nodes
     • Scroll Wheel – Zoom in/out centered at mouse
     • Right Click – Edit system or text properties
-    • Shift + Left Click – Add point to selected border / start new border
+    • Left Click (on system) – Open System Editor
+    • Shift + Left Click – Open system details / add point to selected border
     • Shift + Right Click – 
        - On a system: open detailed System Editor
        - On empty space: create new text node
@@ -57,6 +59,122 @@ class SystemMapEditor:
         text.pack(expand=True, fill=tk.BOTH)
 
         tk.Button(top, text="Close", command=top.destroy).pack(pady=5)
+
+    def auto_link_gates(self):
+        base = get_base_path()
+        systems_dir = os.path.join(base, "data", "missions", "Map Designer", "Terrain")
+        if not os.path.isdir(systems_dir):
+            print(f"Systems directory not found: {systems_dir}")
+            return
+
+        system_files = {}
+        system_paths = {}
+        for filename in os.listdir(systems_dir):
+            if not filename.endswith(".json") or filename == "package.json":
+                continue
+            system_name = filename[:-5]
+            system_files[system_name.lower()] = filename
+            system_paths[filename] = os.path.join(systems_dir, filename)
+
+        system_data = {}
+        for filename, path in system_paths.items():
+            try:
+                with open(path, "r") as f:
+                    system_data[filename] = json.load(f)
+            except (IOError, json.JSONDecodeError):
+                print(f"Warning: Could not parse {filename}, skipping.")
+
+        updates = {}
+        for filename, data in system_data.items():
+            objects = data.get("objects", {})
+            if not isinstance(objects, dict):
+                continue
+            current_system = filename[:-5]
+            current_system_lower = current_system.lower()
+            for gate_name, gate_data in objects.items():
+                if not isinstance(gate_data, dict):
+                    continue
+                if gate_data.get("type") not in ("jumpnode", "jumppoint"):
+                    continue
+                destinations = gate_data.get("destinations")
+                if isinstance(destinations, dict) and destinations:
+                    continue
+                words = re.findall(r"[A-Za-z0-9]+", gate_name)
+                if not words:
+                    continue
+                matched = False
+                fallback_system = None
+                for word in words:
+                    candidate_file = system_files.get(word.lower())
+                    if not candidate_file:
+                        continue
+                    if candidate_file.lower() == filename.lower():
+                        continue
+                    if fallback_system is None:
+                        fallback_system = candidate_file
+                    candidate_data = system_data.get(candidate_file)
+                    if not isinstance(candidate_data, dict):
+                        continue
+                    candidate_objects = candidate_data.get("objects", {})
+                    if not isinstance(candidate_objects, dict):
+                        continue
+                    for candidate_gate_name, candidate_gate_data in candidate_objects.items():
+                        if not isinstance(candidate_gate_data, dict):
+                            continue
+                        if candidate_gate_data.get("type") not in ("jumpnode", "jumppoint"):
+                            continue
+                        if current_system_lower in candidate_gate_name.lower():
+                            dest_system_name = candidate_file[:-5]
+                            gate_data["destinations"] = {candidate_gate_name: dest_system_name}
+                            updates.setdefault(filename, []).append(
+                                (gate_name, candidate_gate_name, dest_system_name)
+                            )
+                            matched = True
+                            break
+                    if matched:
+                        break
+                if not matched and fallback_system:
+                    dest_system_name = fallback_system[:-5]
+                    gate_data["destinations"] = {gate_name: dest_system_name}
+                    updates.setdefault(filename, []).append(
+                        (gate_name, gate_name, dest_system_name)
+                    )
+
+        if not updates:
+            print("Auto Link Gates: no missing destinations matched.")
+            return
+
+        for filename in updates:
+            path = system_paths.get(filename)
+            if not path:
+                continue
+            try:
+                with open(path, "w") as f:
+                    json.dump(system_data[filename], f, indent=4)
+            except IOError:
+                print(f"Failed to write {filename}")
+
+        for filename, changes in updates.items():
+            if filename not in self.systems:
+                continue
+            jump_points = self.systems[filename].get("jump_points", [])
+            for gate_name, dest_gate_name, dest_system_name in changes:
+                for jp in jump_points:
+                    if jp.get("name") == gate_name:
+                        jp["destinations"] = {dest_gate_name: dest_system_name}
+                        break
+
+        self.redraw_map()
+        total = sum(len(changes) for changes in updates.values())
+        print(f"Auto Link Gates: updated {total} gate(s).")
+
+    def reload_systems_data(self):
+        self.systems = {}
+        self.load_systems()
+        self.clear_selection()
+        self.redraw_map()
+        self.draw_scale()
+        print("Systems reloaded.")
 
     def create_new_system(self):
         top = tk.Toplevel(self.root)
@@ -132,6 +250,10 @@ class SystemMapEditor:
         control_frame.pack(side=tk.TOP, fill=tk.X)
         self.selected_text = None
         self.selected_text_index = None
+        auto_link_button = tk.Button(control_frame, text="Auto Link Gates", command=self.auto_link_gates)
+        auto_link_button.pack(side=tk.LEFT)
+        reload_button = tk.Button(control_frame, text="Reload Systems", command=self.reload_systems_data)
+        reload_button.pack(side=tk.LEFT)
         save_button = tk.Button(control_frame, text="Save Changes", command=self.save_changes)
         save_button.pack(side=tk.LEFT)
 
@@ -276,8 +398,44 @@ class SystemMapEditor:
         self.pan_offset_x = screen_cx - center_x * self.SCALE
         self.pan_offset_y = screen_cy - center_y * self.SCALE
 
+    def build_gate_index(self):
+        gate_index = {}
+        for filename, system in self.systems.items():
+            names = set()
+            for jp in system.get("jump_points", []):
+                if jp.get("type") not in ("jumpnode", "jumppoint"):
+                    continue
+                name = jp.get("name")
+                if name:
+                    names.add(name.lower())
+            gate_index[filename] = names
+        return gate_index
+
+    def system_has_invalid_destination(self, filename, gate_index, system_name_map):
+        system = self.systems.get(filename, {})
+        for jp in system.get("jump_points", []):
+            if jp.get("type") not in ("jumpnode", "jumppoint"):
+                continue
+            destinations = jp.get("destinations")
+            if not isinstance(destinations, dict) or not destinations:
+                return True
+            for dest_gate_name, dest_system_name in destinations.items():
+                if not dest_gate_name or not dest_system_name:
+                    return True
+                dest_system_key = str(dest_system_name).lower()
+                if dest_system_key.endswith(".json"):
+                    dest_system_key = dest_system_key[:-5]
+                dest_filename = system_name_map.get(dest_system_key)
+                if not dest_filename:
+                    return True
+                if dest_gate_name.lower() not in gate_index.get(dest_filename, set()):
+                    return True
+        return False
+
     def draw_systems(self):
         """Draw each system with dynamic icon sizing based on current SCALE"""
+        gate_index = self.build_gate_index()
+        system_name_map = {filename.replace(".json", "").lower(): filename for filename in self.systems.keys()}
         for filename, system in self.systems.items():
             x, _, y = system["coord"]
             sx, sy = self.coord_to_screen(x, y)
@@ -306,6 +464,13 @@ class SystemMapEditor:
                 img_id = self.canvas.create_image(sx, sy, image=tk_img, tags=("map",))
             else:
                 img_id = self.canvas.create_oval(sx-half, sy-half, sx+half, sy+half, fill="grey", tags=("map",))
+
+            if self.system_has_invalid_destination(filename, gate_index, system_name_map):
+                ring_r = half + 6
+                self.canvas.create_oval(
+                    sx - ring_r, sy - ring_r, sx + ring_r, sy + ring_r,
+                    outline="yellow", width=3, tags=("map",)
+                )
 
             # Position label below icon
             text_y = sy + half + 5
@@ -610,15 +775,13 @@ class SystemMapEditor:
         # Only treat as click if minimal movement
         if abs(event.x - self.drag_data.get("x", 0)) > 5 or abs(event.y - self.drag_data.get("y", 0)) > 5:
             return
-        # Select system
-        for fname, system in self.systems.items():
-            coords = self.canvas.coords(system["canvas_items"][0])
-            if coords:
-                sx, sy = coords[0], coords[1]
-                if (event.x - sx)**2 + (event.y - sy)**2 < 30**2:
-                    self.clear_selection()
-                    self.select_system(fname)
-                    return
+        # Left-click on a system opens the system editor
+        fname = self.get_clicked_system(event, radius=30)
+        if fname:
+            systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
+            file_path = os.path.join(systems_dir, fname)
+            SystemEditor.open_system_editor(file_path)
+            return
         # Select text node
         items = self.canvas.find_withtag("text_node")
         for idx, item in enumerate(items):
@@ -830,9 +993,9 @@ class SystemMapEditor:
         except Exception as e:
             print(f"Error running generators: {e}")
 
-    def on_shift_left(self, event):
+    def add_border_point_at(self, x, y):
         """Adds a new point to the selected border or starts a new border if none is selected"""
-        bx, _, by = self.screen_to_coord(event.x, event.y)
+        bx, _, by = self.screen_to_coord(x, y)
         # Start a new border if none selected
         if self.selected_type != "border" or self.selected_id is None:
             new_border = {"points": [[bx, by]], "color": "white", "width": 2, "hover_text": ""}
@@ -843,6 +1006,14 @@ class SystemMapEditor:
             # Add point to existing border
             self.borders[self.selected_id]["points"].append([bx, by])
         self.draw_borders()
+
+    def on_shift_left(self, event):
+        """Shift+Left-click: open system details if on a system; otherwise add border point"""
+        fname = self.get_clicked_system(event, radius=30)
+        if fname:
+            self.edit_system_properties(fname)
+            return
+        self.add_border_point_at(event.x, event.y)
       
     def on_shift_right(self, event):
         """Shift+Right-click: open system editor if on a system, otherwise handle text/border edits"""

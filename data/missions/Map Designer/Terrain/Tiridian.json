@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -22273.642853469464,
+        -22273.64285346948,
         0,
-        15180.45428690149
+        21423.521201924985
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -64,8 +64,7 @@
             "type": "station",
             "facilities": [
                 "Docking",
-                "Refuel",
-                "Repair"
+                "Refuel"
             ],
             "cargo": {
                 "Homing": 32,
@@ -93,7 +92,7 @@
                 "Medics": 3,
                 "Combat Engineers": 11
             },
-            "description": ""
+            "description": "Starwright Commercial Shipyards"
         },
         "Titan Slips": {
             "coordinate": [
@@ -112,26 +111,28 @@
                 "Repair"
             ],
             "cargo": {
-                "Iron": 750,
-                "Tharium": 60,
-                "Reisium": 60,
-                "Alerite": 54,
-                "Cabrite": 815,
-                "Ashfilum": 258,
-                "Denebite": 30,
-                "Aegirine": 151,
-                "Nuidinium": 159,
-                "Gredian": 180,
-                "Warhead": 10,
-                "Life Support": 1,
+                "Iron": 6,
+                "Tharium": 5,
+                "Reisium": 5,
+                "Alerite": 5,
+                "Cabrite": 20,
+                "Ashfilum": 14,
+                "Denebite": 25,
+                "Warhead": 4,
+                "Life Support": 3,
                 "Micro Controller": 8,
-                "Power Relay": 16
+                "Power Relay": 11,
+                "Homing": 30,
+                "Casing": 23,
+                "Computer Core": 1,
+                "AMC": 1,
+                "Black Box": 12,
+                "Coolant": 10
             },
             "teams": {
-                "DamCon": 0,
-                "Medics": 0
+                "DamCon": 3
             },
-            "description": ""
+            "description": "Titan Slips, Light Repairs, Ship storage and fuel services"
         },
         "RS 39": {
             "coordinate": [
@@ -209,7 +210,7 @@
             "coordinate": [
                 281891.69559179514,
                 0,
-                165985.94439803358
+                165537.3177788951
             ],
             "sides": [
                 "USFP"
@@ -287,9 +288,9 @@
         },
         "Tiridian Comand": {
             "coordinate": [
-                62948.794357227205,
+                63182.454054695154,
                 0,
-                105222.05550914466
+                105533.60177243526
             ],
             "sides": [
                 "TSN"
@@ -302,25 +303,25 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 72,
-                "Nuke": 11,
-                "EMP": 11,
+                "Homing": 75,
+                "Nuke": 12,
+                "EMP": 12,
                 "Mine": 12,
                 "High Yield Warhead": 15,
-                "Warhead": 64,
-                "Torpedo Casing": 41,
-                "Casing": 17,
-                "Transmitter": 38,
+                "Warhead": 60,
+                "Torpedo Casing": 40,
+                "Casing": 16,
+                "Transmitter": 35,
                 "Navigational Array": 1,
-                "Tactical Array": 11,
-                "Sensor Suite": 5,
-                "Guidance System": 61,
+                "Tactical Array": 10,
+                "Sensor Suite": 6,
+                "Guidance System": 60,
                 "Receiver": 15
             },
             "teams": {
-                "DamCon": 9,
-                "Medics": 3,
-                "Combat Engineers": 11
+                "DamCon": 8,
+                "Medics": 2,
+                "Combat Engineers": 10
             },
             "description": ""
         },
@@ -482,41 +483,45 @@
         },
         "I 07": {
             "coordinate": [
-                -130393.51851851857,
+                -139231.10401425092,
                 0,
-                -93750.00000000001
+                -89796.34333085659
             ],
             "sides": [
                 "USFP"
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {},
             "teams": {},
             "description": ""
         },
         "I 05": {
             "coordinate": [
-                -173796.29629629635,
+                -172866.02413885083,
                 0,
-                -105324.07407407409
+                -98114.46485387137
             ],
             "sides": [
                 "USFP"
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {},
             "teams": {},
             "description": ""
         },
         "I 09": {
             "coordinate": [
-                -170902.77777777784,
+                -168344.5293448027,
                 0,
-                -87384.25925925927
+                -85756.28298372963
             ],
             "sides": [
                 "USFP"
@@ -554,9 +559,9 @@
         },
         "SWY   Foundry": {
             "coordinate": [
-                -54157.392490234524,
+                -54261.72870345288,
                 0,
-                -62330.340183021486
+                -62434.67639623984
             ],
             "sides": [
                 "USFP"
@@ -589,7 +594,7 @@
                 "DamCon": 2,
                 "Medics": 0
             },
-            "description": ""
+            "description": "Starwright Yards Foundry F2"
         },
         "SWY   P2": {
             "coordinate": [
@@ -618,9 +623,33 @@
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 750,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 815,
+                "Ashfilum": 258,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 180,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": ""
         }
     },
     "sensor_relay": {

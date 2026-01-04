@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -27414.24028560362,
-        0.0,
-        19338.79437016358
+        -29922.615385389843,
+        0,
+        25191.66960299813
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -53,9 +53,9 @@
         },
         "DS 15": {
             "coordinate": [
-                -78117.28395061732,
+                -77419.57983253319,
                 0,
-                29367.283950617268
+                32855.804541037935
             ],
             "sides": [
                 "USFP"
@@ -94,151 +94,11 @@
             },
             "description": ""
         },
-        "SM15A": {
-            "coordinate": [
-                -88244.59876543214,
-                0,
-                24062.499999999985
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "usfp_industrial_storage",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": ""
-        },
-        "SM15B": {
-            "coordinate": [
-                -66060.95679012348,
-                0,
-                39494.598765432085
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "usfp_industrial_storage",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": ""
-        },
-        "RS15": {
-            "coordinate": [
-                -89691.35802469139,
-                0,
-                46246.14197530863
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_science",
-            "type": "station",
-            "facilities": [
-                "Docking"
-            ],
-            "cargo": {
-                "High Yield Warhead": 12,
-                "Life Support": 4,
-                "Medical Supplies": 18,
-                "Micro Controller": 26,
-                "Power Relay": 16,
-                "Transmitter": 8,
-                "Receiver": 7,
-                "Analysis Suite": 8,
-                "Sensor Suite": 7,
-                "Guidance System": 15,
-                "Wild Animals": 15,
-                "Casing": 14,
-                "EMP": 9,
-                "Homing": 40
-            },
-            "teams": {
-                "DamCon": 3,
-                "Medics": 3
-            },
-            "description": ""
-        },
-        "RS16": {
-            "coordinate": [
-                173020.5887139283,
-                0,
-                82690.14347790078
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_science",
-            "type": "station",
-            "facilities": [
-                "Docking"
-            ],
-            "cargo": {
-                "High Yield Warhead": 10,
-                "Life Support": 3,
-                "Medical Supplies": 14,
-                "Micro Controller": 27,
-                "Power Relay": 18,
-                "Transmitter": 8,
-                "Receiver": 6,
-                "Analysis Suite": 9,
-                "Sensor Suite": 10,
-                "Guidance System": 17,
-                "Wild Animals": 15,
-                "Casing": 15,
-                "EMP": 11,
-                "Homing": 34
-            },
-            "teams": {
-                "DamCon": 2,
-                "Medics": 1
-            },
-            "description": ""
-        },
-        "RS17": {
-            "coordinate": [
-                111020.5887139283,
-                0,
-                -106309.8565220992
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_science",
-            "type": "station",
-            "facilities": [
-                "Docking"
-            ],
-            "cargo": {
-                "High Yield Warhead": 11,
-                "Life Support": 2,
-                "Medical Supplies": 16,
-                "Micro Controller": 27,
-                "Power Relay": 15,
-                "Transmitter": 9,
-                "Receiver": 5,
-                "Analysis Suite": 9,
-                "Sensor Suite": 9,
-                "Guidance System": 14,
-                "Wild Animals": 13,
-                "Casing": 15,
-                "EMP": 11,
-                "Homing": 38
-            },
-            "teams": {
-                "DamCon": 2,
-                "Medics": 1
-            },
-            "description": ""
-        },
         "DS 16": {
             "coordinate": [
-                167020.5887139283,
+                169811.40518626483,
                 0,
-                68690.14347790078
+                73434.5314808729
             ],
             "sides": [
                 "USFP"
@@ -246,7 +106,8 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel"
             ],
             "cargo": {
                 "Repair Materials": 16,
@@ -271,9 +132,9 @@
         },
         "DS 17": {
             "coordinate": [
-                90020.5887139283,
+                96532.49381604689,
                 0,
-                -88309.8565220992
+                -94821.76162421779
             ],
             "sides": [
                 "USFP"
@@ -317,16 +178,33 @@
             "hull": "pirate_military_base",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 11,
+                "Iso B Circuit": 23,
+                "Container": 23,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 17,
+                "Aid Package": 17,
+                "Pets": 60,
+                "Torpedo Casing": 6,
+                "Casing": 7,
+                "Coffee": 5,
+                "Tea": 4,
+                "Alcohol": 4
+            },
+            "teams": {
+                "Marines": 5
+            },
             "description": "",
             "hideonmap": true
         },
         "Port March": {
             "coordinate": [
-                214967.75285949453,
+                215902.39164936633,
                 0,
-                -309271.3689777973
+                -308897.51346184855
             ],
             "sides": [
                 "Pirate"
@@ -380,7 +258,7 @@
                 -310626.09121061885
             ],
             "sides": [
-                "USFP"
+                "Pirate"
             ],
             "hull": "pirate_cache_1",
             "type": "station",
@@ -405,6 +283,194 @@
             "state": "Untethered",
             "drift": 0,
             "hideonmap": true
+        },
+        "RS 16": {
+            "coordinate": [
+                173020.5887139283,
+                0,
+                82690.14347790078
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 14,
+                "Micro Controller": 27,
+                "Power Relay": 18,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 9,
+                "Sensor Suite": 10,
+                "Guidance System": 17,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 11,
+                "Homing": 34
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 1
+            },
+            "description": ""
+        },
+        "RS 15": {
+            "coordinate": [
+                -89691.35802469139,
+                0,
+                46246.14197530863
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 12,
+                "Life Support": 4,
+                "Medical Supplies": 18,
+                "Micro Controller": 26,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 7,
+                "Analysis Suite": 8,
+                "Sensor Suite": 7,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 14,
+                "EMP": 9,
+                "Homing": 40
+            },
+            "teams": {
+                "DamCon": 3,
+                "Medics": 3
+            },
+            "description": ""
+        },
+        "SM 15 B": {
+            "coordinate": [
+                -66060.95679012348,
+                0,
+                39494.598765432085
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "High Yield Warhead": 4,
+                "Warhead": 12,
+                "Life Support": 2,
+                "Micro Controller": 26,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 5,
+                "Analysis Suite": 8,
+                "Sensor Suite": 7,
+                "Guidance System": 15,
+                "Wild Animals": 14,
+                "Pets": 4,
+                "Casing": 14,
+                "EMP": 11,
+                "Homing": 37,
+                "Coolant": 16,
+                "Tea": 13,
+                "Coffee": 15,
+                "Alcohol": 17
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 3
+            },
+            "description": ""
+        },
+        "SM 15 A": {
+            "coordinate": [
+                -88244.59876543214,
+                0,
+                24062.499999999985
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "High Yield Warhead": 4,
+                "Warhead": 13,
+                "Life Support": 5,
+                "Micro Controller": 27,
+                "Medical Supplies": 26,
+                "Power Relay": 17,
+                "Transmitter": 9,
+                "Receiver": 5,
+                "Analysis Suite": 8,
+                "Sensor Suite": 9,
+                "Guidance System": 14,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 17,
+                "EMP": 10,
+                "Homing": 33,
+                "Coolant": 13,
+                "Tea": 12,
+                "Coffee": 16,
+                "Alcohol": 17
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "RS 17": {
+            "coordinate": [
+                111020.5887139283,
+                0,
+                -106309.8565220992
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 11,
+                "Life Support": 2,
+                "Medical Supplies": 16,
+                "Micro Controller": 27,
+                "Power Relay": 15,
+                "Transmitter": 9,
+                "Receiver": 5,
+                "Analysis Suite": 9,
+                "Sensor Suite": 9,
+                "Guidance System": 14,
+                "Wild Animals": 13,
+                "Casing": 15,
+                "EMP": 11,
+                "Homing": 38
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 1
+            },
+            "description": ""
         }
     },
     "sensor_relay": {
@@ -830,9 +896,9 @@
                 -180309.8565220992
             ],
             "end": [
-                -78979.4112860717,
+                -75366.09136521732,
                 0,
-                -225309.8565220992
+                -226295.31528740164
             ],
             "density": 125,
             "scatter": 10000,

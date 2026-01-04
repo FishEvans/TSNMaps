@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        35899.99304859379,
+        43436.26668172932,
         0,
-        -101.28696268405194
+        1217.5609231146607
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -12,10 +12,398 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Alaris": {
+            "coordinate": [
+                286611.54721861973,
+                0,
+                26379.9604592161
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15
+            },
+            "teams": {
+                "Diplomats": 16,
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "WP 29": {
+            "coordinate": [
+                285195.1220251605,
+                0,
+                26137.07695942139
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 20": {
+            "coordinate": [
+                288010.0037465786,
+                0,
+                26424.221862026207
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Menice": {
+            "coordinate": [
+                -13429.33664691327,
+                0,
+                23577.4269234568
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Orantiv Jump Point": "Castor"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "DS 44": {
+            "coordinate": [
+                94436.80532839536,
+                0,
+                2393.784948148134
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "DS 65": {
+            "coordinate": [
+                207862.7312543213,
+                0,
+                51004.896059259256
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 22,
+                "Container": 24,
+                "Life Support": 3,
+                "Micro Controller": 7,
+                "Power Relay": 17,
+                "Aid Package": 14,
+                "Pets": 3,
+                "Torpedo Casing": 4,
+                "Casing": 7,
+                "Coffee": 3,
+                "Tea": 4,
+                "Alcohol": 4
+            },
+            "teams": {
+                "Diplomats": 0
+            },
+            "description": ""
+        },
+        "Gate Control": {
+            "coordinate": [
+                29621.99051358053,
+                0,
+                49268.78494814814
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 47,
+                "Nuke": 2,
+                "EMP": 6,
+                "Mine": 5,
+                "High Yield Warhead": 15,
+                "Warhead": 67,
+                "Torpedo Casing": 67,
+                "Casing": 65,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 55
+            },
+            "teams": {
+                "DamCon": 4,
+                "Medics": 3,
+                "Combat Engineers": 4
+            },
+            "description": ""
+        },
+        "DS 53": {
+            "coordinate": [
+                215385.87940246947,
+                0,
+                -25962.696533333354
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 15,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 21,
+                "Container": 26,
+                "Life Support": 3,
+                "Micro Controller": 6,
+                "Power Relay": 16,
+                "Aid Package": 18,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 7,
+                "Coffee": 4,
+                "Tea": 5,
+                "Alcohol": 4
+            },
+            "teams": {
+                "Diplomats": 2
+            },
+            "description": ""
+        },
+        "Globaris Gate": {
+            "coordinate": [
+                244533.3333333333,
+                0,
+                -138300.0
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Helios Gate": "Tibur"
+            },
+            "state": "Tethered",
+            "drift": 0
+        }
+    },
+    "sensor_relay": {
+        "SR 69": {
+            "coordinate": [
+                290571.974952693,
+                0,
+                6464.522250710206
+            ]
+        },
+        "SR 15": {
+            "coordinate": [
+                273629.016036336,
+                0,
+                41646.93896177155
+            ]
+        },
+        "SR 37": {
+            "coordinate": [
+                235558.53292465885,
+                0,
+                50336.27829889227
+            ]
+        },
+        "SR 40": {
+            "coordinate": [
+                205028.37589708416,
+                0,
+                25989.290511000327
+            ]
+        },
+        "SR 52": {
+            "coordinate": [
+                205028.37589708416,
+                0,
+                -13060.246009579905
+            ]
+        },
+        "SR 43": {
+            "coordinate": [
+                235558.53292465885,
+                0,
+                -37407.233797471854
+            ]
+        },
+        "SR 98": {
+            "coordinate": [
+                273629.016036336,
+                0,
+                -28717.89446035114
+            ]
+        },
+        "SR 34": {
+            "coordinate": [
+                39224.613970370665,
+                0,
+                25638.38371358021
+            ]
+        },
+        "SR 45": {
+            "coordinate": [
+                22281.655054013674,
+                0,
+                60820.80042464155
+            ]
+        },
+        "SR 24": {
+            "coordinate": [
+                -15788.828057663482,
+                0,
+                69510.13976176227
+            ]
+        },
+        "SR 54": {
+            "coordinate": [
+                -46318.98508523819,
+                0,
+                45163.15197387033
+            ]
+        },
+        "SR 99": {
+            "coordinate": [
+                -46318.98508523819,
+                0,
+                6113.615453290098
+            ]
+        },
+        "SR 77": {
+            "coordinate": [
+                -15788.828057663493,
+                0,
+                -18233.372334601852
+            ]
+        },
+        "SR 42": {
+            "coordinate": [
+                22281.655054013667,
+                0,
+                -9544.03299748114
+            ]
+        }
+    },
+    "terrain": {
+        "1763254364869": {
+            "type": "planet",
+            "name": "Planet 870",
+            "coordinate": [
+                246347.20175056424,
+                0,
+                6658.328950178022
+            ]
+        },
+        "Sundering": {
+            "type": "blackhole",
+            "name": "1763822866466",
+            "coordinate": [
+                34309.490513580546,
+                0,
+                65279.58741728392
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "Unmaking": {
+            "type": "blackhole",
+            "name": "1763822887868",
+            "coordinate": [
+                84772.4534765435,
+                0,
+                82737.149145679
+            ],
+            "size": 1000,
+            "strength": 500
+        },
+        "Dreadfall": {
+            "type": "blackhole",
+            "name": "1763822875502",
+            "coordinate": [
+                113225.38557530893,
+                0,
+                54284.21704691357
+            ],
+            "size": 1000,
+            "strength": 500
+        }
+    },
     "traffic": {}
 }

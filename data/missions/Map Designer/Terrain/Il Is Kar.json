@@ -1,6 +1,6 @@
 {
     "systemMapCoord": [
-        31725.964538899403,
+        31725.96453889939,
         0,
         -37329.17407611982
     ],
@@ -12,9 +12,25 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "JP 12": {
+            "coordinate": [
+                116666.66666666667,
+                0,
+                -45000.00000000001
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "II Is Kar": "Tjorath"
+            },
+            "state": "Tethered",
+            "drift": 0
+        }
+    },
     "sensor_relay": {},
     "terrain": {},
     "traffic": {}

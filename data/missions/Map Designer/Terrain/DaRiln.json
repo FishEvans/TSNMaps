@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        36527.59945129987,
+        36527.59945129986,
         0,
-        -15296.208961206012
+        -15296.208961206008
     ],
     "systemalignment": "Unknown",
     "metadata": {
@@ -10,12 +10,600 @@
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Eukisra Gate": {
+            "coordinate": [
+                -75416.66666666669,
+                0,
+                71666.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Eukisra Gate": "Eukisra"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Burin Gate": {
+            "coordinate": [
+                -36666.66666666667,
+                0,
+                -124166.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Burin Gate": "Burin"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Cofi": {
+            "coordinate": [
+                74166.66666666667,
+                0,
+                -125000.00000000001
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Raka": {
+            "coordinate": [
+                -143602.50930481643,
+                0,
+                -40217.565133714874
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Napis": {
+            "coordinate": [
+                43520.64433510729,
+                0,
+                53546.4497539914
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "WP 7": {
+            "coordinate": [
+                43568.84994501657,
+                0,
+                52176.72105345502
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 77": {
+            "coordinate": [
+                43517.036339806196,
+                0,
+                55454.855836925606
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 82": {
+            "coordinate": [
+                -144671.9643860209,
+                0,
+                -41372.555236923305
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 27": {
+            "coordinate": [
+                -142605.78956787765,
+                0,
+                -38762.42064307468
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 29": {
+            "coordinate": [
+                74160.32235632578,
+                0,
+                -123577.46944570767
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 20": {
+            "coordinate": [
+                74134.2383030212,
+                0,
+                -126785.80800217211
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        }
+    },
+    "sensor_relay": {
+        "SR 96": {
+            "coordinate": [
+                -101347.5214826147,
+                0,
+                -130623.35686104708
+            ],
+            "hideonmap": true
+        },
+        "SR 71": {
+            "coordinate": [
+                133953.40444331124,
+                0,
+                -13377.986490676702
+            ]
+        },
+        "SR 15": {
+            "coordinate": [
+                -149264.18814928137,
+                0,
+                127709.97647228627
+            ],
+            "hideonmap": true
+        },
+        "CR 49": {
+            "coordinate": [
+                17524.02705056858,
+                0,
+                -25471.122659896348
+            ],
+            "hideonmap": true
+        }
+    },
+    "terrain": {
+        "1766413372932": {
+            "type": "planet",
+            "name": "Planet Da'Riln IV",
+            "coordinate": [
+                80076.06628982851,
+                0,
+                22388.251387504988
+            ]
+        },
+        "1766413603180": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -72500.0,
+                0,
+                32500.000000000004
+            ],
+            "end": [
+                -19166.666666666668,
+                0,
+                46666.66666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413607005": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -95833.33333333334,
+                0,
+                -60000.00000000001
+            ],
+            "end": [
+                -61666.66666666667,
+                0,
+                -37500.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413610813": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -9166.666666666668,
+                0,
+                -74166.66666666667
+            ],
+            "end": [
+                22500.000000000004,
+                0,
+                -82500.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413615901": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                1666.6666666666667,
+                0,
+                -13333.333333333334
+            ],
+            "end": [
+                37500.0,
+                0,
+                -42500.00000000001
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413619372": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                36846.92296182976,
+                0,
+                72154.42091673071
+            ],
+            "end": [
+                47958.48060357646,
+                0,
+                40646.534590332296
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413624252": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                134332.54777130997,
+                0,
+                -24150.637501383935
+            ],
+            "end": [
+                136647.3625861248,
+                0,
+                5941.955091208663
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413627708": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                116666.66666666667,
+                0,
+                -56666.66666666667
+            ],
+            "end": [
+                126666.66666666667,
+                0,
+                -81666.66666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413631749": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -48333.333333333336,
+                0,
+                113333.33333333334
+            ],
+            "end": [
+                -24166.666666666668,
+                0,
+                99166.66666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413635900": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -155000.0,
+                0,
+                130000.00000000001
+            ],
+            "end": [
+                -113847.5214826147,
+                0,
+                105487.75425006404
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413639420": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -133333.33333333334,
+                0,
+                48333.333333333336
+            ],
+            "end": [
+                -159166.6666666667,
+                0,
+                24166.666666666668
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413649916": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -161666.6666666667,
+                0,
+                -56666.66666666667
+            ],
+            "end": [
+                -127500.00000000001,
+                0,
+                -27500.000000000004
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413654140": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -130000.00000000001,
+                0,
+                -109166.66666666667
+            ],
+            "end": [
+                -92500.00000000001,
+                0,
+                -135000.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413658476": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -18333.333333333336,
+                0,
+                -163333.33333333334
+            ],
+            "end": [
+                18333.333333333336,
+                0,
+                -163333.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413662172": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                59166.66666666667,
+                0,
+                -136666.6666666667
+            ],
+            "end": [
+                90000.00000000001,
+                0,
+                -113333.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766413738948": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -74166.66666666667,
+                0,
+                4166.666666666667
+            ],
+            "end": [
+                -38333.333333333336,
+                0,
+                -24166.666666666668
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413743260": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                20000.0,
+                0,
+                107500.00000000001
+            ],
+            "end": [
+                5833.333333333334,
+                0,
+                75000.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413748956": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -66666.66666666667,
+                0,
+                -85000.00000000001
+            ],
+            "end": [
+                -31666.666666666668,
+                0,
+                -73333.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413756400": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -103333.33333333334,
+                0,
+                55000.00000000001
+            ],
+            "end": [
+                -107500.00000000001,
+                0,
+                17500.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413760792": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                66666.66666666667,
+                0,
+                -53333.333333333336
+            ],
+            "end": [
+                56666.66666666667,
+                0,
+                -92500.00000000001
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413765536": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                67500.0,
+                0,
+                -164166.6666666667
+            ],
+            "end": [
+                98333.33333333334,
+                0,
+                -166666.6666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413770157": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                69166.66666666667,
+                0,
+                101666.66666666667
+            ],
+            "end": [
+                94166.66666666667,
+                0,
+                77500.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

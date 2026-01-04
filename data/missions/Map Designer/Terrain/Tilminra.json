@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        6857.810648940374,
+        6857.810648940378,
         0,
-        -10953.934924939635
+        -10953.934924939633
     ],
     "systemalignment": "Unknown",
     "metadata": {
@@ -12,28 +12,888 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
+    "objects": {
+        "Acantha Gate": {
+            "coordinate": [
+                -127061.43547096477,
+                0,
+                116805.32335962508
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tilminra Gate": "Acantha"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Sumri Gate": {
+            "coordinate": [
+                191155.2311957019,
+                0,
+                -61666.89886259712
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tilminra Gate": "Sumri"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Tilminra Alders": {
+            "coordinate": [
+                -119904.97899519892,
+                0,
+                -17119.556612940054
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Immigration": {
+            "coordinate": [
+                -80554.46673525378,
+                0,
+                19719.220821902203
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Intu Hospitality": {
+            "coordinate": [
+                -79023.7597165067,
+                0,
+                -9871.917866940985
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "TSN Exosciences": {
+            "coordinate": [
+                -51259.2682924087,
+                0,
+                -84269.29872661369
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "TSN Logistics": {
+            "coordinate": [
+                -48352.46342021039,
+                0,
+                -90890.43638545951
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 32": {
+            "coordinate": [
+                -45916.593323182904,
+                0,
+                -86409.02598503993
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 71": {
+            "coordinate": [
+                -54960.905965014266,
+                0,
+                -88508.59856260793
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "TSN Materials Research": {
+            "coordinate": [
+                -4727.215502910128,
+                0,
+                -119640.15150856123
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 21": {
+            "coordinate": [
+                -4519.945077871168,
+                0,
+                -123395.46605003312
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "TSN Refinery": {
+            "coordinate": [
+                -6054.3171457194985,
+                0,
+                -73817.88487089606
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 6": {
+            "coordinate": [
+                -6724.113099080267,
+                0,
+                -67119.92533728837
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Krynk Welcome": {
+            "coordinate": [
+                164422.6847404259,
+                0,
+                -49473.2132316642
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Aydos": {
+            "coordinate": [
+                193223.91073493895,
+                0,
+                -35072.600234407684
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Anhoto": {
+            "coordinate": [
+                173464.9301107963,
+                0,
+                -81623.41899298108
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Tilmi Police": {
+            "coordinate": [
+                161660.80345327457,
+                0,
+                46973.742501074696
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Mildraz Innkeep": {
+            "coordinate": [
+                161465.84817778302,
+                0,
+                99083.15322352554
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Yashi Traders": {
+            "coordinate": [
+                128196.36872533674,
+                0,
+                74078.41999878845
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Crixia Metals": {
+            "coordinate": [
+                15304.907819986982,
+                0,
+                55541.485842409864
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Yandro Shipyards": {
+            "coordinate": [
+                3174.6351862421125,
+                0,
+                66373.96183692288
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Aga Medical Inst": {
+            "coordinate": [
+                32199.941256200942,
+                0,
+                26730.166397965404
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "L'Shawa Labs": {
+            "coordinate": [
+                16285.589404349086,
+                0,
+                8886.802200434538
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "LNya Traders": {
+            "coordinate": [
+                40398.243725336746,
+                0,
+                13709.33306463207
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Tasn Mining": {
+            "coordinate": [
+                6823.348034893146,
+                0,
+                45829.65699581637
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Tilminra Welcome": {
+            "coordinate": [
+                -102018.13716172324,
+                0,
+                101112.47163916338
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Sondo": {
+            "coordinate": [
+                -145768.13716172325,
+                0,
+                94862.47163916338
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Mirilis": {
+            "coordinate": [
+                -103407.02605061213,
+                0,
+                140001.3605280523
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Mel Ya Foundry": {
+            "coordinate": [
+                13271.574486653639,
+                0,
+                77152.59695352096
+            ],
+            "sides": [
+                "Unknown"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        }
+    },
+    "sensor_relay": {
+        "SR 80": {
+            "coordinate": [
+                -68947.23246513942,
+                0,
+                80846.68315281555
+            ]
+        },
+        "SR 49": {
+            "coordinate": [
+                -33332.15310006005,
+                0,
+                61104.61966075205
+            ]
+        },
+        "SR 47": {
+            "coordinate": [
+                -5217.073734980697,
+                0,
+                42195.8895020219
+            ]
+        },
+        "SR 22": {
+            "coordinate": [
+                73513.08499517805,
+                0,
+                1878.4291845615517
+            ]
+        },
+        "SR 83": {
+            "coordinate": [
+                109128.1643602574,
+                0,
+                -17863.634307501925
+            ]
+        },
+        "SR 74": {
+            "coordinate": [
+                144743.2437253368,
+                0,
+                -37605.69779956543
+            ]
+        },
+        "SR 55": {
+            "coordinate": [
+                -54145.645163552086,
+                0,
+                -244.58668845430984
+            ]
+        },
+        "SR 25": {
+            "coordinate": [
+                -16923.422941329896,
+                0,
+                6560.968867101262
+            ]
+        },
+        "SR 89": {
+            "coordinate": [
+                53354.35483644787,
+                0,
+                39338.74664487903
+            ]
+        },
+        "SR 57": {
+            "coordinate": [
+                81965.46594755902,
+                0,
+                51422.079978212365
+            ]
+        },
+        "SR 75": {
+            "coordinate": [
+                114743.24372533678,
+                0,
+                60172.079978212365
+            ]
+        },
+        "SR 71": {
+            "coordinate": [
+                -121462.58160616769,
+                0,
+                83751.36052805228
+            ]
+        },
+        "SR 85": {
+            "coordinate": [
+                -119726.47049505658,
+                0,
+                57709.693861385604
+            ]
+        },
+        "SR 84": {
+            "coordinate": [
+                -117990.35938394547,
+                0,
+                31668.02719471894
+            ]
+        },
+        "SR 37": {
+            "coordinate": [
+                161026.54090754976,
+                0,
+                26136.227068975913
+            ]
+        },
+        "SR 35": {
+            "coordinate": [
+                166186.73823836824,
+                0,
+                -9010.645787677055
+            ]
+        }
+    },
     "terrain": {
         "1749851666957": {
             "type": "asteroids",
             "seed": 2010,
             "start": [
-                -130000.00000000001,
+                -121666.66666666667,
                 0,
-                17500.0
+                69166.66666666667
             ],
             "end": [
-                15000.000000000002,
+                -56666.66666666667,
                 0,
-                134166.6666666667
+                26666.666666666668
             ],
             "density": 125,
             "scatter": 10000,
             "composition": [
                 "Ast. Std Rand"
+            ]
+        },
+        "1766379575716": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -63333.333333333336,
+                0,
+                29166.666666666668
+            ],
+            "end": [
+                -7500.000000000001,
+                0,
+                26666.666666666668
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379586861": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -13522.090763603108,
+                0,
+                24567.454703932348
+            ],
+            "end": [
+                32500.000000000004,
+                0,
+                60833.333333333336
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379593861": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                25549.33984910838,
+                0,
+                58894.49731367172
+            ],
+            "end": [
+                72042.10962505717,
+                0,
+                63241.473050983106
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379605125": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                63361.55406950162,
+                0,
+                65556.28786579792
+            ],
+            "end": [
+                89403.22073616828,
+                0,
+                44722.95453246459
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379613045": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                86300.7258802012,
+                0,
+                49400.80947073621
+            ],
+            "end": [
+                96845.99336991317,
+                0,
+                12219.096507773245
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379643788": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                95142.03246456334,
+                0,
+                15643.09342135349
+            ],
+            "end": [
+                124623.77114769095,
+                0,
+                -46808.68127000454
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379700749": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                121730.25262917242,
+                0,
+                -42179.05164037491
+            ],
+            "end": [
+                154137.66003657985,
+                0,
+                -61276.27386259714
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766379715597": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -108593.82144490168,
+                0,
+                90922.80021147696
+            ],
+            "end": [
+                -31047.52514860538,
+                0,
+                -512.3849737082392
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766379730973": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -105700.30292638317,
+                0,
+                -71114.2368255601
+            ],
+            "end": [
+                -70399.37700045723,
+                0,
+                -46229.97756630084
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766379736033": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -77922.52514860539,
+                0,
+                -46808.68127000454
+            ],
+            "end": [
+                -40306.78440786464,
+                0,
+                -46229.97756630084
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766379744872": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -46093.821444901674,
+                0,
+                -44493.86645518973
+            ],
+            "end": [
+                19439.45116375654,
+                0,
+                -93806.8181752279
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766379762469": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                74276.54892546871,
+                0,
+                35367.24465592139
+            ],
+            "end": [
+                154137.66003657985,
+                0,
+                -53174.422010745286
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766379780584": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                17383.00897347968,
+                0,
+                101527.54558184731
+            ],
+            "end": [
+                83355.23119570191,
+                0,
+                133471.99002629175
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766379788696": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                72938.56452903524,
+                0,
+                134166.4344707362
+            ],
+            "end": [
+                118077.45341792413,
+                0,
+                117499.76780406953
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766379793504": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                109744.1200845908,
+                0,
+                119583.10113740286
+            ],
+            "end": [
+                153494.1200845908,
+                0,
+                131388.6566929584
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766379837025": {
+            "type": "planet",
+            "name": "Planet Tilminra",
+            "coordinate": [
+                -101644.76880429809,
+                0,
+                733.1011374028776
+            ]
+        },
+        "1766380103780": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -22799.215979738707,
+                0,
+                -81185.6403578645
+            ],
+            "end": [
+                13034.8675250624,
+                0,
+                -63101.14961712376
+            ],
+            "density": 225,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766380192420": {
+            "type": "planet",
+            "name": "Planet Krynk",
+            "coordinate": [
+                153585.00069835913,
+                0,
+                79310.131104184
             ]
         }
     },

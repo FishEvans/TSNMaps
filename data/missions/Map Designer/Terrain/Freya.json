@@ -1,12 +1,12 @@
 {
     "systemMapCoord": [
-        13320.46500639972,
+        15308.18846528579,
         0,
-        22662.10098750189
+        23086.25729808342
     ],
     "systemalignment": "USFP",
     "metadata": {
-        "sysdescription": "System discovered in XXXX. Principally a Research system with light industry and a rear storage armory",
+        "sysdescription": "System discovered in 2275. Principally a Research system with light industry and a rear storage armory built during the first spiral arm war.",
         "skybox": "sky1.png",
         "security": "Normal",
         "exports": [
@@ -32,20 +32,16 @@
                 289200.0
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_command",
             "type": "station",
-            "facilities": [
-                "Docking",
-                "Refuel",
-                "Repair"
-            ],
+            "facilities": [],
             "cargo": {
                 "Repair Materials": 50,
                 "Aid Package": 50,
                 "Comms Relay": 10,
-                "Sensor Buoy": 15,
+                "Sensor Relay": 15,
                 "High Yield Warhead": 10,
                 "Warhead": 11,
                 "Torpedo Casing": 17,
@@ -62,7 +58,7 @@
                 "Marines": 2,
                 "Combat Engineers": 4
             },
-            "description": "Freya Armory, Rear Lines Ammunitioning and Supply Depot, Constructed in the First Hegemony War."
+            "description": "Feya Armory is a back lines facility constructed in the first Hegemony War."
         },
         "ZERO": {
             "coordinate": [
@@ -71,7 +67,7 @@
                 0.0
             ],
             "sides": [
-                "TSN"
+                "USFP"
             ],
             "hull": "starbase_command",
             "type": "station",
@@ -84,7 +80,7 @@
                 "Repair Materials": 50,
                 "Aid Package": 50,
                 "Comms Relay": 10,
-                "Sensor Buoy": 15,
+                "Sensor Relay": 15,
                 "High Yield Warhead": 10,
                 "Warhead": 11,
                 "Torpedo Casing": 17,
@@ -97,7 +93,7 @@
             },
             "teams": {
                 "DamCon": 6,
-                "Medics": 4,
+                "Medics": 2,
                 "Marines": 2,
                 "Combat Engineers": 4
             },
@@ -118,8 +114,25 @@
                 "Docking",
                 "Refuel"
             ],
-            "cargo": {},
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 2,
+                "Power Relay": 30,
+                "Transmitter": 2,
+                "Receiver": 2,
+                "Analysis Suite": 1,
+                "Sensor Suite": 3,
+                "Guidance System": 5,
+                "Wild Animals": 1,
+                "Casing": 15,
+                "EMP": 4,
+                "Homing": 30,
+                "Computer Core": 1
+            },
             "teams": {
+                "DamCon": 2,
                 "Medics": 2
             },
             "description": ""
@@ -136,7 +149,8 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel"
             ],
             "cargo": {
                 "Iron": 750,
@@ -183,7 +197,8 @@
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
-                "Aid Package": 16
+                "Aid Package": 16,
+                "Guidance System": 1
             },
             "teams": {
                 "Diplomats": 1
@@ -192,22 +207,40 @@
         },
         "Dilko Ore Processing": {
             "coordinate": [
-                120464.21875,
-                0.0,
+                120269.50233544337,
+                0,
                 37867.25390625
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "usfp_industrial_refinary",
+            "hull": "usfp_industrial_processor",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {
-                "DamCon": 6,
-                "Medics": 2
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
             },
-            "description": ""
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": "Processing Faciity"
         },
         "Greystone Complex": {
             "coordinate": [
@@ -226,18 +259,24 @@
             ],
             "cargo": {
                 "Repair Materials": 16,
-                "Medical Supplies": 30,
+                "Medical Supplies": 10,
                 "Iso B Circuit": 25,
                 "Container": 25,
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
-                "Aid Package": 16
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5,
+                "EMP": 2,
+                "Homing": 12
             },
-            "teams": {
-                "Diplomats": 1
-            },
-            "description": "Civilian facilities - Average."
+            "teams": {},
+            "description": "Civilian facilities - Average Quality."
         },
         "Direct Wearhouseing ": {
             "coordinate": [
@@ -251,21 +290,36 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel"
             ],
             "cargo": {
-                "Casing": 90,
-                "Container": 25,
-                "Homing": 8,
-                "EMP": 2,
-                "Warhead": 12,
-                "Sensor Suite": 2
+                "High Yield Warhead": 2,
+                "Warhead": 15,
+                "Life Support": 3,
+                "Micro Controller": 24,
+                "Medical Supplies": 22,
+                "Power Relay": 15,
+                "Transmitter": 8,
+                "Receiver": 7,
+                "Analysis Suite": 9,
+                "Sensor Suite": 9,
+                "Guidance System": 16,
+                "Wild Animals": 15,
+                "Pets": 6,
+                "Casing": 13,
+                "EMP": 10,
+                "Homing": 37,
+                "Coolant": 17,
+                "Tea": 13,
+                "Coffee": 17,
+                "Alcohol": 16
             },
             "teams": {
-                "DamCon": 1,
-                "Medics": 1
+                "DamCon": 4,
+                "Medics": 3
             },
-            "description": ""
+            "description": "Direct Wearhousing is a medium sized company offering storage and logistics services."
         },
         "Milliways Resort": {
             "coordinate": [
@@ -314,9 +368,9 @@
         },
         "Port Merry": {
             "coordinate": [
-                376583.84416438045,
+                965417.1241643804,
                 0,
-                -50229.53460791041
+                -86863.13460791043
             ],
             "sides": [
                 "Pirate"
@@ -338,7 +392,8 @@
             "type": "jumpnode",
             "jumppointtype": "Node",
             "destinations": {
-                "Unknown": "Unknown"
+                "Maximillion Gate": "Corus",
+                "Grason": "Freya"
             },
             "state": "Tethered",
             "drift": 0
@@ -355,11 +410,27 @@
             "hull": "starbase_science",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35
+            },
             "teams": {
+                "DamCon": 2,
                 "Medics": 2
             },
-            "description": ""
+            "description": "Reasearch Station ^ Private Property, Ships wishing to dock should use 02."
         },
         "Dilko RS F 02": {
             "coordinate": [
@@ -372,12 +443,30 @@
             ],
             "hull": "starbase_science",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35
+            },
             "teams": {
+                "DamCon": 2,
                 "Medics": 2
             },
-            "description": ""
+            "description": "Dilko Research Facility 2, Private facility with an open docking policy."
         },
         "RS 25": {
             "coordinate": [
@@ -393,8 +482,24 @@
             "facilities": [
                 "Docking"
             ],
-            "cargo": {},
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35
+            },
             "teams": {
+                "DamCon": 2,
                 "Medics": 2
             },
             "description": "Research Station focusing on Gravity based tech and experimentation on the nearby Centrum Black hole. Head Scientist Dr Rosenberg."
@@ -411,9 +516,24 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
             "teams": {
-                "Medics": 2
+                "Diplomats": 1
             },
             "description": "SB53 Residential Block Alpha"
         },
@@ -429,34 +549,54 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
             "teams": {
-                "Medics": 2
+                "Diplomats": 1
             },
             "description": "SB53 Residential Block Beta"
         },
         "RB 332": {
             "coordinate": [
-                99480.3164091244,
+                197215.99640912432,
                 0,
-                315070.82413539366
+                383748.4561353936
             ],
             "sides": [
                 "USFP"
             ],
             "hull": "starbase_science",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Medical Supplies": 8,
+                "Repair Materials": 5
+            },
             "teams": {},
-            "hideonmap": true,
-            "description": "This research outpost was abandoned after funding was dropped."
+            "hideonmap": false,
+            "description": "This research outpost has been retrofited with a Skraaen Energy Core and is the current support base for the Skarran War Corporation VDS."
         },
         "WP 15": {
             "coordinate": [
-                -226165.11351199818,
+                -225983.97425293855,
                 0,
-                289808.42350811494
+                289246.89180503006
             ],
             "sides": [
                 "USFP"
@@ -468,9 +608,9 @@
         },
         "WP 16": {
             "coordinate": [
-                -229845.39415614045,
+                -229537.45741573905,
                 0,
-                292015.1640617544
+                291073.2399146443
             ],
             "sides": [
                 "USFP"
@@ -482,9 +622,9 @@
         },
         "FSP 205": {
             "coordinate": [
-                -229699.0071102363,
+                -228760.10195077714,
                 0,
-                290764.67145325063
+                290758.6334779486
             ],
             "sides": [
                 "USFP"
@@ -499,7 +639,7 @@
             "coordinate": [
                 -233142.34837990522,
                 0,
-                288306.71449057414
+                288995.0436750008
             ],
             "sides": [
                 "USFP"
@@ -511,14 +651,14 @@
         },
         "WP 18": {
             "coordinate": [
-                -229821.50366738258,
+                -227695.6533230586,
                 0,
-                286647.5717136318
+                288121.3207253411
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "defense_platform_beam",
+            "hull": "defense_platform_torp",
             "type": "platform",
             "cargo": {},
             "teams": {},
@@ -526,9 +666,9 @@
         },
         "WP 180": {
             "coordinate": [
-                -229715.3792705846,
+                -229588.58178924286,
                 0,
-                287998.7445944428
+                287292.3014841101
             ],
             "sides": [
                 "USFP"
@@ -547,7 +687,7 @@
             "type": "jumpnode",
             "jumppointtype": "Node",
             "destinations": {
-                "Unknown": "Unknown"
+                "Saphire Jump Point": "Vilnara"
             },
             "state": "Tethered",
             "drift": 0
@@ -565,22 +705,35 @@
             "type": "station",
             "facilities": [
                 "Docking",
-                "Refuel"
+                "Refuel",
+                "Repair"
             ],
-            "cargo": {},
+            "cargo": {
+                "Homing": 50,
+                "Nuke": 2,
+                "EMP": 6,
+                "Mine": 6,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 60,
+                "Casing": 60,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 60
+            },
             "teams": {
-                "DamCon": 6,
-                "Medics": 4,
-                "Marines": 2,
-                "Combat Engineers": 4
+                "DamCon": 8,
+                "Medics": 2,
+                "Combat Engineers": 1,
+                "Marines": 2
             },
             "description": "Inspections, Patrol base for light security craft, Search and Rescue, Admin."
         },
         "Transit Auth R": {
             "coordinate": [
-                -203924.76441046846,
+                966366.2667143599,
                 0,
-                -60635.04124965071
+                -66869.83860218845
             ],
             "sides": [
                 "USFP"
@@ -591,15 +744,28 @@
                 "Docking",
                 "Refuel"
             ],
-            "cargo": {},
+            "cargo": {
+                "Homing": 50,
+                "Nuke": 2,
+                "EMP": 6,
+                "Mine": 6,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 60,
+                "Casing": 60,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 60,
+                "Pets": 1
+            },
             "teams": {
-                "DamCon": 6,
-                "Medics": 4,
-                "Marines": 2,
-                "Combat Engineers": 4
+                "DamCon": 8,
+                "Medics": 2,
+                "Combat Engineers": 2,
+                "Marines": 2
             },
             "description": "Inspections, Patrol base for light security craft, Search and Rescue, Admin.",
-            "hideonmap": false
+            "hideonmap": true
         },
         "SB 53 Recreation": {
             "coordinate": [
@@ -618,13 +784,24 @@
             ],
             "cargo": {
                 "Repair Materials": 16,
-                "Medical Supplies": 30,
+                "Medical Supplies": 10,
                 "Iso B Circuit": 25,
                 "Container": 25,
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
-                "Aid Package": 16
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5,
+                "EMP": 2,
+                "Homing": 35,
+                "Guidance System": 10,
+                "High Yield Warhead": 3,
+                "Warhead": 10
             },
             "teams": {
                 "Diplomats": 1
@@ -633,12 +810,12 @@
         },
         "A": {
             "coordinate": [
-                126511.49918517159,
+                -73488.50081482845,
                 0,
-                -374622.67685689277
+                -203622.67685689277
             ],
             "sides": [
-                "pirate"
+                "Pirate"
             ],
             "hull": "pirate_cache_1",
             "type": "station",
@@ -648,7 +825,294 @@
             "description": "",
             "hideonmap": true
         },
-        "BF 04": {
+        "BF 13": {
+            "coordinate": [
+                172448.15332790356,
+                0,
+                -214439.93704844182
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10,
+                "High Yield Warhead": 3
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": "Bluefield Industrial Polishing Complex. ^Private Property",
+            "hideonmap": false
+        },
+        "BF 03": {
+            "coordinate": [
+                183493.57234034452,
+                0,
+                -210917.17624081267
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_processor",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Bluefield Processing Unit, ^Private Property",
+            "hideonmap": false
+        },
+        "Red Shift": {
+            "coordinate": [
+                369164.4769286692,
+                0,
+                -754157.0713404209
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "C": {
+            "coordinate": [
+                373025.1063820681,
+                0,
+                -758808.4321276484
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_cache_1",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "B": {
+            "coordinate": [
+                131269.86173090967,
+                0,
+                -381004.4043022406
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_cache_1",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "RS Grandon": {
+            "coordinate": [
+                383082.7384041128,
+                0,
+                844767.1717848792
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "RS Grandon USFP Facility mothballed after the first Hegemony War. ^ANOMALY DETECTED",
+            "hideonmap": true
+        },
+        "Moritus": {
+            "coordinate": [
+                411061.3414912881,
+                0,
+                840033.3254669773
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Evacuees": 4
+            },
+            "description": "",
+            "hideonmap": true
+        },
+        "Standford Depot": {
+            "coordinate": [
+                384151.62210055813,
+                0,
+                850825.3278817019
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_cache_1",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Repair Materials": 17,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 23,
+                "Container": 23,
+                "Life Support": 0,
+                "Micro Controller": 4,
+                "Power Relay": 16,
+                "Aid Package": 14,
+                "Pets": 3,
+                "Torpedo Casing": 7,
+                "Casing": 6,
+                "Coffee": 8,
+                "Tea": 6,
+                "Alcohol": 8
+            },
+            "teams": {
+                "Evacuees": 4,
+                "Diplomats": 2
+            },
+            "description": "",
+            "hideonmap": true
+        },
+        "WP 70": {
+            "coordinate": [
+                383090.31876766396,
+                0,
+                845683.1530719582
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 55": {
+            "coordinate": [
+                412422.24232083966,
+                0,
+                838400.28355314
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 9": {
+            "coordinate": [
+                383098.4797735357,
+                0,
+                843756.14348882
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 79": {
+            "coordinate": [
+                412468.90469651157,
+                0,
+                841776.6952299515
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "DS 83": {
+            "coordinate": [
+                413784.07875502325,
+                0,
+                840081.9920528495
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
+        },
+        "Grason": {
+            "coordinate": [
+                530648.9286645997,
+                0,
+                687149.6777057728
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Sudan Gate": "Freya"
+            },
+            "state": "Tethered",
+            "drift": 60000,
+            "hideonmap": true
+        },
+        "Bluefield Central": {
             "coordinate": [
                 182807.14725535153,
                 0,
@@ -673,7 +1137,9 @@
                 "Power Relay": 16,
                 "Aid Package": 16,
                 "Casing": 26,
-                "Torpedo Casing": 12
+                "Torpedo Casing": 12,
+                "Guidance System": 4,
+                "Coffee": 5
             },
             "teams": {
                 "Diplomats": 1,
@@ -681,41 +1147,95 @@
                 "DamCon": 4
             },
             "description": "Bluefield Workers and R&R Complex inc Bluefield Central Hospital",
+            "hideonmap": false
+        },
+        "SM MC A": {
+            "coordinate": [
+                -101186.60469986915,
+                0,
+                129640.52604752438
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": ""
+        },
+        "FLN Transit R": {
+            "coordinate": [
+                -203572.42127419217,
+                0,
+                -58713.045999624774
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Power Relay": 2
+            },
+            "teams": {
+                "DamCon": 2
+            },
+            "description": "",
             "hideonmap": true
         },
-        "BF 13": {
+        "WP 48": {
             "coordinate": [
-                172448.15332790356,
+                -203784.4466779127,
                 0,
-                -214439.93704844182
+                -58294.42793905851
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_industry",
-            "type": "station",
-            "facilities": [],
+            "hull": "defense_platform_beam",
+            "type": "platform",
             "cargo": {},
-            "teams": {},
-            "description": "Bluefield Industrial Polishing Complex. ^Private Property",
-            "hideonmap": false
+            "teams": {}
         },
-        "BF 03": {
+        "WP 80": {
             "coordinate": [
-                190276.80682171803,
+                -4589.352070155631,
                 0,
-                -216925.18392431494
+                18315.619959165284
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "usfp_industrial_processor",
-            "type": "station",
-            "facilities": [],
+            "hull": "defense_platform_beam",
+            "type": "platform",
             "cargo": {},
-            "teams": {},
-            "description": "Bluefield Processing Unit, ^Private Property",
-            "hideonmap": false
+            "teams": {}
         }
     },
     "terrain": {
@@ -1011,6 +1531,28 @@
             "composition": [],
             "hideonmap": true
         },
+        "12121212": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -200583.33704992585,
+                0,
+                -64976.4578997358
+            ],
+            "density": 30,
+            "scatter": 10000
+        },
+        "12121213": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -200618.52446194054,
+                0,
+                -64898.0005350428
+            ],
+            "density": 10,
+            "scatter": 4000
+        },
         "4545264": {
             "type": "asteroids",
             "seed": 2010,
@@ -1090,9 +1632,9 @@
             "type": "asteroids",
             "seed": 2010,
             "start": [
-                145000.0,
+                146393.74851767079,
                 0,
-                -262500.0
+                -262454.0792008185
             ],
             "end": [
                 188333.33333333334,
@@ -1164,20 +1706,20 @@
             "type": "blackhole",
             "name": "1751739199388",
             "coordinate": [
-                -44177.39540863309,
+                -42865.47768700217,
                 0,
-                -30608.31176094221
+                -35890.66773971665
             ],
-            "size": 1000,
+            "size": 2500,
             "strength": 500
         },
         "BH 88": {
             "type": "blackhole",
             "name": "1751739213202",
             "coordinate": [
-                -36226.863858564495,
+                -36270.666385666795,
                 0,
-                -24462.264092903784
+                -26065.744780584366
             ],
             "size": 1000,
             "strength": 500
@@ -1186,20 +1728,20 @@
             "type": "blackhole",
             "name": "1751739218731",
             "coordinate": [
-                -47479.4358750254,
+                -47441.469202214466,
                 0,
-                -21649.121088788557
+                -16509.997792935155
             ],
-            "size": 1000,
+            "size": 3000,
             "strength": 500
         },
         "BH 90": {
             "type": "blackhole",
             "name": "1751739186255",
             "coordinate": [
-                -57382.80317247117,
+                -60227.327847660585,
                 0,
-                -24710.64675894174
+                -22162.69319407976
             ],
             "size": 1000,
             "strength": 500
@@ -1208,22 +1750,22 @@
             "type": "blackhole",
             "name": "1751739192787",
             "coordinate": [
-                -57964.223270874616,
+                -57804.7441043129,
                 0,
-                -37114.2755248819
+                -38851.60342603049
             ],
             "size": 1000,
             "strength": 500
         },
-        "Centraly": {
+        "Centurian": {
             "type": "blackhole",
             "name": "Centurian",
             "coordinate": [
-                -48350.91880128158,
+                -48451.03106269798,
                 0,
-                -33319.60030017444
+                -27171.532603368287
             ],
-            "size": 1000,
+            "size": 6000,
             "strength": 500,
             "description": "This singularity is the focus of a number or research projects by notable scientist Dr. Rosenberg"
         },
@@ -1245,7 +1787,7 @@
             "composition": [
                 "Ast. Std Rand"
             ],
-            "hideonmap": true
+            "hideonmap": false
         },
         "1752258452652": {
             "type": "asteroids",
@@ -1256,12 +1798,12 @@
                 -131243.1951311093
             ],
             "end": [
-                -50263.009223536756,
+                -51730.138269090334,
                 0,
-                -206843.1951311093
+                -206004.40430224058
             ],
-            "density": 125,
-            "scatter": 10000,
+            "density": 325,
+            "scatter": 14000,
             "composition": [
                 "Ast. Std Rand"
             ]
@@ -1270,9 +1812,9 @@
             "type": "asteroids",
             "seed": 2010,
             "start": [
-                283713.7435559239,
+                29496.56434246736,
                 0,
-                186693.02746802458
+                475441.4842948913
             ],
             "end": [
                 368673.7435559239,
@@ -1285,6 +1827,228 @@
                 "Ast. Std Rand"
             ],
             "hideonmap": true
+        },
+        "1754761612988": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                319201.6639999998,
+                0,
+                -797323.4986666666
+            ],
+            "end": [
+                448201.6639999998,
+                0,
+                -685323.4986666667
+            ],
+            "density": 600,
+            "scatter": 35000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1754761629987": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                304201.6639999998,
+                0,
+                -751323.4986666666
+            ],
+            "end": [
+                368201.6639999998,
+                0,
+                -671323.4986666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1754761642722": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                290201.6639999998,
+                0,
+                -839323.4986666666
+            ],
+            "end": [
+                399201.6639999998,
+                0,
+                -832323.4986666666
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1754761907859": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                413455.7984000002,
+                0,
+                786076.5943703698
+            ],
+            "end": [
+                393652.90951111127,
+                0,
+                881811.0388148145
+            ],
+            "density": 400,
+            "scatter": 13000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1754761915368": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                393652.90951111127,
+                0,
+                840339.0388148145
+            ],
+            "end": [
+                490420.90951111127,
+                0,
+                842067.0388148145
+            ],
+            "density": 425,
+            "scatter": 35000,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1754762388841": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                112438.81477090962,
+                0,
+                -381296.3473144826
+            ],
+            "end": [
+                146626.31655703217,
+                0,
+                -374784.44221236405
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1755969585385": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                606965.7544430618,
+                0,
+                781720.7161193081
+            ],
+            "end": [
+                367799.08777639514,
+                0,
+                900054.0494526415
+            ],
+            "density": 500,
+            "scatter": 60000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1755969622724": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                463632.42110972846,
+                0,
+                710887.3827859748
+            ],
+            "end": [
+                571132.4211097285,
+                0,
+                749220.7161193081
+            ],
+            "density": 300,
+            "scatter": 26777,
+            "composition": [
+                "Ast. Std Rand"
+            ],
+            "hideonmap": true
+        },
+        "1755969642641": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                311965.75444306177,
+                0,
+                804220.7161193081
+            ],
+            "end": [
+                553632.4211097285,
+                0,
+                679220.7161193081
+            ],
+            "density": 125,
+            "scatter": 80000,
+            "composition": [],
+            "hideonmap": true
+        },
+        "1755969748240": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                179410.41614654777,
+                0,
+                55972.1517432556
+            ],
+            "end": [
+                134518.12889055454,
+                0,
+                320.06730434106424
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1755969757319": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                160565.74929902886,
+                0,
+                43577.722625557355
+            ],
+            "end": [
+                179403.7604873005,
+                0,
+                41019.4741925822
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1757157300039": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                193085.41686099677,
+                0,
+                131882.35979080934
+            ],
+            "end": [
+                220435.41828989482,
+                0,
+                74112.45881344307
+            ],
+            "density": 360,
+            "scatter": 19000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
         }
     },
     "sensor_relay": {
@@ -1293,9 +2057,7 @@
                 119349.4764714959,
                 0,
                 43170.609644969074
-            ],
-            "description": "Greystone Industrial Zone.",
-            "hideonmap": false
+            ]
         },
         "Mendeleyjev": {
             "coordinate": [
@@ -1641,13 +2403,6 @@
                 319461.3845871074
             ]
         },
-        "SR 26": {
-            "coordinate": [
-                -176791.45037418936,
-                0,
-                284966.89298902784
-            ]
-        },
         "SR 47": {
             "coordinate": [
                 -231804.89240222352,
@@ -1713,13 +2468,47 @@
                 -204476.55892775493
             ]
         },
-        "NAV HAZ 89": {
+        "NAV HAZ 554": {
             "coordinate": [
-                -50418.1902622716,
+                -199124.69861700642,
                 0,
-                -27117.785917204368
-            ],
-            "description": "NAVIGATIONAL HAZARD 89 STAY CLEAR. BLACK HOLES IN IMEDIAT VICINITY. STAY CLEAR"
+                -66585.54279453354
+            ]
+        },
+        "SR 815": {
+            "coordinate": [
+                -290650.26403674827,
+                0,
+                -34363.15144423333
+            ]
+        },
+        "SR 969": {
+            "coordinate": [
+                -271951.7936720935,
+                0,
+                -48317.233805916
+            ]
+        },
+        "SR 902": {
+            "coordinate": [
+                -271114.54873039253,
+                0,
+                -91295.80747989863
+            ]
+        },
+        "SR 373": {
+            "coordinate": [
+                -364885.9822009001,
+                0,
+                -68690.19405397271
+            ]
+        },
+        "SR 50": {
+            "coordinate": [
+                194324.05281713468,
+                0,
+                419322.91735767556
+            ]
         }
     },
     "traffic": {

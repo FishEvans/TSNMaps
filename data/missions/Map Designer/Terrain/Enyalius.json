@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        34826.26861792776,
+        34826.268617927744,
         0,
-        14874.997685367194
+        14874.997685367198
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -12,10 +12,532 @@
         "focus": "",
         "intel": {},
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
+    "objects": {
+        "Tibur Gate": {
+            "coordinate": [
+                31666.666666666668,
+                0,
+                102500.00000000001
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Enyalius Gate": "Tibur"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Toray Gate": {
+            "coordinate": [
+                192500.0000000001,
+                0,
+                -20972.222222222215
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Enyalius Gate": "Toray"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Loria Gate": {
+            "coordinate": [
+                13333.333333333334,
+                0,
+                -155833.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Enyalius Gate": "Loria"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Vanir Gate": {
+            "coordinate": [
+                -97500.00000000001,
+                0,
+                3333.3333333333335
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Enyalius Gate": "Vanir"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Enyalia Command": {
+            "coordinate": [
+                38333.333333333336,
+                0,
+                -25000.000000000004
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Homing": 150,
+                "Nuke": 25,
+                "EMP": 25,
+                "Mine": 20,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 100,
+                "Scorch": 100,
+                "Tactical Array": 10,
+                "Guidance System": 60,
+                "Medical Supplies": 12,
+                "Repair Materials": 5
+            },
+            "teams": {
+                "DamCon": 10,
+                "Medics": 2,
+                "Combat Engineers": 10
+            },
+            "description": ""
+        },
+        "Rysdak Markets": {
+            "coordinate": [
+                15836.203533029826,
+                0,
+                1613.1450085416645
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 87": {
+            "coordinate": [
+                37273.27109291652,
+                0,
+                -20692.72749280522
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "QRF 2": {
+            "coordinate": [
+                32158.92763473807,
+                0,
+                -16195.225106788062
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Kalnath Research": {
+            "coordinate": [
+                78482.6280508738,
+                0,
+                -63585.21613527101
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Capitol Base": {
+            "coordinate": [
+                102623.68172028393,
+                0,
+                42196.462534139166
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Yknik Spas": {
+            "coordinate": [
+                20812.12479298628,
+                0,
+                -125284.67601181423
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Drazma Mining": {
+            "coordinate": [
+                -61363.801132939654,
+                0,
+                -9192.962191512455
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 7,
+                "Tharium": 4,
+                "Reisium": 5,
+                "Alerite": 4,
+                "Cabrite": 18,
+                "Ashfilum": 14,
+                "Denebite": 217,
+                "Aegirine": 6,
+                "Nuidinium": 4,
+                "Gredian": 6,
+                "Warhead": 4,
+                "Life Support": 2,
+                "Micro Controller": 8,
+                "Power Relay": 15
+            },
+            "teams": {},
+            "description": ""
+        },
+        "Hulca Smelters": {
+            "coordinate": [
+                -62497.09588602607,
+                0,
+                12149.416066375126
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {
+                "Iron": 797,
+                "Tharium": 58,
+                "Reisium": 61,
+                "Alerite": 56,
+                "Cabrite": 873,
+                "Ashfilum": 283,
+                "Denebite": 28,
+                "Aegirine": 148,
+                "Nuidinium": 146,
+                "Gredian": 179,
+                "Life Support": 1,
+                "Micro Controller": 7,
+                "Power Relay": 17,
+                "Casing": 14
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
+        },
+        "Idrissa Idyl": {
+            "coordinate": [
+                28193.027282999785,
+                0,
+                74385.30465307855
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Adrath Agora": {
+            "coordinate": [
+                150693.0272829998,
+                0,
+                -19781.36201358813
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16,
+                "Scorch": 10
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        }
+    },
+    "sensor_relay": {
+        "SR 48": {
+            "coordinate": [
+                27500.000000000004,
+                0,
+                60000.00000000001
+            ]
+        },
+        "SR 16": {
+            "coordinate": [
+                25666.66666666667,
+                0,
+                23666.66666666667
+            ]
+        },
+        "SR 19": {
+            "coordinate": [
+                22000.000000000004,
+                0,
+                -49000.00000000001
+            ]
+        },
+        "SR 57": {
+            "coordinate": [
+                20166.666666666668,
+                0,
+                -85333.33333333334
+            ]
+        },
+        "SR 29": {
+            "coordinate": [
+                -22166.66666666667,
+                0,
+                -8833.333333333334
+            ]
+        },
+        "SR 83": {
+            "coordinate": [
+                21500.0,
+                0,
+                -12666.666666666668
+            ]
+        },
+        "SR 46": {
+            "coordinate": [
+                65166.66666666666,
+                0,
+                -16500.0
+            ]
+        },
+        "SR 14": {
+            "coordinate": [
+                108833.33333333334,
+                0,
+                -20333.333333333336
+            ]
+        },
+        "SR 95": {
+            "coordinate": [
+                -81519.77964231327,
+                0,
+                -20893.031929674733
+            ]
+        },
+        "SR 99": {
+            "coordinate": [
+                -60964.22408675771,
+                0,
+                -54226.36526300806
+            ]
+        },
+        "SR 98": {
+            "coordinate": [
+                -40408.66853120216,
+                0,
+                -87559.69859634139
+            ]
+        },
+        "SR 49": {
+            "coordinate": [
+                -19853.112975646596,
+                0,
+                -120893.03192967473
+            ]
+        },
+        "SR 73": {
+            "coordinate": [
+                55980.22035768675,
+                0,
+                -137559.69859634142
+            ]
+        },
+        "SR 41": {
+            "coordinate": [
+                88480.22035768675,
+                0,
+                -109226.36526300808
+            ]
+        },
+        "SR 25": {
+            "coordinate": [
+                120980.22035768675,
+                0,
+                -80893.03192967473
+            ]
+        },
+        "SR 36": {
+            "coordinate": [
+                153480.22035768675,
+                0,
+                -52559.69859634139
+            ]
+        },
+        "SR 26": {
+            "coordinate": [
+                -73186.44630897992,
+                0,
+                30773.63473699194
+            ]
+        },
+        "SR 43": {
+            "coordinate": [
+                -36103.11297564659,
+                0,
+                56190.30140365861
+            ]
+        },
+        "SR 15": {
+            "coordinate": [
+                980.2203576867469,
+                0,
+                81606.96807032528
+            ]
+        },
+        "SR 62": {
+            "coordinate": [
+                53480.22035768675,
+                0,
+                82440.30140365861
+            ]
+        },
+        "SR 93": {
+            "coordinate": [
+                89035.77591324231,
+                0,
+                58829.1902925475
+            ]
+        },
+        "SR 32": {
+            "coordinate": [
+                124591.33146879787,
+                0,
+                35218.079181436384
+            ]
+        },
+        "SR 34": {
+            "coordinate": [
+                160146.88702435343,
+                0,
+                11606.968070325267
+            ]
+        }
+    },
+    "terrain": {
+        "1766359058018": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                147232.6280508738,
+                0,
+                -37196.32724638212
+            ],
+            "end": [
+                -49295.14972690399,
+                0,
+                -105251.88280193768
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766359094590": {
+            "type": "planet",
+            "name": "Planet Enyalius",
+            "coordinate": [
+                86784.3470152085,
+                0,
+                21706.06472892654
+            ]
+        },
+        "1766359190902": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -57891.578910717435,
+                0,
+                52956.06472892654
+            ],
+            "end": [
+                -76410.09742923596,
+                0,
+                -42530.046382184584
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

@@ -1,0 +1,460 @@
+{
+    "systemMapCoord": [
+        43784.07975885122,
+        0,
+        12335.975981003787
+    ],
+    "systemalignment": "USFP",
+    "metadata": {
+        "sysdescription": "",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Unclaimed",
+        "visible": true,
+        "skybox": "sky1.png"
+    },
+    "objects": {
+        "Keltor Gate": {
+            "coordinate": [
+                77080.13974622774,
+                0,
+                -63582.09019204396
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tibur Gate": "Keltor"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Mria Gate": {
+            "coordinate": [
+                -117416.66666666669,
+                0,
+                115277.77777777777
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tibur Gate": "Mria"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Enyalius Gate": {
+            "coordinate": [
+                125583.33333333331,
+                0,
+                85277.77777777777
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tibur Gate": "Enyalius"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Atilia Gate": {
+            "coordinate": [
+                -124416.66666666669,
+                0,
+                -59722.222222222226
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Tibur Gate": "Atilia"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Helios Gate": {
+            "coordinate": [
+                575.5744170095676,
+                0,
+                20304.312414266125
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Globaris Gate": "Helios"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Tibur Mail": {
+            "coordinate": [
+                -35118.98148148147,
+                0,
+                100869.36299725645
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "Interstellar Spas": {
+            "coordinate": [
+                215.34434061119092,
+                0,
+                5213.396494595544
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 5,
+                "Medical Supplies": 2,
+                "Iso B Circuit": 2,
+                "Container": 3,
+                "Life Support": 1,
+                "Micro Controller": 2,
+                "Power Relay": 3,
+                "Aid Package": 2,
+                "Pets": 9,
+                "Torpedo Casing": 1,
+                "Casing": 6,
+                "Coffee": 2,
+                "Tea": 9,
+                "Alcohol": 9
+            },
+            "teams": {
+                "Diplomats": 6
+            },
+            "description": ""
+        },
+        "Astral Agora": {
+            "coordinate": [
+                117931.94444444447,
+                0,
+                69262.88151577499
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 26,
+                "Container": 25,
+                "AMC": 1,
+                "Micro Controller": 7,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 5,
+                "Transmitter": 6,
+                "Receiver": 5,
+                "Coffee": 4,
+                "Tea": 4,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Combat Engineers": 1
+            },
+            "description": ""
+        },
+        "Alders Counsel": {
+            "coordinate": [
+                29390.277777777796,
+                0,
+                91173.24674211245
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 50,
+                "Nuke": 2,
+                "EMP": 6,
+                "Mine": 6,
+                "High Yield Warhead": 15,
+                "Warhead": 60,
+                "Torpedo Casing": 60,
+                "Casing": 60,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Guidance System": 21,
+                "Alcohol": 3,
+                "Computer Core": 1
+            },
+            "teams": {
+                "DamCon": 3,
+                "Medics": 2,
+                "Combat Engineers": 1,
+                "Diplomats": 6
+            },
+            "description": ""
+        },
+        "Tibur Command": {
+            "coordinate": [
+                -573.1103485029248,
+                0,
+                32648.179769132366
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 68,
+                "Nuke": 13,
+                "EMP": 12,
+                "Mine": 12,
+                "High Yield Warhead": 16,
+                "Warhead": 63,
+                "Torpedo Casing": 41,
+                "Casing": 16,
+                "Transmitter": 37,
+                "Navigational Array": 0,
+                "Tactical Array": 10,
+                "Sensor Suite": 7,
+                "Guidance System": 56,
+                "Receiver": 15,
+                "Scorch": 35
+            },
+            "teams": {
+                "DamCon": 7,
+                "Medics": 1,
+                "Combat Engineers": 11
+            },
+            "description": ""
+        },
+        "WP 5": {
+            "coordinate": [
+                5334.107514918754,
+                0,
+                27460.574966738386
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 64": {
+            "coordinate": [
+                -5607.443510236215,
+                0,
+                26050.17901247794
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 55": {
+            "coordinate": [
+                1567.4239760092357,
+                0,
+                12672.365922395975
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 71": {
+            "coordinate": [
+                -2075.3633017353854,
+                0,
+                40241.48951252786
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        }
+    },
+    "sensor_relay": {
+        "SR 62": {
+            "coordinate": [
+                -97416.66666666669,
+                0,
+                88277.77777777777
+            ]
+        },
+        "SR 22": {
+            "coordinate": [
+                -68816.66666666669,
+                0,
+                63877.77777777777
+            ]
+        },
+        "SR 53": {
+            "coordinate": [
+                -40216.666666666686,
+                0,
+                39477.77777777777
+            ]
+        },
+        "SR 78": {
+            "coordinate": [
+                16983.333333333314,
+                0,
+                -9322.222222222234
+            ]
+        },
+        "SR 60": {
+            "coordinate": [
+                45583.333333333314,
+                0,
+                -33722.22222222223
+            ]
+        },
+        "SR 49": {
+            "coordinate": [
+                -101416.66666666669,
+                0,
+                -38722.222222222226
+            ]
+        },
+        "SR 87": {
+            "coordinate": [
+                -67750.00000000003,
+                0,
+                -21888.888888888894
+            ]
+        },
+        "SR 55": {
+            "coordinate": [
+                -34083.33333333336,
+                0,
+                -5055.555555555562
+            ]
+        },
+        "SR 35": {
+            "coordinate": [
+                33249.99999999997,
+                0,
+                28611.111111111102
+            ]
+        },
+        "SR 16": {
+            "coordinate": [
+                66916.66666666666,
+                0,
+                45444.444444444445
+            ]
+        },
+        "SR 45": {
+            "coordinate": [
+                100583.33333333331,
+                0,
+                62277.777777777774
+            ]
+        }
+    },
+    "terrain": {
+        "1766350632904": {
+            "type": "planet",
+            "name": "Planet Tibur",
+            "coordinate": [
+                -660.648148148141,
+                0,
+                108299.91855281201
+            ]
+        },
+        "1766351054324": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -51552.34944770651,
+                0,
+                75461.23007968954
+            ],
+            "end": [
+                -56413.46055881762,
+                0,
+                -37038.769920310464
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766351067443": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                18586.539441182384,
+                0,
+                -44677.658809199354
+            ],
+            "end": [
+                72753.20610784905,
+                0,
+                81016.7856352451
+            ],
+            "density": 125,
+            "scatter": 30000,
+            "composition": []
+        }
+    },
+    "traffic": {}
+}

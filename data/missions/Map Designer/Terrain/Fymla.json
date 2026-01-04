@@ -1,0 +1,65 @@
+{
+    "systemMapCoord": [
+        60185.67557722522,
+        0,
+        -29435.76458109383
+    ],
+    "systemalignment": "Ximni",
+    "metadata": {
+        "skybox": "sky1.png",
+        "sysdescription": "Fymla is the technological nerve center of the Confederation, home to sprawling orbital dockyards and the Ximni Gateforge, where the latest generation of jump coils and gate relays are constructed. The system\u2019s innermost planet, Fym-II, is tidally locked \u2014 its permanent twilight band houses vast energy farms that harvest the planet\u2019s magnetic storms. Fymla\u2019s shipyards are constantly alive with neon-lit scaffolds, and the local culture celebrates engineers as celebrities, often featuring them in holo-dramas and competitions. Fymla is also notorious for \u201cslipfire storms\u201d \u2014 spontaneous bursts of electromagnetic radiation that can scramble unshielded navigation systems.",
+        "security": "Neutral",
+        "exports": [
+            "Research"
+        ],
+        "focus": "Research",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Outpost",
+        "visible": true
+    },
+    "objects": {
+        "Gateforge Portal": {
+            "coordinate": [
+                60000.00000000001,
+                0,
+                68333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Isscar Portal Nexus": "Isscar"
+            },
+            "state": "Tethered",
+            "drift": 45000
+        }
+    },
+    "sensor_relay": {},
+    "terrain": {
+        "1760744404578": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                15833.333333333334,
+                0,
+                81666.66666666667
+            ],
+            "end": [
+                56666.66666666667,
+                0,
+                114166.66666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        }
+    },
+    "traffic": {
+        "security": "medium",
+        "civilian": "light",
+        "commercial": "medium"
+    }
+}

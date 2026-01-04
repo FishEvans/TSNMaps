@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Sundering": {"type": "blackhole", "x": 34309.490513580546, "y": 65279.58741728392, "grid": "P13"}, "Unmaking": {"type": "blackhole", "x": 84772.4534765435, "y": 82737.149145679, "grid": "Q16"}, "Dreadfall": {"type": "blackhole", "x": 113225.38557530893, "y": 54284.21704691357, "grid": "O17"}, "Planet 870": {"type": "planet", "x": 246347.20175056424, "y": 6658.328950178022, "grid": "M24", "hidden": false}, "Alaris": {"type": "station", "x": 286611.54721861973, "y": 26379.9604592161, "grid": "N26", "hidden": false, "label": "Alaris", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 29": {"type": "platform", "x": 285195.1220251605, "y": 26137.07695942139, "grid": "N26", "hidden": false, "label": "WP 29"}, "WP 20": {"type": "platform", "x": 288010.0037465786, "y": 26424.221862026207, "grid": "N26", "hidden": false, "label": "WP 20"}, "Menice": {"type": "jumpnode", "x": -13429.33664691327, "y": 23577.4269234568, "grid": "N11", "hidden": false, "label": "Menice", "destinations": {"Orantiv Jump Point": "Castor"}}, "DS 44": {"type": "station", "x": 94436.80532839536, "y": 2393.784948148134, "grid": "M16", "hidden": false, "label": "DS 44", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "DS 65": {"type": "station", "x": 207862.7312543213, "y": 51004.896059259256, "grid": "O22", "hidden": false, "label": "DS 65", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Gate Control": {"type": "station", "x": 29621.99051358053, "y": 49268.78494814814, "grid": "O13", "hidden": false, "label": "Gate Control", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "DS 53": {"type": "station", "x": 215385.87940246947, "y": -25962.696533333354, "grid": "K22", "hidden": false, "label": "DS 53", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Globaris Gate": {"type": "jumpnode", "x": 244533.3333333333, "y": -138300.0, "grid": "F24", "hidden": false, "label": "Globaris Gate", "destinations": {"Helios Gate": "Tibur"}}, "SR 69": {"type": "sensor_relay", "x": 290571.974952693, "y": 6464.522250710206, "grid": "M26", "hidden": false, "label": "SR 69"}, "SR 15": {"type": "sensor_relay", "x": 273629.016036336, "y": 41646.93896177155, "grid": "O25", "hidden": false, "label": "SR 15"}, "SR 37": {"type": "sensor_relay", "x": 235558.53292465885, "y": 50336.27829889227, "grid": "O23", "hidden": false, "label": "SR 37"}, "SR 40": {"type": "sensor_relay", "x": 205028.37589708416, "y": 25989.290511000327, "grid": "N22", "hidden": false, "label": "SR 40"}, "SR 52": {"type": "sensor_relay", "x": 205028.37589708416, "y": -13060.246009579905, "grid": "L22", "hidden": false, "label": "SR 52"}, "SR 43": {"type": "sensor_relay", "x": 235558.53292465885, "y": -37407.233797471854, "grid": "K23", "hidden": false, "label": "SR 43"}, "SR 98": {"type": "sensor_relay", "x": 273629.016036336, "y": -28717.89446035114, "grid": "K25", "hidden": false, "label": "SR 98"}, "SR 34": {"type": "sensor_relay", "x": 39224.613970370665, "y": 25638.38371358021, "grid": "N13", "hidden": false, "label": "SR 34"}, "SR 45": {"type": "sensor_relay", "x": 22281.655054013674, "y": 60820.80042464155, "grid": "P13", "hidden": false, "label": "SR 45"}, "SR 24": {"type": "sensor_relay", "x": -15788.828057663482, "y": 69510.13976176227, "grid": "P11", "hidden": false, "label": "SR 24"}, "SR 54": {"type": "sensor_relay", "x": -46318.98508523819, "y": 45163.15197387033, "grid": "O09", "hidden": false, "label": "SR 54"}, "SR 99": {"type": "sensor_relay", "x": -46318.98508523819, "y": 6113.615453290098, "grid": "M09", "hidden": false, "label": "SR 99"}, "SR 77": {"type": "sensor_relay", "x": -15788.828057663493, "y": -18233.372334601852, "grid": "L11", "hidden": false, "label": "SR 77"}, "SR 42": {"type": "sensor_relay", "x": 22281.655054013667, "y": -9544.03299748114, "grid": "L13", "hidden": false, "label": "SR 42"}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Helios", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [246347.20175056424], "y": [6658.328950178022], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet 870"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet 870 [M24]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [34309.490513580546], "y": [65279.58741728392], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["Sundering"], "textposition": "top center", "hovertext": ["Sundering [P13]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [84772.4534765435], "y": [82737.149145679], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["Unmaking"], "textposition": "top center", "hovertext": ["Unmaking [Q16]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [113225.38557530893], "y": [54284.21704691357], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["Dreadfall"], "textposition": "top center", "hovertext": ["Dreadfall [O17]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [286611.54721861973], "y": [26379.9604592161], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Alaris [N26]"], "hoverinfo": "text", "text": ["Alaris"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [285195.1220251605], "y": [26137.07695942139], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 29 [N26]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [288010.0037465786], "y": [26424.221862026207], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 20 [N26]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-13429.33664691327], "y": [23577.4269234568], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Menice [N11]"], "hoverinfo": "text", "text": ["Menice"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [94436.80532839536], "y": [2393.784948148134], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 44 [M16]"], "hoverinfo": "text", "text": ["DS 44"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [207862.7312543213], "y": [51004.896059259256], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 65 [O22]"], "hoverinfo": "text", "text": ["DS 65"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [29621.99051358053], "y": [49268.78494814814], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Gate Control [O13]"], "hoverinfo": "text", "text": ["Gate Control"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [215385.87940246947], "y": [-25962.696533333354], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 53 [K22]"], "hoverinfo": "text", "text": ["DS 53"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [244533.3333333333], "y": [-138300.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Globaris Gate [F24]"], "hoverinfo": "text", "text": ["Globaris Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [290571.974952693], "y": [6464.522250710206], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 69 [M26]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [273629.016036336], "y": [41646.93896177155], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 15 [O25]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [235558.53292465885], "y": [50336.27829889227], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 37 [O23]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [205028.37589708416], "y": [25989.290511000327], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 40 [N22]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [205028.37589708416], "y": [-13060.246009579905], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 52 [L22]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [235558.53292465885], "y": [-37407.233797471854], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 43 [K23]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [273629.016036336], "y": [-28717.89446035114], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 98 [K25]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [39224.613970370665], "y": [25638.38371358021], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 34 [N13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [22281.655054013674], "y": [60820.80042464155], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 45 [P13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-15788.828057663482], "y": [69510.13976176227], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 24 [P11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-46318.98508523819], "y": [45163.15197387033], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 54 [O09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-46318.98508523819], "y": [6113.615453290098], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 99 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-15788.828057663493], "y": [-18233.372334601852], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 77 [L11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [22281.655054013667], "y": [-9544.03299748114], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 42 [L13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Helios", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Helios';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [1, 2, 3];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,21 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Globaris Gate',function(){highlight('Globaris Gate');},false,null,false)
+    addButton('Menice',function(){highlight('Menice');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet 870',function(){highlight('Planet 870');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Alaris',function(){highlight('Alaris');},false,'blue',false)
+    addButton('DS 44',function(){highlight('DS 44');},false,'blue',false)
+    addButton('DS 53',function(){highlight('DS 53');},false,'blue',false)
+    addButton('DS 65',function(){highlight('DS 65');},false,'blue',false)
+    addButton('Gate Control',function(){highlight('Gate Control');},false,'blue',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

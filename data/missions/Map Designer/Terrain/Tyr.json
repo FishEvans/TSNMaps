@@ -1,25 +1,1429 @@
 {
     "systemMapCoord": [
-        12757.323939928488,
+        14095.12399314782,
         0,
-        12542.268887724755
+        11984.852198883364
     ],
     "systemalignment": "USFP",
     "metadata": {
-        "sysdescription": "",
+        "sysdescription": "A Stage 3 Colony of the USFP, Mixed population including Grezintian, Humans, Aquarins and others. Self sufficiant with minor reaserch, contains a major starship scraping facility - Sams Junkyard. No notable Military",
         "security": "Neutral",
-        "exports": [],
-        "focus": "",
+        "exports": [
+            "Agriculture",
+            "Industry",
+            "Research"
+        ],
+        "focus": "Research",
         "intel": {
             "pirate": "Low",
             "enemy": "Low",
             "assets": []
         },
-        "development": "Unclaimed",
-        "visible": true
+        "development": "Colony",
+        "visible": true,
+        "skybox": "sky1-blue.png"
     },
-    "objects": {},
-    "sensor_relay": {},
-    "terrain": {},
-    "traffic": {}
+    "objects": {
+        "Leopard": {
+            "coordinate": [
+                258769.4287651877,
+                0.0,
+                -181158.06672365504
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Emerald Jump Point": "Vilnara"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Ornate": {
+            "coordinate": [
+                -40896.18403481218,
+                0.0,
+                222178.79087634472
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Lightening Gate": "Ashia"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "DS 59": {
+            "coordinate": [
+                -93208.01193982622,
+                0.0,
+                -228936.19999777782
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 17,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 26,
+                "Container": 26,
+                "Life Support": 0,
+                "Micro Controller": 8,
+                "Power Relay": 15,
+                "Aid Package": 17,
+                "Pets": 3,
+                "Torpedo Casing": 6,
+                "Casing": 6,
+                "Coffee": 4,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 2
+            },
+            "description": ""
+        },
+        "I 264": {
+            "coordinate": [
+                -132357.31749538175,
+                0.0,
+                -225952.66090312766
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "M 184": {
+            "coordinate": [
+                -113679.23107562869,
+                0.0,
+                -255301.00452452677
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 36": {
+            "coordinate": [
+                160292.85481190315,
+                0.0,
+                -81026.72492603782
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "SY 287": {
+            "coordinate": [
+                -59090.89123481231,
+                0.0,
+                -133524.5200569884
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_shipyard",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Tyr Admin": {
+            "coordinate": [
+                -56972.83567925678,
+                0.0,
+                -201510.63116809956
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "P 24": {
+            "coordinate": [
+                -142042.28012370123,
+                0.0,
+                -134959.70524217363
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_processor",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 46": {
+            "coordinate": [
+                -53955.02516355533,
+                0.0,
+                -202348.06856885174
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 25": {
+            "coordinate": [
+                -55668.924869054885,
+                0.0,
+                -202039.8241797062
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 41": {
+            "coordinate": [
+                -63113.598772443394,
+                0.0,
+                -157958.01157557755
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Anning Research": {
+            "coordinate": [
+                224715.95379195188,
+                0.0,
+                86178.28992667061
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "High Yield Warhead": 10,
+                "Life Support": 3,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "Luek": {
+            "coordinate": [
+                211358.31835623324,
+                0.0,
+                77185.0387311592
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 17,
+                "Medical Supplies": 11,
+                "Iso B Circuit": 26,
+                "Container": 25,
+                "Life Support": 0,
+                "Micro Controller": 9,
+                "Power Relay": 16,
+                "Aid Package": 15,
+                "Pets": 3,
+                "Torpedo Casing": 5,
+                "Casing": 7,
+                "Coffee": 4,
+                "Tea": 5,
+                "Alcohol": 4
+            },
+            "teams": {
+                "Diplomats": 2
+            },
+            "description": ""
+        },
+        "Korti": {
+            "coordinate": [
+                -25331.867591895425,
+                0.0,
+                180062.29372241697
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "Gena": {
+            "coordinate": [
+                -24389.86154060933,
+                0.0,
+                182608.64325741952
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "WP 30": {
+            "coordinate": [
+                -23709.230803923565,
+                0.0,
+                181369.41780161654
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_unit",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Frasier Ind Traders": {
+            "coordinate": [
+                -25602.3070565574,
+                0.0,
+                181594.7840221682
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "High Yield Warhead": 5,
+                "Warhead": 13,
+                "Life Support": 2,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 14,
+                "Transmitter": 8,
+                "Receiver": 7,
+                "Analysis Suite": 7,
+                "Sensor Suite": 10,
+                "Guidance System": 16,
+                "Wild Animals": 15,
+                "Pets": 3,
+                "Casing": 15,
+                "EMP": 9,
+                "Homing": 37,
+                "Coolant": 14,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 14
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 3
+            },
+            "description": ""
+        },
+        "M 845": {
+            "coordinate": [
+                -232934.28650038733,
+                0.0,
+                69333.09389109237
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_refinary",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Iron": 683,
+                "Tharium": 69,
+                "Reisium": 62,
+                "Alerite": 50,
+                "Cabrite": 889,
+                "Ashfilum": 321,
+                "Denebite": 29,
+                "Aegirine": 133,
+                "Nuidinium": 165,
+                "Gredian": 200,
+                "Warhead": 7,
+                "Life Support": 3,
+                "Micro Controller": 11,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 32,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
+        },
+        "M 844": {
+            "coordinate": [
+                -245051.18993072028,
+                0.0,
+                56682.74704332193
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_refinary",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Iron": 727,
+                "Tharium": 52,
+                "Reisium": 58,
+                "Alerite": 54,
+                "Cabrite": 713,
+                "Ashfilum": 243,
+                "Denebite": 31,
+                "Aegirine": 167,
+                "Nuidinium": 145,
+                "Gredian": 175,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 7,
+                "Power Relay": 17,
+                "Casing": 16,
+                "Homing": 32,
+                "Torpedo Casing": 9
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 0
+            },
+            "description": ""
+        },
+        "SM 845": {
+            "coordinate": [
+                -234277.37467996727,
+                0.0,
+                67734.5375203955
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Storage Module"
+        },
+        "SM 844": {
+            "coordinate": [
+                -243810.69033665946,
+                0.0,
+                59135.860653575015
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Storage Module"
+        },
+        "PM 844": {
+            "coordinate": [
+                -234090.4469219929,
+                0.0,
+                71286.16492190832
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_processor",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Storage additional Processing Module"
+        },
+        "Try Transit": {
+            "coordinate": [
+                159214.76243453712,
+                0.0,
+                -81701.89389742297
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 55,
+                "Nuke": 3,
+                "EMP": 6,
+                "Mine": 7,
+                "High Yield Warhead": 16,
+                "Warhead": 58,
+                "Torpedo Casing": 64,
+                "Casing": 64,
+                "Navigational Array": 0,
+                "Tactical Array": 10,
+                "Guidance System": 63
+            },
+            "teams": {
+                "DamCon": 7,
+                "Medics": 3,
+                "Combat Engineers": 1
+            },
+            "description": ""
+        },
+        "WP 97": {
+            "coordinate": [
+                161797.549879976,
+                0.0,
+                -80109.80450616112
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Leesh": {
+            "coordinate": [
+                -41306.698815950236,
+                0.0,
+                24335.531860640243
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 26,
+                "Container": 25,
+                "Life Support": 2,
+                "Micro Controller": 7,
+                "Power Relay": 15,
+                "Aid Package": 16,
+                "Pets": 3,
+                "Torpedo Casing": 6,
+                "Casing": 5,
+                "Coffee": 7,
+                "Tea": 3,
+                "Alcohol": 7
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
+        },
+        "LCS Himae": {
+            "coordinate": [
+                -44097.51528828677,
+                0.0,
+                17358.49067979891
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "transport_ship",
+            "type": "station",
+            "facilities": [
+                "Refuel",
+                "Docking"
+            ],
+            "cargo": {
+                "Alcohol": 12,
+                "Warhead": 10,
+                "Denebite Crystals": 15,
+                "Tea": 8,
+                "Coffee": 8,
+                "Guidance System": 8,
+                "Casing": 25,
+                "Homing": 7,
+                "Repair Materials": 9
+            },
+            "teams": {},
+            "description": "The LCS Himae is a woundering trader thats broke down here and set up shop."
+        },
+        "Guardic": {
+            "coordinate": [
+                -47742.37328294481,
+                0.0,
+                11843.527239742805
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 18,
+                "Medical Supplies": 9,
+                "Iso B Circuit": 27,
+                "Container": 24,
+                "Life Support": 0,
+                "Micro Controller": 9,
+                "Power Relay": 15,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 3,
+                "Casing": 5,
+                "Coffee": 5,
+                "Tea": 4,
+                "Alcohol": 3
+            },
+            "teams": {
+                "Diplomats": 0
+            },
+            "description": ""
+        },
+        "Sams Junkyard": {
+            "coordinate": [
+                -206661.58996566857,
+                0.0,
+                -197026.00276880263
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Iron": 60,
+                "Tharium": 60,
+                "Reisium": 60,
+                "Alerite": 54,
+                "Cabrite": 35,
+                "Ashfilum": 58,
+                "Denebite": 30,
+                "Aegirine": 151,
+                "Nuidinium": 159,
+                "Gredian": 10,
+                "Warhead": 10,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Casing": 15,
+                "Homing": 35,
+                "Torpedo Casing": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 0
+            },
+            "description": ""
+        }
+    },
+    "sensor_relay": {
+        "SR 63": {
+            "coordinate": [
+                -40896.18403481218,
+                0.0,
+                211429.24847634468
+            ]
+        },
+        "SR 92": {
+            "coordinate": [
+                4103.815965187823,
+                0.0,
+                211429.24847634468
+            ]
+        },
+        "SR 53": {
+            "coordinate": [
+                -12839.142951169168,
+                0.0,
+                246611.665187406
+            ]
+        },
+        "SR 84": {
+            "coordinate": [
+                -50909.62606284632,
+                0.0,
+                255301.00452452677
+            ]
+        },
+        "SR 81": {
+            "coordinate": [
+                -81439.78309042103,
+                0.0,
+                230954.01673663483
+            ]
+        },
+        "SR 70": {
+            "coordinate": [
+                -81439.78309042103,
+                0.0,
+                191904.4802160546
+            ]
+        },
+        "SR 21": {
+            "coordinate": [
+                -50909.626062846335,
+                0.0,
+                167557.4924281626
+            ]
+        },
+        "SR 61": {
+            "coordinate": [
+                -12839.142951169175,
+                0.0,
+                176246.8317652833
+            ]
+        },
+        "SR 49": {
+            "coordinate": [
+                -16995.793634812,
+                0.0,
+                188719.7188763448
+            ]
+        },
+        "SR 79": {
+            "coordinate": [
+                8684.206365188002,
+                0.0,
+                153919.7188763448
+            ]
+        },
+        "SR 42": {
+            "coordinate": [
+                34364.206365188,
+                0.0,
+                119119.71887634479
+            ]
+        },
+        "SR 76": {
+            "coordinate": [
+                60044.206365188,
+                0.0,
+                84319.71887634482
+            ]
+        },
+        "SR 98": {
+            "coordinate": [
+                85724.206365188,
+                0.0,
+                49519.71887634482
+            ]
+        },
+        "SR 13": {
+            "coordinate": [
+                111404.206365188,
+                0.0,
+                14719.718876344821
+            ]
+        },
+        "SR 56": {
+            "coordinate": [
+                137084.206365188,
+                0.0,
+                -20080.28112365518
+            ]
+        },
+        "SR 31": {
+            "coordinate": [
+                162764.206365188,
+                0.0,
+                -54880.28112365515
+            ]
+        },
+        "SR 18": {
+            "coordinate": [
+                188444.206365188,
+                0.0,
+                -89680.28112365515
+            ]
+        },
+        "SR 85": {
+            "coordinate": [
+                214124.206365188,
+                0.0,
+                -124480.28112365515
+            ]
+        },
+        "SR 54": {
+            "coordinate": [
+                239804.206365188,
+                0.0,
+                -159280.28112365515
+            ]
+        },
+        "SR 64": {
+            "coordinate": [
+                265484.206365188,
+                0.0,
+                -194080.28112365515
+            ]
+        },
+        "SR 46": {
+            "coordinate": [
+                304724.206365188,
+                0.0,
+                -179680.28112365518
+            ]
+        },
+        "SR 52": {
+            "coordinate": [
+                287781.247448831,
+                0.0,
+                -144497.86441259383
+            ]
+        },
+        "SR 14": {
+            "coordinate": [
+                249710.7643371538,
+                0.0,
+                -135808.5250754731
+            ]
+        },
+        "SR 80": {
+            "coordinate": [
+                219180.60730957912,
+                0.0,
+                -160155.51286336506
+            ]
+        },
+        "SR 58": {
+            "coordinate": [
+                219180.60730957912,
+                0.0,
+                -199205.04938394527
+            ]
+        },
+        "SR 75": {
+            "coordinate": [
+                249710.7643371538,
+                0.0,
+                -223552.03717183723
+            ]
+        },
+        "SR 15": {
+            "coordinate": [
+                287781.247448831,
+                0.0,
+                -214862.69783471653
+            ]
+        },
+        "SR 99": {
+            "coordinate": [
+                -100757.55790147898,
+                0.0,
+                -185191.18672365506
+            ]
+        },
+        "SR 77": {
+            "coordinate": [
+                -55757.557901478984,
+                0.0,
+                -185191.18672365506
+            ]
+        },
+        "SR 87": {
+            "coordinate": [
+                -72700.51681783597,
+                0.0,
+                -150008.77001259374
+            ]
+        },
+        "SR 26": {
+            "coordinate": [
+                -110770.99992951314,
+                0.0,
+                -141319.430675473
+            ]
+        },
+        "SR 23": {
+            "coordinate": [
+                -141301.15695708783,
+                0.0,
+                -165666.41846336494
+            ]
+        },
+        "SR 17": {
+            "coordinate": [
+                -141301.15695708783,
+                0.0,
+                -204715.95498394518
+            ]
+        },
+        "SR 82": {
+            "coordinate": [
+                -110770.99992951314,
+                0.0,
+                -229062.94277183712
+            ]
+        },
+        "SR 40": {
+            "coordinate": [
+                -72700.51681783597,
+                0.0,
+                -220373.6034347164
+            ]
+        },
+        "SR 93": {
+            "coordinate": [
+                -238632.78645282742,
+                0.0,
+                64269.6797003517
+            ]
+        },
+        "SR 38": {
+            "coordinate": [
+                -193632.78645282742,
+                0.0,
+                64269.6797003517
+            ]
+        },
+        "SR 66": {
+            "coordinate": [
+                -210575.7453691844,
+                0.0,
+                99452.09641141305
+            ]
+        },
+        "SR 19": {
+            "coordinate": [
+                -248646.22848086155,
+                0.0,
+                108141.43574853375
+            ]
+        },
+        "SR 90": {
+            "coordinate": [
+                -279176.38550843624,
+                0.0,
+                83794.44796064182
+            ]
+        },
+        "SR 25": {
+            "coordinate": [
+                -279176.38550843624,
+                0.0,
+                44744.91144006158
+            ]
+        },
+        "SR 59": {
+            "coordinate": [
+                -248646.22848086155,
+                0.0,
+                20397.923652169644
+            ]
+        },
+        "SR 67": {
+            "coordinate": [
+                -210575.7453691844,
+                0.0,
+                29087.26298929035
+            ]
+        },
+        "SR 24": {
+            "coordinate": [
+                -54660.15928568828,
+                0.0,
+                25575.33833112064
+            ]
+        },
+        "SR 71": {
+            "coordinate": [
+                -34920.58804359601,
+                0.0,
+                12453.009721320675
+            ]
+        }
+    },
+    "terrain": {
+        "1759516069165": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                180712.1932895514,
+                0.0,
+                105532.70331639779
+            ],
+            "end": [
+                179781.92113210587,
+                0.0,
+                51111.78210583539
+            ],
+            "density": 300,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1759516080411": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                179084.21701402173,
+                0.0,
+                84601.57977387382
+            ],
+            "end": [
+                191177.7550608134,
+                0.0,
+                121114.76195361011
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1759516092901": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                227437.64015901403,
+                0.0,
+                45337.046971644566
+            ],
+            "end": [
+                226295.52900438145,
+                0.0,
+                62507.61603454291
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759516111589": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                222894.25715269282,
+                0.0,
+                53515.136383022764
+            ],
+            "end": [
+                231916.11769381637,
+                0.0,
+                54618.52939884362
+            ],
+            "density": 125,
+            "scatter": 5000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759516731877": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -280611.55204420036,
+                0.0,
+                47963.93848464533
+            ],
+            "end": [
+                -264214.9471059287,
+                0.0,
+                81721.65453402806
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759516735150": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -265661.706365188,
+                0.0,
+                71594.33971921323
+            ],
+            "end": [
+                -227081.45945160775,
+                0.0,
+                93295.72860810213
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759516738486": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -272413.2495750645,
+                0.0,
+                95224.74095378112
+            ],
+            "end": [
+                -260839.17550099044,
+                0.0,
+                61467.02490439842
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759516743854": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -304724.206365188,
+                0.0,
+                34460.85206489224
+            ],
+            "end": [
+                -254087.63229111393,
+                0.0,
+                17581.994040200865
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759516752727": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -287363.0952540769,
+                0.0,
+                44588.166879707045
+            ],
+            "end": [
+                -177891.64463679292,
+                0.0,
+                39283.38292908977
+            ],
+            "density": 125,
+            "scatter": 25000,
+            "composition": []
+        },
+        "1759516760510": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -260839.17550099044,
+                0.0,
+                133804.9878673614
+            ],
+            "end": [
+                -211649.36068617564,
+                0.0,
+                41212.39527476879
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1759516773040": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -225152.4471059287,
+                0.0,
+                24333.53725007741
+            ],
+            "end": [
+                -250229.6075997559,
+                0.0,
+                -41252.88250300901
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1759518067692": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -60828.77529884211,
+                0.0,
+                15481.239400505292
+            ],
+            "end": [
+                -54660.15928568828,
+                0.0,
+                2919.694064628391
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1759528584982": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -215324.42876732352,
+                0,
+                -201584.10239146976
+            ],
+            "density": 100,
+            "scatter": 15000
+        },
+        "1759528617554": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -241693.81927511052,
+                0.0,
+                -194487.63550740707
+            ],
+            "end": [
+                -239002.05956027974,
+                0.0,
+                -250610.82556162847
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759528625911": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -240481.4506995507,
+                0.0,
+                -247219.20832094172
+            ],
+            "end": [
+                -210480.17362193295,
+                0.0,
+                -254428.81754114444
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1759528629449": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -235597.52187296175,
+                0.0,
+                -185356.1098508152
+            ],
+            "end": [
+                -218620.05499958116,
+                0.0,
+                -159308.48944234088
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1759528751594": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -215096.80611536177,
+                0,
+                -201381.43596428738
+            ],
+            "density": 12,
+            "scatter": 3000
+        },
+        "1761332235951": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                67089.36587062593,
+                0,
+                -19375.669357224033
+            ],
+            "end": [
+                69867.14364840371,
+                0,
+                -55486.78046833515
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1761332247311": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                313739.36587062594,
+                0,
+                -129414.55824611292
+            ],
+            "end": [
+                179339.36587062594,
+                0,
+                16985.441753887062
+            ],
+            "density": 300,
+            "scatter": 30000,
+            "composition": []
+        },
+        "1761332296339": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -39873.62281250169,
+                0,
+                155521.58287185687
+            ],
+            "end": [
+                -98673.6228125017,
+                0,
+                167521.58287185687
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1761332302572": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -9873.622812501662,
+                0,
+                285121.58287185687
+            ],
+            "end": [
+                35726.377187498336,
+                0,
+                305521.58287185687
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
+    "traffic": {
+        "commercial": "medium",
+        "civilian": "light",
+        "security": "light"
+    }
 }

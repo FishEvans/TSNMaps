@@ -1,21 +1,380 @@
 {
     "systemMapCoord": [
-        25889.40670738137,
+        25889.406707381357,
         0,
         -32444.228934523486
     ],
-    "systemalignment": "Arvonians",
+    "systemalignment": "Arvonian",
     "metadata": {
         "sysdescription": "",
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "Ka'Morlin Gate": {
+            "coordinate": [
+                -95000.00000000001,
+                0,
+                193333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Khoros Gate": {
+            "coordinate": [
+                194166.6666666667,
+                0,
+                105833.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Vrae Gate": "Khoros"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Jhohara Gate": {
+            "coordinate": [
+                18333.333333333336,
+                0,
+                -27500.000000000004
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Vrae Gate": "Jhohara"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Il Is'Kar Gate": {
+            "coordinate": [
+                112500.00000000001,
+                0,
+                -188333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Athorn Gate": {
+            "coordinate": [
+                -185000.00000000003,
+                0,
+                -84166.66666666667
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Vrae Gate": "Athorn"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "D 4": {
+            "coordinate": [
+                -33333.333333333336,
+                0,
+                149166.6666666667
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "R 7": {
+            "coordinate": [
+                -63333.333333333336,
+                0,
+                60833.333333333336
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "W 8": {
+            "coordinate": [
+                -110000.00000000001,
+                0,
+                -32500.000000000004
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "N 5": {
+            "coordinate": [
+                -36666.66666666667,
+                0,
+                -125000.00000000001
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "K 2": {
+            "coordinate": [
+                80000.0,
+                0,
+                -85000.00000000001
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "C 8": {
+            "coordinate": [
+                75833.33333333334,
+                0,
+                65833.33333333334
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "E 6": {
+            "coordinate": [
+                165833.33333333334,
+                0,
+                5833.333333333334
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "H 9": {
+            "coordinate": [
+                -165833.33333333334,
+                0,
+                108333.33333333334
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "M 7": {
+            "coordinate": [
+                71666.66666666667,
+                0,
+                154166.6666666667
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "starbase_arvonian",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "P 3": {
+            "coordinate": [
+                -138333.33333333334,
+                0,
+                -140000.0
+            ],
+            "sides": [
+                "Arvonians"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "1766413004536": {
+            "type": "planet",
+            "name": "Planet Vrae II",
+            "coordinate": [
+                21666.666666666668,
+                0,
+                106666.66666666667
+            ]
+        },
+        "1766413012460": {
+            "type": "planet",
+            "name": "Planet Vrae III",
+            "coordinate": [
+                -67500.0,
+                0,
+                -180000.00000000003
+            ]
+        },
+        "1766413182864": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -147500.0,
+                0,
+                139166.6666666667
+            ],
+            "end": [
+                -12500.000000000002,
+                0,
+                33333.333333333336
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766413189672": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                1666.6666666666667,
+                0,
+                -186666.6666666667
+            ],
+            "end": [
+                105000.00000000001,
+                0,
+                -74166.66666666667
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766413197280": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                60000.00000000001,
+                0,
+                74166.66666666667
+            ],
+            "end": [
+                190000.00000000003,
+                0,
+                -2500.0
+            ],
+            "density": 125,
+            "scatter": 20000,
+            "composition": []
+        },
+        "1766413206704": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -130000.00000000001,
+                0,
+                -1666.6666666666667
+            ],
+            "end": [
+                -82500.0,
+                0,
+                -80000.0
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413213496": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                36666.66666666667,
+                0,
+                209166.6666666667
+            ],
+            "end": [
+                93333.33333333334,
+                0,
+                120000.00000000001
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766413223552": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -192500.00000000003,
+                0,
+                133333.33333333334
+            ],
+            "end": [
+                -148333.33333333334,
+                0,
+                80833.33333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

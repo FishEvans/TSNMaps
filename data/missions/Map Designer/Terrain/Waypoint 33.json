@@ -1,21 +1,54 @@
 {
     "systemMapCoord": [
-        -13401.247384935416,
+        -11004.355622917463,
         0,
-        25653.57571843702
+        29722.71754697912
     ],
     "systemalignment": "USFP",
     "metadata": {
         "skybox": "sky1.png",
-        "sysdescription": "",
+        "sysdescription": "Waypoint System - Standard Search and Rescue station, othwise uninhabited",
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
-        "development": "Unclaimed",
+        "intel": {
+            "pirate": "Mid",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Uninhabited",
         "visible": true
     },
-    "objects": {},
+    "objects": {
+        "Coral Gate": {
+            "coordinate": [
+                213333.33333333337,
+                0,
+                -71166.66666666669
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Rock Breaker Gate": "Hypherion"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Crab Gate": {
+            "coordinate": [
+                -166500.0,
+                0,
+                126833.33333333331
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Waypoint 33 Gate": "Rhea"
+            },
+            "state": "Tethered",
+            "drift": 0
+        }
+    },
     "sensor_relay": {},
     "terrain": {},
     "traffic": {}

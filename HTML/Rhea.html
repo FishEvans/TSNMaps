@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Planet Rhea": {"type": "planet", "x": 53194.44444444446, "y": 49791.66666666666, "grid": "O14", "hidden": false}, "Tethys Gate": {"type": "jumpnode", "x": -84305.55555555555, "y": 86944.44444444444, "grid": "Q07", "hidden": false, "label": "Tethys Gate", "destinations": {"Rhea Gate": "Tethys"}}, "Waypoint 33 Gate": {"type": "jumpnode", "x": -16249.999999999993, "y": -80995.37037037041, "grid": "H11", "hidden": false, "label": "Waypoint 33 Gate", "destinations": {"Crab Gate": "Waypoint 33"}}, "Titan Gate": {"type": "jumpnode", "x": 115115.74074074077, "y": -34120.370370370394, "grid": "K17", "hidden": false, "label": "Titan Gate", "destinations": {"Titan Gate": "Titan"}}, "Rhea Command": {"type": "station", "x": -1203.7037037036946, "y": 601.8518518518309, "grid": "M11", "hidden": false, "label": "Rhea Command", "hull": "starbase_command", "facilities": [], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 16": {"type": "platform", "x": 2736.0360939643724, "y": 7820.912637174204, "grid": "M12", "hidden": false, "label": "WP 16"}, "WP 39": {"type": "platform", "x": -5357.331675811579, "y": -6133.169724508471, "grid": "L11", "hidden": false, "label": "WP 39"}, "QRF 94": {"type": "platform", "x": 5526.852566300907, "y": -3063.271604938282, "grid": "L12", "hidden": false, "label": "QRF 94"}, "QRF 55": {"type": "platform", "x": -10101.719678783687, "y": 6983.667695473243, "grid": "M11", "hidden": false, "label": "QRF 55"}, "Altiris Center": {"type": "station", "x": -40503.75800182896, "y": 46541.816700960226, "grid": "O09", "hidden": false, "label": "Altiris Center", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Maltic Market": {"type": "station", "x": 40514.760516689574, "y": -40263.73885459534, "grid": "J14", "hidden": false, "label": "Maltic Market", "hull": "starbase_civil", "facilities": ["Refuel", "Docking"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "SR 59": {"type": "sensor_relay", "x": -70648.14814814815, "y": 62523.14814814814, "grid": "P08", "hidden": false, "label": "SR 59"}, "SR 38": {"type": "sensor_relay", "x": -56566.358024691355, "y": 25100.308641975294, "grid": "N09", "hidden": false, "label": "SR 38"}, "SR 21": {"type": "sensor_relay", "x": -42484.567901234564, "y": -12322.53086419755, "grid": "L09", "hidden": false, "label": "SR 21"}, "SR 32": {"type": "sensor_relay", "x": -28402.777777777774, "y": -49745.3703703704, "grid": "J10", "hidden": false, "label": "SR 32"}, "SR 54": {"type": "sensor_relay", "x": -49814.81481481481, "y": 79305.55555555555, "grid": "P09", "hidden": false, "label": "SR 54"}, "SR 67": {"type": "sensor_relay", "x": -15237.268518518511, "y": 56157.407407407394, "grid": "O11", "hidden": false, "label": "SR 67"}, "SR 42": {"type": "sensor_relay", "x": 19340.27777777779, "y": 33009.25925925924, "grid": "N12", "hidden": false, "label": "SR 42"}, "SR 86": {"type": "sensor_relay", "x": 53917.824074074095, "y": 9861.11111111108, "grid": "M14", "hidden": false, "label": "SR 86"}, "SR 20": {"type": "sensor_relay", "x": 88495.3703703704, "y": -13287.037037037066, "grid": "L16", "hidden": false, "label": "SR 20"}, "SR 55": {"type": "sensor_relay", "x": 17314.81481481483, "y": -67106.48148148152, "grid": "I12", "hidden": false, "label": "SR 55"}, "SR 64": {"type": "sensor_relay", "x": 48275.46296296298, "y": -59583.333333333365, "grid": "J14", "hidden": false, "label": "SR 64"}, "SR 30": {"type": "sensor_relay", "x": 79236.11111111114, "y": -52060.18518518521, "grid": "J15", "hidden": false, "label": "SR 30"}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Rhea", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [53194.44444444446], "y": [49791.66666666666], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Rhea"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Rhea [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-55589.7657049158, -103815.07434689111, -72678.55276787793, -24453.244125902624, -55589.7657049158], "y": [115038.22374944724, 55238.84103339784, 30128.742985806573, 89928.12570185596, 115038.22374944724], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-90345.11702600849, -20418.419495144284, -38405.45453320498, -108332.1520640692, -90345.11702600849], "y": [29642.48670586274, 64846.96201450471, 100574.6343503787, 65370.15904173674, 29642.48670586274], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-84305.55555555555], "y": [86944.44444444444], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Tethys Gate [Q07]"], "hoverinfo": "text", "text": ["Tethys Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-16249.999999999993], "y": [-80995.37037037041], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Waypoint 33 Gate [H11]"], "hoverinfo": "text", "text": ["Waypoint 33 Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [115115.74074074077], "y": [-34120.370370370394], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Titan Gate [K17]"], "hoverinfo": "text", "text": ["Titan Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-1203.7037037036946], "y": [601.8518518518309], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Rhea Command [M11]"], "hoverinfo": "text", "text": ["Rhea Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [2736.0360939643724], "y": [7820.912637174204], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 16 [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-5357.331675811579], "y": [-6133.169724508471], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 39 [L11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [5526.852566300907], "y": [-3063.271604938282], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 94 [L12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-10101.719678783687], "y": [6983.667695473243], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 55 [M11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-40503.75800182896], "y": [46541.816700960226], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Altiris Center [O09]"], "hoverinfo": "text", "text": ["Altiris Center"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [40514.760516689574], "y": [-40263.73885459534], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Maltic Market [J14]"], "hoverinfo": "text", "text": ["Maltic Market"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-70648.14814814815], "y": [62523.14814814814], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 59 [P08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-56566.358024691355], "y": [25100.308641975294], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 38 [N09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-42484.567901234564], "y": [-12322.53086419755], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 21 [L09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-28402.777777777774], "y": [-49745.3703703704], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 32 [J10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-49814.81481481481], "y": [79305.55555555555], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 54 [P09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-15237.268518518511], "y": [56157.407407407394], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 67 [O11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [19340.27777777779], "y": [33009.25925925924], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 42 [N12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [53917.824074074095], "y": [9861.11111111108], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 86 [M14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [88495.3703703704], "y": [-13287.037037037066], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 20 [L16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [17314.81481481483], "y": [-67106.48148148152], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 55 [I12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [48275.46296296298], "y": [-59583.333333333365], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 64 [J14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [79236.11111111114], "y": [-52060.18518518521], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 30 [J15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Rhea", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Rhea';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,20 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Tethys Gate',function(){highlight('Tethys Gate');},false,null,false)
+    addButton('Titan Gate',function(){highlight('Titan Gate');},false,null,false)
+    addButton('Waypoint 33 Gate',function(){highlight('Waypoint 33 Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Rhea',function(){highlight('Planet Rhea');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Altiris Center',function(){highlight('Altiris Center');},false,'blue',false)
+    addButton('Maltic Market',function(){highlight('Maltic Market');},false,'blue',false)
+    addButton('Rhea Command',function(){highlight('Rhea Command');},false,'blue',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

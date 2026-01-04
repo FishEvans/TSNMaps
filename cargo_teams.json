@@ -1,5 +1,48 @@
 {
-    "skyboxes":[
+    "Factions":[
+	"Hegemony",
+	"USFP",
+	"Pirate",
+	"Ximni"
+	],
+	"Races":{
+	"TSN": {
+		"Faction": "USFP"
+		},
+	"USFP": {
+		"Faction": "USFP"
+		},
+	"Torgoth": {
+		"Faction": "Hegemony"
+		},
+	"Kralien": {
+		"Faction": "Hegemony"
+		},
+	"Arvonian": {
+		"Faction": "Hegemony"
+		},
+	"Skaraan": {
+		"Faction": "Hegemony"
+		},
+	"Pirate": {
+		"Faction": "Pirate"
+		},		
+	"Euphini": {
+		"Faction": "Pirate"
+		},		
+	"Skull": {
+		"Faction": "Pirate"
+		},
+	"Ximni": {
+		"Faction": "USFP"
+		},
+	"Hjorden": {
+		"Faction": "USFP"
+		}
+	},
+
+	
+	"skyboxes":[
 	"sky1.png",
 	"sky1-blue.png",
 	"sky1-ds9.png",
@@ -57,7 +100,8 @@
         "Homing",
         "Nuke",
         "EMP",
-        "Mine"
+        "Mine",
+		"Scorch"
     ],
     "teams": [
         "DamCon",
@@ -132,7 +176,7 @@
 				"Alerite": 5,
 				"Cabrite": 20,
 				"Ashfilum": 14,
-				"Denebite": 600,
+				"Denebite": 200,
 				"Aegirine": 5,
 				"Nuidinium": 5,
 				"Gredian": 5,
@@ -252,7 +296,7 @@
 				"Guidance System": 60
             },
             "teams": {
-                "DamCon": 8,
+                "DamCon": 3,
                 "Medics": 2,
 				"Combat Engineers": 2
             }
@@ -280,7 +324,7 @@
 				"Repair Materials": 83
             },
             "teams": {
-                "DamCon": 8,
+                "DamCon": 4,
                 "Medics": 2,
 				"Combat Engineers": 10
             }

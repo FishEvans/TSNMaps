@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isscar.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">Isscar</h2>
+        <h3 class="subheader">Alignment: Ximni</h3>
+        <img src="Images/Factions/Ximni.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"Fall Rise": {"type": "planet", "x": 74722.22222222225, "y": 57361.11111111113, "grid": "O15", "hidden": false}, "Renaera Portal": {"type": "jumpnode", "x": 148333.3333333333, "y": 46000.0, "grid": "O19", "hidden": false, "label": "Renaera Portal", "destinations": {"Portal of Renewal": "Renaera"}}, "Isscar Portal Nexus": {"type": "jumpnode", "x": -70578.70370370372, "y": 82268.51851851853, "grid": "Q08", "hidden": false, "label": "Isscar Portal Nexus", "destinations": {"Banner Portal": "Tjorath", "Gateforge Portal": "Fymla", "Hoprate Portal": "Memoras", "Portal Of Plenty": "Chawaras"}}, "DS 47": {"type": "station", "x": 64537.03703703704, "y": 84675.92592592597, "grid": "Q15", "hidden": false, "label": "DS 47", "hull": "defense_platform_fighter", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Fighter Platform", "hullImage": "Images/Ships/TSN Mod/USFP/DefensePlatFighter256.png", "hullDescription": ""}, "DS 60": {"type": "station", "x": 64537.03703703704, "y": 27962.962962962996, "grid": "N15", "hidden": false, "label": "DS 60", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "DS 74": {"type": "station", "x": -63356.4814814815, "y": -112083.33333333333, "grid": "G08", "hidden": false, "label": "DS 74", "hull": "hegemony_drydock", "facilities": [], "sides": ["Hegemony"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": ""}, "Electrophyer 6 4": {"type": "station", "x": -43101.85185185187, "y": 103194.4444444445, "grid": "R09", "hidden": false, "label": "Electrophyer 6 4", "hull": "hegemony_generator", "facilities": ["Refuel", "Docking"], "sides": ["Hegemony"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "Electrophyer 5 3": {"type": "station", "x": -85347.22222222225, "y": 51111.111111111146, "grid": "O07", "hidden": false, "label": "Electrophyer 5 3", "hull": "hegemony_generator", "facilities": ["Docking", "Refuel"], "sides": ["Hegemony"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "Electrophyer 4 4": {"type": "station", "x": -44837.96296296298, "y": 59212.962962963, "grid": "O09", "hidden": false, "label": "Electrophyer 4 4", "hull": "hegemony_generator", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "Electrophyer 3 5": {"type": "station", "x": -99814.81481481485, "y": 102037.03703703708, "grid": "R07", "hidden": false, "label": "Electrophyer 3 5", "hull": "hegemony_generator", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 21": {"type": "station", "x": 35833.333333333336, "y": -144166.6666666667, "grid": "E13", "hidden": false, "label": "DS 21", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "DS 12": {"type": "station", "x": 65000.00000000001, "y": -144166.6666666667, "grid": "E15", "hidden": false, "label": "DS 12", "hull": "starbase_industry", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 48": {"type": "station", "x": 41666.66666666667, "y": -178333.33333333334, "grid": "D14", "hidden": false, "label": "DS 48", "hull": "starbase_industry", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 11": {"type": "station", "x": 33333.333333333336, "y": -59166.66666666667, "grid": "J13", "hidden": false, "label": "DS 11", "hull": "starbase_science", "facilities": [], "sides": ["USFP"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": ""}, "Tat 2 Eni": {"type": "station", "x": -139641.20370370374, "y": -1805.5555555555147, "grid": "L05", "hidden": false, "label": "Tat 2 Eni", "description": "Comand HQ for the Ximmni High command", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "Electrophyer 13": {"type": "station", "x": 129351.85185185187, "y": 61527.77777777782, "grid": "P18", "hidden": false, "label": "Electrophyer 13", "hull": "hegemony_generator", "facilities": ["Refuel", "Docking"], "sides": ["Hegemony"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [74722.22222222225], "y": [57361.11111111113], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Fall Rise"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Fall Rise [O15]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-174886.23250771078, -67386.23250771078, -80947.10082562259, -188447.1008256226, -174886.23250771078], "y": [62649.78145793855, 161816.44812460523, 176516.88520872814, 77350.21854206144, 62649.78145793855], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-11414.562258433813, -75581.22892510048, -271085.4377415662, -206918.77107489953, -11414.562258433813], "y": [-197249.5461080282, 100250.45389197179, 58082.879441361525, -239417.12055863847, -197249.5461080282], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [96582.61034704912, 44915.94368038245, 35084.056319617564, 86750.72298628425, 96582.61034704912], "y": [-125458.4235757035, -96291.75690903682, -113708.24309096318, -142874.90975762985, -125458.4235757035], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [4571.482702903652, 51238.149369570325, 45428.51729709635, -1238.1493695703239, 4571.482702903652], "y": [-140402.13909976106, -126235.47243309437, -107097.86090023894, -121264.52756690563, -140402.13909976106], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [32209.198215304874, 17209.19821530487, -2209.1982153048702, 12790.801784695133, 32209.198215304874], "y": [-186772.61779166, -125939.28445832664, -130727.38220834002, -191560.71554167336, -186772.61779166], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [69606.47782623673, 11273.144492903404, 27060.18884042993, 85393.52217376327, 69606.47782623673], "y": [-104693.92719818414, -179693.92719818413, -191972.73946848256, -116972.73946848254, -104693.92719818414], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-39288.60881883661, 97378.05784783007, 97621.94215216996, -39044.72451449673, -39288.60881883661], "y": [-104165.9231446016, -105832.58981126829, -85834.0768553984, -84167.41018873171, -104165.9231446016], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [151670.0234980309, 73336.69016469755, 86663.30983530245, 164996.64316863578, 151670.0234980309], "y": [-13376.772327161554, -83376.77232716155, -98289.89433950513, -28289.894339505132, -13376.772327161554], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [112904.40114519882, 98737.73447853213, 84595.59885480118, 98762.26552146787, 112904.40114519882], "y": [161237.73447853216, 175404.4011451988, 161262.26552146784, 147095.5988548012, 161237.73447853216], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [145217.56965354749, 111050.9029868808, 102282.43034645251, 136449.0970131192, 145217.56965354749], "y": [151487.684456439, 168154.35112310568, 150178.9822102277, 133512.315543561, 151487.684456439], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [37678.39768764019, 86845.06435430686, 84821.60231235983, 35654.93564569316, 37678.39768764019], "y": [144217.97829376045, 149217.97829376045, 169115.35503957293, 164115.35503957293, 144217.97829376045], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [136621.67869855446, 66621.67869855446, 58378.32130144553, 128378.32130144554, 136621.67869855446], "y": [134111.07922838355, 165777.74589505023, 147555.58743828314, 115888.92077161644, 134111.07922838355], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [149244.87060603482, 47578.20393936818, 54088.46272729851, 155755.12939396518, 149244.87060603482], "y": [201122.04252532742, 166122.04252532742, 147211.29080800596, 182211.29080800596, 201122.04252532742], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [171440.24547074834, 153940.24547074834, 134393.08786258503, 151893.08786258503, 171440.24547074834], "y": [115449.26276514481, 196282.59609847819, 192050.7372348552, 111217.40390152184, 115449.26276514481], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [69203.04122881716, -35796.95877118285, -37536.37456215049, 67463.62543784952, 69203.04122881716], "y": [166628.77528766321, 175795.44195432984, 155871.22471233679, 146704.55804567016, 166628.77528766321], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [148333.3333333333], "y": [46000.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Renaera Portal [O19]"], "hoverinfo": "text", "text": ["Renaera Portal"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-70578.70370370372], "y": [82268.51851851853], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Isscar Portal Nexus [Q08]"], "hoverinfo": "text", "text": ["Isscar Portal Nexus"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [64537.03703703704], "y": [84675.92592592597], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 47 [Q15]"], "hoverinfo": "text", "text": ["DS 47"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [64537.03703703704], "y": [27962.962962962996], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 60 [N15]"], "hoverinfo": "text", "text": ["DS 60"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-63356.4814814815], "y": [-112083.33333333333], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 74 [G08]"], "hoverinfo": "text", "text": ["DS 74"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-43101.85185185187], "y": [103194.4444444445], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Electrophyer 6 4 [R09]"], "hoverinfo": "text", "text": ["Electrophyer 6 4"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-85347.22222222225], "y": [51111.111111111146], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Electrophyer 5 3 [O07]"], "hoverinfo": "text", "text": ["Electrophyer 5 3"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-44837.96296296298], "y": [59212.962962963], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Electrophyer 4 4 [O09]"], "hoverinfo": "text", "text": ["Electrophyer 4 4"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-99814.81481481485], "y": [102037.03703703708], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Electrophyer 3 5 [R07]"], "hoverinfo": "text", "text": ["Electrophyer 3 5"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [35833.333333333336], "y": [-144166.6666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 21 [E13]"], "hoverinfo": "text", "text": ["DS 21"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [65000.00000000001], "y": [-144166.6666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 12 [E15]"], "hoverinfo": "text", "text": ["DS 12"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [41666.66666666667], "y": [-178333.33333333334], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 48 [D14]"], "hoverinfo": "text", "text": ["DS 48"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [33333.333333333336], "y": [-59166.66666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 11 [J13]"], "hoverinfo": "text", "text": ["DS 11"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-139641.20370370374], "y": [-1805.5555555555147], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Tat 2 Eni [L05]"], "hoverinfo": "text", "text": ["Tat 2 Eni"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [129351.85185185187], "y": [61527.77777777782], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Electrophyer 13 [P18]"], "hoverinfo": "text", "text": ["Electrophyer 13"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Isscar", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Isscar';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+        }
+    });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('Isscar Portal Nexus',function(){highlight('Isscar Portal Nexus');},false,null,false)
+    addButton('Renaera Portal',function(){highlight('Renaera Portal');},false,null,false)
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+    addButton('--- Planets ---', null, true, null);
+    addButton('Fall Rise',function(){highlight('Fall Rise');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('DS 11',function(){highlight('DS 11');},false,'blue',false)
+    addButton('DS 12',function(){highlight('DS 12');},false,'blue',false)
+    addButton('DS 21',function(){highlight('DS 21');},false,'blue',false)
+    addButton('DS 47',function(){highlight('DS 47');},false,'blue',false)
+    addButton('DS 48',function(){highlight('DS 48');},false,'blue',false)
+    addButton('DS 60',function(){highlight('DS 60');},false,'blue',false)
+    addButton('DS 74',function(){highlight('DS 74');},false,'red',false)
+    addButton('Electrophyer 13',function(){highlight('Electrophyer 13');},false,'red',false)
+    addButton('Electrophyer 3 5',function(){highlight('Electrophyer 3 5');},false,'red',false)
+    addButton('Electrophyer 4 4',function(){highlight('Electrophyer 4 4');},false,'red',false)
+    addButton('Electrophyer 5 3',function(){highlight('Electrophyer 5 3');},false,'red',false)
+    addButton('Electrophyer 6 4',function(){highlight('Electrophyer 6 4');},false,'red',false)
+    addButton('Tat 2 Eni',function(){highlight('Tat 2 Eni');},false,'red',false)
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

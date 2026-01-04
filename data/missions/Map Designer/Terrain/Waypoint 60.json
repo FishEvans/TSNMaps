@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -27775.312379058883,
-        0.0,
-        4086.125218494776
+        -27162.154021333372,
+        0,
+        9158.617086951372
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -45,7 +45,8 @@
             "type": "jumpnode",
             "jumppointtype": "Node",
             "destinations": {
-                "Waypoint 60 Gate": "Atlantis"
+                "Waypoint 60 Gate": "Atlantis",
+                "Waypoint 60": "Krisenda"
             },
             "state": "Tethered",
             "drift": 0
@@ -68,15 +69,20 @@
             ],
             "cargo": {
                 "Repair Materials": 16,
-                "Medical Supplies": 30,
+                "Medical Supplies": 10,
                 "Iso B Circuit": 25,
                 "Container": 25,
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
                 "Aid Package": 16,
-                "Guidance System": 4,
-                "Torpedo Casing": 4
+                "Pets": 4,
+                "Torpedo Casing": 14,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5,
+                "Homing": 30
             },
             "teams": {
                 "Diplomats": 1
@@ -99,8 +105,8 @@
                 "Refuel"
             ],
             "cargo": {
-                "High Yield Warhead": 3,
-                "Warhead": 13,
+                "High Yield Warhead": 7,
+                "Warhead": 133,
                 "Life Support": 3,
                 "Micro Controller": 25,
                 "Medical Supplies": 25,
@@ -109,13 +115,13 @@
                 "Receiver": 6,
                 "Analysis Suite": 8,
                 "Sensor Suite": 8,
-                "Guidance System": 15,
+                "Guidance System": 26,
                 "Wild Animals": 15,
                 "Pets": 4,
                 "Casing": 15,
                 "EMP": 10,
                 "Homing": 35,
-                "Coolant": 15,
+                "Coolant": 11,
                 "Tea": 12,
                 "Coffee": 15,
                 "Alcohol": 16
@@ -166,26 +172,27 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [
-                "Docking",
-                "Refuel"
+                "Docking"
             ],
             "cargo": {
                 "Repair Materials": 16,
                 "Medical Supplies": 30,
-                "Iso B Circuit": 25,
+                "Iso B Circuit": 12,
                 "Container": 25,
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
                 "Aid Package": 16,
-                "Alcohol": 5,
+                "Alcohol": 12,
                 "Torpedo Casing": 8,
-                "Casing": 5
+                "Casing": 9,
+                "Tea": 10,
+                "Coffee": 15
             },
             "teams": {
                 "Diplomats": 1
             },
-            "description": ""
+            "description": "Rest Stop for the weary, has some luxuray facilites and a number of resturants for all price points."
         },
         "IMO 31": {
             "coordinate": [
@@ -199,27 +206,28 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [
-                "Docking",
-                "Refuel"
+                "Docking"
             ],
             "cargo": {
-                "Iron": 60,
+                "Iron": 750,
                 "Tharium": 60,
                 "Reisium": 60,
                 "Alerite": 54,
-                "Cabrite": 35,
-                "Ashfilum": 58,
+                "Cabrite": 815,
+                "Ashfilum": 258,
                 "Denebite": 30,
                 "Aegirine": 151,
                 "Nuidinium": 159,
-                "Gredian": 10,
-                "Warhead": 10,
+                "Gredian": 180,
+                "Warhead": 24,
                 "Life Support": 1,
                 "Micro Controller": 8,
                 "Power Relay": 16,
                 "Casing": 15,
                 "Homing": 35,
-                "Torpedo Casing": 10
+                "Torpedo Casing": 10,
+                "High Yield Warhead": 4,
+                "EMP": 4
             },
             "teams": {
                 "DamCon": 1,
@@ -236,19 +244,19 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_industry",
             "type": "station",
             "facilities": [
                 "Docking",
                 "Refuel"
             ],
             "cargo": {
-                "Iron": 750,
+                "Iron": 40,
                 "Tharium": 60,
                 "Reisium": 60,
                 "Alerite": 54,
-                "Cabrite": 815,
-                "Ashfilum": 258,
+                "Cabrite": 40,
+                "Ashfilum": 12,
                 "Denebite": 30,
                 "Aegirine": 151,
                 "Nuidinium": 159,
@@ -259,7 +267,9 @@
                 "Power Relay": 16,
                 "Casing": 15,
                 "Homing": 35,
-                "Torpedo Casing": 10
+                "Torpedo Casing": 10,
+                "High Yield Warhead": 4,
+                "Guidance System": 2
             },
             "teams": {
                 "DamCon": 1,
@@ -298,7 +308,8 @@
             ],
             "cargo": {
                 "Denebite": 65,
-                "Guidance System": 5
+                "Guidance System": 8,
+                "Sensor Relay": 2
             },
             "teams": {},
             "description": ""

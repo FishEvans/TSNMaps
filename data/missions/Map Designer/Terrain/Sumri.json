@@ -1,21 +1,1790 @@
 {
     "systemMapCoord": [
-        13424.614492918941,
+        13424.614492918936,
         0,
         -5285.460327982949
     ],
-    "systemalignment": "Unknown",
+    "systemalignment": "League Of Traders",
     "metadata": {
-        "sysdescription": "",
+        "sysdescription": "Sumri is a system under the League Of Traders Democray",
         "security": "Neutral",
-        "exports": [],
-        "focus": "",
-        "intel": {},
+        "exports": [
+            "Mining"
+        ],
+        "focus": "Industry",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": [
+                "Shipyard",
+                "Listening Post"
+            ]
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "Sumri Administration": {
+            "coordinate": [
+                -66480.9485882488,
+                0,
+                -5208.046553497988
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Ingarda Market": {
+            "coordinate": [
+                45536.79832533146,
+                0,
+                -50501.2564300412
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Tubilt Works": {
+            "coordinate": [
+                -1685.423896890765,
+                0,
+                61998.74356995882
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 73": {
+            "coordinate": [
+                -1960.0129497853943,
+                0,
+                68119.06611193666
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 6": {
+            "coordinate": [
+                -70366.29888723251,
+                0,
+                -10535.025557429033
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 35": {
+            "coordinate": [
+                49611.543766485185,
+                0,
+                -55760.928796291
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Acmen Mining": {
+            "coordinate": [
+                -27414.178245345734,
+                0,
+                -79091.2193453778
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 45": {
+            "coordinate": [
+                -28809.586481514,
+                0,
+                -83835.60734834992
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Ashu Ores": {
+            "coordinate": [
+                65164.40816964439,
+                0,
+                52692.1616481181
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 9": {
+            "coordinate": [
+                67973.48278352438,
+                0,
+                56769.72560718179
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "G'Torin Gate": {
+            "coordinate": [
+                -177078.09383906878,
+                0,
+                170047.8871335625
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Tilminra Gate": {
+            "coordinate": [
+                132227.4617164868,
+                0,
+                125464.55380022919
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Sumri Gate": "Tilminra"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Eulis Gate": {
+            "coordinate": [
+                -109811.42717240212,
+                0,
+                -116485.44619977083
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Sumri Gate": "Eulis"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Ibroan Gate": {
+            "coordinate": [
+                173388.57282759785,
+                0,
+                -172885.4461997708
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Sumri Gate": "Ibroan"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Yonk Mining": {
+            "coordinate": [
+                -114235.50124647621,
+                0,
+                174150.66491134037
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Rei Shops": {
+            "coordinate": [
+                -136804.94569092066,
+                0,
+                197298.81305948852
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Lyn Markets": {
+            "coordinate": [
+                -96295.6864316614,
+                0,
+                130169.18342985888
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Chelle Denabite": {
+            "coordinate": [
+                -127545.6864316614,
+                0,
+                155632.14639282183
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Scarsalt Ores": {
+            "coordinate": [
+                -139698.46420943917,
+                0,
+                135377.51676319222
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Paragon Mills": {
+            "coordinate": [
+                2083.943197968255,
+                0,
+                157368.25750393295
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Czarin Denabite": {
+            "coordinate": [
+                -10068.834579809525,
+                0,
+                185724.73898541444
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Fiyah Ores": {
+            "coordinate": [
+                5556.165420190478,
+                0,
+                177622.8871335626
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Nyama Minerals": {
+            "coordinate": [
+                17708.943197968256,
+                0,
+                200192.33157800703
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Usi Ax": {
+            "coordinate": [
+                84838.57282759789,
+                0,
+                131326.5908372663
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Kadumi Mining": {
+            "coordinate": [
+                110301.53579056087,
+                0,
+                166048.81305948852
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Ushu Denabite": {
+            "coordinate": [
+                108565.42467944976,
+                0,
+                148687.7019483774
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Holyard Respite": {
+            "coordinate": [
+                123611.72097574607,
+                0,
+                9220.10935578478
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Yiari Gemstones": {
+            "coordinate": [
+                197685.79504982012,
+                0,
+                88502.5167631922
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Banjul Works": {
+            "coordinate": [
+                224884.86912389423,
+                0,
+                69983.99824467368
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Quan Excavations": {
+            "coordinate": [
+                198843.20245722754,
+                0,
+                53780.294540969975
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Dujum Denabite": {
+            "coordinate": [
+                167593.20245722754,
+                0,
+                71720.10935578479
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Fluzor Denabite": {
+            "coordinate": [
+                179745.98023500532,
+                0,
+                -13928.038792363372
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Cliowa Smithy": {
+            "coordinate": [
+                155440.42467944976,
+                0,
+                -30710.44619977078
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Grepna Ores": {
+            "coordinate": [
+                182060.79504982012,
+                0,
+                -42284.52027384486
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 71": {
+            "coordinate": [
+                106221.13884268707,
+                0,
+                -118274.21077453073
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 22": {
+            "coordinate": [
+                117607.67004982014,
+                0,
+                -107892.37349743882
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 1": {
+            "coordinate": [
+                174135.14775901075,
+                0,
+                -164543.05436735193
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 91": {
+            "coordinate": [
+                166320.86163646847,
+                0,
+                -176264.48355116538
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 77": {
+            "coordinate": [
+                178321.37246751555,
+                0,
+                -177101.72849286633
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_torp",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "QRF 67": {
+            "coordinate": [
+                160181.0653973281,
+                0,
+                -162589.48283671634
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_fighter",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 58": {
+            "coordinate": [
+                172252.70747426167,
+                0,
+                -171705.6395422846
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Orvag Mining": {
+            "coordinate": [
+                75410.06964393775,
+                0,
+                -166560.93437952537
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Xar Production": {
+            "coordinate": [
+                61521.18075504886,
+                0,
+                -144338.71215730315
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kaolus Elements": {
+            "coordinate": [
+                58743.40297727108,
+                0,
+                -181144.2677128587
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Sandur Denabite": {
+            "coordinate": [
+                -50978.819244951155,
+                0,
+                -166560.93437952537
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Mikos Denabite": {
+            "coordinate": [
+                -36395.48591161782,
+                0,
+                -184616.48993508093
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Jedna Denabite": {
+            "coordinate": [
+                -25978.81924495115,
+                0,
+                -201283.15660174759
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Deleno Ores": {
+            "coordinate": [
+                -162784.37480050672,
+                0,
+                -118644.2677128587
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Bujum": {
+            "coordinate": [
+                -134312.1525782845,
+                0,
+                -89477.60104619202
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Maury Polytech": {
+            "coordinate": [
+                62910.06964393774,
+                0,
+                7744.621176030207
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 87": {
+            "coordinate": [
+                63056.31244018954,
+                0,
+                6162.835302762313
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "defense_platform_beam",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Conakry Foundry": {
+            "coordinate": [
+                -161751.6532150361,
+                0,
+                9564.601350735835
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Maseru Metals": {
+            "coordinate": [
+                -185577.57914096207,
+                0,
+                25626.63838777283
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Purity Denabite": {
+            "coordinate": [
+                -192522.0235854065,
+                0,
+                -1572.435686301248
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Niyamo Ores": {
+            "coordinate": [
+                -217406.28284466578,
+                0,
+                15788.675424809866
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Juba Residences": {
+            "coordinate": [
+                -133494.24580762873,
+                0,
+                -9674.287538153101
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Okalpa Minerals": {
+            "coordinate": [
+                -198331.23654836946,
+                0,
+                -17314.318402350673
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Pakku Est": {
+            "coordinate": [
+                112037.64690167198,
+                0,
+                -113465.07582940042
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        },
+        "Lon Na": {
+            "coordinate": [
+                -23895.48591161782,
+                0,
+                -151283.15660174759
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Marr Toc Mines": {
+            "coordinate": [
+                -175284.37480050672,
+                0,
+                -96422.04549063648
+            ],
+            "sides": [
+                "League Of Traders"
+            ],
+            "hull": "",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {}
+        }
+    },
     "sensor_relay": {},
-    "terrain": {},
+    "terrain": {
+        "Planet Sumri": {
+            "type": "planet",
+            "name": "Planet Sumri",
+            "coordinate": [
+                155.47379679579115,
+                0,
+                -135.79332845150574
+            ]
+        },
+        "1766375907219": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -11407.646119112987,
+                0,
+                82137.6324588477
+            ],
+            "end": [
+                -42657.64611911299,
+                0,
+                75193.18801440326
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375911855": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -39069.68315615003,
+                0,
+                75887.63245884773
+            ],
+            "end": [
+                -69740.97945244634,
+                0,
+                51003.37319958846
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375918771": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -63375.23871170559,
+                0,
+                59105.22505144031
+            ],
+            "end": [
+                -81893.75723022412,
+                0,
+                31906.150977366233
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375924219": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -79000.23871170559,
+                0,
+                40008.00282921809
+            ],
+            "end": [
+                -87296.06347165072,
+                0,
+                4482.9160435083195
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375951315": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                9425.687214220347,
+                0,
+                81443.18801440326
+            ],
+            "end": [
+                39981.242769775905,
+                0,
+                75887.6324588477
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375957427": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                35120.131658664795,
+                0,
+                76582.07690329215
+            ],
+            "end": [
+                61509.020547553686,
+                0,
+                57832.076903292145
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375962803": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                56647.90943644258,
+                0,
+                61998.74356995882
+            ],
+            "end": [
+                78870.1316586648,
+                0,
+                35609.85468106992
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375968323": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                77481.24276977591,
+                0,
+                38387.6324588477
+            ],
+            "end": [
+                86509.0205475537,
+                0,
+                7137.632458847697
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766375993763": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                86509.0205475537,
+                0,
+                11304.299125514364
+            ],
+            "end": [
+                87897.90943644257,
+                0,
+                -13695.700874485638
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376002271": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                89286.79832533146,
+                0,
+                -8834.589763374526
+            ],
+            "end": [
+                77481.24276977591,
+                0,
+                -44945.70087448564
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376011907": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                81647.90943644257,
+                0,
+                -40084.589763374526
+            ],
+            "end": [
+                65675.68721422035,
+                0,
+                -61612.36754115231
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376017355": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                52481.242769775905,
+                0,
+                -72029.03420781897
+            ],
+            "end": [
+                33036.79832533146,
+                0,
+                -81056.81198559675
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376024379": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                39286.79832533146,
+                0,
+                -78973.47865226342
+            ],
+            "end": [
+                6647.909436442569,
+                0,
+                -85917.92309670786
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376042571": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                10120.131658664792,
+                0,
+                -85917.92309670786
+            ],
+            "end": [
+                -22518.7572302241,
+                0,
+                -82445.70087448564
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376057211": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -16963.201674668544,
+                0,
+                -83140.1453189301
+            ],
+            "end": [
+                -51685.42389689077,
+                0,
+                -67862.36754115231
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376063571": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -48213.20167466855,
+                0,
+                -69945.70087448564
+            ],
+            "end": [
+                -74602.09056355743,
+                0,
+                -48417.92309670786
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376068523": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -70435.42389689077,
+                0,
+                -51195.70087448564
+            ],
+            "end": [
+                -83161.94434032019,
+                0,
+                -21344.922399590825
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376248395": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -64163.751896332935,
+                0,
+                71864.60942196843
+            ],
+            "end": [
+                5015.37892880805,
+                0,
+                94213.46773243939
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376258871": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -8008.431275429114,
+                0,
+                93748.33165371662
+            ],
+            "end": [
+                50594.62144614538,
+                0,
+                79357.39348689752
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376269431": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                42396.31897700958,
+                0,
+                83215.41817825554
+            ],
+            "end": [
+                80494.31280417008,
+                0,
+                50422.20830171233
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376296791": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                75488.70437938724,
+                0,
+                56593.261685342906
+            ],
+            "end": [
+                93070.84815510742,
+                0,
+                19475.402603266994
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376308783": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                91954.5215661728,
+                0,
+                26173.362136874675
+            ],
+            "end": [
+                93908.09309680837,
+                0,
+                -14293.476712005078
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376318935": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                94577.88905016915,
+                0,
+                -7305.272265274385
+            ],
+            "end": [
+                78100.90859749426,
+                0,
+                -59147.47905539785
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376345719": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                81315.92917362593,
+                0,
+                -53119.315475150936
+            ],
+            "end": [
+                47156.33555222676,
+                0,
+                -82858.25580436905
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376368035": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                58007.029996671205,
+                0,
+                -80848.86794428674
+            ],
+            "end": [
+                2949.8026304160503,
+                0,
+                -92503.31753276411
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376383087": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                12594.864358811114,
+                0,
+                -92905.19510478058
+            ],
+            "end": [
+                -44471.750867526345,
+                0,
+                -81652.62308831967
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376404047": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -36032.321855180664,
+                0,
+                -84867.64366445135
+            ],
+            "end": [
+                -79435.09963295844,
+                0,
+                -49502.41732700279
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376414519": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -77827.5893448926,
+                0,
+                -57941.84633934846
+            ],
+            "end": [
+                -93902.69222555104,
+                0,
+                5554.810039252367
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376430247": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -97117.71280168273,
+                0,
+                -2080.863829060392
+            ],
+            "end": [
+                -81444.48749304075,
+                0,
+                48957.58781703015
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376439647": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -86668.89592925475,
+                0,
+                40116.28123266801
+            ],
+            "end": [
+                -53714.935023904945,
+                0,
+                75481.50757011658
+            ],
+            "density": 125,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1766376616727": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -2859.16050573544,
+                0,
+                197190.2871335625
+            ],
+            "end": [
+                85415.49145836427,
+                0,
+                180405.65608297312
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376633323": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                73415.49145836427,
+                0,
+                186405.65608297312
+            ],
+            "end": [
+                153415.49145836427,
+                0,
+                129405.6560829731
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376652502": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                146415.49145836427,
+                0,
+                137405.65608297312
+            ],
+            "end": [
+                191415.49145836427,
+                0,
+                63405.65608297311
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376669160": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                183415.49145836427,
+                0,
+                77405.6560829731
+            ],
+            "end": [
+                199415.49145836427,
+                0,
+                2405.6560829731097
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376702543": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                185540.83949426454,
+                0,
+                -78809.71286643748
+            ],
+            "end": [
+                202415.49145836427,
+                0,
+                13405.65608297311
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376735586": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                187940.83949426454,
+                0,
+                -70409.71286643748
+            ],
+            "end": [
+                137540.83949426454,
+                0,
+                -142409.71286643748
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376749067": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                145940.83949426454,
+                0,
+                -134009.71286643748
+            ],
+            "end": [
+                79940.83949426455,
+                0,
+                -182009.71286643748
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376764075": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                91940.83949426455,
+                0,
+                -174809.71286643748
+            ],
+            "end": [
+                -5259.16050573544,
+                0,
+                -197609.71286643748
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376783578": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                10340.83949426456,
+                0,
+                -196409.71286643748
+            ],
+            "end": [
+                -97659.16050573543,
+                0,
+                -173609.71286643748
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376856102": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -152839.1605057354,
+                0,
+                -135296.37953310416
+            ],
+            "end": [
+                -185959.1605057354,
+                0,
+                -74816.37953310418
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376870627": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -85159.16050573542,
+                0,
+                -179936.37953310416
+            ],
+            "end": [
+                -160039.1605057354,
+                0,
+                -125216.37953310416
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376885163": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -183079.1605057354,
+                0,
+                -83456.37953310418
+            ],
+            "end": [
+                -202938.6902520732,
+                0,
+                12895.156906291346
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376899282": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -201799.1605057354,
+                0,
+                63.62046689582712
+            ],
+            "end": [
+                -180199.1605057354,
+                0,
+                83583.62046689582
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376916619": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -183079.1605057354,
+                0,
+                74943.62046689582
+            ],
+            "end": [
+                -136999.1605057354,
+                0,
+                146943.6204668958
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376929155": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -145639.1605057354,
+                0,
+                141183.6204668958
+            ],
+            "end": [
+                -86599.16050573542,
+                0,
+                185823.6204668958
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766376943611": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -105319.16050573542,
+                0,
+                175743.6204668958
+            ],
+            "end": [
+                8440.839494264583,
+                0,
+                197343.6204668958
+            ],
+            "density": 75,
+            "scatter": 30000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
     "traffic": {}
 }

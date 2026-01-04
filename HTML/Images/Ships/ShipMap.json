@@ -21,7 +21,8 @@
     "side": "USFP",
     "artfileroot": "tsn-big-base",
     "long_desc": "",
-    "roles": "station"
+    "roles": "station",
+    "BRange": 1100
   },
   {
     "key": "starbase_civil",
@@ -53,7 +54,17 @@
     "side": "Arvonian",
     "artfileroot": "arvonian_station",
     "long_desc": "",
-    "roles": "station,carrier"
+    "roles": "station,carrier",
+    "BRange": 1000
+  },
+  {
+    "key": "starbase_skaraan",
+    "name": "Skaraan Base",
+    "side": "Skaraan",
+    "artfileroot": "skaraan_station",
+    "long_desc": "",
+    "roles": "station",
+    "BRange": 1000
   },
   {
     "key": "starbase_torgoth",
@@ -61,7 +72,9 @@
     "side": "Torgoth",
     "artfileroot": "torgoth_station",
     "long_desc": "",
-    "roles": "station"
+    "roles": "station",
+    "BRange": 1500,
+    "DRange": 30
   },
   {
     "key": "starbase_kralien",
@@ -69,7 +82,8 @@
     "side": "Kralien",
     "artfileroot": "kralien_station",
     "long_desc": "",
-    "roles": "station"
+    "roles": "station",
+    "BRange": 1000
   },
   {
     "key": "monster_charbdis",
@@ -1453,7 +1467,8 @@
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/DefensePlatBeam",
     "long_desc": "",
-    "roles": "defense"
+    "roles": "platform,static,defense",
+    "BRange": 2500
   },
   {
     "key": "defense_platform_torp",
@@ -1461,7 +1476,9 @@
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/DefensePlatTorp",
     "long_desc": "",
-    "roles": "defense"
+    "roles": "platform,static,defense",
+    "BRange": 600,
+    "DRange": 20
   },
   {
     "key": "defense_platform_fighter",
@@ -1469,7 +1486,8 @@
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/DefensePlatFighter",
     "long_desc": "",
-    "roles": "defense"
+    "roles": "platform,static,defense",
+    "BRange": 600
   },
   {
     "key": "usfp_industrial_unit",
@@ -1477,7 +1495,7 @@
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/IndustrialUnit",
     "long_desc": "",
-    "roles": "industrial"
+    "roles": "platform,static,industrial"
   },
   {
     "key": "usfp_industrial_storage",
@@ -1485,23 +1503,23 @@
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/IndustrialStorage",
     "long_desc": "",
-    "roles": "industrial,platform"
+    "roles": "static,industrial"
   },
   {
     "key": "usfp_industrial_refinary",
-    "name": "Storage Module",
+    "name": "Refinary Unit",
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/IndustrialRefinary",
     "long_desc": "",
-    "roles": "industrial"
+    "roles": "platform,static,industrial"
   },
   {
     "key": "usfp_industrial_processor",
-    "name": "Storage Module",
+    "name": "Processor Unit",
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/IndustrialProcessor",
     "long_desc": "",
-    "roles": "industrial"
+    "roles": "platform,static,industrial"
   },
   {
     "key": "usfp_industrial_assembly",
@@ -1509,7 +1527,15 @@
     "side": "USFP",
     "artfileroot": "TSN Mod/USFP/IndustrialAssembler",
     "long_desc": "",
-    "roles": "industrial"
+    "roles": "platform,static,industrial"
+  },
+  {
+    "key": "usfp_shipyard",
+    "name": "Ship Yard",
+    "side": "USFP",
+    "artfileroot": "TSN Mod/USFP/ShipYard",
+    "long_desc": "",
+    "roles": "static,industrial"
   },
   {
     "key": "pirate_military_base",
@@ -1517,7 +1543,7 @@
     "side": "pirate",
     "artfileroot": "TSN Mod/Pirate/PirateBaseAst",
     "long_desc": "",
-    "roles": "pirate"
+    "roles": "static,pirate"
   },
   {
     "key": "pirate_cache_1",
@@ -1525,7 +1551,7 @@
     "side": "pirate",
     "artfileroot": "TSN Mod/Pirate/PirateCache",
     "long_desc": "",
-    "roles": "pirate"
+    "roles": "static,industrial,pirate"
   },
   {
     "key": "hegemony_generator",
@@ -1533,7 +1559,50 @@
     "side": "kralien",
     "artfileroot": "TSN Mod/Hegemony/HegGen",
     "long_desc": "",
-    "roles": "generator"
+    "roles": "static,industrial,generator",
+    "BRange": 600
+  },
+  {
+    "key": "arvonian_platform",
+    "name": "Platform",
+    "side": "arvonian",
+    "artfileroot": "TSN Mod/Hegemony/ArvonianPlatform",
+    "long_desc": "",
+    "roles": "static,defense"
+  },
+  {
+    "key": "hegemony_gasextractor",
+    "name": "Gas Extractor",
+    "side": "kralien",
+    "artfileroot": "TSN Mod/Hegemony/GasExtractor",
+    "long_desc": "",
+    "roles": "static,industrial"
+  },
+  {
+    "key": "hegemony_drydock",
+    "name": "Dry Dock",
+    "side": "kralien",
+    "artfileroot": "TSN Mod/Hegemony/HegDryDock",
+    "long_desc": "",
+    "roles": "static,industrial"
+  },
+  {
+    "key": "hegemony_fighter_platform",
+    "name": "Light Craft Base",
+    "side": "arvonian",
+    "artfileroot": "TSN Mod/Hegemony/ArvonianPlatform",
+    "long_desc": "",
+    "roles": "platform, static, defence, carrier",
+    "BRange": 1200
+  },
+  {
+    "key": "hegemony_beam_platform",
+    "name": "Beam Defense",
+    "side": "kralien",
+    "artfileroot": "TSN Mod/Hegemony/HegBeamPlatform",
+    "long_desc": "",
+    "roles": "platform, static, defence, beam",
+    "BRange": 2600
   },
   {
     "key": "arvonian_command",
@@ -1542,6 +1611,14 @@
     "artfileroot": "TSN Mod/Hegemony/AVCommand",
     "long_desc": "Arvonian Command and Control vessel^",
     "roles": "ship"
+  },
+  {
+    "key": "Arvo_Bomber",
+    "name": "Arvonian Fighter mk2",
+    "side": "Arvonian",
+    "artfileroot": "TSN Mod/Hegemony/AVBomber",
+    "long_desc": "Displacement: 0.015 kt. Armament: 2 light beams.",
+    "roles": "cockpit,fighter"
   },
   {
     "key": "torgoth_command",
@@ -1557,6 +1634,14 @@
     "side": "Kralien",
     "artfileroot": "kralien_cruiser",
     "long_desc": "Kralien Drone Cruiser",
+    "roles": "ship"
+  },
+  {
+    "key": "Hegemony_Transport",
+    "name": "Transport",
+    "side": "Hegemony",
+    "artfileroot": "TSN Mod/Hegemony/HegTransport",
+    "long_desc": "Hegemony Armored Transport",
     "roles": "ship"
   },
   {
@@ -1593,7 +1678,7 @@
   },
   {
     "key": "tsn_lion_class_supply",
-    "name": "Lion Supply Ship",
+    "name": "Lion Class Supply Ship",
     "side": "TSN",
     "artfileroot": "TSN Mod/TSN/LionClass",
     "long_desc": "Lion Class Supply Ship",
@@ -1601,10 +1686,106 @@
   },
   {
     "key": "tsn_nemesis_class_interceptor",
-    "name": "Lancer",
+    "name": "Nemesis Class Interceptor",
     "side": "TSN",
     "artfileroot": "TSN Mod/TSN/NemesisClass",
     "long_desc": "Nemesis Class Interceptor",
     "roles": "ship"
+  },
+  {
+    "key": "Debris1",
+    "name": "Debris1",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris1",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris2",
+    "name": "Debris2",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris2",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris3",
+    "name": "Debris3",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris3",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris4",
+    "name": "Debris4",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris4",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris5",
+    "name": "Debris5",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris5",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris6",
+    "name": "Debris6",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris6",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris7",
+    "name": "Debris7",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris7",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris8",
+    "name": "Debris8",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris8",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris9",
+    "name": "Debris9",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris9",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "Debris10",
+    "name": "Debris10",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/SpaceJunk/Debris10",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "EarthLike",
+    "name": "EarthLike",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/Planets/Earthlike",
+    "long_desc": "",
+    "roles": []
+  },
+  {
+    "key": "RingPlanet",
+    "name": "RingPlanet",
+    "side": "unknown",
+    "artfileroot": "TSN Mod/Planets/Ring",
+    "long_desc": "",
+    "roles": []
   }
 ]

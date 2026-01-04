@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keltor.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
+        #plot { flex: 3; min-width: 400px; }
+        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">Keltor</h2>
+        <h3 class="subheader">Alignment: USFP</h3>
+        <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Select an object
+    </div>
+<script>
+    var objData = {"Planet Keltor II": {"type": "planet", "x": 5697.113101123724, "y": 171497.62543819167, "grid": "U12", "hidden": false}, "Tibur Gate": {"type": "jumpnode", "x": 148888.88888888888, "y": 96527.77777777778, "grid": "Q19", "hidden": false, "label": "Tibur Gate", "destinations": {"Keltor Gate": "Tibur"}}, "Kratos Gate": {"type": "jumpnode", "x": -222333.3333333334, "y": 188138.88888888893, "grid": "V00", "hidden": false, "label": "Kratos Gate", "destinations": {"Keltor Gate": "Kratos"}}, "Toray Gate": {"type": "jumpnode", "x": -115446.75925925924, "y": -160251.54320987655, "grid": "D06", "hidden": false, "label": "Toray Gate", "destinations": {"Keltor Gate": "Toray"}}, "Keltor Command": {"type": "station", "x": -28885.562318344746, "y": 32904.02968429821, "grid": "N10", "hidden": false, "label": "Keltor Command", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 93": {"type": "platform", "x": -33002.900663008666, "y": 27540.259202103352, "grid": "N10", "hidden": false, "label": "WP 93"}, "WP 35": {"type": "platform", "x": -24072.28795153175, "y": 38703.52509144949, "grid": "N10", "hidden": false, "label": "WP 35"}, "SY 23": {"type": "station", "x": -32498.635155223903, "y": 21050.8253407657, "grid": "N10", "hidden": false, "label": "SY 23", "hull": "usfp_shipyard", "facilities": [], "sides": ["USFP"], "hullName": "Ship Yard", "hullImage": "Images/Ships/TSN Mod/USFP/ShipYard256.png", "hullDescription": ""}, "Altan Nui": {"type": "station", "x": -22646.794598943303, "y": 44985.05547180257, "grid": "O10", "hidden": false, "label": "Altan Nui", "hull": "starbase_civil", "facilities": ["Refuel", "Docking"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Keltor Kommand": {"type": "station", "x": 1412.536273907042, "y": 145638.65873588197, "grid": "T12", "hidden": false, "label": "Keltor Kommand", "description": "Paranoid, but committed to the USFP", "hull": "starbase_command", "facilities": ["Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "Ika Ika Welcome": {"type": "station", "x": -186820.44348323855, "y": 167057.32194024936, "grid": "U02", "hidden": false, "label": "Ika Ika Welcome", "hull": "starbase_civil", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Sui Trades": {"type": "station", "x": 108422.35487067093, "y": 82729.38984148392, "grid": "Q17", "hidden": false, "label": "Sui Trades", "hull": "starbase_civil", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Tori Nui": {"type": "station", "x": -98119.55356554301, "y": -135652.2202408206, "grid": "F07", "hidden": false, "label": "Tori Nui", "hull": "starbase_civil", "facilities": ["Refuel", "Repair", "Docking"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "SR 46": {"type": "sensor_relay", "x": -165833.33333333334, "y": 140833.33333333334, "grid": "T03", "hidden": false, "label": "SR 46"}, "SR 55": {"type": "sensor_relay", "x": -136458.33333333334, "y": 117708.33333333334, "grid": "R05", "hidden": false, "label": "SR 55"}, "SR 92": {"type": "sensor_relay", "x": -107083.33333333334, "y": 94583.33333333334, "grid": "Q06", "hidden": false, "label": "SR 92"}, "SR 16": {"type": "sensor_relay", "x": -77708.33333333334, "y": 71458.33333333334, "grid": "P08", "hidden": false, "label": "SR 16"}, "SR 74": {"type": "sensor_relay", "x": -48333.33333333334, "y": 48333.33333333334, "grid": "O09", "hidden": false, "label": "SR 74"}, "SR 80": {"type": "sensor_relay", "x": 125416.6666666667, "y": 74166.66666666669, "grid": "P18", "hidden": false, "label": "SR 80"}, "SR 30": {"type": "sensor_relay", "x": 68611.11111111112, "y": 65277.77777777779, "grid": "P15", "hidden": false, "label": "SR 30"}, "SR 97": {"type": "sensor_relay", "x": 30555.555555555562, "y": 52222.22222222223, "grid": "O13", "hidden": false, "label": "SR 97"}, "SR 72": {"type": "sensor_relay", "x": -7500.0, "y": 39166.66666666667, "grid": "N11", "hidden": false, "label": "SR 72"}, "SR 51": {"type": "sensor_relay", "x": -154502.31481481483, "y": 166577.93209876545, "grid": "U04", "hidden": false, "label": "SR 51"}, "SR 66": {"type": "sensor_relay", "x": -110752.31481481483, "y": 156300.15432098767, "grid": "T06", "hidden": false, "label": "SR 66"}, "SR 13": {"type": "sensor_relay", "x": -67002.31481481483, "y": 146022.3765432099, "grid": "T08", "hidden": false, "label": "SR 13"}, "SR 37": {"type": "sensor_relay", "x": -23252.314814814832, "y": 135744.59876543214, "grid": "S10", "hidden": false, "label": "SR 37"}, "SR 52": {"type": "sensor_relay", "x": 20497.685185185168, "y": 125466.82098765436, "grid": "S13", "hidden": false, "label": "SR 52"}, "SR 61": {"type": "sensor_relay", "x": 64247.68518518517, "y": 115189.04320987657, "grid": "R15", "hidden": false, "label": "SR 61"}, "SR 43": {"type": "sensor_relay", "x": 107997.68518518517, "y": 104911.2654320988, "grid": "R17", "hidden": false, "label": "SR 43"}, "SR 48": {"type": "sensor_relay", "x": -200199.0288741849, "y": 132704.8785246115, "grid": "S01", "hidden": false, "label": "SR 48"}, "SR 14": {"type": "sensor_relay", "x": -188599.0288741849, "y": 94304.8785246115, "grid": "Q02", "hidden": false, "label": "SR 14"}, "SR 62": {"type": "sensor_relay", "x": -176999.0288741849, "y": 55904.8785246115, "grid": "O03", "hidden": false, "label": "SR 62"}, "SR 87": {"type": "sensor_relay", "x": -165399.0288741849, "y": 17504.8785246115, "grid": "M03", "hidden": false, "label": "SR 87"}, "SR 85": {"type": "sensor_relay", "x": -153799.02887418494, "y": -20895.1214753885, "grid": "K04", "hidden": false, "label": "SR 85"}, "SR 22": {"type": "sensor_relay", "x": -142199.0288741849, "y": -59295.1214753885, "grid": "J04", "hidden": false, "label": "SR 22"}, "SR 39": {"type": "sensor_relay", "x": -130599.02887418492, "y": -97695.1214753885, "grid": "H05", "hidden": false, "label": "SR 39"}, "SR 67": {"type": "sensor_relay", "x": -57399.02887418493, "y": -120495.12147538849, "grid": "F09", "hidden": false, "label": "SR 67"}, "SR 59": {"type": "sensor_relay", "x": -30999.02887418493, "y": -92495.12147538849, "grid": "H10", "hidden": false, "label": "SR 59"}, "SR 57": {"type": "sensor_relay", "x": -4599.028874184929, "y": -64495.121475388485, "grid": "I11", "hidden": false, "label": "SR 57"}, "SR 23": {"type": "sensor_relay", "x": 21800.97112581507, "y": -36495.121475388485, "grid": "K13", "hidden": false, "label": "SR 23"}, "SR 96": {"type": "sensor_relay", "x": 48200.97112581507, "y": -8495.121475388485, "grid": "L14", "hidden": false, "label": "SR 96"}, "SR 95": {"type": "sensor_relay", "x": 74600.97112581506, "y": 19504.878524611515, "grid": "M15", "hidden": false, "label": "SR 95"}, "SR 40": {"type": "sensor_relay", "x": 101000.97112581506, "y": 47504.878524611515, "grid": "O17", "hidden": false, "label": "SR 40"}, "SR 32": {"type": "sensor_relay", "x": -40858.13381245654, "y": 7946.0822283152065, "grid": "M09", "hidden": false, "label": "SR 32"}, "SR 60": {"type": "sensor_relay", "x": -55807.97949146888, "y": -27419.144109133355, "grid": "K09", "hidden": false, "label": "SR 60"}, "SR 24": {"type": "sensor_relay", "x": -70757.82517048123, "y": -62784.37044658192, "grid": "I08", "hidden": false, "label": "SR 24"}, "SR 68": {"type": "sensor_relay", "x": -85707.67084949357, "y": -98149.5967840305, "grid": "H07", "hidden": false, "label": "SR 68"}};
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+        document.getElementById('galactic-map-btn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            document.getElementById('galactic-map-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+                + infoHtml;
+         
+    }
+         document.getElementById('galactic-map-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [15301.951573901431, -168864.71509276525, -188074.3920383207, -3907.725371654, 15301.951573901431], "y": [-100959.65305367716, -126.31972034382125, -35211.76273660622, -136045.09606993955, -100959.65305367716], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [101432.59163473228, -14400.741698601068, -12538.365432484814, 103294.96790084853, 101432.59163473228], "y": [-98545.8245237253, -109379.15785705861, -129292.25793322474, -118458.92459989143, -98545.8245237253], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-242894.8024909723, -146228.13582430562, -145710.97130678027, -242377.63797344695, -242894.8024909723], "y": [-31833.47890337665, -33500.14557004332, -3504.6035535733918, -1837.9368869067202, -31833.47890337665], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [5697.113101123724], "y": [171497.62543819167], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Keltor II"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Keltor II [U12]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-135659.86736407652, -172326.53403074318, -146279.2397670094, -109612.57310034275, -135659.86736407652], "y": [192273.0428468775, 128106.37618021082, 113222.20802950583, 177388.8746961725, 192273.0428468775], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [61275.99579434037, 108775.99579434037, 90951.56374124043, 43451.56374124043, 61275.99579434037], "y": [38628.61073420343, 131961.94406753677, 141033.30680884657, 47699.973475513216, 38628.61073420343], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [75546.2856641946, 64712.952330861255, 45014.60720471952, 55847.94053805286, 75546.2856641946], "y": [-9272.114516944555, 52394.55214972212, 48934.03205999451, -12732.634606672156, -9272.114516944555], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-88916.67156648388, -212250.0048998172, -204416.6617668495, -81083.32843351617, -88916.67156648388], "y": [164201.06971173987, 111701.06971173987, 93298.93028826013, 145798.93028826013, 164201.06971173987], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [148888.88888888888], "y": [96527.77777777778], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Tibur Gate [Q19]"], "hoverinfo": "text", "text": ["Tibur Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-222333.3333333334], "y": [188138.88888888893], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Kratos Gate [V00]"], "hoverinfo": "text", "text": ["Kratos Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-115446.75925925924], "y": [-160251.54320987655], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Toray Gate [D06]"], "hoverinfo": "text", "text": ["Toray Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-28885.562318344746], "y": [32904.02968429821], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Keltor Command [N10]"], "hoverinfo": "text", "text": ["Keltor Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-33002.900663008666], "y": [27540.259202103352], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 93 [N10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-24072.28795153175], "y": [38703.52509144949], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 35 [N10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-32498.635155223903], "y": [21050.8253407657], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["SY 23 [N10]"], "hoverinfo": "text", "text": ["SY 23"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-22646.794598943303], "y": [44985.05547180257], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Altan Nui [O10]"], "hoverinfo": "text", "text": ["Altan Nui"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [1412.536273907042], "y": [145638.65873588197], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Keltor Kommand [T12]"], "hoverinfo": "text", "text": ["Keltor Kommand"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-186820.44348323855], "y": [167057.32194024936], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Ika Ika Welcome [U02]"], "hoverinfo": "text", "text": ["Ika Ika Welcome"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [108422.35487067093], "y": [82729.38984148392], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Sui Trades [Q17]"], "hoverinfo": "text", "text": ["Sui Trades"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-98119.55356554301], "y": [-135652.2202408206], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Tori Nui [F07]"], "hoverinfo": "text", "text": ["Tori Nui"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-165833.33333333334], "y": [140833.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 46 [T03]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-136458.33333333334], "y": [117708.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 55 [R05]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-107083.33333333334], "y": [94583.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 92 [Q06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-77708.33333333334], "y": [71458.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 16 [P08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-48333.33333333334], "y": [48333.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 74 [O09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [125416.6666666667], "y": [74166.66666666669], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 80 [P18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [68611.11111111112], "y": [65277.77777777779], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 30 [P15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [30555.555555555562], "y": [52222.22222222223], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 97 [O13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-7500.0], "y": [39166.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 72 [N11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-154502.31481481483], "y": [166577.93209876545], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 51 [U04]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-110752.31481481483], "y": [156300.15432098767], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 66 [T06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-67002.31481481483], "y": [146022.3765432099], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 13 [T08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-23252.314814814832], "y": [135744.59876543214], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 37 [S10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [20497.685185185168], "y": [125466.82098765436], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 52 [S13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [64247.68518518517], "y": [115189.04320987657], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 61 [R15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [107997.68518518517], "y": [104911.2654320988], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 43 [R17]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-200199.0288741849], "y": [132704.8785246115], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 48 [S01]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-188599.0288741849], "y": [94304.8785246115], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 14 [Q02]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-176999.0288741849], "y": [55904.8785246115], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 62 [O03]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-165399.0288741849], "y": [17504.8785246115], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 87 [M03]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-153799.02887418494], "y": [-20895.1214753885], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 85 [K04]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-142199.0288741849], "y": [-59295.1214753885], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 22 [J04]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-130599.02887418492], "y": [-97695.1214753885], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 39 [H05]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57399.02887418493], "y": [-120495.12147538849], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 67 [F09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-30999.02887418493], "y": [-92495.12147538849], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 59 [H10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-4599.028874184929], "y": [-64495.121475388485], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 57 [I11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [21800.97112581507], "y": [-36495.121475388485], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 23 [K13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [48200.97112581507], "y": [-8495.121475388485], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 96 [L14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [74600.97112581506], "y": [19504.878524611515], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 95 [M15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [101000.97112581506], "y": [47504.878524611515], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 40 [O17]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-40858.13381245654], "y": [7946.0822283152065], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 32 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-55807.97949146888], "y": [-27419.144109133355], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 60 [K09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-70757.82517048123], "y": [-62784.37044658192], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 24 [I08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-85707.67084949357], "y": [-98149.5967840305], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 68 [H07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Keltor", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'Keltor';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+        }
+    });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [3];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('Kratos Gate',function(){highlight('Kratos Gate');},false,null,false)
+    addButton('Tibur Gate',function(){highlight('Tibur Gate');},false,null,false)
+    addButton('Toray Gate',function(){highlight('Toray Gate');},false,null,false)
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Keltor II',function(){highlight('Planet Keltor II');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Altan Nui',function(){highlight('Altan Nui');},false,'blue',false)
+    addButton('Ika Ika Welcome',function(){highlight('Ika Ika Welcome');},false,'blue',false)
+    addButton('Keltor Command',function(){highlight('Keltor Command');},false,'blue',false)
+    addButton('Keltor Kommand',function(){highlight('Keltor Kommand');},false,'blue',false)
+    addButton('SY 23',function(){highlight('SY 23');},false,'blue',false)
+    addButton('Sui Trades',function(){highlight('Sui Trades');},false,'blue',false)
+    addButton('Tori Nui',function(){highlight('Tori Nui');},false,'blue',false)
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,20 +1,40 @@
 {
     "systemMapCoord": [
-        33692.63076473724,
+        33410.020503494634,
         0,
-        -28447.45563685366
+        -30143.11720430917
     ],
-    "systemalignment": "Arvonians",
+    "systemalignment": "Arvonian",
     "metadata": {
         "sysdescription": "",
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
-        "visible": true
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "Alpha Vector": {
+            "coordinate": [
+                65000.00000000001,
+                0,
+                13333.333333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "JP 15": "Alpha"
+            },
+            "state": "Tethered",
+            "drift": 0
+        }
+    },
     "sensor_relay": {},
     "terrain": {},
     "traffic": {}

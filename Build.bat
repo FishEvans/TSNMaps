@@ -7,7 +7,7 @@ if exist dist rmdir /s /q dist
 if exist StellarCartography.py.spec del /f /q StellarCartography.py.spec
 
 REM Run PyInstaller to create a windowed executable
-pyinstaller --name StellarCartography ^
+pyinstaller --onefile --name StellarCartography ^
     --add-data "HTML\Images;HTML\Images" ^
     --add-data "GalMapInfo.json;." ^
     --add-data "LocMapGen.py;." ^
@@ -15,11 +15,11 @@ pyinstaller --name StellarCartography ^
     StellarCartography.py
 
 
-pyinstaller --name LocMapGen LocMapGen.py
+pyinstaller  --onefile --name LocMapGen LocMapGen.py
 
-pyinstaller --name GalMapGen GalMapGen.py
+pyinstaller  --onefile --name GalMapGen GalMapGen.py
 
-pyinstaller --name SystemEditor SystemEditor.py
+pyinstaller  --onefile --name SystemEditor SystemEditor.py
 
 
 REM Pause to show build results

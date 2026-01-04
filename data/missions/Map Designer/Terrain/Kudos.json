@@ -1,20 +1,40 @@
 {
     "systemMapCoord": [
-        58672.624621227296,
+        66047.50592439494,
         0,
-        -16156.74792343213
+        -17078.608086328088
     ],
     "systemalignment": "Ximni",
     "metadata": {
-        "sysdescription": "",
-        "security": "Neutral",
+        "sysdescription": "Kudos is a newly claimed system that was recently discovered after the Freya Fracture Inident in 2245",
+        "security": "Low",
         "exports": [],
         "focus": "",
-        "intel": {},
-        "development": "Unclaimed",
-        "visible": true
+        "intel": {
+            "pirate": "Mid",
+            "enemy": "Mid",
+            "assets": []
+        },
+        "development": "Uninhabited",
+        "visible": true,
+        "skybox": "sky1.png"
     },
-    "objects": {},
+    "objects": {
+        "JP 56": {
+            "coordinate": [
+                -381485.35679999995,
+                0,
+                68096.88832000001
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Portal of Renewal": "Renaera"
+            },
+            "state": "Tethered",
+            "drift": 25000
+        }
+    },
     "sensor_relay": {},
     "terrain": {},
     "traffic": {}

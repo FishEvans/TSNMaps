@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -5285.6913575611525,
+        -2557.5950264770686,
         0,
-        23842.982468630024
+        30208.960988895262
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -65,9 +65,29 @@
             ],
             "hull": "starbase_command",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
+            "description": ""
         },
         "Marmonto Yards": {
             "coordinate": [
@@ -78,7 +98,7 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_civil",
+            "hull": "usfp_shipyard",
             "type": "station",
             "facilities": [
                 "Docking",
@@ -155,7 +175,9 @@
             ],
             "type": "jumppoint",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Rhea Gate": "Tethys"
+            },
             "state": "Untethered",
             "drift": 0,
             "hideonmap": true
@@ -415,7 +437,23 @@
                 "Refuel",
                 "Docking"
             ],
-            "cargo": {},
+            "cargo": {
+                "Iron": 6,
+                "Tharium": 5,
+                "Reisium": 5,
+                "Alerite": 5,
+                "Cabrite": 20,
+                "Ashfilum": 14,
+                "Denebite": 600,
+                "Aegirine": 5,
+                "Nuidinium": 5,
+                "Gredian": 5,
+                "Warhead": 4,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Homing": 35
+            },
             "teams": {},
             "description": ""
         },
@@ -490,9 +528,28 @@
             ],
             "hull": "starbase_industry",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
             "description": ""
         },
         "DS 70": {
@@ -506,9 +563,28 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Repair Materials": 16,
+                "Medical Supplies": 10,
+                "Iso B Circuit": 25,
+                "Container": 25,
+                "Life Support": 1,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Aid Package": 16,
+                "Pets": 4,
+                "Torpedo Casing": 5,
+                "Casing": 6,
+                "Coffee": 5,
+                "Tea": 5,
+                "Alcohol": 5
+            },
+            "teams": {
+                "Diplomats": 1
+            },
             "description": ""
         },
         "DS 61": {
@@ -522,7 +598,9 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Repair Materials": 16,
                 "Medical Supplies": 8,
@@ -555,7 +633,9 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Docking"
+            ],
             "cargo": {
                 "Repair Materials": 15,
                 "Medical Supplies": 12,
@@ -913,7 +993,9 @@
             ],
             "type": "jumppoint",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Unknown": "Unknown"
+            },
             "state": "Untethered",
             "drift": 50000,
             "hideonmap": true
@@ -932,6 +1014,49 @@
             "facilities": [],
             "cargo": {},
             "teams": {}
+        },
+        "Direct Warehousing": {
+            "coordinate": [
+                53138.81419454616,
+                0,
+                15972.27120568219
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "High Yield Warhead": 3,
+                "Warhead": 13,
+                "Life Support": 3,
+                "Micro Controller": 25,
+                "Medical Supplies": 25,
+                "Power Relay": 16,
+                "Transmitter": 8,
+                "Receiver": 6,
+                "Analysis Suite": 8,
+                "Sensor Suite": 8,
+                "Guidance System": 15,
+                "Wild Animals": 15,
+                "Pets": 4,
+                "Casing": 15,
+                "EMP": 10,
+                "Homing": 35,
+                "Coolant": 15,
+                "Tea": 12,
+                "Coffee": 15,
+                "Alcohol": 16
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": ""
         }
     },
     "traffic": {
@@ -1379,6 +1504,17 @@
             "composition": [
                 "Ast. Std Rand"
             ]
+        },
+        "1761410612002": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -129113.38647253448,
+                0,
+                -12652.440554347386
+            ],
+            "density": 30,
+            "scatter": 10000
         }
     },
     "sensor_relay": {

@@ -8,6 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+        }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
         #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
         #plot { flex: 3; min-width: 400px; }
         #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
@@ -36,7 +44,7 @@
         Select an object
     </div>
 <script>
-    var objData = {};
+    var objData = {"Planet Onwia": {"type": "planet", "x": -27500.000000000004, "y": 30833.333333333336, "grid": "N10", "hidden": false}, "Onwia Ship Fields": {"type": "station", "x": -66666.66666666667, "y": 45833.333333333336, "grid": "O08", "hidden": false, "label": "Onwia Ship Fields", "hull": "starbase_kralien", "facilities": [], "sides": ["Kraliens"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Ximni Factories": {"type": "station", "x": -3333.3333333333335, "y": 54166.66666666667, "grid": "O11", "hidden": false, "label": "Ximni Factories", "hull": "starbase_industry", "facilities": [], "sides": ["Kraliens"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "Ximni  Ores": {"type": "station", "x": 5833.333333333334, "y": -5000.0, "grid": "L12", "hidden": false, "label": "Ximni  Ores", "hull": "pirate_military_base", "facilities": [], "sides": ["Kraliens"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Grand Terminal": {"type": "station", "x": -58333.333333333336, "y": 3333.3333333333335, "grid": "M09", "hidden": false, "label": "Grand Terminal", "hull": "starbase_kralien", "facilities": [], "sides": ["Kraliens"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Drenan Gate": {"type": "jumpnode", "x": 45833.333333333336, "y": -50000.00000000001, "grid": "J14", "hidden": false, "label": "Drenan Gate", "destinations": {"Onwia Gate": "Drenan"}}, "Gzhar": {"type": "station", "x": -25667.283950617253, "y": -114785.3858024691, "grid": "G10", "hidden": false, "label": "Gzhar", "hull": "starbase_kralien", "facilities": [], "sides": ["Kraliens"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Ishka Gasses": {"type": "station", "x": -32901.08024691355, "y": -94691.50720164606, "grid": "H10", "hidden": false, "label": "Ishka Gasses", "hull": "hegemony_gasextractor", "facilities": [], "sides": ["Kraliens"], "hullName": "Gas Extractor", "hullImage": "Images/Ships/TSN Mod/Hegemony/GasExtractor256.png", "hullDescription": ""}, "Anza Markets": {"type": "station", "x": 118179.11522633744, "y": 112730.68930041158, "grid": "R17", "hidden": false, "label": "Anza Markets", "hull": "starbase_kralien", "facilities": [], "sides": ["Kraliens"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "K'za Skaraan Base": {"type": "station", "x": -139847.2080246913, "y": 116525.56111111135, "grid": "R05", "hidden": true, "label": "**K'za Skaraan Base**", "hull": "starbase_skaraan", "facilities": [], "sides": ["Kraliens"], "hullName": "Skaraan Base", "hullImage": "Images/Ships/skaraan_station256.png", "hullDescription": ""}, "Ya er Military Base": {"type": "station", "x": 109337.8086419753, "y": 125992.64917695479, "grid": "S17", "hidden": false, "label": "Ya er Military Base", "hull": "starbase_kralien", "facilities": [], "sides": ["Kraliens"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Li Andra Denabite": {"type": "station", "x": 149927.44341563786, "y": 137647.09876543217, "grid": "S19", "hidden": false, "label": "Li Andra Denabite", "hull": "starbase_kralien", "facilities": [], "sides": ["Kraliens"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}};
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
@@ -88,7 +96,7 @@
                 infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
             }
             if (obj.hullDescription) {
-                infoHtml += '<p style="margin-top:5px; font-size:90%; color:#ccc;">' + obj.hullDescription + '</p>';
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
             }
         } 
         else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
@@ -115,13 +123,18 @@
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
             infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
         }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
         else {
             infoHtml += '<b>Type:</b> ' + obj.type;
         }
 
             // ——— append a description paragraph if one exists ———
             if (obj.description) {
-                infoHtml += '<p style="font-size:90%; margin-top:8px;">'
+                infoHtml += '<p class="desc-text">'
                           + obj.description
                           + '</p>';
             }
@@ -137,7 +150,7 @@
     });
     
 
-    var fig = {"data": [], "layout": {"title": "Onwia", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-27500.000000000004], "y": [30833.333333333336], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Onwia"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Onwia [N10]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [22989.439377094684, -156052.63881220578, -192280.6945211276, -13238.616331827136, 22989.439377094684], "y": [-179046.90133260153, 203478.32500484705, 186521.674995153, -196003.55134229557, -179046.90133260153], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-43600.696689356104, 107343.07903080848, 67656.92096919152, -83286.85475097306, -43600.696689356104], "y": [-201445.99618560346, 113833.21677735946, 132833.4498893072, -182445.76307365575, -201445.99618560346], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [189979.9349960738, 174979.9349960738, 125020.06500392621, 140020.0650039262, 189979.9349960738], "y": [-155665.2438828597, 218501.42278380704, 216498.57721619308, -157668.08945047366, -155665.2438828597], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-117448.57441859305, -136615.2410852597, -163384.7589147403, -144218.09224807366, -117448.57441859305], "y": [89937.9927338537, 152437.9927338537, 144228.673932813, 81728.67393281299, 89937.9927338537], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [203682.85239036666, 147849.51905703335, 98817.1476096333, 154650.48094296665, 203682.85239036666], "y": [115623.69589636388, 194790.36256303056, 160209.6374369695, 81042.97077030281, 115623.69589636388], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-449.82781960297143, -31289.102510961035, -50377.56415570564, -19538.289464347574, -449.82781960297143], "y": [-154801.71602089918, -56182.096679335395, -62151.236653997934, -160770.8559955617, -154801.71602089918], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-66666.66666666667], "y": [45833.333333333336], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Onwia Ship Fields [O08]"], "hoverinfo": "text", "text": ["Onwia Ship Fields"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-3333.3333333333335], "y": [54166.66666666667], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ximni Factories [O11]"], "hoverinfo": "text", "text": ["Ximni Factories"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [5833.333333333334], "y": [-5000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ximni  Ores [L12]"], "hoverinfo": "text", "text": ["Ximni  Ores"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-58333.333333333336], "y": [3333.3333333333335], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Grand Terminal [M09]"], "hoverinfo": "text", "text": ["Grand Terminal"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [45833.333333333336], "y": [-50000.00000000001], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Drenan Gate [J14]"], "hoverinfo": "text", "text": ["Drenan Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-25667.283950617253], "y": [-114785.3858024691], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Gzhar [G10]"], "hoverinfo": "text", "text": ["Gzhar"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-32901.08024691355], "y": [-94691.50720164606], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ishka Gasses [H10]"], "hoverinfo": "text", "text": ["Ishka Gasses"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [118179.11522633744], "y": [112730.68930041158], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Anza Markets [R17]"], "hoverinfo": "text", "text": ["Anza Markets"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-139847.2080246913], "y": [116525.56111111135], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["K'za Skaraan Base [R05]"], "hoverinfo": "text", "text": ["**K'za Skaraan Base**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [109337.8086419753], "y": [125992.64917695479], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ya er Military Base [S17]"], "hoverinfo": "text", "text": ["Ya er Military Base"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [149927.44341563786], "y": [137647.09876543217], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Li Andra Denabite [S19]"], "hoverinfo": "text", "text": ["Li Andra Denabite"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Onwia", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Onwia';
@@ -149,32 +162,62 @@
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
-    // Custom click: select nearest object within 10px of cursor
-    plotDiv.addEventListener('click', function(evt) {
-        var rect = plotDiv.getBoundingClientRect();
-        var px = evt.clientX - rect.left;
-        var py = evt.clientY - rect.top;
-        var xaxis = plotDiv._fullLayout.xaxis;
-        var yaxis = plotDiv._fullLayout.yaxis;
-        var l2px = xaxis.l2p.bind(xaxis);
-        var l2py = yaxis.l2p.bind(yaxis);
-        var minDist = Infinity, closest = null;
-        for (var name in objData) {
-            var pt = objData[name];
-            var xPx = l2px(pt.x);
-            var yPx = l2py(pt.y);
-            var dx = xPx - px, dy = yPx - py;
-            var d = Math.sqrt(dx*dx + dy*dy);
-            console.log(`${name}: data=(${pt.x}, ${pt.y}) -> screen=(${xPx.toFixed(1)}, ${yPx.toFixed(1)}), cursor=(${px.toFixed(1)}, ${py.toFixed(1)}), dx=${dx.toFixed(1)}, dy=${dy.toFixed(1)}, d=${d.toFixed(1)}`);
-            if (d < minDist) {
-                minDist = d;
-                closest = name;
-            }
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
         }
-        if (minDist <= 35 && closest) {
-            highlight(closest);
+        if (picked && objData[picked]) {
+            highlight(picked);
         }
     });
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [0];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
 
   var ctrl = document.getElementById('object-buttons');
 
@@ -233,13 +276,25 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  
+  addButton('Drenan Gate',function(){highlight('Drenan Gate');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
-  addButton('--- Stations ---', null, true, null);
-  
+    addButton('--- Planets ---', null, true, null);
+    addButton('Planet Onwia',function(){highlight('Planet Onwia');},false,null,false)
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('Anza Markets',function(){highlight('Anza Markets');},false,'red',false)
+    addButton('Grand Terminal',function(){highlight('Grand Terminal');},false,'red',false)
+    addButton('Gzhar',function(){highlight('Gzhar');},false,'red',false)
+    addButton('Ishka Gasses',function(){highlight('Ishka Gasses');},false,'red',false)
+    addButton('K'za Skaraan Base',function(){highlight('K'za Skaraan Base');},false,'red',true)
+    addButton('Li Andra Denabite',function(){highlight('Li Andra Denabite');},false,'red',false)
+    addButton('Onwia Ship Fields',function(){highlight('Onwia Ship Fields');},false,'red',false)
+    addButton('Ximni  Ores',function(){highlight('Ximni  Ores');},false,'red',false)
+    addButton('Ximni Factories',function(){highlight('Ximni Factories');},false,'red',false)
+    addButton('Ya er Military Base',function(){highlight('Ya er Military Base');},false,'red',false)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {
