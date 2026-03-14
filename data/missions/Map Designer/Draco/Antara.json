@@ -1,0 +1,170 @@
+{
+    "systemMapCoord": [
+        -31194.283918076446,
+        0.0,
+        -14720.75669148082
+    ],
+    "systemalignment": "Hjorden",
+    "metadata": {
+        "skybox": "sky1.png",
+        "sysdescription": "",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "intel": {},
+        "development": "Unclaimed",
+        "visible": true,
+        "original_author": "Draeco",
+        "revision_date": "23/12/2025",
+        "revision_number": 3,
+        "all_authors": [
+            "Draeco"
+        ]
+    },
+    "objects": {
+        "Hjorden Gate": {
+            "coordinate": [
+                -130833.33333333334,
+                0,
+                78333.33333333334
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Kalixa Gate": {
+            "coordinate": [
+                180533.33333333334,
+                0,
+                -15766.666666666695
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {},
+            "state": "Tethered",
+            "drift": 0
+        },
+        "DS 63": {
+            "coordinate": [
+                -59166.66666666667,
+                0,
+                -43333.333333333336
+            ],
+            "sides": [
+                "Hjorden"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Hjordens captured this pirate base and are using it for their own purposes"
+        }
+    },
+    "sensor_relay": {},
+    "terrain": {
+        "1766410072418": {
+            "type": "planet",
+            "name": "Planet Antara",
+            "coordinate": [
+                10000.0,
+                0,
+                1666.6666666666667
+            ]
+        },
+        "1766410092258": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -97500.00000000001,
+                0,
+                9166.666666666668
+            ],
+            "end": [
+                -58333.333333333336,
+                0,
+                40833.333333333336
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766410096642": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                98433.33333333331,
+                0,
+                63766.66666666663
+            ],
+            "end": [
+                104166.66666666667,
+                0,
+                -13333.333333333334
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1766410100243": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                24166.666666666668,
+                0,
+                -65833.33333333334
+            ],
+            "end": [
+                71666.66666666667,
+                0,
+                -54166.66666666667
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766410104914": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -5833.333333333334,
+                0,
+                80833.33333333334
+            ],
+            "end": [
+                49233.33333333332,
+                0,
+                27766.666666666628
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1766410109754": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -53333.333333333336,
+                0,
+                -17500.0
+            ],
+            "end": [
+                -65833.33333333334,
+                0,
+                -53333.333333333336
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
+    "traffic": {}
+}

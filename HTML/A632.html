@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A632.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        html, body { margin: 0; height: 100%; background: black; color: white; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
+        }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">A632</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">A632</h2>
+        <h3 class="subheader">Alignment: Kralien</h3>
+        <img src="Images/Factions/Kralien.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects...">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Loading system info...
+    </div>
+<script>
+    var objData = {"JP 82": {"type": "jumppoint", "x": 135300.0, "y": -161000.0, "grid": "D18", "hidden": false, "label": "JP 82", "destinations": {"Helios Gate": "Tibur"}}, "DS 17": {"type": "station", "x": 125173.47731847844, "y": 37793.62906317743, "grid": "N18", "hidden": false, "label": "DS 17", "hull": "starbase_kralien", "facilities": [], "sides": ["Kralien"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Gen 23": {"type": "platform", "x": 121732.50730633861, "y": 33538.84449063029, "grid": "N18", "hidden": false, "label": "Gen 23"}, "WP 14": {"type": "platform", "x": 123568.82482472571, "y": 37440.74317342229, "grid": "N18", "hidden": false, "label": "WP 14"}, "WP 82": {"type": "platform", "x": 123286.65340912312, "y": 38966.83971871537, "grid": "N18", "hidden": false, "label": "WP 82"}, "Gen 77": {"type": "platform", "x": 123928.8412367983, "y": 35344.22074224209, "grid": "N18", "hidden": false, "label": "Gen 77"}, "Gen 74": {"type": "platform", "x": 122678.98034928675, "y": 35797.068889891205, "grid": "N18", "hidden": false, "label": "Gen 74"}, "Gen 67": {"type": "platform", "x": 122914.46138606429, "y": 33079.98000399654, "grid": "N18", "hidden": false, "label": "Gen 67"}, "Gen 40": {"type": "platform", "x": 121646.48657264677, "y": 36431.05629659996, "grid": "N18", "hidden": false, "label": "Gen 40"}, "WP 40": {"type": "platform", "x": 121048.72701774994, "y": 32301.081190040062, "grid": "N18", "hidden": false, "label": "WP 40"}, "DS 12": {"type": "station", "x": 121845.73975761238, "y": 30924.42282118676, "grid": "N18", "hidden": false, "label": "DS 12", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "DS 98": {"type": "station", "x": -45547.197460261006, "y": 189246.7234206307, "grid": "V09", "hidden": true, "label": "**DS 98**", "hull": "starbase_kralien", "facilities": [], "sides": ["Kralien"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "DS 18": {"type": "station", "x": -57212.79245340232, "y": 177291.56224093246, "grid": "U09", "hidden": true, "label": "**DS 18**", "hull": "starbase_kralien", "facilities": [], "sides": ["Torgoth"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Beacon 68": {"type": "sensor_relay", "x": 134572.74295924584, "y": -159894.43250100102, "grid": "E18", "hidden": false, "label": "Beacon 68"}};
+    var systemMeta = {"system_name": "A632", "description": "", "exports": [], "assets": ["Slingshot", "Fortification"], "focus": "", "intel": {"pirate": "Low", "enemy": "Low"}, "original_author": "Fish Evans", "last_author": "Fish Evans", "revision_number": 9, "version_tag": "21226.9", "all_authors": ["Fish Evans"]};
+    var pageBody = document.body;
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        setDefaultInfo();
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
+                + infoHtml;
+         
+    }
+         bindGalacticButton();
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [86065.36379837114, 111528.18379837114, 93395.25620162886, 67932.43620162885, 86065.36379837114], "y": [370428.46601132967, 403371.8860113297, 417387.29398867034, 384443.8739886703, 370428.46601132967], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [114292.46597983525, 76972.16597983526, 74289.29402016476, 111609.59402016475, 114292.46597983525], "y": [386692.57015262055, 391739.3701526206, 371899.94984737947, 366853.1498473794, 386692.57015262055], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [87884.7081178369, 100341.4581178369, 119822.86188216311, 107366.11188216311, 87884.7081178369], "y": [400230.4446753688, 369855.7146753688, 377845.08532463125, 408219.8153246312, 400230.4446753688], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-358249.4577062707, -341204.65770627063, -376366.22229372925, -393411.0222937293, -358249.4577062707], "y": [-136489.50731254515, -103390.77731254513, -85283.68268745486, -118382.41268745487, -136489.50731254515], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [143483.9164341893, 222855.69643418933, 223539.52356581064, 144167.7435658106, 143483.9164341893], "y": [-183258.26362321214, -186466.06362321213, -169545.87637678787, -166338.07637678788, -183258.26362321214], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-301281.7689146604, -278180.34891466046, -271362.15108533954, -294463.57108533947, -301281.7689146604], "y": [-224947.41392369886, -235652.9539236989, -220940.0060763012, -210234.46607630115, -224947.41392369886], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-157917.24685786283, -198750.58019119615, -227916.08647547054, -187082.75314213723, -157917.24685786283], "y": [-79976.32592378644, 21690.34074288024, 9976.32592378642, -91690.34074288025, -79976.32592378644], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-144056.92446814993, -172695.6544681499, -165156.94553185007, -136518.2155318501, -144056.92446814993], "y": [-183568.2460942634, -188056.52609426342, -236159.3739057366, -231671.09390573658, -183568.2460942634], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [50549.132640959106, 7942.672640959099, -6594.772640959105, 36011.6873590409, 50549.132640959106], "y": [234725.6007921235, 276789.77079212357, 262064.9092078765, 220000.73920787647, 234725.6007921235], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [200809.810166685, 208131.11016668504, 230311.70983331502, 222990.40983331497, 200809.810166685], "y": [-21756.855063563013, -71876.39506356302, -68636.32493643698, -18516.78493643698, -21756.855063563013], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-376596.9591357257, -376830.7191357257, -411255.5208642743, -411021.7608642743, -376596.9591357257], "y": [-357240.94423648756, -329224.7242364876, -329511.95576351247, -357528.17576351244, -357240.94423648756], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [288437.7611369145, 255579.92113691452, 237460.27886308555, 270318.1188630855, 288437.7611369145], "y": [-177520.62863674533, -163083.44863674528, -204322.2713632547, -218759.45136325475, -177520.62863674533], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [71888.58978368845, 94364.46978368846, 145127.19021631154, 122651.31021631154, 71888.58978368845], "y": [430741.2168551303, 404101.19685513026, 446929.1231448697, 473569.1431448697, 430741.2168551303], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [240618.3736248122, 210343.2636248122, 255707.7563751878, 285982.86637518776, 240618.3736248122], "y": [-55979.74051176346, -93675.65051176344, -130109.70948823655, -92413.79948823657, -55979.74051176346], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-7753.435341135639, -70950.29534113564, -57113.08465886436, 6083.775341135635, -7753.435341135639], "y": [116416.55410132023, 64845.79410132022, 47889.12589867976, 99459.88589867977, 116416.55410132023], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [338776.3824598425, 382704.2824598425, 405843.1175401575, 361915.2175401575, 338776.3824598425], "y": [75027.27100945446, 38261.95100945445, 65908.66899054554, 102673.98899054555, 75027.27100945446], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-280181.00149681553, -289158.4914968155, -305250.3085031845, -296272.81850318454, -280181.00149681553], "y": [-94289.03851893666, -70025.75851893667, -75979.78148106334, -100243.06148106334, -94289.03851893666], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-272037.21098394354, -283636.1709839435, -297566.0690160565, -285967.1090160565, -272037.21098394354], "y": [-108688.981670004, -88162.31167000401, -96033.64832999601, -116560.318329996, -108688.981670004], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-261431.36968122752, -275742.60968122754, -288240.99031877244, -273929.75031877245, -261431.36968122752], "y": [-121100.91071052864, -103195.41071052864, -113184.92928947136, -131090.42928947136, -121100.91071052864], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [137402.4201203599, 115795.8501203599, 87807.1498796401, 109413.7198796401, 137402.4201203599], "y": [-217895.80766339472, -156958.4876633947, -166882.4523366053, -227819.7723366053, -217895.80766339472], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [174038.0202723096, 219685.7002723096, 198253.2397276904, 152605.55972769042, 174038.0202723096], "y": [419667.30911336496, 464606.31911336497, 486376.7608866351, 441437.7508866351, 419667.30911336496], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [23110.307750810243, 67510.87775081025, 93179.54224918976, 48778.972249189756, 23110.307750810243], "y": [413400.0857805616, 381552.38578056166, 417338.4342194384, 449186.13421943836, 413400.0857805616], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-46330.93389776998, -88444.69389776999, -55531.946102230024, -13418.18610223001, -46330.93389776998], "y": [251990.26416464616, 200967.69416464615, 173801.68583535386, 224824.25583535386, 251990.26416464616], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-150498.0603116658, -189773.68031166578, -234523.3596883342, -195247.7396883342, -150498.0603116658], "y": [101464.16079458628, 137125.40079458628, 87840.19920541371, 52178.95920541372, 101464.16079458628], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [2872.152926645471, -61772.02707335453, -85340.17292664548, -20695.992926645467, 2872.152926645471], "y": [-40360.54423629057, -11466.444236290561, -64194.97576370942, -93089.07576370944, -40360.54423629057], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [33614.423056385654, 79004.11305638566, 84885.50694361434, 39495.816943614336, 33614.423056385654], "y": [-529441.3788138094, -543351.7888138094, -524160.7911861907, -510250.3811861906, -529441.3788138094], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-216942.78409845274, -233093.38409845272, -290216.6759015472, -274066.0759015472, -216942.78409845274], "y": [-496619.60024375777, -431347.96024375776, -445482.3597562422, -510753.9997562422, -496619.60024375777], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [121981.1367394317, 184903.48673943168, 161635.3132605683, 98712.96326056833, 121981.1367394317], "y": [-488111.3049611808, -434777.65496118076, -407326.1650388192, -460659.8150388192, -488111.3049611808], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-300939.309721328, -288940.779721328, -322823.1402786719, -334821.67027867195, -300939.309721328], "y": [277819.2226532684, 299202.26265326847, 318214.4573467315, 296831.41734673147, 277819.2226532684], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-378205.53733038943, -416184.1073303895, -405773.53266961063, -367794.96266961057, -378205.53733038943], "y": [84765.02050246144, 72059.55050246144, 40940.76949753857, 53646.23949753857, 84765.02050246144], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-495155.79276418703, -504541.18276418693, -450745.77723581303, -441360.38723581313, -495155.79276418703], "y": [-122956.52697886314, -142180.83697886314, -168443.98302113687, -149219.67302113687, -122956.52697886314], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-367219.97245392215, -352575.33245392225, -307547.7275460778, -322192.3675460777, -367219.97245392215], "y": [100332.87619160058, 69829.24619160057, 91446.77380839942, 121950.40380839942, 100332.87619160058], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-138853.6666666667, -138920.5079647531, -139119.8881858702, -139448.395879156, -139900.41018689887, -140468.19701897126, -141142.0413852562, -141910.41362182156, -142760.1666666667, -143676.76100959824, -144644.5134672807, -145646.8655268514, -146666.6666666667, -147686.46780648196, -148688.81986605268, -149656.57232373513, -150573.1666666667, -151422.91971151181, -152191.29194807718, -152865.1363143621, -153432.9231464345, -153884.93745417736, -154213.44514746318, -154412.82536858026, -154479.6666666667, -154412.82536858026, -154213.44514746318, -153884.93745417736, -153432.9231464345, -152865.1363143621, -152191.29194807718, -151422.91971151181, -150573.1666666667, -149656.57232373513, -148688.81986605268, -147686.46780648196, -146666.6666666667, -145646.8655268514, -144644.5134672807, -143676.76100959824, -142760.1666666667, -141910.41362182156, -141142.0413852562, -140468.19701897126, -139900.41018689887, -139448.395879156, -139119.8881858702, -138920.5079647531, -138853.6666666667], "y": [-5000.0, -3980.198860184737, -2977.8468006140056, -2010.0943429315535, -1093.5000000000005, -243.74695515486565, 524.6252814104964, 1198.4696476954205, 1766.2564797678187, 2218.2707875106835, 2546.778480796491, 2746.1587019135804, 2813.0, 2746.1587019135804, 2546.778480796491, 2218.2707875106844, 1766.2564797678197, 1198.4696476954205, 524.6252814104964, -243.74695515486383, -1093.5000000000005, -2010.0943429315525, -2977.8468006140033, -3980.198860184734, -4999.999999999999, -6019.801139815265, -7022.153199385995, -7989.905657068446, -8906.499999999998, -9756.253044845134, -10524.625281410492, -11198.46964769542, -11766.256479767817, -12218.270787510684, -12546.77848079649, -12746.15870191358, -12813.0, -12746.15870191358, -12546.778480796493, -12218.270787510686, -11766.256479767819, -11198.469647695425, -10524.625281410497, -9756.253044845136, -8906.500000000004, -7989.905657068444, -7022.153199386001, -6019.801139815264, -5000.0], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [93550.97106069457, 143550.97106069457, 143550.97106069457, 93550.97106069457, 93550.97106069457], "y": [7621.17081864359, 7621.17081864359, 27621.17081864359, 27621.17081864359, 7621.17081864359], "fill": "toself", "fillcolor": "rgba(204,0,0,0.4)", "line": {"shape": "linear", "color": "rgba(204,0,0,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [118550.97106069457], "y": [17621.17081864359], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none"}, {"type": "scatter", "x": [94270.22753387813, 144270.22753387812, 144270.22753387812, 94270.22753387813, 94270.22753387813], "y": [42030.60403930377, 42030.60403930377, 62030.60403930377, 62030.60403930377, 42030.60403930377], "fill": "toself", "fillcolor": "rgba(204,0,0,0.4)", "line": {"shape": "linear", "color": "rgba(204,0,0,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [119270.22753387813], "y": [52030.60403930377], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none"}, {"type": "scatter", "x": [133416.0035572401, 163416.0035572401, 163416.0035572401, 133416.0035572401, 133416.0035572401], "y": [13057.436604906376, 13057.436604906376, 53057.436604906376, 53057.436604906376, 13057.436604906376], "fill": "toself", "fillcolor": "rgba(204,0,0,0.4)", "line": {"shape": "linear", "color": "rgba(204,0,0,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [148416.0035572401], "y": [33057.436604906376], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none"}, {"type": "scatter", "x": [135300.0], "y": [-161000.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["JP 82 [D18]"], "hoverinfo": "text", "text": ["JP 82"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [125173.47731847844], "y": [37793.62906317743], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 17 [N18]"], "hoverinfo": "text", "text": ["DS 17"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [121732.50730633861], "y": [33538.84449063029], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["Gen 23 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [123568.82482472571], "y": [37440.74317342229], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 14 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [123286.65340912312], "y": [38966.83971871537], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 82 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [123928.8412367983], "y": [35344.22074224209], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["Gen 77 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [122678.98034928675], "y": [35797.068889891205], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["Gen 74 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [122914.46138606429], "y": [33079.98000399654], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["Gen 67 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [121646.48657264677], "y": [36431.05629659996], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["Gen 40 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [121048.72701774994], "y": [32301.081190040062], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 40 [N18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [121845.73975761238], "y": [30924.42282118676], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 12 [N18]"], "hoverinfo": "text", "text": ["DS 12"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-45547.197460261006], "y": [189246.7234206307], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 98 [V09]"], "hoverinfo": "text", "text": ["**DS 98**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-57212.79245340232], "y": [177291.56224093246], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 18 [U09]"], "hoverinfo": "text", "text": ["**DS 18**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [134572.74295924584], "y": [-159894.43250100102], "mode": "markers+text", "marker": {"symbol": "circle", "size": 6, "color": "#FF13F0"}, "hovertext": ["Beacon 68 [E18]"], "hoverinfo": "text", "text": ["Beacon 68"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 6, "base_text_size": 14}}], "layout": {"title": "A632", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'A632';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    setDefaultInfo();
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+            lastPlotlyClickTs = Date.now();
+        }
+    });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  addButton('JP 82',function(){highlight('JP 82');},false,null,false)
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  addButton('Beacon 68',function(){highlight('Beacon 68');},false,null,false)
+
+    addButton('--- Planets ---', null, true, null);
+    
+
+    addButton('--- Stations ---', null, true, null);
+    addButton('DS 12',function(){highlight('DS 12');},false,'red',false)
+    addButton('DS 17',function(){highlight('DS 17');},false,'red',false)
+    addButton('DS 18',function(){highlight('DS 18');},false,'red',true)
+    addButton('DS 98',function(){highlight('DS 98');},false,'red',true)
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

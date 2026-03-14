@@ -1,6 +1,9 @@
 #import os
+import os
+import argparse
 import sys
 import json
+import datetime
 #import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 from typing import Any, Dict, List, Optional, Tuple
@@ -12,9 +15,106 @@ import random
 import copy
 from PIL import Image, ImageTk
 import re
+import SystemMetaOptions as smopts
+
+def distance_to_spine(px, pz, ax, az, bx, bz):
+    abx = bx - ax
+    abz = bz - az
+    apx = px - ax
+    apz = pz - az
+
+    ab_len_sq = abx * abx + abz * abz
+    if ab_len_sq == 0:
+        return math.hypot(apx, apz)
+
+    # NOTE: no clamping → ends fade naturally
+    t = (apx * abx + apz * abz) / ab_len_sq
+    cx = ax + t * abx
+    cz = az + t * abz
+
+    return math.hypot(px - cx, pz - cz)
+
+
+def influence(dist, radius):
+    if dist >= radius:
+        return 0.0
+    x = 1.0 - (dist / radius)
+    return x * x
+
+
+def generate_line_coords(start, end, count, radius, seed=None, y_range=(-600, 600),
+                         clump_count=10, void_count=6, clump_radius_range=(300, 800),
+                         void_radius_range=(400, 900), clump_strength_range=(0.3, 0.9),
+                         void_strength_range=(0.4, 1.0)):
+    rng = random.Random(seed)
+    coords = []
+    # --- Bounding volume (intentionally oversized) ---
+    min_x = min(start[0], end[0]) - radius * 2.0
+    max_x = max(start[0], end[0]) + radius * 2.0
+    min_z = min(start[2], end[2]) - radius * 2.0
+    max_z = max(start[2], end[2]) + radius * 2.0
+
+    # --- Pre-generate clumps & voids ---
+    clumps = []
+    voids = []
+
+    for _ in range(clump_count):
+        t = rng.random()
+        x = start[0] + t * (end[0] - start[0]) + rng.uniform(-radius, radius)
+        z = start[2] + t * (end[2] - start[2]) + rng.uniform(-radius, radius)
+        r = rng.uniform(*clump_radius_range)
+        s = rng.uniform(*clump_strength_range)
+        clumps.append((x, z, r, s))
+
+    for _ in range(void_count):
+        t = rng.random()
+        x = start[0] + t * (end[0] - start[0]) + rng.uniform(-radius, radius)
+        z = start[2] + t * (end[2] - start[2]) + rng.uniform(-radius, radius)
+        r = rng.uniform(*void_radius_range)
+        s = rng.uniform(*void_strength_range)
+        voids.append((x, z, r, s))
+
+    attempts = 0
+    max_attempts = count * 8
+
+    while len(coords) < count and attempts < max_attempts:
+        attempts += 1
+
+        x = rng.uniform(min_x, max_x)
+        z = rng.uniform(min_z, max_z)
+        y = rng.uniform(*y_range)
+
+        # --- Base density from distance to spine ---
+        d = distance_to_spine(
+            x, z,
+            start[0], start[2],
+            end[0], end[2]
+        )
+
+        t = d / radius
+        density = math.exp(-t * t)
+
+        if density < 0.01:
+            continue
+
+        # --- Clumps ---
+        for cx, cz, r, s in clumps:
+            density += influence(math.hypot(x - cx, z - cz), r) * s
+
+        # --- Voids ---
+        for vx, vz, r, s in voids:
+            density -= influence(math.hypot(x - vx, z - vz), r) * s
+
+        density = max(0.0, min(density, 1.0))
+
+        if rng.random() < density:
+            coords.append((x, y, z))
+
+    return coords
 
 # valid names: letters, digits, dot, space; 1–20 chars
 _VALID_NAME = re.compile(r'^[A-Za-z0-9. ]{1,20}$')
+DEFAULT_PLANET_CLASS = 'EarthLike'
 
 g_obj_lb = None
 g_relay_lb = None
@@ -35,6 +135,92 @@ def get_base_path():
 def get_data_path():
     """Directory where system JSON files live under data/missions/.../Terrain"""
     return os.path.join(get_base_path(), 'data', 'missions', 'Map Designer', 'Terrain')
+
+def get_settings_path():
+    base = get_base_path()
+    settings_path = os.path.join(base, 'Settings.json')
+    try:
+        if os.path.isdir(base) and os.access(base, os.W_OK):
+            return settings_path
+    except Exception:
+        pass
+    home = os.path.expanduser('~')
+    return os.path.join(home, '.tsnmaps', 'Settings.json')
+
+def _load_settings_file(path: str) -> Dict[str, Any]:
+    try:
+        with open(path, 'r') as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+def load_editor_settings():
+    base_path = os.path.join(get_base_path(), 'Settings.json')
+    settings = _load_settings_file(base_path)
+    user_path = get_settings_path()
+    if os.path.abspath(user_path) != os.path.abspath(base_path):
+        user_settings = _load_settings_file(user_path)
+        settings.update(user_settings)
+    return settings
+
+def save_editor_settings(settings: Dict[str, Any]) -> None:
+    path = get_settings_path()
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+    except Exception:
+        pass
+
+def _normalize_roles(entry: Dict[str, Any]) -> set:
+    roles = set()
+    raw_roles = entry.get('roles')
+    if isinstance(raw_roles, str):
+        roles.update(r.strip().lower() for r in raw_roles.split(',') if r.strip())
+    elif isinstance(raw_roles, list):
+        roles.update(str(r).strip().lower() for r in raw_roles if str(r).strip())
+    raw_role = entry.get('role')
+    if isinstance(raw_role, str) and raw_role.strip():
+        roles.add(raw_role.strip().lower())
+    return roles
+    try:
+        with open(path, 'w') as f:
+            json.dump(settings, f, indent=4)
+    except Exception:
+        pass
+
+def _normalize_author_list(value: Any) -> List[str]:
+    if value is None:
+        return []
+    items = []
+    if isinstance(value, str):
+        items = [x.strip() for x in value.split(',')]
+    elif isinstance(value, list):
+        items = [str(x).strip() for x in value]
+    else:
+        return []
+    cleaned = []
+    seen = set()
+    for item in items:
+        if not item:
+            continue
+        key = item.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        cleaned.append(item)
+    return cleaned
+
+def _coerce_revision_number(value: Any) -> int:
+    try:
+        if isinstance(value, bool):
+            return int(value)
+        if isinstance(value, (int, float)):
+            return int(value)
+        if isinstance(value, str):
+            return int(value.strip() or 0)
+    except Exception:
+        return 0
+    return 0
 
 def build_gate_index_for_systems(data_base: str, current_filename: str):
     system_files = {}
@@ -226,10 +412,20 @@ class SystemMap:
 
 
 def open_system_editor(filename: str) -> None:
+    undo_stack = []
+    redo_stack = []
+    current_selection = {'type': None, 'name': None}
+    last_desc_widget = None
+    last_desc_obj = None
+    copy_state = {'source_name': None, 'source_obj': None}
+    session_revision_bumped = False
     # base for images, data_base for system JSON files
     base = get_base_path()
     data_base = get_data_path()
     file_path = os.path.join(data_base, filename)
+    editor_settings = load_editor_settings()
+    if not isinstance(editor_settings, dict):
+        editor_settings = {}
     # Load ShipMap for valid hulls and sides
     # ─── Load Cargo/Teams presets and master lists from JSON ─────────────
     try:
@@ -241,6 +437,18 @@ def open_system_editor(filename: str) -> None:
         with open(os.path.join(base, 'HTML', 'Images', 'Ships', 'ShipMap.json'), 'r') as sf:
             ship_entries = json.load(sf)
             valid_hulls = [entry['key'] for entry in ship_entries]
+            valid_planet_classes = sorted(
+                [
+                    str(entry.get('key')).strip()
+                    for entry in ship_entries
+                    if (
+                        isinstance(entry, dict)
+                        and str(entry.get('key', '')).strip()
+                        and 'planet' in _normalize_roles(entry)
+                    )
+                ],
+                key=str.casefold
+            )
             # Extract unique sides from ShipMap as a fallback only
             ship_sides = sorted(
                 {
@@ -293,19 +501,99 @@ def open_system_editor(filename: str) -> None:
                 hull_category_map[key] = cats
     except Exception:
         valid_hulls = []
+        valid_planet_classes = [DEFAULT_PLANET_CLASS]
         ship_sides = []
         hull_ranges = {}
         hull_side_map = {}
         hull_role_map = {}
         hull_category_map = {}
+    if not valid_planet_classes:
+        valid_planet_classes = [DEFAULT_PLANET_CLASS]
 
-    # ── Valid sides: prefer cargo_teams.json “Factions”; fallback to ShipMap.json sides ──
-    factions = ct_config.get('Factions', []) or []
-    valid_sides = sorted(factions, key=str.casefold) if factions else []
-    # For Alignment specifically, allow *either* a Faction or any Race name
-    races_map = (ct_config.get('Races') or {}) if isinstance(ct_config, dict) else {}
-    race_names = sorted(list(races_map.keys()), key=str.casefold)
-    valid_alignments = sorted(set(valid_sides) | set(race_names), key=str.casefold)
+    # ── Valid factions/races: prefer Settings.json; fallback to cargo_teams.json or ShipMap.json ──
+    settings_factions = editor_settings.get('Factions', []) if isinstance(editor_settings, dict) else []
+    factions = settings_factions or (ct_config.get('Factions', []) or [])
+    valid_factions = sorted(factions, key=str.casefold) if factions else []
+    settings_races = editor_settings.get('Races') if isinstance(editor_settings, dict) else None
+    races_map = settings_races if isinstance(settings_races, dict) else (ct_config.get('Races') or {}) if isinstance(ct_config, dict) else {}
+    valid_races = sorted(list(races_map.keys()), key=str.casefold) if races_map else []
+    # Fallback to ShipMap.json sides if Settings/cargo_teams are missing/empty.
+    if not valid_races and ship_sides:
+        valid_races = list(ship_sides)
+    valid_sides = list(valid_races)
+    # For Alignment specifically, allow either a Faction or any Race name
+    valid_alignments = sorted(set(valid_factions) | set(valid_races), key=str.casefold)
+
+    faction_name_by_cf = {str(f).casefold(): str(f) for f in valid_factions}
+    race_to_faction_cf = {
+        str(race).casefold(): str(info.get('Faction', '')).casefold()
+        for race, info in (races_map or {}).items()
+        if isinstance(info, dict)
+    }
+
+    def _races_for_faction(faction_val: str) -> List[str]:
+        if not faction_val:
+            return list(valid_races)
+        f_cf = str(faction_val).casefold()
+        matches = [
+            str(race) for race, info in (races_map or {}).items()
+            if isinstance(info, dict) and str(info.get('Faction', '')).casefold() == f_cf
+        ]
+        return sorted(matches, key=str.casefold)
+
+    def _init_faction_for_side(side_val: str) -> str:
+        fac_cf = race_to_faction_cf.get(str(side_val).casefold(), '')
+        return faction_name_by_cf.get(fac_cf, '')
+
+    def _build_faction_side_controls(parent, obj, *, layout: str = 'pack', row: int = 1):
+        side_val = ''
+        sides = obj.get('sides')
+        if isinstance(sides, list) and sides:
+            side_val = str(sides[0])
+        side_var = tk.StringVar(value=side_val)
+        faction_var = tk.StringVar(value=_init_faction_for_side(side_val))
+
+        if layout == 'grid':
+            tk.Label(parent, text="Faction:").grid(row=row, column=0, sticky='w')
+            faction_cb = ttk.Combobox(parent, textvariable=faction_var,
+                                      values=valid_factions, state='readonly')
+            faction_cb.grid(row=row, column=1, padx=5, pady=2, sticky='w')
+            tk.Label(parent, text="Side:").grid(row=row + 1, column=0, sticky='w')
+            side_cb = ttk.Combobox(parent, textvariable=side_var,
+                                   values=valid_races, state='readonly')
+            side_cb.grid(row=row + 1, column=1, padx=5, pady=2, sticky='w')
+        else:
+            tk.Label(parent, text="Faction:").pack(anchor='w', pady=2)
+            faction_cb = ttk.Combobox(parent, textvariable=faction_var,
+                                      values=valid_factions, state='readonly')
+            faction_cb.pack(anchor='w', pady=2)
+            tk.Label(parent, text="Side:").pack(anchor='w', pady=2)
+            side_cb = ttk.Combobox(parent, textvariable=side_var,
+                                   values=valid_races, state='readonly')
+            side_cb.pack(anchor='w', pady=2)
+
+        def _update_side_values_from_faction(*_):
+            vals = _races_for_faction(faction_var.get())
+            current = side_var.get().strip()
+            if current and current not in vals:
+                vals = [current] + vals
+            side_cb['values'] = vals
+
+        def _update_faction_from_side(*_):
+            side_cf = side_var.get().strip().casefold()
+            fac_cf = race_to_faction_cf.get(side_cf, '')
+            fac_display = faction_name_by_cf.get(fac_cf, '')
+            if fac_display and faction_var.get() != fac_display:
+                faction_var.set(fac_display)
+
+        def _on_side_change(*_):
+            obj.__setitem__('sides', [side_var.get()])
+            _update_faction_from_side()
+
+        side_var.trace_add('write', _on_side_change)
+        faction_var.trace_add('write', _update_side_values_from_faction)
+        _update_side_values_from_faction()
+        return side_var, faction_var, side_cb
     # initialize system map
     
     try:
@@ -371,7 +659,7 @@ def open_system_editor(filename: str) -> None:
               - 'TSN'     → 'USFP'
               - 'pirate'  → 'Pirate'
             Only checks objects of type: station, platform, static.
-            Warnings list any remaining sides not in cargo_teams.json Factions.
+            Warnings list any remaining sides not in Settings.json Races.
             """
             fset = set(valid_sides)
             remap = {'tsn': 'USFP', 'pirate': 'Pirate'}
@@ -408,6 +696,38 @@ def open_system_editor(filename: str) -> None:
                 except Exception:
                     print(msg)
 
+        def validate_and_fix_planet_classes_on_load(_sm: SystemMap):
+            valid_class_set = set(valid_planet_classes)
+            changed = False
+            issues = []
+            for terrain_key, feat in _sm.data.get('terrain', {}).items():
+                if not isinstance(feat, dict):
+                    continue
+                if str(feat.get('type', '')).lower() != 'planet':
+                    continue
+                cls = feat.get('class')
+                if not isinstance(cls, str) or not cls.strip():
+                    feat['class'] = DEFAULT_PLANET_CLASS
+                    cls = DEFAULT_PLANET_CLASS
+                    changed = True
+                else:
+                    cls = cls.strip()
+                    if cls != feat.get('class'):
+                        feat['class'] = cls
+                        changed = True
+                if valid_class_set and cls not in valid_class_set:
+                    display_name = feat.get('name', terrain_key)
+                    issues.append(f"{terrain_key} ({display_name}): invalid planet class '{cls}'")
+            if changed:
+                _sm.save()
+            if issues:
+                msg = "Planets with invalid class values:\n\n" + "\n".join(issues)
+                try:
+                    messagebox.showwarning("Planet Class Validation", msg)
+                except Exception:
+                    print(msg)
+
+        validate_and_fix_planet_classes_on_load(sm)
         validate_and_fix_sides_on_load(sm)
         system_files, other_gate_index = build_gate_index_for_systems(data_base, filename)
 
@@ -415,6 +735,16 @@ def open_system_editor(filename: str) -> None:
         messagebox.showerror("Error", f"Failed to load system map: {e}")
         return("Error", f"Failed to load system map: {e}")
         return
+
+    def push_undo():
+        if sm is None:
+            return
+        undo_stack.append(copy.deepcopy(sm.data))
+        # cap at 5
+        if len(undo_stack) > 5:
+            undo_stack.pop(0)
+        # any new action invalidates redo history
+        redo_stack.clear()
 
     global sm_win
     win = tk.Toplevel()
@@ -549,10 +879,74 @@ def open_system_editor(filename: str) -> None:
     skybox_var.trace_add('write', _update_sky_preview)
     row += 1
 
+    # ── Author & Revision Metadata ──────────────────────────────────────
+    tk.Label(md_parent, text="Author (current):").grid(row=row, column=0, sticky='w')
+    author_var = tk.StringVar(value=str(editor_settings.get('author', '') or ''))
+    author_entry = tk.Entry(md_parent, textvariable=author_var, width=30)
+    author_entry.grid(row=row, column=1, columnspan=2, sticky='w')
+
+    def persist_author_setting(*_):
+        editor_settings['author'] = author_var.get().strip()
+        save_editor_settings(editor_settings)
+
+    if not author_var.get().strip():
+        try:
+            entered = simpledialog.askstring(
+                "Author",
+                "Enter your author name for this session:",
+                parent=win
+            )
+        except Exception:
+            entered = None
+        if entered is not None:
+            author_var.set(entered.strip())
+            persist_author_setting()
+
+    author_entry.bind('<FocusOut>', persist_author_setting)
+    author_entry.bind('<Return>', persist_author_setting)
+    row += 1
+
+    orig_author_var = tk.StringVar()
+    last_author_var = tk.StringVar()
+    rev_num_var = tk.StringVar()
+    rev_date_var = tk.StringVar()
+    all_authors_var = tk.StringVar()
+
+    def refresh_author_metadata_display(metadata: Optional[Dict[str, Any]] = None):
+        data = metadata if isinstance(metadata, dict) else sm.data.get('metadata', {})
+        orig_author_var.set(str(data.get('original_author', '') or ''))
+        last_author_var.set(str(data.get('last_revision_author', data.get('last_author', '')) or ''))
+        rev_num_var.set(str(_coerce_revision_number(data.get('revision_number', 0))))
+        rev_date_var.set(str(data.get('revision_date', '') or ''))
+        all_authors_var.set(", ".join(_normalize_author_list(data.get('all_authors'))))
+
+    tk.Label(md_parent, text="Original Author:").grid(row=row, column=0, sticky='w')
+    ttk.Entry(md_parent, textvariable=orig_author_var, state='readonly', width=28)\
+        .grid(row=row, column=1, columnspan=2, sticky='w', padx=(0, 5))
+    tk.Label(md_parent, text="Last Revision Author:").grid(row=row, column=3, sticky='w')
+    ttk.Entry(md_parent, textvariable=last_author_var, state='readonly', width=28)\
+        .grid(row=row, column=4, columnspan=2, sticky='w')
+    row += 1
+
+    tk.Label(md_parent, text="Revision #:").grid(row=row, column=0, sticky='w')
+    ttk.Entry(md_parent, textvariable=rev_num_var, state='readonly', width=8)\
+        .grid(row=row, column=1, sticky='w')
+    tk.Label(md_parent, text="Revision Date:").grid(row=row, column=3, sticky='w')
+    ttk.Entry(md_parent, textvariable=rev_date_var, state='readonly', width=16)\
+        .grid(row=row, column=4, columnspan=2, sticky='w')
+    row += 1
+
+    tk.Label(md_parent, text="All Authors:").grid(row=row, column=0, sticky='nw')
+    ttk.Entry(md_parent, textvariable=all_authors_var, state='readonly', width=60)\
+        .grid(row=row, column=1, columnspan=6, sticky='w')
+    refresh_author_metadata_display(md)
+    row += 1
+
 
     # ── Traffic controls: Commercial, Civilian, Security ────────────────
     traffic = sm.data.setdefault('traffic', {})
-    levels = ['none', 'light', 'medium', 'heavy']
+    levels = smopts.TRAFFIC_LEVELS
+    traffic_vars = {}
     # now inside the System Details pane
     tk.Label(md_parent, text="Traffic:") \
         .grid(row=row, column=0, sticky='e', pady=(1, 0))
@@ -561,6 +955,7 @@ def open_system_editor(filename: str) -> None:
         tk.Label(md_parent, text=f"{cat.capitalize()}:") \
             .grid(row=row, column=1 + i , sticky='e', padx=(1, 0))
         var = tk.StringVar(value=traffic.get(cat, 'none'))
+        traffic_vars[cat] = var
         cb = ttk.Combobox(
             md_parent,
             textvariable = var,
@@ -572,6 +967,106 @@ def open_system_editor(filename: str) -> None:
         var.trace_add(
             'write', lambda *a, c=cat, v=var: traffic.__setitem__(c, v.get())
         )
+    row += 1
+
+    # ── System intel & development ─────────────────────────────────────
+    intel = md.get('intel', {})
+    if not isinstance(intel, dict):
+        intel = {}
+    sec_val = md.get('security', 'Neutral')
+    if sec_val not in smopts.SECURITY_LEVELS:
+        sec_val = 'Neutral'
+    pirate_val = intel.get('pirate', 'Low')
+    if pirate_val not in smopts.PIRATE_LEVELS:
+        pirate_val = 'Low'
+    enemy_val = intel.get('enemy', 'Low')
+    if enemy_val not in smopts.ENEMY_LEVELS:
+        enemy_val = 'Low'
+    dev_val = md.get('development', 'Unclaimed')
+    if dev_val not in smopts.DEVELOPMENT_STAGES:
+        dev_val = 'Unclaimed'
+
+    dd_frame = tk.Frame(md_parent)
+    dd_frame.grid(row=row, column=0, columnspan=8, sticky='w', pady=(4, 2))
+    tk.Label(dd_frame, text="Security Level:").grid(row=0, column=0, sticky='w')
+    sec_var = tk.StringVar(value=sec_val)
+    sec_cb = ttk.Combobox(
+        dd_frame, textvariable=sec_var,
+        values=smopts.SECURITY_LEVELS, state='readonly', width=10
+    )
+    sec_cb.grid(row=0, column=1, sticky='w', padx=5)
+    tk.Label(dd_frame, text="Pirate Activity:").grid(row=0, column=2, sticky='w')
+    pirate_var = tk.StringVar(value=pirate_val)
+    pirate_cb = ttk.Combobox(
+        dd_frame, textvariable=pirate_var,
+        values=smopts.PIRATE_LEVELS, state='readonly', width=8
+    )
+    pirate_cb.grid(row=0, column=3, sticky='w', padx=5)
+    tk.Label(dd_frame, text="Enemy Strength:").grid(row=0, column=4, sticky='w')
+    enemy_var = tk.StringVar(value=enemy_val)
+    enemy_cb = ttk.Combobox(
+        dd_frame, textvariable=enemy_var,
+        values=smopts.ENEMY_LEVELS, state='readonly', width=8
+    )
+    enemy_cb.grid(row=0, column=5, sticky='w', padx=5)
+    tk.Label(dd_frame, text="Development Stage:").grid(row=0, column=6, sticky='w')
+    dev_var = tk.StringVar(value=dev_val)
+    dev_cb = ttk.Combobox(
+        dd_frame, textvariable=dev_var,
+        values=smopts.DEVELOPMENT_STAGES, state='readonly', width=18
+    )
+    dev_cb.grid(row=0, column=7, sticky='w', padx=5)
+    row += 1
+
+    # Strategic Assets
+    assets_frame = tk.Frame(md_parent)
+    assets_frame.grid(row=row, column=0, columnspan=8, sticky='w', pady=(2, 0))
+    tk.Label(assets_frame, text="Strategic Assets:").grid(row=0, column=0, sticky='w')
+    assets_vars = {}
+    assets_current = set(intel.get('assets', []) or [])
+    for i, opt in enumerate(smopts.ASSET_OPTIONS):
+        var = tk.BooleanVar(value=opt in assets_current)
+        cb = tk.Checkbutton(assets_frame, text=opt, variable=var)
+        cb.grid(row=0, column=i + 1, sticky='w', padx=5)
+        assets_vars[opt] = var
+    row += 1
+
+    # Exports
+    tk.Label(md_parent, text="Exports:").grid(row=row, column=0, sticky='nw', pady=(2, 0))
+    export_vars = {}
+    exports_frame = tk.Frame(md_parent)
+    exports_frame.grid(row=row, column=1, columnspan=7, sticky='w')
+    exports_current = set(md.get('exports', []) or [])
+    for idx, val in enumerate(smopts.EXPORT_OPTIONS):
+        var = tk.BooleanVar(value=val in exports_current)
+        cb = tk.Checkbutton(exports_frame, text=val, variable=var)
+        cb.grid(row=idx // 4, column=idx % 4, sticky='w', padx=5, pady=2)
+        export_vars[val] = var
+    row += 1
+
+    # Primary Focus
+    tk.Label(md_parent, text="Primary Focus:").grid(row=row, column=0, sticky='w', pady=(2, 0))
+    focus_var = tk.StringVar(value=md.get('focus', ''))
+    focus_cb = ttk.Combobox(
+        md_parent, textvariable=focus_var,
+        values=smopts.FOCUS_OPTIONS, state='normal', width=28
+    )
+    focus_cb.grid(row=row, column=1, columnspan=3, sticky='w')
+    row += 1
+
+    # Display on Galactic Map
+    tk.Label(md_parent, text="Display on Galactic Map:").grid(row=row, column=0, sticky='w', pady=(2, 0))
+    vis_var = tk.StringVar(value="Show" if md.get('visible', True) else "Hide")
+    vis_frame = tk.Frame(md_parent)
+    vis_frame.grid(row=row, column=1, columnspan=4, sticky='w')
+    tk.Radiobutton(
+        vis_frame, text="Show System on Galactic Map",
+        variable=vis_var, value="Show"
+    ).grid(row=0, column=0, sticky='w', padx=5)
+    tk.Radiobutton(
+        vis_frame, text="Hide System on Galactic Map",
+        variable=vis_var, value="Hide"
+    ).grid(row=0, column=1, sticky='w', padx=5)
     row += 1
 
 
@@ -733,10 +1228,48 @@ def open_system_editor(filename: str) -> None:
     # move past the two rows used by each list (label + listbox)
     row += 2
 
-    global g_obj_lb, g_relay_lb, g_ter_lb, g_ctx
-    g_obj_lb   = obj_lb
-    g_relay_lb = relay_lb
-    g_ter_lb   = ter_lb
+    def _refresh_ui():
+        obj_names = sm.list_objects()
+        objs.clear()
+        objs.extend(obj_names)
+        obj_lb.delete(0, tk.END)
+        for n in obj_names:
+            obj_lb.insert(tk.END, n)
+        relay_names = list(sm.list_sensor_relays().keys())
+        relay_order.clear()
+        relay_order.extend(relay_names)
+        relay_lb.delete(0, tk.END)
+        for r in relay_names:
+            relay_lb.insert(tk.END, r)
+        terrain_names = sm.list_terrain()
+        terrain_keys.clear()
+        terrain_keys.extend(terrain_names)
+        ter_lb.delete(0, tk.END)
+        for t in terrain_names:
+            ter_lb.insert(tk.END, t)
+        clear_edit_pane()
+        draw_map(ctx)
+        drag_data.clear()
+        current_selection['type'] = None
+        current_selection['name'] = None
+
+    def do_undo():
+        if not undo_stack:
+            win.bell()
+            return
+        redo_stack.append(copy.deepcopy(sm.data))
+        state = undo_stack.pop()
+        sm.data = state
+        _refresh_ui()
+
+    def do_redo():
+        if not redo_stack:
+            win.bell()
+            return
+        undo_stack.append(copy.deepcopy(sm.data))
+        state = redo_stack.pop()
+        sm.data = state
+        _refresh_ui()
 
     # Edit pane setup (sidebar on far right)
     edit_frame = tk.Frame(win, bd=1, relief=tk.SUNKEN, width=350)
@@ -751,23 +1284,24 @@ def open_system_editor(filename: str) -> None:
     edit_frame.grid_columnconfigure(0, weight=1)
     edit_title.grid(row=0, column=0, columnspan=2, pady=5)
 
-    global clear_edit_pane
     def clear_edit_pane():
         # before destroying widgets, commit any pending description safely
-        global _last_desc_widget, _last_desc_obj
-        if _last_desc_widget and _last_desc_obj:
+        nonlocal last_desc_widget, last_desc_obj
+        if last_desc_widget and last_desc_obj:
             try:
-                text = _last_desc_widget.get('1.0', 'end').strip()
-                _last_desc_obj['description'] = text
+                text = last_desc_widget.get('1.0', 'end').strip()
+                last_desc_obj['description'] = text
             except tk.TclError:
         # widget no longer exists; skip saving
                 pass
             finally:
             # clear references to avoid calling a destroyed widget again
-                _last_desc_widget = None
-                _last_desc_obj = None
+                last_desc_widget = None
+                last_desc_obj = None
           # now clear the pane
 
+        if not edit_frame.winfo_exists():
+            return
         for child in edit_frame.winfo_children():
             if child is not edit_title:
                 child.destroy()
@@ -832,7 +1366,10 @@ def open_system_editor(filename: str) -> None:
 
     def show_item(kind, key, fields, rename_fn, delete_fn):
         """
-        Generic item display: fields may include optional fourth element 'text' to render a multi-line Text widget
+        Generic item display.
+        Optional field elements:
+        - 4th element: widget type ('text', 'check', 'combo')
+        - 5th element: widget options for combo fields
         """
         clear_edit_pane()
         # Track selection type and name
@@ -840,7 +1377,8 @@ def open_system_editor(filename: str) -> None:
         edit_title.config(text=f"{kind}: {key}")
         for field in fields:
             label_text, getter, setter = field[0], field[1], field[2]
-            widget_type = field[3] if len(field) == 4 else 'entry'
+            widget_type = field[3] if len(field) >= 4 else 'entry'
+            widget_options = field[4] if len(field) >= 5 else []
             if widget_type == 'text':
                 # multiline description
                 tk.Label(edit_frame, text=label_text, wraplength=230, justify='left')\
@@ -849,6 +1387,17 @@ def open_system_editor(filename: str) -> None:
                 txt.insert('1.0', getter())
                 txt.pack(anchor='w', pady=2)
                 txt.bind('<FocusOut>', lambda e, s=setter, t=txt: s(t.get('1.0', 'end').strip()))
+            elif widget_type == 'combo':
+                tk.Label(edit_frame, text=label_text, wraplength=230, justify='left')\
+                    .pack(anchor='w', pady=2)
+                initial = str(getter())
+                values = list(widget_options or [])
+                if initial and initial not in values:
+                    values.append(initial)
+                var = tk.StringVar(value=initial)
+                cb = ttk.Combobox(edit_frame, textvariable=var, values=values, state='readonly')
+                cb.pack(anchor='w', pady=2)
+                var.trace_add('write', lambda *a, s=setter, v=var: s(v.get()))
             elif widget_type == 'check':
                 # inline checkbox with label to the right
                 var = tk.BooleanVar(value=getter())
@@ -874,14 +1423,18 @@ def open_system_editor(filename: str) -> None:
         tk.Button(edit_frame, text="Delete", fg="red", command=lambda: delete_fn(key)).pack(pady=5)
         # --- Selection Display Functions ---
     # Track current selection for Delete key support
-    global current_selection
-    current_selection = {'type': None, 'name': None}
 
     def set_selection(item_type, name):
         current_selection['type'] = item_type
         current_selection['name'] = name
     
     def on_delete_key(event=None):
+        if event is not None:
+            try:
+                if event.widget.winfo_toplevel() != win:
+                    return
+            except Exception:
+                return
         t = current_selection['type']
         n = current_selection['name']
         if not t or not n:
@@ -932,7 +1485,7 @@ def open_system_editor(filename: str) -> None:
         if not new_name:
             return
         if not _VALID_NAME.match(new_name):
-            sm_win.bell()
+            win.bell()
             return
         if new_name != name:
             push_undo()
@@ -950,7 +1503,7 @@ def open_system_editor(filename: str) -> None:
         if not new_name:
             return
         if not _VALID_NAME.match(new_name):
-            sm_win.bell()
+            win.bell()
             return
         if new_name != name:
             push_undo()
@@ -977,7 +1530,7 @@ def open_system_editor(filename: str) -> None:
         if not new_name:
             return
         if not _VALID_NAME.match(new_name):
-            sm_win.bell()
+            win.bell()
             return
         if new_name != name:
             push_undo()
@@ -1146,8 +1699,15 @@ def open_system_editor(filename: str) -> None:
         dlg.transient(win)
         dlg.wait_window()
     # Adapter: show_object via generic helper
+    def arm_copy_object(name: str, obj: Dict[str, Any]) -> None:
+        copy_state['source_name'] = name
+        copy_state['source_obj'] = copy.deepcopy(obj)
+
     def show_object(name: str):
+        nonlocal last_desc_widget, last_desc_obj
         obj = sm.get_object(name)
+        if not win.winfo_exists():
+            return
         update_coord_display(obj.get('coordinate'), False)
         clear_edit_pane()
         edit_title.config(text=f"Station: {name}" if obj.get('type')=='station' else f"Object: {name}")
@@ -1157,34 +1717,14 @@ def open_system_editor(filename: str) -> None:
         # ─── Platform‐type custom layout ──────────────────────────────
         if obj.get('type') == 'platform':
             edit_title.config(text=f"Platform: {name}")
-            # Side dropdown
-            tk.Label(edit_frame, text="Side:").pack(anchor='w', pady=2)
-            side_var = tk.StringVar(value=obj.get('sides',[''])[0])
-            side_cb = ttk.Combobox(
-                edit_frame,
-                textvariable=side_var,
-                values=valid_sides,   # limited to cargo_teams.json Factions
-                state='readonly'      # enforce selection from allowed set
-            )
-            side_cb.pack(anchor='w', pady=2)
-            side_var.trace_add('write',
-                lambda *a, v=side_var: obj.__setitem__('sides',[v.get()])
-            )
+            side_var, _, _ = _build_faction_side_controls(edit_frame, obj, layout='pack')
 
             # Hull dropdown (include hulls with role 'platform' or 'defense')
             tk.Label(edit_frame, text="Hull:").pack(anchor='w', pady=2)
             hull_var = tk.StringVar(value=obj.get('hull',''))
-            platform_hulls = [
-                e['key'] for e in ship_entries
-                if any(
-                    role in ('platform', 'defense')
-                    for role in (
-                        e.get('roles')
-                        if isinstance(e.get('roles'), list)
-                        else [r.strip() for r in e.get('roles','').split(',')]
-                    )
-                )
-            ]
+            platform_hulls = SysMapCanvas._filter_hulls_by_roles(
+                valid_hulls, {'platform', 'static', 'defense'}, hull_role_map, hull_category_map
+            )
             hull_cb = ttk.Combobox(
                 edit_frame,
                 textvariable=hull_var,
@@ -1192,13 +1732,49 @@ def open_system_editor(filename: str) -> None:
                 state='readonly'
             )
             hull_cb.pack(anchor='w', pady=2)
+            hull_cb.bind("<Button-1>", lambda e, cb=hull_cb: SysMapCanvas._schedule_combobox_colors(cb), add="+")
+            SysMapCanvas._ensure_hull_color_binding(hull_cb)
             hull_var.trace_add('write',
                 lambda *a, v=hull_var: obj.__setitem__('hull', v.get())
             )
 
+            show_all_var = tk.BooleanVar(value=False)
+            relax_role_var = tk.BooleanVar(value=False)
+            tk.Checkbutton(
+                edit_frame, text="Show all hulls",
+                variable=show_all_var
+            ).pack(anchor='w', pady=(2, 0))
+            tk.Checkbutton(
+                edit_frame, text="Relax role filter",
+                variable=relax_role_var
+            ).pack(anchor='w', pady=(0, 2))
+
+            def update_platform_hulls(*_):
+                base_pool = valid_hulls if relax_role_var.get() else platform_hulls
+                opts, green_count = SysMapCanvas._build_hull_options(
+                    base_pool, side_var.get(), hull_side_map, toolbar, include_others=show_all_var.get()
+                )
+                current = hull_var.get()
+                if current and current not in opts:
+                    opts = opts + [current]
+                hull_cb['values'] = opts
+                hull_cb._green_count = green_count
+                SysMapCanvas._schedule_combobox_colors(hull_cb)
+                current = hull_var.get().strip()
+                if current and current not in opts and opts:
+                    hull_var.set(opts[0])
+
+            side_var.trace_add('write', update_platform_hulls)
+            show_all_var.trace_add('write', update_platform_hulls)
+            relax_role_var.trace_add('write', update_platform_hulls)
+            update_platform_hulls()
+
             # Rename & Delete buttons
             frm = tk.Frame(edit_frame)
             frm.pack(fill='x', pady=5)
+            tk.Button(frm, text="Copy",
+                      command=lambda n=name, o=obj: arm_copy_object(n, o))\
+              .pack(side='left', expand=True, padx=2)
             tk.Button(frm, text="Rename",
                       command=lambda: rename_object(name))\
               .pack(side='left', expand=True, padx=2)
@@ -1381,16 +1957,10 @@ def open_system_editor(filename: str) -> None:
         # ─── Station-only custom layout ────────────────────────────────
         if obj.get('type') == 'station':
             # Station pane now starts at row 1 (row 0 is the title)
-            # Side dropdown
-            tk.Label(edit_frame, text="Side:").grid(row=1, column=0, sticky='w')
-            side_var = tk.StringVar(value=obj.get('sides',[''])[0])
-            ttk.Combobox(edit_frame, textvariable=side_var,
-                         values=valid_sides, state='readonly')\
-                .grid(row=1, column=1, padx=5, pady=2, sticky='w')
-            side_var.trace_add('write', lambda *a: obj.__setitem__('sides',[side_var.get()]))
+            side_var, _, _ = _build_faction_side_controls(edit_frame, obj, layout='grid', row=1)
 
             # Hull dropdown
-            tk.Label(edit_frame, text="Hull:").grid(row=2, column=0, sticky='w')
+            tk.Label(edit_frame, text="Hull:").grid(row=3, column=0, sticky='w')
             hull_var = tk.StringVar(value=obj.get('hull',''))
             hull_cb  = ttk.Combobox(
                 edit_frame,
@@ -1398,61 +1968,44 @@ def open_system_editor(filename: str) -> None:
                 values=valid_hulls,
                 state='readonly'
             )
-            hull_cb.grid(row=2, column=1, padx=5, pady=2, sticky='w')
+            hull_cb.grid(row=3, column=1, padx=5, pady=2, sticky='w')
+            hull_cb.bind("<Button-1>", lambda e, cb=hull_cb: SysMapCanvas._schedule_combobox_colors(cb), add="+")
+            SysMapCanvas._ensure_hull_color_binding(hull_cb)
             hull_var.trace_add('write', lambda *a: obj.__setitem__('hull', hull_var.get()))
 
-            # Filter checkboxes
-            side_filter = tk.BooleanVar(value=False)
-            role_filter = tk.BooleanVar(value=False)
-            def update_hulls():
-                filtered = list(valid_hulls)
-                if side_filter.get():
-                    current = obj.get('sides',[''])[0]
-                    current_cf = str(current).casefold()
-                    # Build casefolded Race→Faction and Faction→Races maps from cargo_teams
-                    races_map = (ct_config.get('Races') or {}) if isinstance(ct_config, dict) else {}
-                    race_to_faction_cf = {str(r).casefold(): str(v.get('Faction','')).casefold()
-                                          for r, v in races_map.items()
-                                          if isinstance(v, dict)}
-                    faction_to_races_cf = {}
-                    for r_cf, f_cf in race_to_faction_cf.items():
-                        faction_to_races_cf.setdefault(f_cf, set()).add(r_cf)
-                    # Allowed sides: selected + its faction + all races in that faction
-                    allowed = {current_cf}
-                    if current_cf in race_to_faction_cf:
-                        fac_cf = race_to_faction_cf[current_cf]
-                        allowed.add(fac_cf)
-                        allowed |= faction_to_races_cf.get(fac_cf, set())
-                    if current_cf in faction_to_races_cf:
-                        allowed |= faction_to_races_cf.get(current_cf, set())
-                    # Filter by allowed sides
-                    filtered = [
-                        h for h in filtered
-                        if str(
-                            next((e for e in ship_entries if e['key']==h),{}).get('side','')
-                        ).casefold() in allowed
-                    ]
-                if role_filter.get():
-                    newf = []
-                    for h in filtered:
-                        roles = next((e for e in ship_entries if e['key']==h),{}).get('roles',[])
-                        if isinstance(roles,str):
-                            roles = [r.strip() for r in roles.split(',') if r.strip()]
-                        if 'station' in roles:
-                            newf.append(h)
-                    filtered = newf
-                hull_cb['values'] = filtered
-                if hull_var.get() not in filtered:
-                    hull_var.set('')
+            show_all_var = tk.BooleanVar(value=False)
+            relax_role_var = tk.BooleanVar(value=False)
+            tk.Checkbutton(
+                edit_frame, text="Show all hulls",
+                variable=show_all_var
+            ).grid(row=4, column=0, columnspan=2, sticky='w')
+            tk.Checkbutton(
+                edit_frame, text="Relax role filter",
+                variable=relax_role_var
+            ).grid(row=5, column=0, columnspan=2, sticky='w')
 
-            tk.Checkbutton(
-                edit_frame, text="Match station side",
-                variable=side_filter, command=update_hulls
-            ).grid(row=3, column=0, sticky='w')
-            tk.Checkbutton(
-                edit_frame, text="Only roles=station",
-                variable=role_filter, command=update_hulls
-            ).grid(row=3, column=1, sticky='w')
+            station_hulls = SysMapCanvas._filter_hulls_by_roles(
+                valid_hulls, {'station'}, hull_role_map, hull_category_map
+            )
+            def update_hulls(*_):
+                hull_pool = valid_hulls if relax_role_var.get() else station_hulls
+                opts, green_count = SysMapCanvas._build_hull_options(
+                    hull_pool, side_var.get(), hull_side_map, toolbar, include_others=show_all_var.get()
+                )
+                current = hull_var.get()
+                if current and current not in opts:
+                    opts = opts + [current]
+                hull_cb['values'] = opts
+                hull_cb._green_count = green_count
+                SysMapCanvas._schedule_combobox_colors(hull_cb)
+                current = hull_var.get().strip()
+                if current and current not in opts and opts:
+                    hull_var.set(opts[0])
+
+            side_var.trace_add('write', update_hulls)
+            show_all_var.trace_add('write', update_hulls)
+            relax_role_var.trace_add('write', update_hulls)
+            update_hulls()
 
             # ─── Facilities checkboxes ──────────────────────────────
             dock_var   = tk.BooleanVar(value="Docking" in obj.get('facilities', []))
@@ -1462,51 +2015,53 @@ def open_system_editor(filename: str) -> None:
                 edit_frame, text="Docking",
                 variable=dock_var,
                 command=lambda v=dock_var: set_facility(obj, "Docking", v.get())
-            ).grid(row=4, column=0, sticky='w')
+            ).grid(row=6, column=0, sticky='w')
             tk.Checkbutton(
                 edit_frame, text="Refuel",
                 variable=refuel_var,
                 command=lambda v=refuel_var: set_facility(obj, "Refuel", v.get())
-            ).grid(row=4, column=1, sticky='w')
+            ).grid(row=6, column=1, sticky='w')
             tk.Checkbutton(
                 edit_frame, text="Repair",
                 variable=repair_var,
                 command=lambda v=repair_var: set_facility(obj, "Repair", v.get())
-            ).grid(row=4, column=2, sticky='w')
+            ).grid(row=6, column=2, sticky='w')
 
 
 
             # Rename & Delete buttons on row 5
+            tk.Button(edit_frame, text="Copy",
+                      command=lambda n=name, o=obj: arm_copy_object(n, o))\
+                .grid(row=8, column=0, padx=2, pady=5, sticky='w')
             tk.Button(edit_frame, text="Rename",
                       command=lambda: rename_object(name))\
-                .grid(row=5, column=1, padx=2, pady=5, sticky='w')
+                .grid(row=8, column=1, padx=2, pady=5, sticky='w')
             tk.Button(edit_frame, text="Delete",
                       command=lambda: delete_object(name))\
-                .grid(row=5, column=2, padx=2, pady=5, sticky='w')
+                .grid(row=8, column=2, padx=2, pady=5, sticky='w')
 
             # Description (multi-line) at row 6
             tk.Label(edit_frame, text="Description:") \
-                .grid(row=6, column=0, sticky='nw', pady=(4, 0))
+                .grid(row=9, column=0, sticky='nw', pady=(4, 0))
             desc_text = tk.Text(edit_frame, width=30, height=4, wrap='word')
-            desc_text.grid(row=7, column=0, columnspan=2, padx=5, pady=2, sticky='w')
+            desc_text.grid(row=10, column=0, columnspan=2, padx=5, pady=2, sticky='w')
             desc_text.insert('1.0', obj.get('description', ''))
             # remember this widget & obj so clear_edit_pane() can commit edits
 
-            global _last_desc_widget, _last_desc_obj
-            _last_desc_widget = desc_text
-            _last_desc_obj = obj
+            last_desc_widget = desc_text
+            last_desc_obj = obj
 
             # Hide on map at row 7
             hide_var = tk.BooleanVar(value=obj.get('hideonmap', False))
             tk.Checkbutton(edit_frame, text="Hide on map",
                            variable=hide_var,
                            command=lambda: obj.__setitem__('hideonmap', hide_var.get()))\
-                .grid(row=8, column=0, columnspan=2, sticky='w', pady=2)
+                .grid(row=11, column=0, columnspan=2, sticky='w', pady=2)
 
             # Edit Cargo/Teams at row 8
             tk.Button(edit_frame, text="Edit Cargo/Teams",
                       command=lambda n=name: open_cargo_teams_dialog(n))\
-                .grid(row=5, column=0, columnspan=2, sticky='w', pady=2)
+                .grid(row=7, column=0, columnspan=2, sticky='w', pady=2)
             return
 
         show_item("Object", name, fields, rename_object, delete_object)
@@ -1535,35 +2090,22 @@ def open_system_editor(filename: str) -> None:
                                values=valid_hulls, state='readonly')
         hull_cb.grid(row=0, column=1, sticky='w', padx=5)
 
-        # Filter checkboxes
-        side_var = tk.BooleanVar(value=False)
-        role_var = tk.BooleanVar(value=False)
+        side_var, _, _ = _build_faction_side_controls(edit_frame, obj, layout='pack')
 
-        # ——— Side editable Combobox ———————————————————————
-        tk.Label(edit_frame, text="Side:").pack(anchor='w', pady=2)
-        side_var = tk.StringVar(value=obj.get('sides',[''])[0])
-        side_cb  = ttk.Combobox(
-            edit_frame,
-            textvariable=side_var,
-            values=valid_sides,  # from ShipMap.json loader :contentReference[oaicite:0]{index=0}
-            state='normal'       # editable dropdown
-        )
-        side_cb.pack(anchor='w', pady=2)
-        side_var.trace_add(
-            'write',
-            lambda *a, v=side_var: obj.__setitem__('sides',[v.get()])
-        )
+        # Filter checkboxes
+        side_filter_var = tk.BooleanVar(value=False)
+        role_filter_var = tk.BooleanVar(value=False)
         def update_hulls():
             # start from all hull keys
             filtered = list(valid_hulls)
             # filter by matching side if requested
-            if side_var.get():
-                current_side = obj.get('sides',[''])[0]
+            if side_filter_var.get():
+                current_side = side_var.get()
                 current_cf = str(current_side).casefold()
-                # Build casefolded Race→Faction and Faction→Races maps from cargo_teams
-                races_map = (ct_config.get('Races') or {}) if isinstance(ct_config, dict) else {}
+                # Build casefolded Race→Faction and Faction→Races maps from Settings.json
+                races_map_local = races_map if isinstance(races_map, dict) else {}
                 race_to_faction_cf = {str(r).casefold(): str(v.get('Faction','')).casefold()
-                                      for r, v in races_map.items()
+                                      for r, v in races_map_local.items()
                                       if isinstance(v, dict)}
                 faction_to_races_cf = {}
                 for r_cf, f_cf in race_to_faction_cf.items():
@@ -1584,7 +2126,7 @@ def open_system_editor(filename: str) -> None:
                     ).casefold() in allowed
                 ]
             # filter by roles containing 'station'
-            if role_var.get():
+            if role_filter_var.get():
                 new_filtered = []
                 for h in filtered:
                     entry = next((e for e in ship_entries if e['key']==h), {})
@@ -1605,12 +2147,12 @@ def open_system_editor(filename: str) -> None:
 
         tk.Checkbutton(edit_frame,
                        text="Match station side",
-                       variable=side_var,
+                       variable=side_filter_var,
                        command=update_hulls)\
             .pack(anchor='w')
         tk.Checkbutton(edit_frame,
                        text="Only roles=station",
-                       variable=role_var,
+                       variable=role_filter_var,
                        command=update_hulls)\
             .pack(anchor='w', pady=(0,5))
 
@@ -1633,6 +2175,8 @@ def open_system_editor(filename: str) -> None:
             is_center = True
         elif isinstance(feat.get('coordinate'), (list, tuple)):
             coord = feat.get('coordinate')
+            if ttype in ('blackhole', 'planet', 'debris_field', 'hidden_minefield'):
+                is_center = True
         update_coord_display(coord, is_center)
         clear_edit_pane()
         edit_title.config(text=f"Terrain: {key}")
@@ -1654,6 +2198,13 @@ def open_system_editor(filename: str) -> None:
                 ("X:",      lambda: coord[0], lambda v: feat.__setitem__('coordinate',[v,coord[1],coord[2]])),
                 ("Z:",      lambda: coord[2], lambda v: feat.__setitem__('coordinate',[coord[0],coord[1],v])),
                 ("Name:",   lambda: feat.get('name', key), lambda v: feat.__setitem__('name', v)),
+                (
+                    "Class:",
+                    lambda: feat.get('class', DEFAULT_PLANET_CLASS),
+                    lambda v: feat.__setitem__('class', v),
+                    'combo',
+                    valid_planet_classes,
+                ),
                 # Size is fixed visually (15,000 units); no size field in JSON by design
                 ("Description:", lambda: feat.get('description',''),
                     lambda v: feat.__setitem__('description', v), 'text'),
@@ -1672,6 +2223,16 @@ def open_system_editor(filename: str) -> None:
             if 'seed' in feat:
                 fields.append(("Seed:", lambda: feat.get('seed',2010), lambda v: feat.__setitem__('seed', int(v))))
             show_item("Debris Field", key, fields, rename_terrain, delete_terrain)
+        elif ttype == 'hidden_minefield':
+            coord = feat.get('coordinate', [0,0,0])
+            fields = [
+                ("X:", lambda: coord[0], lambda v: feat.__setitem__('coordinate', [v, coord[1], coord[2]])),
+                ("Z:", lambda: coord[2], lambda v: feat.__setitem__('coordinate', [coord[0], coord[1], v])),
+                ("Width:", lambda: feat.get('width', 15000), lambda v: feat.__setitem__('width', int(v))),
+                ("Height:", lambda: feat.get('height', 15000), lambda v: feat.__setitem__('height', int(v))),
+                ("Density:", lambda: feat.get('density', 70), lambda v: feat.__setitem__('density', int(v))),
+            ]
+            show_item("Hidden Mine Field", key, fields, rename_terrain, delete_terrain)
         else:
             fields = [
                 ("Density:", lambda: feat.get('density',1), lambda v: feat.__setitem__('density',int(v))),
@@ -1706,13 +2267,69 @@ def open_system_editor(filename: str) -> None:
 
     # Save All button
     def save_all():
+        nonlocal session_revision_bumped
+        old_md = {}
         try:
             # Update in-memory state
             sm.set_system_map_coord([float(var.get()) for var in coord_vars])
             sm.set_alignment(align_var.get())
             sm.set_description(desc_text.get('1.0', tk.END).strip())
+            persist_author_setting()
+
+            md = sm.data.setdefault('metadata', {})
+            def _merge_with_extras(selected, existing, known):
+                extras = [x for x in (existing or []) if x not in known]
+                for x in extras:
+                    if x not in selected:
+                        selected.append(x)
+                return selected
+
+            md['security'] = sec_var.get()
+            selected_exports = [k for k, v in export_vars.items() if v.get()]
+            md['exports'] = _merge_with_extras(selected_exports, md.get('exports', []), smopts.EXPORT_OPTIONS)
+            md['focus'] = focus_var.get()
+            md['development'] = dev_var.get()
+            md['visible'] = True if vis_var.get() == "Show" else False
+            md['skybox'] = skybox_var.get()
+
+            intel_data = md.get('intel', {})
+            if not isinstance(intel_data, dict):
+                intel_data = {}
+            intel_data['pirate'] = pirate_var.get()
+            intel_data['enemy'] = enemy_var.get()
+            selected_assets = [k for k, v in assets_vars.items() if v.get()]
+            intel_data['assets'] = _merge_with_extras(selected_assets, intel_data.get('assets', []), smopts.ASSET_OPTIONS)
+            md['intel'] = intel_data
+
+            current_author = author_var.get().strip()
+            old_md = {}
+            for key in ('original_author', 'last_revision_author', 'revision_number', 'revision_date', 'all_authors'):
+                if key in md:
+                    old_md[key] = (True, md.get(key))
+                else:
+                    old_md[key] = (False, None)
+
+            authors = _normalize_author_list(md.get('all_authors'))
+            if current_author:
+                if not any(a.casefold() == current_author.casefold() for a in authors):
+                    authors.append(current_author)
+                if not str(md.get('original_author', '') or '').strip():
+                    md['original_author'] = current_author
+                md['last_revision_author'] = current_author
+            if authors:
+                md['all_authors'] = authors
+
+            bumped_this_save = False
+            if not session_revision_bumped:
+                rev_num = _coerce_revision_number(md.get('revision_number', 0))
+                md['revision_number'] = rev_num + 1
+                md['revision_date'] = datetime.date.today().isoformat()
+                bumped_this_save = True
             # Persist to disk
             sm.save()
+            if bumped_this_save:
+                session_revision_bumped = True
+            refresh_author_metadata_display(md)
             # Mark as clean (no unsaved changes)
             # Using the project's definition: "unsaved" ≙ undo list has entries.
             # After a successful save, clear undo/redo so close won't warn.
@@ -1721,9 +2338,23 @@ def open_system_editor(filename: str) -> None:
                 redo_stack.clear()
             except Exception:
                 pass
-            # Inform user but do NOT close the window
-            messagebox.showinfo("Saved", f"{filename} saved.")
+            # Inform user with a sound only (no popup)
+            try:
+                win.bell()
+            except Exception:
+                pass
         except Exception as e:
+            # Restore metadata on failure to avoid false revision bumps
+            try:
+                md = sm.data.setdefault('metadata', {})
+                for key, (exists, val) in old_md.items():
+                    if exists:
+                        md[key] = val
+                    else:
+                        md.pop(key, None)
+                refresh_author_metadata_display(md)
+            except Exception:
+                pass
             messagebox.showerror("Error", f"Save failed: {e}")
 
    # ─── Reload button (clear & reload from disk) ──────────────────
@@ -1738,6 +2369,47 @@ def open_system_editor(filename: str) -> None:
             align_var.set(sm.get_alignment() or '')
             desc_text.delete('1.0', tk.END)
             desc_text.insert('1.0', sm.get_description())
+            refresh_author_metadata_display(sm.data.get('metadata', {}))
+
+            md = sm.data.setdefault('metadata', {})
+            intel = md.get('intel', {})
+            if not isinstance(intel, dict):
+                intel = {}
+            sec_val = md.get('security', 'Neutral')
+            if sec_val not in smopts.SECURITY_LEVELS:
+                sec_val = 'Neutral'
+            pirate_val = intel.get('pirate', 'Low')
+            if pirate_val not in smopts.PIRATE_LEVELS:
+                pirate_val = 'Low'
+            enemy_val = intel.get('enemy', 'Low')
+            if enemy_val not in smopts.ENEMY_LEVELS:
+                enemy_val = 'Low'
+            dev_val = md.get('development', 'Unclaimed')
+            if dev_val not in smopts.DEVELOPMENT_STAGES:
+                dev_val = 'Unclaimed'
+
+            sec_var.set(sec_val)
+            pirate_var.set(pirate_val)
+            enemy_var.set(enemy_val)
+            dev_var.set(dev_val)
+
+            assets_current = set(intel.get('assets', []) or [])
+            for opt, var in assets_vars.items():
+                var.set(opt in assets_current)
+
+            exports_current = set(md.get('exports', []) or [])
+            for opt, var in export_vars.items():
+                var.set(opt in exports_current)
+
+            focus_var.set(md.get('focus', ''))
+            vis_var.set("Show" if md.get('visible', True) else "Hide")
+            skybox_var.set(md.get('skybox', '') or skybox_var.get())
+
+            traffic = sm.data.get('traffic', {})
+            if not isinstance(traffic, dict):
+                traffic = {}
+            for cat, var in traffic_vars.items():
+                var.set(traffic.get(cat, 'none'))
 
             # refresh Objects list
             obj_lb.delete(0, tk.END)
@@ -1767,6 +2439,7 @@ def open_system_editor(filename: str) -> None:
             return
         # Re-run validation after a reload
         validate_and_report()
+        validate_and_fix_planet_classes_on_load(sm)
         validate_and_fix_sides_on_load(sm)
         # Refresh object list ordering/coloring after reload
 
@@ -2039,6 +2712,109 @@ def open_system_editor(filename: str) -> None:
         txt.insert("1.0", help_content)
         txt.config(state='disabled')
 
+    def generate_terrain():
+        scripts_dir = os.path.join(base, 'scripts')
+        if scripts_dir not in sys.path:
+            sys.path.insert(0, scripts_dir)
+        try:
+            import generate_system_terrain as gst
+        except Exception as exc:
+            messagebox.showerror("Generate Terrain", f"Failed to load generator:\n{exc}")
+            return
+
+        defaults = argparse.Namespace(
+            size="medium",
+            radius=None,
+            asteroids=getattr(gst, "DEFAULT_ASTEROIDS", 12),
+            nebulas=getattr(gst, "DEFAULT_NEBULAS", 8),
+            debris=6,
+            density_min=100,
+            density_max=300,
+            debris_density=130,
+            seed=None,
+            pattern_ratio=0.7,
+            track_min=4,
+            track_max=9,
+            arc_angle_min=20.0,
+            arc_angle_max=45.0,
+            max_circle_sides=24,
+            path_turn=40.0,
+            segment_overlap=0.15,
+            segment_swing=0.15,
+            min_gap=None,
+            input=None,
+            out=None,
+            mode="append",
+        )
+
+        try:
+            args = gst.interactive_prompt(defaults, parent=win, show_io=False)
+        except SystemExit as exc:
+            if "canceled" in str(exc).lower():
+                return
+            messagebox.showerror("Generate Terrain", str(exc))
+            return
+        except Exception as exc:
+            messagebox.showerror("Generate Terrain", f"Failed to open generator:\n{exc}")
+            return
+
+        try:
+            radius = args.radius if args.radius else gst.SIZE_TO_RADIUS[args.size]
+        except Exception:
+            messagebox.showerror("Generate Terrain", "Invalid size selection.")
+            return
+
+        min_gap = args.min_gap if args.min_gap is not None else max(20000.0, radius * 0.08)
+        counts_custom = getattr(args, "_counts_custom", False)
+        if not counts_custom:
+            if args.size == "medium":
+                args.asteroids *= 2
+                args.nebulas *= 2
+            elif args.size == "large":
+                args.asteroids *= 4
+                args.nebulas *= 4
+
+        rng = random.Random(args.seed)
+        terrain_data = sm.data.setdefault("terrain", {})
+        used_names = set(terrain_data.keys()) if args.mode == "append" else set()
+
+        try:
+            new_terrain = gst.build_terrain(
+                radius,
+                args.asteroids,
+                args.nebulas,
+                args.debris,
+                rng,
+                args.pattern_ratio,
+                min_gap,
+                used_names,
+                args.track_min,
+                args.track_max,
+                args.max_circle_sides,
+                args.path_turn,
+                args.segment_overlap,
+                args.density_min,
+                args.density_max,
+                args.segment_swing,
+                args.debris_density,
+                args.arc_angle_min,
+                args.arc_angle_max,
+            )
+        except Exception as exc:
+            messagebox.showerror("Generate Terrain", f"Generation failed:\n{exc}")
+            return
+
+        if not new_terrain:
+            messagebox.showinfo("Generate Terrain", "No terrain was generated.")
+            return
+
+        push_undo()
+        if args.mode == "append":
+            terrain_data.update(new_terrain)
+        else:
+            sm.data["terrain"] = new_terrain
+        _refresh_ui()
+
     # ─── Meta Ribbon ────────────────────────────────────────────────────
     button_frame = tk.Frame(frame)
     # span all columns and allow horizontal expansion
@@ -2051,6 +2827,7 @@ def open_system_editor(filename: str) -> None:
         ("Load Different System", load_different_system),
         ("Undo",             do_undo),
         ("Redo",             do_redo),
+        ("Generate Terrain", generate_terrain),
         ("Stations Overview", show_station_list),
         ("Info",             show_info),
     ]
@@ -2100,6 +2877,12 @@ def open_system_editor(filename: str) -> None:
     # Editor-only: grid mode cycling (press 'g' to toggle)
     grid_mode_index = 0
     def cycle_grid_mode(event=None):
+        if event is not None:
+            try:
+                if event.widget.winfo_toplevel() != win:
+                    return
+            except Exception:
+                return
         nonlocal grid_mode_index
         grid_mode_index = (grid_mode_index + 1) % len(GRID_MODES)
         mode = GRID_MODES[grid_mode_index]
@@ -2418,6 +3201,37 @@ def open_system_editor(filename: str) -> None:
                     tags=('terrain', key)
                 )
                 continue
+            if t_type == 'hidden_minefield':
+                coord = feat.get('coordinate', [0,0,0])
+                width = float(feat.get('width', 15000) or 0)
+                height = float(feat.get('height', 15000) or 0)
+                # Width/height are treated as extents from center (full size = 2x)
+                extent_w = width
+                extent_h = height
+                x0, z0 = coord[0] - extent_w, coord[2] - extent_h
+                x1, z1 = coord[0] + extent_w, coord[2] + extent_h
+                sx0, sy0 = coord_to_screen(x0, z0)
+                sx1, sy1 = coord_to_screen(x1, z1)
+                map_canvas.create_rectangle(
+                    sx0, sy0, sx1, sy1,
+                    outline='#cc0000', fill='#552222',
+                    tags=('terrain', key)
+                )
+                # draggable/selectable center handle (blue)
+                sx, sy = coord_to_screen(coord[0], coord[2])
+                rr = 4
+                map_canvas.create_oval(
+                    sx - rr, sy - rr, sx + rr, sy + rr,
+                    fill='blue',
+                    tags=('terrain_pt', key, 'coord')
+                )
+                # label at center
+                map_canvas.create_text(
+                    sx, sy - 10,
+                    text=key, fill='white', font=('Arial',8),
+                    tags=('terrain', key)
+                )
+                continue
             x0, _, z0 = feat.get('start', [0,0,0])
             x1, _, z1 = feat.get('end', [0,0,0])
             dx, dz = x1 - x0, z1 - z0
@@ -2437,10 +3251,42 @@ def open_system_editor(filename: str) -> None:
             for gx, gz in corners:
                 sx2, sy2 = coord_to_screen(gx, gz)
                 pts.extend([sx2, sy2])
+            fill_color = color
+            fill_stipple = ''
+            if t_type in ('nebulas', 'asteroids'):
+                # Tkinter doesn't support alpha in hex colors; use stipple for translucency.
+                fill_stipple = 'gray25'
             map_canvas.create_polygon(
-                pts, fill=color, outline='',
-                tags=('terrain', key)
+                pts, fill=fill_color, outline='',
+                stipple=fill_stipple,
+                tags=('terrain_poly', key)
             )
+            # overlay exact placement dots for nebulae/asteroids
+            if t_type in ('nebulas', 'asteroids'):
+                density = int(feat.get('density', 125) or 0)
+                density = max(0, min(density, 10000))
+                seed = feat.get('seed', 2010)
+                scatter = float(feat.get('scatter', 0) or 0)
+                cache = ctx.setdefault('terrain_points_cache', {})
+                cache_key = (t_type, tuple(feat.get('start', [0, 0, 0])), tuple(feat.get('end', [0, 0, 0])),
+                             float(scatter), int(density), int(seed))
+                coords = cache.get((key, cache_key))
+                if coords is None and density > 0 and scatter > 0:
+                    coords = generate_line_coords(feat.get('start', [0, 0, 0]),
+                                                  feat.get('end', [0, 0, 0]),
+                                                  density, scatter, seed=seed)
+                    cache[(key, cache_key)] = coords
+                if coords:
+                    dot_color = '#C24BFF' if t_type == 'nebulas' else '#D8A25A'
+                    dot_radius_world = 500 if t_type == 'nebulas' else 150
+                    rpx = dot_radius_world * map_scale
+                    for gx, _, gz in coords:
+                        sx2, sy2 = coord_to_screen(gx, gz)
+                        map_canvas.create_oval(
+                            sx2 - rpx, sy2 - rpx, sx2 + rpx, sy2 + rpx,
+                            fill=dot_color, outline='',
+                            tags=('terrain_pt', key)
+                        )
             # Label terrain at midpoint (hide names for asteroids & nebulas)
             if t_type not in ('asteroids', 'nebulas'):
                 cx = (x0 + x1) / 2 * map_scale + pan_x
@@ -2460,7 +3306,9 @@ def open_system_editor(filename: str) -> None:
             )
 
         # ── finally: push all terrain behind relays & objects ─────────────
+        map_canvas.tag_lower('terrain_poly')
         map_canvas.tag_lower('terrain')
+        map_canvas.tag_raise('terrain_pt')
         map_canvas.tag_raise('relay_pt')
         map_canvas.tag_raise('obj')
 
@@ -2537,6 +3385,7 @@ def open_system_editor(filename: str) -> None:
         'terrain_keys': terrain_keys,
         'valid_sides': valid_sides,
         'valid_hulls': valid_hulls,
+        'valid_planet_classes': valid_planet_classes,
         'hull_ranges': hull_ranges,
         'hull_side_map': hull_side_map,
         'hull_role_map': hull_role_map,
@@ -2557,7 +3406,8 @@ def open_system_editor(filename: str) -> None:
         'pan_x': pan_x,
         'pan_y': pan_y,
         'map_scale': map_scale,
-        'push_undo':  push_undo
+        'push_undo':  push_undo,
+        'copy_state': copy_state
     }
 
     # Create transform functions that always read the *current* pan/zoom from ctx.
@@ -2616,9 +3466,6 @@ def open_system_editor(filename: str) -> None:
     # Run validation once the editor window is up
     validate_and_report()
     refresh_objects_list()
-    global g_ctx
-    g_ctx = ctx    
-
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()

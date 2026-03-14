@@ -1,0 +1,652 @@
+{
+    "systemMapCoord": [
+        6916.131048591675,
+        0.0,
+        -5180.810958761205
+    ],
+    "systemalignment": "Kralien",
+    "metadata": {
+        "sysdescription": "",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "development": "Unclaimed",
+        "visible": false,
+        "skybox": "sky1.png",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
+        "original_author": "Fish Evans",
+        "last_revision_author": "Fish Evans",
+        "all_authors": [
+            "Fish Evans"
+        ],
+        "revision_number": 6,
+        "revision_date": "2026-02-21"
+    },
+    "objects": {
+        "JP 82": {
+            "coordinate": [
+                135300.0,
+                0,
+                -161000.0
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Helios Gate": "Tibur"
+            },
+            "state": "Tethered",
+            "drift": 10000
+        },
+        "DS 17": {
+            "coordinate": [
+                100655.86419753091,
+                0,
+                83793.98148148152
+            ],
+            "sides": [
+                "Hegemony"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        }
+    },
+    "sensor_relay": {},
+    "terrain": {
+        "Asteroid Ring": {
+            "type": "asteroids",
+            "seed": 2141367,
+            "start": [
+                102461.72,
+                0,
+                410379.59
+            ],
+            "end": [
+                76998.9,
+                0,
+                377436.17
+            ],
+            "density": 217,
+            "scatter": 11459,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 2": {
+            "type": "asteroids",
+            "seed": 9808438,
+            "start": [
+                75630.73,
+                0,
+                381819.66
+            ],
+            "end": [
+                112951.03,
+                0,
+                376772.86
+            ],
+            "density": 171,
+            "scatter": 10010,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 3": {
+            "type": "asteroids",
+            "seed": 3401738,
+            "start": [
+                110082.16,
+                0,
+                373850.4
+            ],
+            "end": [
+                97625.41,
+                0,
+                404225.13
+            ],
+            "density": 157,
+            "scatter": 10528,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field": {
+            "type": "asteroids",
+            "seed": 9042541,
+            "start": [
+                -358785.44,
+                0,
+                -94337.23
+            ],
+            "end": [
+                -375830.24,
+                0,
+                -127435.96
+            ],
+            "density": 343,
+            "scatter": 19775,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 2": {
+            "type": "asteroids",
+            "seed": 7711173,
+            "start": [
+                223197.61,
+                0,
+                -178005.97
+            ],
+            "end": [
+                143825.83,
+                0,
+                -174798.17
+            ],
+            "density": 349,
+            "scatter": 8467,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 3": {
+            "type": "asteroids",
+            "seed": 3621271,
+            "start": [
+                -274771.25,
+                0,
+                -228296.48
+            ],
+            "end": [
+                -297872.67,
+                0,
+                -217590.94
+            ],
+            "density": 98,
+            "scatter": 8108,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 4": {
+            "type": "asteroids",
+            "seed": 7748807,
+            "start": [
+                -510580.95,
+                0,
+                42999.57
+            ],
+            "end": [
+                -499941.44,
+                0,
+                -17540.14
+            ],
+            "density": 401,
+            "scatter": 15715,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 5": {
+            "type": "asteroids",
+            "seed": 3923280,
+            "start": [
+                -168926.3,
+                0,
+                -212107.95
+            ],
+            "end": [
+                -140287.57,
+                0,
+                -207619.67
+            ],
+            "density": 339,
+            "scatter": 24345,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 6": {
+            "type": "asteroids",
+            "seed": 1547876,
+            "start": [
+                673.95,
+                0,
+                269427.34
+            ],
+            "end": [
+                43280.41,
+                0,
+                227363.17
+            ],
+            "density": 269,
+            "scatter": 10346,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 7": {
+            "type": "asteroids",
+            "seed": 8056628,
+            "start": [
+                219221.41,
+                0,
+                -70256.36
+            ],
+            "end": [
+                211900.11,
+                0,
+                -20136.82
+            ],
+            "density": 286,
+            "scatter": 11208,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 8": {
+            "type": "asteroids",
+            "seed": 1488168,
+            "start": [
+                -394043.12,
+                0,
+                -329368.34
+            ],
+            "end": [
+                -393809.36,
+                0,
+                -357384.56
+            ],
+            "density": 269,
+            "scatter": 17213,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 9": {
+            "type": "asteroids",
+            "seed": 4501402,
+            "start": [
+                246520.1,
+                0,
+                -183702.86
+            ],
+            "end": [
+                279377.94,
+                0,
+                -198140.04
+            ],
+            "density": 410,
+            "scatter": 22522,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 10": {
+            "type": "asteroids",
+            "seed": 3792038,
+            "start": [
+                119745.83,
+                0,
+                425515.16
+            ],
+            "end": [
+                97269.95,
+                0,
+                452155.18
+            ],
+            "density": 490,
+            "scatter": 33208,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 11": {
+            "type": "asteroids",
+            "seed": 9098705,
+            "start": [
+                233025.51,
+                0,
+                -111892.68
+            ],
+            "end": [
+                263300.62,
+                0,
+                -74196.77
+            ],
+            "density": 703,
+            "scatter": 29092,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 12": {
+            "type": "asteroids",
+            "seed": 4347074,
+            "start": [
+                -64031.69,
+                0,
+                56367.46
+            ],
+            "end": [
+                -834.83,
+                0,
+                107938.22
+            ],
+            "density": 381,
+            "scatter": 10943,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 13": {
+            "type": "asteroids",
+            "seed": 177057,
+            "start": [
+                394273.7,
+                0,
+                52085.31
+            ],
+            "end": [
+                350345.8,
+                0,
+                88850.63
+            ],
+            "density": 445,
+            "scatter": 18026,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Nebula Arc": {
+            "type": "nebulas",
+            "seed": 6759237,
+            "start": [
+                -297204.4,
+                0,
+                -73002.77
+            ],
+            "end": [
+                -288226.91,
+                0,
+                -97266.05
+            ],
+            "density": 116,
+            "scatter": 8579,
+            "composition": []
+        },
+        "Nebula Arc 2": {
+            "type": "nebulas",
+            "seed": 6893026,
+            "start": [
+                -290601.12,
+                0,
+                -92097.98
+            ],
+            "end": [
+                -279002.16,
+                0,
+                -112624.65
+            ],
+            "density": 99,
+            "scatter": 8000,
+            "composition": []
+        },
+        "Nebula Arc 3": {
+            "type": "nebulas",
+            "seed": 779026,
+            "start": [
+                -281991.8,
+                0,
+                -108190.17
+            ],
+            "end": [
+                -267680.56,
+                0,
+                -126095.67
+            ],
+            "density": 96,
+            "scatter": 8000,
+            "composition": []
+        },
+        "Nebula Field": {
+            "type": "nebulas",
+            "seed": 8359492,
+            "start": [
+                101801.5,
+                0,
+                -161920.47
+            ],
+            "end": [
+                123408.07,
+                0,
+                -222857.79
+            ],
+            "density": 406,
+            "scatter": 14848,
+            "composition": []
+        },
+        "Nebula Field 2": {
+            "type": "nebulas",
+            "seed": 3089511,
+            "start": [
+                208969.47,
+                0,
+                475491.54
+            ],
+            "end": [
+                163321.79,
+                0,
+                430552.53
+            ],
+            "density": 485,
+            "scatter": 15275,
+            "composition": []
+        },
+        "Nebula Field 3": {
+            "type": "nebulas",
+            "seed": 6018555,
+            "start": [
+                80345.21,
+                0,
+                399445.41
+            ],
+            "end": [
+                35944.64,
+                0,
+                431293.11
+            ],
+            "density": 578,
+            "scatter": 22020,
+            "composition": []
+        },
+        "Nebula Field 4": {
+            "type": "nebulas",
+            "seed": 7748176,
+            "start": [
+                -71988.32,
+                0,
+                187384.69
+            ],
+            "end": [
+                -29874.56,
+                0,
+                238407.26
+            ],
+            "density": 662,
+            "scatter": 21338,
+            "composition": []
+        },
+        "Nebula Field 5": {
+            "type": "nebulas",
+            "seed": 3104033,
+            "start": [
+                -212148.52,
+                0,
+                112482.8
+            ],
+            "end": [
+                -172872.9,
+                0,
+                76821.56
+            ],
+            "density": 795,
+            "scatter": 33285,
+            "composition": []
+        },
+        "Nebula Field 6": {
+            "type": "nebulas",
+            "seed": 2675970,
+            "start": [
+                -73556.1,
+                0,
+                -37830.71
+            ],
+            "end": [
+                -8911.92,
+                0,
+                -66724.81
+            ],
+            "density": 1077,
+            "scatter": 28878,
+            "composition": []
+        },
+        "Nebula Field 7": {
+            "type": "nebulas",
+            "seed": 251303,
+            "start": [
+                81944.81,
+                0,
+                -533756.29
+            ],
+            "end": [
+                36555.12,
+                0,
+                -519845.88
+            ],
+            "density": 207,
+            "scatter": 10036,
+            "composition": []
+        },
+        "Nebula Field 8": {
+            "type": "nebulas",
+            "seed": 3979858,
+            "start": [
+                -261655.03,
+                0,
+                -438415.16
+            ],
+            "end": [
+                -245504.43,
+                0,
+                -503686.8
+            ],
+            "density": 959,
+            "scatter": 29423,
+            "composition": []
+        },
+        "Nebula Field 9": {
+            "type": "nebulas",
+            "seed": 6859412,
+            "start": [
+                173269.4,
+                0,
+                -421051.91
+            ],
+            "end": [
+                110347.05,
+                0,
+                -474385.56
+            ],
+            "density": 679,
+            "scatter": 17993,
+            "composition": []
+        },
+        "Nebula Field 10": {
+            "type": "nebulas",
+            "seed": 9733375,
+            "start": [
+                -305881.96,
+                0,
+                308708.36
+            ],
+            "end": [
+                -317880.49,
+                0,
+                287325.32
+            ],
+            "density": 222,
+            "scatter": 19426,
+            "composition": []
+        },
+        "Nebula Field 11": {
+            "type": "nebulas",
+            "seed": 1991740,
+            "start": [
+                -410978.82,
+                0,
+                56500.16
+            ],
+            "end": [
+                -373000.25,
+                0,
+                69205.63
+            ],
+            "density": 298,
+            "scatter": 16407,
+            "composition": []
+        },
+        "Nebula Field 12": {
+            "type": "nebulas",
+            "seed": 2349651,
+            "start": [
+                -477643.48,
+                0,
+                -155312.41
+            ],
+            "end": [
+                -468258.09,
+                0,
+                -136088.1
+            ],
+            "density": 315,
+            "scatter": 29932,
+            "composition": []
+        },
+        "Nebula Field 13": {
+            "type": "nebulas",
+            "seed": 8595799,
+            "start": [
+                -330061.53,
+                0,
+                80638.01
+            ],
+            "end": [
+                -344706.17,
+                0,
+                111141.64
+            ],
+            "density": 387,
+            "scatter": 24974,
+            "composition": []
+        },
+        "Debris Field": {
+            "type": "debris_field",
+            "seed": 310360,
+            "coordinate": [
+                -512862.09,
+                0,
+                153204.8
+            ],
+            "density": 32,
+            "scatter": 7813
+        }
+    },
+    "traffic": {}
+}

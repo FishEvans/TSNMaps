@@ -7,33 +7,215 @@
     <title>Renaera.html</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        html, body { margin: 0; height: 100%; background: black; color: white; }
         /* === Description typography controls ===
            Tweak these two variables to change description sizes globally */
         :root {
             --desc-font-size: 130%;
             --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
         }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
         .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
         .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
-        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
-        #plot { flex: 3; min-width: 400px; }
-        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
         h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
         h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
         .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
-        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
         button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">Renaera</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Renaera</h2>
         <h3 class="subheader">Alignment: Ximni</h3>
         <img src="Images/Factions/Ximni.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
-        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <input type="text" id="search-box" placeholder="Search objects...">
         <div id="object-buttons">
     </div>
     </div>
@@ -41,22 +223,136 @@
     <div id="info">
         <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
         <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
-        Select an object
+        Loading system info...
     </div>
 <script>
-    var objData = {"1761415819123": {"type": "blackhole", "x": -26040.025189775468, "y": -92617.05940198779, "grid": "H10"}, "Renaera": {"type": "planet", "x": -39444.44444444445, "y": -19305.555555555566, "grid": "L10", "hidden": false}, "Portal of Renewal": {"type": "jumpnode", "x": 80000.0, "y": 39914.48354050214, "grid": "N16", "hidden": false, "label": "Portal of Renewal", "destinations": {"Renaera Portal": "Isscar", "JP 56": "Kudos"}}, "Old Zenth": {"type": "station", "x": -1551.586791266572, "y": -4464.663351623235, "grid": "L11", "hidden": false, "label": "Old Zenth", "description": "Before the Folly of the first Age Old Zenth was the capital of Renaera. This staion in Geostationary Orbit of the site is part museum, part alter and part tourist attraction", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Egress Yards 2": {"type": "station", "x": -32130.3768242265, "y": 5400.463558337133, "grid": "M10", "hidden": false, "label": "Egress Yards 2", "hull": "xim_avenger", "facilities": [], "sides": ["Ximni"], "hullName": "Avenger", "hullImage": "Images/Ships/ximni_avenger256.png", "hullDescription": "Ximni single seat fighter."}, "Egress Yards 1": {"type": "station", "x": -14791.666666666677, "y": -32859.17435890109, "grid": "K11", "hidden": false, "label": "Egress Yards 1", "description": "Abandoned Yards, Irriadiated", "hull": "hegemony_drydock", "facilities": [], "sides": ["Ximni"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": ""}, "Old Zenth SM1": {"type": "station", "x": 920.8185372411139, "y": -1464.12188330684, "grid": "L12", "hidden": false, "label": "Old Zenth SM1", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["Ximni"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": ""}, "Old Zenth SM2": {"type": "station", "x": -6322.632084265281, "y": -2320.8741073559836, "grid": "L11", "hidden": false, "label": "Old Zenth SM2", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["Ximni"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": ""}, "Renewal Traffic": {"type": "station", "x": 72895.60467246253, "y": 32469.65318117742, "grid": "N15", "hidden": false, "label": "Renewal Traffic", "hull": "starbase_command", "facilities": ["Docking", "Repair", "Refuel"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 7": {"type": "platform", "x": 73720.44343850297, "y": 32287.359221827373, "grid": "N15", "hidden": false, "label": "WP 7"}, "DS 77": {"type": "station", "x": 80107.9231055248, "y": 36181.08653637171, "grid": "N16", "hidden": false, "label": "DS 77", "hull": "hegemony_generator", "facilities": [], "sides": ["Ximni"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 29": {"type": "station", "x": -94323.20420212118, "y": 139489.42207949373, "grid": "S07", "hidden": false, "label": "DS 29", "hull": "starbase_industry", "facilities": [], "sides": ["Ximni"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 68": {"type": "station", "x": -172656.53753545452, "y": -43843.911253839615, "grid": "J03", "hidden": false, "label": "DS 68", "hull": "starbase_science", "facilities": [], "sides": ["Ximni"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": ""}, "DS 59": {"type": "station", "x": 109843.46246454549, "y": -104577.24458717297, "grid": "G17", "hidden": false, "label": "DS 59", "hull": "starbase_kralien", "facilities": [], "sides": ["Ximni"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": ""}, "Echo Ring": {"type": "station", "x": -59281.50383424916, "y": 282.8914917687155, "grid": "M09", "hidden": false, "label": "Echo Ring", "hull": "starbase_command", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 40": {"type": "platform", "x": -60026.72234486126, "y": -876.9077346553184, "grid": "L08", "hidden": false, "label": "WP 40"}, "WP 32": {"type": "platform", "x": -57913.91402718956, "y": 218.62250413741316, "grid": "M09", "hidden": false, "label": "WP 32"}, "WP 6": {"type": "platform", "x": -59478.957225464896, "y": 1653.2454358897999, "grid": "M09", "hidden": false, "label": "WP 6"}, "WP 26": {"type": "platform", "x": -60626.6555708668, "y": 557.7151970970682, "grid": "M08", "hidden": false, "label": "WP 26"}, "WP 50": {"type": "platform", "x": -57444.40106770696, "y": 1470.657062757678, "grid": "M09", "hidden": false, "label": "WP 50"}, "WP 79": {"type": "platform", "x": -60626.6555708668, "y": -1085.5801610920294, "grid": "L08", "hidden": false, "label": "WP 79"}, "WP 74": {"type": "platform", "x": -60548.40341095303, "y": 1940.1700222402771, "grid": "M08", "hidden": false, "label": "WP 74"}};
+    var objData = {"1761415819123": {"type": "blackhole", "x": -26040.025189775468, "y": -92617.05940198779, "grid": "H10"}, "Renaera": {"type": "planet", "x": -39444.44444444445, "y": -19305.555555555566, "grid": "L10", "hidden": false}, "Portal of Renewal": {"type": "jumpnode", "x": 80000.0, "y": 39914.48354050214, "grid": "N16", "hidden": false, "label": "Portal of Renewal", "destinations": {"Renaera Portal": "Isscar", "JP 56": "Kudos"}}, "Old Zenth": {"type": "station", "x": -1551.586791266572, "y": -4464.663351623235, "grid": "L11", "hidden": false, "label": "Old Zenth", "description": "Before the Folly of the first Age Old Zenth was the capital of Renaera. This staion in Geostationary Orbit of the site is part museum, part alter and part tourist attraction", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Egress Yards 2": {"type": "station", "x": -32130.3768242265, "y": 5400.463558337133, "grid": "M10", "hidden": false, "label": "Egress Yards 2", "hull": "xim_avenger", "facilities": [], "sides": ["Ximni"], "hullName": "Avenger", "hullImage": "Images/Ships/ximni_avenger256.png", "hullDescription": "Ximni single seat fighter."}, "Egress Yards 1": {"type": "station", "x": -14791.666666666677, "y": -32859.17435890109, "grid": "K11", "hidden": false, "label": "Egress Yards 1", "description": "Abandoned Yards, Irriadiated", "hull": "hegemony_drydock", "facilities": [], "sides": ["Ximni"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": ""}, "Old Zenth SM1": {"type": "station", "x": 920.8185372411139, "y": -1464.12188330684, "grid": "L12", "hidden": false, "label": "Old Zenth SM1", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["Ximni"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": ""}, "Old Zenth SM2": {"type": "station", "x": -6322.632084265281, "y": -2320.8741073559836, "grid": "L11", "hidden": false, "label": "Old Zenth SM2", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["Ximni"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": ""}, "Renewal Traffic": {"type": "station", "x": 72895.60467246253, "y": 32469.65318117742, "grid": "N15", "hidden": false, "label": "Renewal Traffic", "hull": "starbase_command", "facilities": ["Docking", "Repair", "Refuel"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 7": {"type": "platform", "x": 73720.44343850297, "y": 32287.359221827373, "grid": "N15", "hidden": false, "label": "WP 7"}, "DS 77": {"type": "station", "x": 80107.9231055248, "y": 36181.08653637171, "grid": "N16", "hidden": false, "label": "DS 77", "hull": "hegemony_generator", "facilities": [], "sides": ["Ximni"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 29": {"type": "station", "x": -94323.20420212118, "y": 139489.42207949373, "grid": "S07", "hidden": false, "label": "DS 29", "hull": "starbase_industry", "facilities": [], "sides": ["Ximni"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 68": {"type": "station", "x": -172656.53753545452, "y": -43843.911253839615, "grid": "J03", "hidden": false, "label": "DS 68", "hull": "starbase_science", "facilities": [], "sides": ["Ximni"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": ""}, "DS 59": {"type": "station", "x": 109843.46246454549, "y": -104577.24458717297, "grid": "G17", "hidden": false, "label": "DS 59", "hull": "starbase_Kralien", "facilities": [], "sides": ["Ximni"]}, "Echo Ring": {"type": "station", "x": -59281.50383424916, "y": 282.8914917687155, "grid": "M09", "hidden": false, "label": "Echo Ring", "hull": "starbase_command", "facilities": ["Docking", "Refuel"], "sides": ["Ximni"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 40": {"type": "platform", "x": -60026.72234486126, "y": -876.9077346553184, "grid": "L08", "hidden": false, "label": "WP 40"}, "WP 32": {"type": "platform", "x": -57913.91402718956, "y": 218.62250413741316, "grid": "M09", "hidden": false, "label": "WP 32"}, "WP 6": {"type": "platform", "x": -59478.957225464896, "y": 1653.2454358897999, "grid": "M09", "hidden": false, "label": "WP 6"}, "WP 26": {"type": "platform", "x": -60626.6555708668, "y": 557.7151970970682, "grid": "M08", "hidden": false, "label": "WP 26"}, "WP 50": {"type": "platform", "x": -57444.40106770696, "y": 1470.657062757678, "grid": "M09", "hidden": false, "label": "WP 50"}, "WP 79": {"type": "platform", "x": -60626.6555708668, "y": -1085.5801610920294, "grid": "L08", "hidden": false, "label": "WP 79"}, "WP 74": {"type": "platform", "x": -60548.40341095303, "y": 1940.1700222402771, "grid": "M08", "hidden": false, "label": "WP 74"}};
+    var systemMeta = {"system_name": "Renaera", "description": "The cradle of Ximni civilization, Renaera still bears the scars of the nuclear holocaust that nearly ended their species a millennium ago. Vast regions of the surface remain lifeless and glassed, their twisted metal skeletons now monuments to the \u201cFolly of the First Age.\u201d Enormous biodome cities and underground arcologies dot the habitable belts, powered by geothermal fusion reactors buried deep beneath the irradiated crust. The surviving ruins of Old Zenth, the pre-war capital, are preserved as a cultural relic and a place of pilgrimage. Orbiting Renaera is the Echo Ring, an artificial habitat containing the Confederation\u2019s largest historical archives.", "exports": [], "assets": [], "focus": "", "intel": {"pirate": "", "enemy": ""}, "original_author": "Fish Evans", "last_author": "Fish Evans", "revision_number": 15, "version_tag": "29126.15", "all_authors": ["Fish Evans"]};
+    var pageBody = document.body;
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
     function clearAnnotations() {
         Plotly.relayout('plot', {annotations: []});
-        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        setDefaultInfo();
     }
     
     function getInfoHeader() {
@@ -139,24 +435,23 @@
                           + '</p>';
             }
             document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
-            document.getElementById('galactic-map-btn').addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
                 + infoHtml;
          
     }
-         document.getElementById('galactic-map-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+         bindGalacticButton();
     
 
-    var fig = {"data": [{"type": "scatter", "x": [-54714.415472550005, -10547.748805883333, -21118.91786078334, -65285.58452745001, -54714.415472550005], "y": [76511.0309104591, 104011.0309104591, 120988.96908954093, 93488.96908954093, 76511.0309104591], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-39444.44444444445], "y": [-19305.555555555566], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Renaera"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Renaera [L10]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [41896.657507705706, 25500.052569434087, 11154.46495224955, 27551.069890521165, 41896.657507705706], "y": [-90471.73342355283, -73592.87539886148, -87528.58908412646, -104407.44710881781, -90471.73342355283], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-75551.84163192648, -53850.4527430376, -72496.5729451553, -94197.9618340442, -75551.84163192648], "y": [-97680.52301079573, -41739.16498610436, -34505.756287006974, -90447.11431169836, -97680.52301079573], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-48062.92213656998, -41311.37892669343, -60922.992440511836, -67674.53565038838, -48062.92213656998], "y": [-119655.3812471968, -85897.66519781407, -81975.34249505038, -115733.05854443311, -119655.3812471968], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [25295.510169304558, 28671.28177424283, 48492.495006700075, 45116.7234017618, 25295.510169304558], "y": [-36563.06223945255, -61640.22273327971, -58971.98249044893, -33894.821996621766, -36563.06223945255], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [19614.021258543235, -42596.62688960493, -39383.114847970704, 22827.533300177452, 19614.021258543235], "y": [-102519.36324589254, -112646.67806070737, -132386.8234593176, -122259.50864450276, -102519.36324589254], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [144842.10531675132, 92758.77198341799, 91465.18998271016, 143548.52331604346, 144842.10531675132], "y": [88079.59433892243, 91455.36594386068, 71497.24364722554, 68121.47204228728, 88079.59433892243], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [22833.957540687137, 29103.247664143928, 9480.282203218734, 3210.9920797619434, 22833.957540687137], "y": [52537.5671757943, 84366.270879498, 88231.40043998328, 56402.69673627956, 52537.5671757943], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [72740.97970652676, 46217.05995344034, 60846.40818552729, 87370.32793861371, 72740.97970652676], "y": [3418.5255921477556, -25034.40650661768, -38671.93451958009, -10219.002420814653, 3418.5255921477556], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [108522.91690814953, 90197.29962419892, 107529.74876168229, 125855.36604563291, 108522.91690814953], "y": [55601.75171334836, 23773.04800964465, 13793.75911230574, 45622.46281600944, 55601.75171334836], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-85515.38356729504, -78763.84035741849, -97737.50631842876, -104489.0495283053, -85515.38356729504], "y": [12245.354295868543, 32499.983925498178, 38824.53924583494, 18569.909616205303, 12245.354295868543], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-26040.025189775468], "y": [-92617.05940198779], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["1761415819123"], "textposition": "top center", "hovertext": ["1761415819123 [H10]"], "hoverinfo": "text", "meta": {"base_marker_size": 140, "base_text_size": 14}}, {"type": "scatter", "x": [80000.0], "y": [39914.48354050214], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Portal of Renewal [N16]"], "hoverinfo": "text", "text": ["Portal of Renewal"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-1551.586791266572], "y": [-4464.663351623235], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth [L11]"], "hoverinfo": "text", "text": ["Old Zenth"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-32130.3768242265], "y": [5400.463558337133], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Egress Yards 2 [M10]"], "hoverinfo": "text", "text": ["Egress Yards 2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-14791.666666666677], "y": [-32859.17435890109], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Egress Yards 1 [K11]"], "hoverinfo": "text", "text": ["Egress Yards 1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [920.8185372411139], "y": [-1464.12188330684], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth SM1 [L12]"], "hoverinfo": "text", "text": ["Old Zenth SM1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-6322.632084265281], "y": [-2320.8741073559836], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth SM2 [L11]"], "hoverinfo": "text", "text": ["Old Zenth SM2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [72895.60467246253], "y": [32469.65318117742], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Renewal Traffic [N15]"], "hoverinfo": "text", "text": ["Renewal Traffic"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [73720.44343850297], "y": [32287.359221827373], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 7 [N15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [80107.9231055248], "y": [36181.08653637171], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 77 [N16]"], "hoverinfo": "text", "text": ["DS 77"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-94323.20420212118], "y": [139489.42207949373], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 29 [S07]"], "hoverinfo": "text", "text": ["DS 29"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-172656.53753545452], "y": [-43843.911253839615], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 68 [J03]"], "hoverinfo": "text", "text": ["DS 68"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [109843.46246454549], "y": [-104577.24458717297], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 59 [G17]"], "hoverinfo": "text", "text": ["DS 59"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-59281.50383424916], "y": [282.8914917687155], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Echo Ring [M09]"], "hoverinfo": "text", "text": ["Echo Ring"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-60026.72234486126], "y": [-876.9077346553184], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 40 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57913.91402718956], "y": [218.62250413741316], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 32 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-59478.957225464896], "y": [1653.2454358897999], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 6 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60626.6555708668], "y": [557.7151970970682], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 26 [M08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57444.40106770696], "y": [1470.657062757678], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 50 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60626.6555708668], "y": [-1085.5801610920294], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 79 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60548.40341095303], "y": [1940.1700222402771], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 74 [M08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Renaera", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-54714.415472550005, -10547.748805883333, -21118.91786078334, -65285.58452745001, -54714.415472550005], "y": [76511.0309104591, 104011.0309104591, 120988.96908954093, 93488.96908954093, 76511.0309104591], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-39444.44444444445], "y": [-19305.555555555566], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Renaera"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Renaera [L10]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [41896.657507705706, 25500.052569434087, 11154.46495224955, 27551.069890521165, 41896.657507705706], "y": [-90471.73342355283, -73592.87539886148, -87528.58908412646, -104407.44710881781, -90471.73342355283], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-75551.84163192648, -53850.4527430376, -72496.5729451553, -94197.9618340442, -75551.84163192648], "y": [-97680.52301079573, -41739.16498610436, -34505.756287006974, -90447.11431169836, -97680.52301079573], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-48062.92213656998, -41311.37892669343, -60922.992440511836, -67674.53565038838, -48062.92213656998], "y": [-119655.3812471968, -85897.66519781407, -81975.34249505038, -115733.05854443311, -119655.3812471968], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [25295.510169304558, 28671.28177424283, 48492.495006700075, 45116.7234017618, 25295.510169304558], "y": [-36563.06223945255, -61640.22273327971, -58971.98249044893, -33894.821996621766, -36563.06223945255], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [19614.021258543235, -42596.62688960493, -39383.114847970704, 22827.533300177452, 19614.021258543235], "y": [-102519.36324589254, -112646.67806070737, -132386.8234593176, -122259.50864450276, -102519.36324589254], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [144842.10531675132, 92758.77198341799, 91465.18998271016, 143548.52331604346, 144842.10531675132], "y": [88079.59433892243, 91455.36594386068, 71497.24364722554, 68121.47204228728, 88079.59433892243], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [22833.957540687137, 29103.247664143928, 9480.282203218734, 3210.9920797619434, 22833.957540687137], "y": [52537.5671757943, 84366.270879498, 88231.40043998328, 56402.69673627956, 52537.5671757943], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [72740.97970652676, 46217.05995344034, 60846.40818552729, 87370.32793861371, 72740.97970652676], "y": [3418.5255921477556, -25034.40650661768, -38671.93451958009, -10219.002420814653, 3418.5255921477556], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [108522.91690814953, 90197.29962419892, 107529.74876168229, 125855.36604563291, 108522.91690814953], "y": [55601.75171334836, 23773.04800964465, 13793.75911230574, 45622.46281600944, 55601.75171334836], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-85515.38356729504, -78763.84035741849, -97737.50631842876, -104489.0495283053, -85515.38356729504], "y": [12245.354295868543, 32499.983925498178, 38824.53924583494, 18569.909616205303, 12245.354295868543], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-26040.025189775468], "y": [-92617.05940198779], "mode": "markers+text", "marker": {"symbol": "star", "size": 40, "color": "yellow"}, "text": ["1761415819123"], "textposition": "top center", "hovertext": ["1761415819123 [H10]"], "hoverinfo": "text", "meta": {"base_marker_size": 40, "base_text_size": 14}}, {"type": "scatter", "x": [80000.0], "y": [39914.48354050214], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Portal of Renewal [N16]"], "hoverinfo": "text", "text": ["Portal of Renewal"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-1551.586791266572], "y": [-4464.663351623235], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth [L11]"], "hoverinfo": "text", "text": ["Old Zenth"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-32130.3768242265], "y": [5400.463558337133], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Egress Yards 2 [M10]"], "hoverinfo": "text", "text": ["Egress Yards 2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-14791.666666666677], "y": [-32859.17435890109], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Egress Yards 1 [K11]"], "hoverinfo": "text", "text": ["Egress Yards 1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [920.8185372411139], "y": [-1464.12188330684], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth SM1 [L12]"], "hoverinfo": "text", "text": ["Old Zenth SM1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-6322.632084265281], "y": [-2320.8741073559836], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Old Zenth SM2 [L11]"], "hoverinfo": "text", "text": ["Old Zenth SM2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [72895.60467246253], "y": [32469.65318117742], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Renewal Traffic [N15]"], "hoverinfo": "text", "text": ["Renewal Traffic"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [73720.44343850297], "y": [32287.359221827373], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 7 [N15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [80107.9231055248], "y": [36181.08653637171], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 77 [N16]"], "hoverinfo": "text", "text": ["DS 77"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-94323.20420212118], "y": [139489.42207949373], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 29 [S07]"], "hoverinfo": "text", "text": ["DS 29"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-172656.53753545452], "y": [-43843.911253839615], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 68 [J03]"], "hoverinfo": "text", "text": ["DS 68"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [109843.46246454549], "y": [-104577.24458717297], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 59 [G17]"], "hoverinfo": "text", "text": ["DS 59"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-59281.50383424916], "y": [282.8914917687155], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Echo Ring [M09]"], "hoverinfo": "text", "text": ["Echo Ring"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-60026.72234486126], "y": [-876.9077346553184], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 40 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57913.91402718956], "y": [218.62250413741316], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 32 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-59478.957225464896], "y": [1653.2454358897999], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 6 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60626.6555708668], "y": [557.7151970970682], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 26 [M08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-57444.40106770696], "y": [1470.657062757678], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 50 [M09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60626.6555708668], "y": [-1085.5801610920294], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 79 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-60548.40341095303], "y": [1940.1700222402771], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 74 [M08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Renaera", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Renaera';
     if (!isGM()) {
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
+    setDefaultInfo();
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -176,8 +471,123 @@
         }
         if (picked && objData[picked]) {
             highlight(picked);
+            lastPlotlyClickTs = Date.now();
         }
     });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
 
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {
@@ -271,6 +681,21 @@ function addButton(label, fn, header, color, isHidden) {
   }
 
   renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);

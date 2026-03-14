@@ -1,0 +1,292 @@
+{
+    "systemMapCoord": [
+        -15997.987993844727,
+        0.0,
+        1803.4615984150996
+    ],
+    "systemalignment": "USFP",
+    "metadata": {
+        "sysdescription": "",
+        "security": "Neutral",
+        "exports": [],
+        "focus": "",
+        "intel": {},
+        "development": "Unclaimed",
+        "visible": true,
+        "skybox": "sky1.png",
+        "original_author": "Draeco",
+        "revision_date": "23/12/2025",
+        "revision_number": 3,
+        "all_authors": [
+            "Draeco"
+        ]
+    },
+    "traffic": {
+        "commercial": "light",
+        "civilian": "light",
+        "security": "none"
+    },
+    "objects": {
+        "Atlantis Gate": {
+            "coordinate": [
+                78666.66666666666,
+                0,
+                163437.96296296295
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Waypoint 52 Gate": "Atlantis"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Volantis Gate": {
+            "coordinate": [
+                -60100.00000000001,
+                0,
+                -171395.37037037036
+            ],
+            "type": "jumpnode",
+            "jumppointtype": "Node",
+            "destinations": {
+                "Waypoint 52 Gate": "Volantis"
+            },
+            "state": "Tethered",
+            "drift": 0
+        },
+        "Gate Control": {
+            "coordinate": [
+                15439.814814814788,
+                0,
+                12337.962962962978
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_command",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Homing": 48,
+                "Nuke": 2,
+                "EMP": 7,
+                "Mine": 5,
+                "High Yield Warhead": 16,
+                "Warhead": 54,
+                "Torpedo Casing": 59,
+                "Casing": 56,
+                "Navigational Array": 1,
+                "Scorch": 10,
+                "Guidance System": 65
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 1,
+                "Combat Engineers": 2
+            },
+            "description": ""
+        }
+    },
+    "terrain": {
+        "1754700379217": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -75650.92592592593,
+                0,
+                -110131.48148148149
+            ],
+            "end": [
+                21015.74074074075,
+                0,
+                -155131.4814814815
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "1754700406169": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                73333.33333333334,
+                0.0,
+                -55995.37037037037
+            ],
+            "end": [
+                73333.33333333334,
+                0.0,
+                69004.62962962964
+            ],
+            "density": 680,
+            "scatter": 15000,
+            "composition": []
+        },
+        "1754700432657": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                73515.74074074076,
+                0,
+                99035.1851851852
+            ],
+            "end": [
+                -88333.33333333333,
+                0.0,
+                187337.96296296298
+            ],
+            "density": 400,
+            "scatter": 18000,
+            "composition": []
+        },
+        "1754700451077": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -68333.33333333333,
+                0.0,
+                52337.96296296297
+            ],
+            "end": [
+                -38333.33333333333,
+                0.0,
+                22337.962962962967
+            ],
+            "density": 425,
+            "scatter": 8000,
+            "composition": []
+        },
+        "1754700487757": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -10925.925925925883,
+                0.0,
+                121689.81481481483
+            ],
+            "end": [
+                82682.40740740742,
+                0,
+                120701.85185185187
+            ],
+            "density": 680,
+            "scatter": 10000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754700500293": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -56064.81481481478,
+                0.0,
+                54560.18518518519
+            ],
+            "end": [
+                -18544.44444444457,
+                0,
+                28488.888888888912
+            ],
+            "density": 324,
+            "scatter": 17000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754700527169": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                -51184.44444444456,
+                0,
+                -51863.11111111114
+            ],
+            "end": [
+                53888.888888888934,
+                0.0,
+                -56550.92592592594
+            ],
+            "density": 175,
+            "scatter": 20000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "1754700541037": {
+            "type": "asteroids",
+            "seed": 2010,
+            "start": [
+                8750.000000000044,
+                0.0,
+                -123680.55555555558
+            ],
+            "end": [
+                87055.55555555542,
+                0,
+                -165911.11111111107
+            ],
+            "density": 125,
+            "scatter": 8000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        }
+    },
+    "sensor_relay": {
+        "SR 17": {
+            "coordinate": [
+                62187.5,
+                0,
+                127916.66666666669
+            ]
+        },
+        "SR 42": {
+            "coordinate": [
+                46875.0,
+                0,
+                89166.66666666669
+            ]
+        },
+        "SR 48": {
+            "coordinate": [
+                31562.5,
+                0,
+                50416.666666666686
+            ]
+        },
+        "SR 29": {
+            "coordinate": [
+                937.5,
+                0,
+                -27083.333333333314
+            ]
+        },
+        "SR 66": {
+            "coordinate": [
+                -14375.0,
+                0,
+                -65833.33333333331
+            ]
+        },
+        "SR 45": {
+            "coordinate": [
+                -29687.5,
+                0,
+                -104583.33333333331
+            ]
+        },
+        "SR 96": {
+            "coordinate": [
+                -45000.0,
+                0,
+                -143333.3333333333
+            ]
+        }
+    }
+}

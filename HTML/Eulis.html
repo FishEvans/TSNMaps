@@ -7,33 +7,215 @@
     <title>Eulis.html</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        html, body { margin: 0; height: 100%; background: black; color: white; }
         /* === Description typography controls ===
            Tweak these two variables to change description sizes globally */
         :root {
             --desc-font-size: 130%;
             --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
         }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
         .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
         .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
-        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
-        #plot { flex: 3; min-width: 400px; }
-        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
         h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
         h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
         .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
-        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
         button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">Eulis</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Eulis</h2>
         <h3 class="subheader">Alignment: League Of Traders</h3>
         <img src="Images/Factions/League Of Traders.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
-        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <input type="text" id="search-box" placeholder="Search objects...">
         <div id="object-buttons">
     </div>
     </div>
@@ -41,22 +223,136 @@
     <div id="info">
         <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
         <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
-        Select an object
+        Loading system info...
     </div>
 <script>
     var objData = {"Planet Eulis": {"type": "planet", "x": -79159.37989860633, "y": -51549.21253275013, "grid": "J08", "hidden": false}, "Jhohara Gate": {"type": "jumpnode", "x": -39166.66666666667, "y": 163333.33333333334, "grid": "U10", "hidden": false, "label": "Jhohara Gate", "destinations": {"Eulis Gate": "Jhohara"}}, "Khoros Gate": {"type": "jumpnode", "x": 183333.33333333334, "y": 37500.0, "grid": "N21", "hidden": false, "label": "Khoros Gate", "destinations": {"Eulis Gate": "Khoros"}}, "Sumri Gate": {"type": "jumpnode", "x": -144166.66666666666, "y": 10833.333333333334, "grid": "M04", "hidden": false, "label": "Sumri Gate", "destinations": {"Eulis Gate": "Sumri"}}, "Reema Gate": {"type": "jumpnode", "x": -90000.00000000001, "y": -131666.6666666667, "grid": "F07", "hidden": false, "label": "Reema Gate", "destinations": {"Eulis Gate": "Reema"}}, "Mria Gate": {"type": "jumpnode", "x": 154166.6666666667, "y": -125833.33333333334, "grid": "F19", "hidden": false, "label": "Mria Gate", "destinations": {"Eulis Gate": "Mria"}}, "Marge Security": {"type": "station", "x": 33333.333333333336, "y": -55000.00000000001, "grid": "J13", "hidden": false, "label": "Marge Security", "description": "Neutral base using pirate design", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "WP 9": {"type": "platform", "x": 33117.37292598097, "y": -49783.3767565082, "grid": "J13", "hidden": false, "label": "WP 9"}, "WP 34": {"type": "platform", "x": 33655.72486894712, "y": -61627.11950176356, "grid": "I13", "hidden": false, "label": "WP 34"}, "Campton Industries": {"type": "station", "x": 45023.857194695665, "y": -37513.406517278934, "grid": "K14", "hidden": false, "label": "Campton Industries", "hull": "", "facilities": [], "sides": ["League Of Traders"]}, "Carilon Shipwrights": {"type": "station", "x": 14213.243340100324, "y": -77366.26574224465, "grid": "I12", "hidden": false, "label": "Carilon Shipwrights", "hull": "", "facilities": [], "sides": ["League Of Traders"]}, "Baratron Refinery": {"type": "station", "x": 19305.30009593023, "y": 5117.5519875221, "grid": "M12", "hidden": false, "label": "Baratron Refinery", "hull": "", "facilities": [], "sides": ["League Of Traders"]}, "SY 2C": {"type": "station", "x": 11665.25395674659, "y": -81634.20983217689, "grid": "H12", "hidden": false, "label": "SY 2C", "hull": "usfp_shipyard", "facilities": [], "sides": ["League Of Traders"], "hullName": "Ship Yard", "hullImage": "Images/Ships/TSN Mod/USFP/ShipYard256.png", "hullDescription": ""}, "SY 1C": {"type": "station", "x": 18798.417201048112, "y": -80961.26990346919, "grid": "H12", "hidden": false, "label": "SY 1C", "hull": "usfp_shipyard", "facilities": [], "sides": ["League Of Traders"], "hullName": "Ship Yard", "hullImage": "Images/Ships/TSN Mod/USFP/ShipYard256.png", "hullDescription": ""}, "Jartak Inspections": {"type": "station", "x": -32995.063173831215, "y": 136316.13883327643, "grid": "S10", "hidden": false, "label": "Jartak Inspections", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Bratmech Cartel": {"type": "station", "x": -37836.884161485534, "y": 122118.60796907889, "grid": "S10", "hidden": false, "label": "Bratmech Cartel", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Trellis Confederacy": {"type": "station", "x": -69279.78539605343, "y": -77109.78709264954, "grid": "I08", "hidden": false, "label": "Trellis Confederacy", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Canton Traders": {"type": "station", "x": -93836.11255654729, "y": -34825.83647536558, "grid": "K07", "hidden": false, "label": "Canton Traders", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Sultam Customs": {"type": "station", "x": -105100.47298178733, "y": -5286.6739525032, "grid": "L06", "hidden": false, "label": "Sultam Customs", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Reticle Inspections": {"type": "station", "x": -73854.59594798904, "y": -112795.35450805878, "grid": "G08", "hidden": false, "label": "Reticle Inspections", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Veich Market": {"type": "station", "x": -57457.99100971744, "y": -102668.03969324396, "grid": "G09", "hidden": false, "label": "Veich Market", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Madisom Customs": {"type": "station", "x": 129173.95343472704, "y": -100256.7742611452, "grid": "G18", "hidden": false, "label": "Madisom Customs", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Ketan Customs": {"type": "station", "x": 161002.65713843075, "y": 15966.21956601532, "grid": "M20", "hidden": false, "label": "Ketan Customs", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "Staraway Systems": {"type": "station", "x": 153198.64479275173, "y": -41213.56438460197, "grid": "J19", "hidden": false, "label": "Staraway Systems", "hull": "pirate_military_base", "facilities": [], "sides": ["League Of Traders"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": ""}, "SR 91": {"type": "sensor_relay", "x": -119166.66666666667, "y": 19166.666666666668, "grid": "M06", "hidden": false, "label": "SR 91"}, "SR 34": {"type": "sensor_relay", "x": -79404.76190476191, "y": 21666.666666666668, "grid": "N08", "hidden": false, "label": "SR 34"}, "SR 88": {"type": "sensor_relay", "x": -39642.857142857145, "y": 24166.666666666668, "grid": "N10", "hidden": false, "label": "SR 88"}, "SR 12": {"type": "sensor_relay", "x": 119.04761904761835, "y": 26666.666666666668, "grid": "N12", "hidden": false, "label": "SR 12"}, "SR 63": {"type": "sensor_relay", "x": 39880.95238095238, "y": 29166.66666666667, "grid": "N13", "hidden": false, "label": "SR 63"}, "SR 98": {"type": "sensor_relay", "x": 79642.85714285717, "y": 31666.66666666667, "grid": "N15", "hidden": false, "label": "SR 98"}, "SR 82": {"type": "sensor_relay", "x": 119404.76190476191, "y": 34166.66666666667, "grid": "N17", "hidden": false, "label": "SR 82"}, "SR 44": {"type": "sensor_relay", "x": 159166.6666666667, "y": 36666.66666666667, "grid": "N19", "hidden": false, "label": "SR 44"}, "SR 42": {"type": "sensor_relay", "x": -130000.00000000001, "y": -15833.333333333334, "grid": "L05", "hidden": false, "label": "SR 42"}, "SR 26": {"type": "sensor_relay", "x": -115416.66666666669, "y": -57916.66666666668, "grid": "J06", "hidden": false, "label": "SR 26"}, "SR 18": {"type": "sensor_relay", "x": -100833.33333333334, "y": -100000.00000000001, "grid": "H06", "hidden": false, "label": "SR 18"}, "SR 40": {"type": "sensor_relay", "x": -30000.000000000004, "y": -89583.33333333334, "grid": "H10", "hidden": false, "label": "SR 40"}, "SR 95": {"type": "sensor_relay", "x": 79301.69753086418, "y": -36358.02469135803, "grid": "K15", "hidden": false, "label": "SR 95"}, "SR 19": {"type": "sensor_relay", "x": 108252.31481481482, "y": -18001.54320987655, "grid": "L17", "hidden": false, "label": "SR 19"}, "SR 52": {"type": "sensor_relay", "x": 139131.9444444444, "y": 2283.950617283946, "grid": "M18", "hidden": false, "label": "SR 52"}, "SR 11": {"type": "sensor_relay", "x": 179166.6666666667, "y": -833.3333333333334, "grid": "L20", "hidden": false, "label": "SR 11"}, "SR 50": {"type": "sensor_relay", "x": 173055.55555555556, "y": -31944.444444444445, "grid": "K20", "hidden": false, "label": "SR 50"}, "SR 65": {"type": "sensor_relay", "x": 166944.44444444447, "y": -63055.55555555556, "grid": "I20", "hidden": false, "label": "SR 65"}, "SR 49": {"type": "sensor_relay", "x": 160833.33333333334, "y": -94166.66666666667, "grid": "H20", "hidden": false, "label": "SR 49"}, "SR 24": {"type": "sensor_relay", "x": 129166.66666666667, "y": -125833.33333333334, "grid": "F18", "hidden": false, "label": "SR 24"}, "SR 22": {"type": "sensor_relay", "x": 86666.66666666667, "y": -127083.33333333334, "grid": "F16", "hidden": false, "label": "SR 22"}, "SR 96": {"type": "sensor_relay", "x": 44166.66666666667, "y": -128333.33333333334, "grid": "F14", "hidden": false, "label": "SR 96"}, "SR 43": {"type": "sensor_relay", "x": 1666.6666666666715, "y": -129583.33333333334, "grid": "F12", "hidden": false, "label": "SR 43"}, "SR 16": {"type": "sensor_relay", "x": -40833.33333333333, "y": -130833.33333333334, "grid": "F09", "hidden": false, "label": "SR 16"}, "SR 73": {"type": "sensor_relay", "x": -65138.8888888889, "y": -21388.88888888889, "grid": "K08", "hidden": false, "label": "SR 73"}, "SR 83": {"type": "sensor_relay", "x": -26944.444444444453, "y": -36111.11111111111, "grid": "K10", "hidden": false, "label": "SR 83"}, "SR 55": {"type": "sensor_relay", "x": 7916.666666666667, "y": -54166.66666666667, "grid": "J12", "hidden": false, "label": "SR 55"}, "SR 81": {"type": "sensor_relay", "x": 60632.71604938273, "y": -72079.47530864198, "grid": "I15", "hidden": false, "label": "SR 81"}, "SR 68": {"type": "sensor_relay", "x": 97862.65432098767, "y": -87283.95061728398, "grid": "H16", "hidden": false, "label": "SR 68"}};
+    var systemMeta = {"system_name": "Eulis", "description": "system under the League Of Traders Democray", "exports": [], "assets": ["Shipyard", "Listening Post", "Fortification"], "focus": "Agriculture", "intel": {"pirate": "Low", "enemy": "Low"}, "original_author": "Draeco", "last_author": "Draeco", "revision_number": 15, "version_tag": "231205.15", "all_authors": ["Fish Evans", "Draeco"]};
+    var pageBody = document.body;
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
     function clearAnnotations() {
         Plotly.relayout('plot', {annotations: []});
-        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        setDefaultInfo();
     }
     
     function getInfoHeader() {
@@ -139,15 +435,13 @@
                           + '</p>';
             }
             document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
-            document.getElementById('galactic-map-btn').addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
                 + infoHtml;
          
     }
-         document.getElementById('galactic-map-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+         bindGalacticButton();
     
 
     var fig = {"data": [{"type": "scatter", "x": [103271.66376339251, -24123.52656582561, -37638.8156291452, 89756.37470007292, 103271.66376339251], "y": [5990.541637879785, 41757.645547344815, -6381.08066695082, -42148.18457641585, 5990.541637879785], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-79159.37989860633], "y": [-51549.21253275013], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Eulis"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Eulis [J08]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-39166.66666666667], "y": [163333.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Jhohara Gate [U10]"], "hoverinfo": "text", "text": ["Jhohara Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [183333.33333333334], "y": [37500.0], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Khoros Gate [N21]"], "hoverinfo": "text", "text": ["Khoros Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-144166.66666666666], "y": [10833.333333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Sumri Gate [M04]"], "hoverinfo": "text", "text": ["Sumri Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-90000.00000000001], "y": [-131666.6666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Reema Gate [F07]"], "hoverinfo": "text", "text": ["Reema Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [154166.6666666667], "y": [-125833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Mria Gate [F19]"], "hoverinfo": "text", "text": ["Mria Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [33333.333333333336], "y": [-55000.00000000001], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Marge Security [J13]"], "hoverinfo": "text", "text": ["Marge Security"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [33117.37292598097], "y": [-49783.3767565082], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 9 [J13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [33655.72486894712], "y": [-61627.11950176356], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 34 [I13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [45023.857194695665], "y": [-37513.406517278934], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Campton Industries [K14]"], "hoverinfo": "text", "text": ["Campton Industries"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [14213.243340100324], "y": [-77366.26574224465], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Carilon Shipwrights [I12]"], "hoverinfo": "text", "text": ["Carilon Shipwrights"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [19305.30009593023], "y": [5117.5519875221], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Baratron Refinery [M12]"], "hoverinfo": "text", "text": ["Baratron Refinery"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [11665.25395674659], "y": [-81634.20983217689], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["SY 2C [H12]"], "hoverinfo": "text", "text": ["SY 2C"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [18798.417201048112], "y": [-80961.26990346919], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["SY 1C [H12]"], "hoverinfo": "text", "text": ["SY 1C"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-32995.063173831215], "y": [136316.13883327643], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Jartak Inspections [S10]"], "hoverinfo": "text", "text": ["Jartak Inspections"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-37836.884161485534], "y": [122118.60796907889], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Bratmech Cartel [S10]"], "hoverinfo": "text", "text": ["Bratmech Cartel"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-69279.78539605343], "y": [-77109.78709264954], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Trellis Confederacy [I08]"], "hoverinfo": "text", "text": ["Trellis Confederacy"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-93836.11255654729], "y": [-34825.83647536558], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Canton Traders [K07]"], "hoverinfo": "text", "text": ["Canton Traders"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-105100.47298178733], "y": [-5286.6739525032], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Sultam Customs [L06]"], "hoverinfo": "text", "text": ["Sultam Customs"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-73854.59594798904], "y": [-112795.35450805878], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Reticle Inspections [G08]"], "hoverinfo": "text", "text": ["Reticle Inspections"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-57457.99100971744], "y": [-102668.03969324396], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Veich Market [G09]"], "hoverinfo": "text", "text": ["Veich Market"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [129173.95343472704], "y": [-100256.7742611452], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Madisom Customs [G18]"], "hoverinfo": "text", "text": ["Madisom Customs"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [161002.65713843075], "y": [15966.21956601532], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Ketan Customs [M20]"], "hoverinfo": "text", "text": ["Ketan Customs"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [153198.64479275173], "y": [-41213.56438460197], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Staraway Systems [J19]"], "hoverinfo": "text", "text": ["Staraway Systems"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-119166.66666666667], "y": [19166.666666666668], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 91 [M06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-79404.76190476191], "y": [21666.666666666668], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 34 [N08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-39642.857142857145], "y": [24166.666666666668], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 88 [N10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [119.04761904761835], "y": [26666.666666666668], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 12 [N12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [39880.95238095238], "y": [29166.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 63 [N13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [79642.85714285717], "y": [31666.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 98 [N15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [119404.76190476191], "y": [34166.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 82 [N17]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [159166.6666666667], "y": [36666.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 44 [N19]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-130000.00000000001], "y": [-15833.333333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 42 [L05]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-115416.66666666669], "y": [-57916.66666666668], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 26 [J06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-100833.33333333334], "y": [-100000.00000000001], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 18 [H06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-30000.000000000004], "y": [-89583.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 40 [H10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [79301.69753086418], "y": [-36358.02469135803], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 95 [K15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [108252.31481481482], "y": [-18001.54320987655], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 19 [L17]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [139131.9444444444], "y": [2283.950617283946], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 52 [M18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [179166.6666666667], "y": [-833.3333333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 11 [L20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [173055.55555555556], "y": [-31944.444444444445], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 50 [K20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [166944.44444444447], "y": [-63055.55555555556], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 65 [I20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [160833.33333333334], "y": [-94166.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 49 [H20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [129166.66666666667], "y": [-125833.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 24 [F18]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [86666.66666666667], "y": [-127083.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 22 [F16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [44166.66666666667], "y": [-128333.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 96 [F14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [1666.6666666666715], "y": [-129583.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 43 [F12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-40833.33333333333], "y": [-130833.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 16 [F09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-65138.8888888889], "y": [-21388.88888888889], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 73 [K08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-26944.444444444453], "y": [-36111.11111111111], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 83 [K10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [7916.666666666667], "y": [-54166.66666666667], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 55 [J12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [60632.71604938273], "y": [-72079.47530864198], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 81 [I15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [97862.65432098767], "y": [-87283.95061728398], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 68 [H16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Eulis", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
@@ -157,6 +451,7 @@
     if (!isGM()) {
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
+    setDefaultInfo();
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -176,8 +471,123 @@
         }
         if (picked && objData[picked]) {
             highlight(picked);
+            lastPlotlyClickTs = Date.now();
         }
     });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
 
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {
@@ -271,6 +681,21 @@ function addButton(label, fn, header, color, isHidden) {
   }
 
   renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);

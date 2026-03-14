@@ -26,8 +26,10 @@ class Toolbar:
         self.nebula_mode = False
         self.blackhole_mode = False
         self.debris_mode = False
+        self.minefield_mode = False
         self.planet_mode = False
         self.debris_pending = None  # holds {'density': int, 'scatter': int, 'seed': int} when armed
+        self.minefield_pending = None  # holds {'name': str, 'width': int, 'height': int, 'density': int} when armed
         self.gate_mode        = False
         self.platform_mode    = False
 
@@ -40,19 +42,19 @@ class Toolbar:
         # Buttons: station, single relay, batch relay, asteroid, nebula, blackhole, plus our new Center/Scale tool
         icons = [
             'Station.png','Relay.png','RelayP.png','Asteroid.png',
-            'Nebular.png','Blackhole.png','Planet.png','Debris.png','Platform.png','Gate.png',
+            'Nebular.png','Blackhole.png','Planet.png','Debris.png','mine.png','Platform.png','Gate.png',
             'Center.png'
         ]
         cmds  = [
             self.toggle_station_mode,self.toggle_sensor_mode,self.configure_multi_relay,
             self.toggle_asteroid_mode,self.toggle_nebula_mode,self.toggle_blackhole_mode,
-            self.toggle_planet_mode, self.open_debris_dialog,
+            self.toggle_planet_mode, self.open_debris_dialog, self.open_minefield_dialog,
             self.toggle_platform_mode,self.toggle_gate_mode,
             self.open_center_dialog
         ]
         refs  = [
             'station_btn','sensor_btn','multi_btn','asteroid_btn',
-            'nebula_btn','blackhole_btn','planet_btn','debris_btn','platform_btn','gate_btn',
+            'nebula_btn','blackhole_btn','planet_btn','debris_btn','minefield_btn','platform_btn','gate_btn',
             'center_btn'
         ]
         for icon, cmd, ref in zip(icons, cmds, refs):
@@ -135,6 +137,13 @@ class Toolbar:
                     break
                 except Exception:
                     pass
+        if not icon_img:
+            # fallback to a blank image if not found
+            try:
+                blank = Image.new('RGBA', (30, 30), (0, 0, 0, 0))
+                icon_img = ImageTk.PhotoImage(blank)
+            except Exception:
+                icon_img = None
         if icon_img:
             btn = tk.Button(parent, image=icon_img, command=command, bg='#333333', activebackground='#333333')
             btn.image = icon_img
@@ -202,36 +211,51 @@ class Toolbar:
                 return name
         return f"DS {random.randint(100,999)}"
 
+    def gen_minefield_name(self):
+        """Produce a unique Hidden Mine Field X name for terrain."""
+        existing = set(self.sm.list_terrain())
+        for i in range(1, 1000):
+            name = f"Hidden Mine Field {i}"
+            if name not in existing:
+                return name
+        return f"Hidden Mine Field {random.randint(1000,9999)}"
+
     def toggle_station_mode(self):
         self.station_mode = not self.station_mode
         self.sensor_mode = self.multi_mode = self.asteroid_mode = self.nebula_mode = self.blackhole_mode = False
+        self.planet_mode = self.debris_mode = self.minefield_mode = self.platform_mode = self.gate_mode = False
         if self.station_btn:
             self.station_btn.config(relief=tk.SUNKEN if self.station_mode else tk.RAISED,
                                      bg='#666666' if self.station_mode else '#333333',
                                      activebackground='#666666' if self.station_mode else '#333333')
-        for btn in (self.sensor_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn, self.blackhole_btn):
+        for btn in (self.sensor_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn, self.blackhole_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.platform_btn, self.gate_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
     def toggle_sensor_mode(self):
         self.sensor_mode = not self.sensor_mode
         self.station_mode = self.multi_mode = self.asteroid_mode = self.nebula_mode = self.blackhole_mode = False
+        self.planet_mode = self.debris_mode = self.minefield_mode = self.platform_mode = self.gate_mode = False
         if self.sensor_btn:
             self.sensor_btn.config(relief=tk.SUNKEN if self.sensor_mode else tk.RAISED,
                                     bg='#666666' if self.sensor_mode else '#333333',
                                     activebackground='#666666' if self.sensor_mode else '#333333')
-        for btn in (self.station_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn, self.blackhole_btn):
+        for btn in (self.station_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn, self.blackhole_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.platform_btn, self.gate_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
     def toggle_asteroid_mode(self):
         self.asteroid_mode = not self.asteroid_mode
         self.station_mode = self.sensor_mode = self.multi_mode = self.nebula_mode = self.blackhole_mode = False
+        self.planet_mode = self.debris_mode = self.minefield_mode = self.platform_mode = self.gate_mode = False
         if self.asteroid_btn:
             self.asteroid_btn.config(relief=tk.SUNKEN if self.asteroid_mode else tk.RAISED,
                                      bg='#666666' if self.asteroid_mode else '#333333',
                                      activebackground='#666666' if self.asteroid_mode else '#333333')
-        for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.nebula_btn, self.blackhole_btn):
+        for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.nebula_btn, self.blackhole_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.platform_btn, self.gate_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
@@ -241,7 +265,7 @@ class Toolbar:
         # reset others
         (self.station_mode, self.sensor_mode, self.multi_mode,
          self.asteroid_mode, self.nebula_mode, self.blackhole_mode,
-         self.debris_mode, self.platform_mode, self.gate_mode) = (False,)*9
+         self.debris_mode, self.minefield_mode, self.platform_mode, self.gate_mode) = (False,)*10
         # highlight our button
         if getattr(self, 'planet_btn', None):
             self.planet_btn.config(
@@ -251,17 +275,19 @@ class Toolbar:
             )
         # reset others' buttons
         for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn,
-                    self.blackhole_btn, self.debris_btn, self.platform_btn, self.gate_btn):
+                    self.blackhole_btn, self.debris_btn, self.minefield_btn, self.platform_btn, self.gate_btn):
             if btn: btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
     def toggle_nebula_mode(self):
         self.nebula_mode = not self.nebula_mode
         self.station_mode = self.sensor_mode = self.multi_mode = self.asteroid_mode = self.blackhole_mode = self.planet_mode = False
+        self.debris_mode = self.minefield_mode = self.platform_mode = self.gate_mode = False
         if self.nebula_btn:
             self.nebula_btn.config(relief=tk.SUNKEN if self.nebula_mode else tk.RAISED,
                                     bg='#666666' if self.nebula_mode else '#333333',
                                     activebackground='#666666' if self.nebula_mode else '#333333')
-        for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.asteroid_btn, self.blackhole_btn):
+        for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.asteroid_btn, self.blackhole_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.platform_btn, self.gate_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
@@ -269,6 +295,7 @@ class Toolbar:
         self.blackhole_mode = not self.blackhole_mode
         # reset all other modes
         self.station_mode = self.sensor_mode = self.multi_mode = self.asteroid_mode = self.nebula_mode = self.planet_mode = False
+        self.debris_mode = self.minefield_mode = self.platform_mode = self.gate_mode = False
         # update button relief/colors
         if self.blackhole_btn:
             self.blackhole_btn.config(
@@ -276,7 +303,8 @@ class Toolbar:
                 bg    = '#666666' if self.blackhole_mode else '#333333',
                 activebackground = '#666666' if self.blackhole_mode else '#333333'
             )
-        for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn):
+        for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.asteroid_btn, self.nebula_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.platform_btn, self.gate_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
@@ -285,7 +313,8 @@ class Toolbar:
         self.platform_mode = not self.platform_mode
         # turn off all other modes
         (self.station_mode, self.sensor_mode, self.multi_mode,
-         self.asteroid_mode, self.nebula_mode, self.blackhole_mode) = (False,)*6
+         self.asteroid_mode, self.nebula_mode, self.blackhole_mode,
+         self.planet_mode, self.debris_mode, self.minefield_mode, self.gate_mode) = (False,)*10
         # update button reliefs
         if self.platform_btn:
             self.platform_btn.config(
@@ -295,7 +324,8 @@ class Toolbar:
             )
         # reset others
         for btn in (self.station_btn, self.sensor_btn, self.multi_btn,
-                    self.asteroid_btn, self.nebula_btn, self.blackhole_btn):
+                    self.asteroid_btn, self.nebula_btn, self.blackhole_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.gate_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
@@ -305,7 +335,7 @@ class Toolbar:
         # reset all other modes
         (self.station_mode, self.sensor_mode, self.multi_mode, self.planet_mode,
          self.asteroid_mode, self.nebula_mode, self.blackhole_mode,
-         self.platform_mode, self.gate_mode) = (False,)*9
+         self.platform_mode, self.minefield_mode, self.gate_mode) = (False,)*10
         # update button states
         if getattr(self, 'debris_btn', None):
             self.debris_btn.config(
@@ -314,7 +344,7 @@ class Toolbar:
                 activebackground = '#666666' if self.debris_mode else '#333333'
             )
         for btn in (self.station_btn, self.sensor_btn, self.multi_btn, self.asteroid_btn,
-                    self.nebula_btn, self.blackhole_btn, self.platform_btn, self.gate_btn):
+                    self.nebula_btn, self.blackhole_btn, self.platform_btn, self.gate_btn, self.minefield_btn):
             if btn: btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
     # ───────────────────────────────────────────────────────────────────────────
@@ -329,7 +359,7 @@ class Toolbar:
         # Reset other modes but keep our button highlighted only after arming
         (self.station_mode, self.sensor_mode, self.multi_mode, self.planet_mode,
          self.asteroid_mode, self.nebula_mode, self.blackhole_mode,
-         self.platform_mode, self.gate_mode) = (False,)*9
+         self.platform_mode, self.minefield_mode, self.gate_mode) = (False,)*10
 
         dlg, body, footer = self.make_dialog('New Debris Field', near="toolbar")
         dens_var = tk.IntVar(value=30)
@@ -365,8 +395,71 @@ class Toolbar:
         btn_row.grid(row=4, column=0, columnspan=2, pady=6)
         tk.Button(btn_row, text='Add', width=12, command=_arm).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_row, text='Cancel', width=12, command=_cancel).pack(side=tk.LEFT, padx=5)
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
 
         # Center the dialog near the toolbar
+        dlg.update_idletasks()
+        w = dlg.winfo_width(); h = dlg.winfo_height()
+        px = self.frame.winfo_rootx() + self.frame.winfo_width() // 2
+        py = self.frame.winfo_rooty() + self.frame.winfo_height() // 2
+        dlg.geometry(f"+{px - w//2}+{py - h//2}")
+
+    # ───────────────────────────────────────────────────────────────────────────
+    # Hidden minefield: dialog-first flow, then place on next click
+    # ───────────────────────────────────────────────────────────────────────────
+    def open_minefield_dialog(self):
+        """
+        Configure a Hidden Mine Field (name, width, height, density).
+        Pressing 'Add' will ARM placement: the next left-click on the map will create
+        the hidden_minefield at the clicked location using these settings.
+        """
+        # Reset other modes but keep our button highlighted only after arming
+        (self.station_mode, self.sensor_mode, self.multi_mode, self.planet_mode,
+         self.asteroid_mode, self.nebula_mode, self.blackhole_mode,
+         self.platform_mode, self.debris_mode, self.gate_mode) = (False,)*10
+
+        dlg, body, footer = self.make_dialog('New Hidden Mine Field', near="toolbar")
+        name_var = tk.StringVar(value=self.gen_minefield_name())
+        self.labeled_entry(body, 'Name:', name_var, width=22, row=0, col=0)
+        width_var = tk.IntVar(value=15000)
+        self.labeled_spinbox(body, 'Width:', width_var, frm=1, to=1000000, width=10, row=1, col=0)
+        height_var = tk.IntVar(value=15000)
+        self.labeled_spinbox(body, 'Height:', height_var, frm=1, to=1000000, width=10, row=2, col=0)
+        dens_var = tk.IntVar(value=70)
+        self.labeled_spinbox(body, 'Density:', dens_var, frm=1, to=100000, width=10, row=3, col=0)
+
+        tk.Label(body, text="Click 'Add', then click on the map to place.", fg='#3a86ff')\
+          .grid(row=4, column=0, columnspan=2, padx=6, pady=(2, 6), sticky='w')
+
+        def _arm():
+            name = (name_var.get() or '').strip()
+            if not name:
+                name = self.gen_minefield_name()
+            # store config and arm placement
+            self.minefield_pending = {
+                'name': name,
+                'width': max(1, int(width_var.get() or 1)),
+                'height': max(1, int(height_var.get() or 1)),
+                'density': max(1, int(dens_var.get() or 1))
+            }
+            self.minefield_mode = True
+            if getattr(self, 'minefield_btn', None):
+                self.minefield_btn.config(relief=tk.SUNKEN, bg='#666666', activebackground='#666666')
+            dlg.destroy()
+
+        def _cancel():
+            self.minefield_pending = None
+            self.minefield_mode = False
+            if getattr(self, 'minefield_btn', None):
+                self.minefield_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+            dlg.destroy()
+
+        btn_row = tk.Frame(dlg)
+        btn_row.grid(row=5, column=0, columnspan=2, pady=6)
+        tk.Button(btn_row, text='Add', width=12, command=_arm).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_row, text='Cancel', width=12, command=_cancel).pack(side=tk.LEFT, padx=5)
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
+
         dlg.update_idletasks()
         w = dlg.winfo_width(); h = dlg.winfo_height()
         px = self.frame.winfo_rootx() + self.frame.winfo_width() // 2
@@ -376,10 +469,18 @@ class Toolbar:
     def configure_multi_relay(self):
         # Reset other modes
         self.station_mode = self.sensor_mode = self.asteroid_mode = self.nebula_mode = False
+        self.blackhole_mode = self.planet_mode = self.debris_mode = self.minefield_mode = False
+        self.platform_mode = self.gate_mode = False
         if self.station_btn: self.station_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
         if self.asteroid_btn: self.asteroid_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
         if self.nebula_btn: self.nebula_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
         if self.sensor_btn: self.sensor_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+        if self.blackhole_btn: self.blackhole_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+        if self.planet_btn: self.planet_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+        if self.debris_btn: self.debris_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+        if self.minefield_btn: self.minefield_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+        if self.platform_btn: self.platform_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+        if self.gate_btn: self.gate_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
         dlg = tk.Toplevel(self.frame)
         dlg.title('Batch Sensor Relay Placement')
         tk.Label(dlg, text='Pattern:').grid(row=0, column=0, padx=5, pady=5, sticky='w')
@@ -398,6 +499,12 @@ class Toolbar:
             if self.multi_btn:
                 self.multi_btn.config(relief=tk.SUNKEN, bg='#666666', activebackground='#666666')
             dlg.destroy()
+        def _cancel():
+            self.multi_mode = False
+            if self.multi_btn:
+                self.multi_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+            dlg.destroy()
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
         tk.Button(dlg, text='OK', command=start_batch).grid(row=3, column=0, columnspan=3, pady=10)
         dlg.update_idletasks()  # ensure correct winfo_width/height
         w = dlg.winfo_width()
@@ -424,7 +531,8 @@ class Toolbar:
         self.gate_mode = not self.gate_mode
         # reset all other modes
         (self.station_mode, self.sensor_mode, self.multi_mode,
-         self.asteroid_mode, self.nebula_mode, self.blackhole_mode) = (False,)*6
+         self.asteroid_mode, self.nebula_mode, self.blackhole_mode,
+         self.planet_mode, self.debris_mode, self.minefield_mode, self.platform_mode) = (False,)*10
        # highlight our button
         if self.gate_btn:
             self.gate_btn.config(
@@ -434,6 +542,7 @@ class Toolbar:
             )
         # reset the others
         for btn in (self.station_btn, self.sensor_btn, self.multi_btn,
-                    self.asteroid_btn, self.nebula_btn, self.blackhole_btn):
+                    self.asteroid_btn, self.nebula_btn, self.blackhole_btn,
+                    self.planet_btn, self.debris_btn, self.minefield_btn, self.platform_btn):
             if btn:
                 btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')

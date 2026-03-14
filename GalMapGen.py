@@ -1,53 +1,67 @@
-import os
 import json
+import os
 import sys
 from pathlib import Path
 from urllib.parse import quote
 
-# Helper to locate resources when running as a module or frozen executable
+
+VIEWPORT_WIDTH = 1600
+VIEWPORT_HEIGHT = 800
+SCALE_MODIFIER = 6.0
+MAP_INFO_FILENAME = "GalMapInfo.json"
+HTML_OUTPUT_NAME = "index.html"
+JUMP_TYPES = {"jump_point", "jumppoint", "jumpnode"}
+DEFAULT_MAP_INFO = {"borders": [], "texts": []}
+
+
 def get_base_path():
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, "frozen", False):
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
-# Base paths
-BASE = get_base_path()
-default_base = get_base_path()
-HTML_OUTPUT = Path(default_base) / "HTML" / "index.html"
-JSON_FOLDER = Path(default_base) / "data/missions/Map Designer/Terrain"
-# Offsets for map centering (computed later)
-OFFSET_X = 0
-OFFSET_Y = 0
+
+BASE = Path(get_base_path())
+HTML_OUTPUT = BASE / "HTML" / HTML_OUTPUT_NAME
+JSON_FOLDER = BASE / "data/missions/Map Designer/Terrain"
 
 
-def main():
-    # Load system definitions from JSON files
+def load_map_info(warnings):
+    map_info_file = Path(os.getcwd()) / MAP_INFO_FILENAME
+    if not map_info_file.exists():
+        return DEFAULT_MAP_INFO
+
+    try:
+        return json.loads(map_info_file.read_text())
+    except json.JSONDecodeError:
+        warnings.append(f"Could not parse {MAP_INFO_FILENAME}, skipping overlays.")
+        return DEFAULT_MAP_INFO
+
+
+def load_systems(json_folder, warnings):
     system_names = set()
     raw_systems = []
-    # collect metadata for each system
     system_meta = {}
-    # Scale modifier (tweak this to adjust overall zoom level)
-    SCALE_MODIFIER = 6.0
-    for json_file in JSON_FOLDER.glob("*.json"):
+
+    for json_file in json_folder.glob("*.json"):
         if json_file.name.lower() == "package.json":
             continue
+
         try:
-            with open(json_file, 'r') as f:
-                data = json.load(f)
+            with open(json_file, "r") as handle:
+                data = json.load(handle)
         except json.JSONDecodeError:
-            print(f"Warning: Could not parse {json_file.name}, skipping.")
+            warnings.append(f"Could not parse {json_file.name}, skipping.")
             continue
+
         if "systemMapCoord" not in data:
             continue
+
         name = json_file.stem
-        # read visibility flag from metadata
         meta = data.get("metadata", {})
-        # GM visibility flag: include hidden systems but mark them
         visible = meta.get("visible", True)
-        system_names.add(name)
         alignment = data.get("alignment") or data.get("systemalignment") or "Unknown"
-        # collect metadata
-        meta = data.get("metadata", {})
+
+        system_names.add(name)
         system_meta[name] = {
             "visible": visible,
             "alignment": alignment,
@@ -55,184 +69,311 @@ def main():
             "focus": meta.get("focus", ""),
             "exports": ", ".join(meta.get("exports", [])) or "None",
             "intel": meta.get("intel", {}),
-            "description": meta.get("sysdescription", "")
+            "description": meta.get("sysdescription", ""),
         }
-        dests = []
+
+        destinations = []
         for obj in data.get("objects", {}).values():
-        # accept multiple jump‐point type labels
-            typ = obj.get("type", "").lower()
-            if typ in ("jump_point", "jumppoint", "jumpnode"):
-              # skip any jump‐points flagged as hidden in the JSON
-                if obj.get("hideonmap", False):
-                    continue
-                for target in obj.get("destinations", {}).values():
-                    dests.append({"target": target})
-        raw_systems.append({"name": name, "alignment": alignment, "coord": data["systemMapCoord"], "destinations": dests})
-
-    # Filter valid destinations based on final system_names
-    systems = []
-
-    for s in raw_systems:
-        filtered_dests = s["destinations"]
-       # filtered_dests = [d for d in s["destinations"] if d["target"] in system_names]
-        systems.append({"name": s["name"], "alignment": s["alignment"], "coord": s["coord"], "destinations": filtered_dests})
-
-    # If no systems found, exit or define defaults
-    if not systems:
-        print("No systems with 'systemMapCoord' found. Exiting without generating map.")
-        sys.exit(1)
-
-    # Compute map extents safely
-    xs = [s["coord"][0] for s in systems]
-    ys = [s["coord"][2] for s in systems]
-    extent_x = max(abs(min(xs)), abs(max(xs))) if xs else 0
-    extent_y = max(abs(min(ys)), abs(max(ys))) if ys else 0
-    spread_x, spread_y = extent_x * 2, extent_y * 2
-
-    # Viewport and scaling
-    viewport_w, viewport_h = 1600, 800
-    # apply scale modifier to zoom level
-    SCALE = (viewport_w / max(spread_x, 1)) * SCALE_MODIFIER
-    pan_w = spread_x * SCALE
-    pan_h = spread_y * SCALE
-
-    # Center offsets (accounting for DIST_MODIFIER)
-    center_x = pan_w / 2
-    center_y = pan_h / 2
-    globals()['OFFSET_X'] = center_x
-    globals()['OFFSET_Y'] = center_y
-
-    # Build HTML elements
-    coords = {}
-
-    for s in systems:
-    # position each system according to the modified scale
-        px = s["coord"][0] * SCALE + OFFSET_X
-        py = s["coord"][2] * SCALE + OFFSET_Y
-        coords[s["name"]] = {"x": px, "y": py}
-
-    # Debug: ensure all systems loaded before pan bounds calculation
-    if len(coords) != len(systems):
-        print(f"Warning: coords ({len(coords)}) != systems ({len(systems)})")
-    else:
-        print(f"Debug: loaded {len(systems)} systems")
-
-    system_divs = []
-    svg_lines = []
-    print(f"[DEBUG] rendering jump‐lines, total systems: {len(systems)}")
-
-    for s in systems:
-        print(f"[DEBUG] {s['name']} → {len(s['destinations'])} raw dests")
-        px, py = coords[s["name"]]["x"], coords[s["name"]]["y"]
-        # build system icon, hiding if not visible by default+
-        # build system icon, hiding if not visible by default
-        vis = system_meta[s["name"]]["visible"]
-        cls = "system" + ("" if vis else " hidden-system")
-        style_attr = f"left:{px}px; top:{py}px;{'display:none;' if not vis else ''}"
-        system_divs.append(
-            f'<a href="{quote(s["name"])}.html" class="{cls}" data-system="{s["name"]}" style="{style_attr}">'
-            f'<div class="icon">'
-            f'<img src="Images/Factions/{s["alignment"]}.png" class="alignment-img" />'
-            f'<img src="Images/ring.png" class="tint-img" />'
-            f'</div>'
-            f'<div class="system-name">{s["name"]}</div></a>'
-)
-        for d in s.get("destinations", []):
-            tgt = coords.get(d["target"])
-            if not tgt:
+            if obj.get("type", "").lower() not in JUMP_TYPES:
                 continue
-            # base connector line (grey, sits under animated arrow)
+            for target in obj.get("destinations", {}).values():
+                destinations.append(
+                    {
+                        "target": target,
+                        "hidden": obj.get("hideonmap", False),
+                    }
+                )
+
+        raw_systems.append(
+            {
+                "name": name,
+                "alignment": alignment,
+                "coord": data["systemMapCoord"],
+                "destinations": destinations,
+            }
+        )
+
+    systems = []
+    for system in raw_systems:
+        filtered_destinations = [
+            destination
+            for destination in system["destinations"]
+            if destination["target"] in system_names
+        ]
+        missing_targets = sorted(
+            {
+                destination["target"]
+                for destination in system["destinations"]
+                if destination["target"] not in system_names
+            }
+        )
+        if missing_targets:
+            warnings.append(
+                f"{system['name']} has unknown jump targets: {', '.join(missing_targets)}"
+            )
+        systems.append(
+            {
+                "name": system["name"],
+                "alignment": system["alignment"],
+                "coord": system["coord"],
+                "destinations": filtered_destinations,
+            }
+        )
+
+    return systems, system_meta
+
+
+def compute_world_bounds(systems, map_info):
+    xs = [system["coord"][0] for system in systems]
+    ys = [system["coord"][2] for system in systems]
+
+    for border in map_info.get("borders", []):
+        for point in border.get("points", []):
+            if len(point) >= 2:
+                xs.append(point[0])
+                ys.append(point[1])
+
+    min_x = min(xs) if xs else 0
+    max_x = max(xs) if xs else 0
+    min_y = min(ys) if ys else 0
+    max_y = max(ys) if ys else 0
+
+    return {
+        "min_x": min_x,
+        "max_x": max_x,
+        "min_y": min_y,
+        "max_y": max_y,
+        "spread_x": max(max_x - min_x, 1),
+        "spread_y": max(max_y - min_y, 1),
+    }
+
+
+def compute_layout(bounds):
+    scale = (VIEWPORT_WIDTH / max(bounds["spread_x"], 1)) * SCALE_MODIFIER
+    map_width = bounds["spread_x"] * scale
+    map_height = bounds["spread_y"] * scale
+    offset_x = -bounds["min_x"] * scale
+    offset_y = -bounds["min_y"] * scale
+
+    margin_px = 400 * scale
+    pan_x_min = VIEWPORT_WIDTH - map_width - margin_px
+    pan_x_max = margin_px
+    pan_y_min = VIEWPORT_HEIGHT - map_height - margin_px
+    pan_y_max = margin_px
+
+    return {
+        "scale": scale,
+        "map_width": map_width,
+        "map_height": map_height,
+        "offset_x": offset_x,
+        "offset_y": offset_y,
+        "pan_x_min": pan_x_min,
+        "pan_x_max": pan_x_max,
+        "pan_y_min": pan_y_min,
+        "pan_y_max": pan_y_max,
+        "center_py_pixel": map_height / 2,
+    }
+
+
+def build_coords(systems, layout):
+    coords = {}
+    for system in systems:
+        px = system["coord"][0] * layout["scale"] + layout["offset_x"]
+        py = system["coord"][2] * layout["scale"] + layout["offset_y"]
+        coords[system["name"]] = {"x": px, "y": py}
+    return coords
+
+
+def build_system_divs(systems, system_meta, coords):
+    system_divs = []
+    for system in systems:
+        px = coords[system["name"]]["x"]
+        py = coords[system["name"]]["y"]
+        visible = system_meta[system["name"]]["visible"]
+        system_class = "system" + ("" if visible else " hidden-system")
+        style_attr = f"left:{px}px; top:{py}px;{'display:none;' if not visible else ''}"
+        system_divs.append(
+            f'<a href="{quote(system["name"])}.html" class="{system_class}" '
+            f'data-system="{system["name"]}" style="{style_attr}">'
+            f'<div class="icon">'
+            f'<img src="Images/Factions/{system["alignment"]}.png" class="alignment-img" />'
+            f'<img src="Images/ring.png" class="tint-img" />'
+            f"</div>"
+            f'<div class="system-name">{system["name"]}</div></a>'
+        )
+    return system_divs
+
+
+def build_directed_jumps(systems, coords):
+    directed_jumps = {}
+    for system in systems:
+        for destination in system.get("destinations", []):
+            target = destination.get("target")
+            if target not in coords:
+                continue
+            directed_jumps.setdefault((system["name"], target), []).append(destination)
+    return directed_jumps
+
+
+def build_one_way_jump_svg(src_name, tgt_name, hidden_jump, coords):
+    src_class = src_name.replace(" ", "-")
+    px = coords[src_name]["x"]
+    py = coords[src_name]["y"]
+    tx = coords[tgt_name]["x"]
+    ty = coords[tgt_name]["y"]
+    line_style = ' style="display:none;"' if hidden_jump else ""
+    line_class = " hidden-jump" if hidden_jump else ""
+    dx = tx - px
+    dy = ty - py
+    arrow_x = px + dx * (2 / 3)
+    arrow_y = py + dy * (2 / 3)
+
+    return [
+        f'<line x1="{px}" y1="{py}" x2="{tx}" y2="{ty}" '
+        f'stroke="#666666" stroke-width="9" opacity="0.6" '
+        f'class="jump-base jump-from-{src_class}{line_class}"{line_style} />',
+        f'<line x1="{px}" y1="{py}" x2="{arrow_x}" y2="{arrow_y}" '
+        f'stroke="#50CC50" stroke-width="12" marker-end="url(#arrow)" '
+        f'class="jump-line jump-from-{src_class}{line_class}"{line_style} />',
+    ]
+
+
+def build_jump_lines(systems, system_meta, coords):
+    svg_lines = []
+    directed_jumps = build_directed_jumps(systems, coords)
+    processed_pairs = set()
+
+    for src_name, tgt_name in directed_jumps:
+        pair_key = tuple(sorted((src_name, tgt_name)))
+        if pair_key in processed_pairs:
+            continue
+        processed_pairs.add(pair_key)
+
+        a_name, b_name = pair_key
+        a_to_b_entries = directed_jumps.get((a_name, b_name), [])
+        b_to_a_entries = directed_jumps.get((b_name, a_name), [])
+        pair_public = (
+            system_meta.get(a_name, {}).get("visible", True)
+            and system_meta.get(b_name, {}).get("visible", True)
+        )
+        a_to_b_public = pair_public and any(
+            not entry.get("hidden", False) for entry in a_to_b_entries
+        )
+        b_to_a_public = pair_public and any(
+            not entry.get("hidden", False) for entry in b_to_a_entries
+        )
+        a_to_b_hidden = any(entry.get("hidden", False) for entry in a_to_b_entries) or not pair_public
+        b_to_a_hidden = any(entry.get("hidden", False) for entry in b_to_a_entries) or not pair_public
+
+        ax = coords[a_name]["x"]
+        ay = coords[a_name]["y"]
+        bx = coords[b_name]["x"]
+        by = coords[b_name]["y"]
+        a_class = a_name.replace(" ", "-")
+        b_class = b_name.replace(" ", "-")
+
+        if a_to_b_public and b_to_a_public:
             svg_lines.append(
-                f'<line x1="{px}" y1="{py}" x2="{tgt["x"]}" y2="{tgt["y"]}" '
-                'stroke="#666666" stroke-width="6" opacity="0.4" class="jump-base" />'
-                )
+                f'<line x1="{ax}" y1="{ay}" x2="{bx}" y2="{by}" '
+                f'stroke="#50CC50" stroke-width="12" '
+                f'class="jump-line jump-from-{a_class} jump-from-{b_class}" />'
+            )
+            continue
 
-            dx, dy = tgt["x"] - px, tgt["y"] - py
-            ax, ay = px + dx / 3, py + dy / 3
-            # animated arrow segment (pale green), drawn after base so it appears above it
-            svg_lines.append(
-                f'<line x1="{px}" y1="{py}" x2="{ax}" y2="{ay}" '
-                'stroke="#50CC50" stroke-width="12" marker-end="url(#arrow)" '
-                f'class="jump-arrow jump-from-{s["name"].replace(" ", "-")}" />'
-                )
+        if a_to_b_public:
+            svg_lines.extend(build_one_way_jump_svg(a_name, b_name, False, coords))
+        elif a_to_b_hidden:
+            svg_lines.extend(build_one_way_jump_svg(a_name, b_name, True, coords))
 
-    # Optional map info overlays
-    map_info_file = Path(BASE) / "GalMapInfo.json"
-    if map_info_file.exists():
-        try:
-            info = json.loads(map_info_file.read_text())
-            for border in info.get("borders", []):
-                pts = ' '.join(f"{x * SCALE + OFFSET_X},{y * SCALE + OFFSET_Y}" for x, y in border.get("points", []))
-                svg_lines.append(
-                    f'<polyline points="{pts}" stroke="{border.get("color","white")}" '
-                    f'stroke-width="{border.get("width",16)}" fill="none">'
-                    f'<title>{border.get("hover_text","")}</title></polyline>'
-                )
-            for text in info.get("texts", []):
-                pos = text.get("position", [])
-                if len(pos) < 2:
-                    continue
-                cy = pos[2] if len(pos) > 2 else pos[1]
-                tx, ty = pos[0] * SCALE + OFFSET_X, cy * SCALE + OFFSET_Y
-                size = text.get("size", 12)
-                # use em-units for line spacing so multi-line text scales correctly
-                line_height_em = 1.2
-                tspans = ''.join(
-                    f'<tspan x="{tx}" dy="{(line_height_em if i else 0)}em">{line}</tspan>'
-                    for i, line in enumerate(text.get("lines", []))
-                )
-                svg_lines.append(
-                    f'<text data-base-size="{size}" x="{tx}" y="{ty}" fill="{text.get("color","white")}" '
-                    f'font-size="{size}">{tspans}</text>'
-                )
-        except json.JSONDecodeError:
-            print("Warning: Could not parse GalMapInfo.json, skipping overlays.")
+        if b_to_a_public:
+            svg_lines.extend(build_one_way_jump_svg(b_name, a_name, False, coords))
+        elif b_to_a_hidden:
+            svg_lines.extend(build_one_way_jump_svg(b_name, a_name, True, coords))
 
-    # Compute pan bounds using full map dimensions + 400‐unit buffer
-    margin_px = 400 * SCALE
-    # pan_w and pan_h already include DIST_MODIFIER
-    panX_min = viewport_w - pan_w - margin_px
-    panX_max = margin_px
-    panY_min = viewport_h - pan_h - margin_px
-    panY_max = margin_px
+    return svg_lines
 
-    center_py_pixel = OFFSET_Y  # define vertical center for JS
 
-    print(f"Pan X range: {panX_min} to {panX_max}, Pan Y range: {panY_min} to {panY_max}")
-    PANX_MIN = panX_min
-    PANX_MAX = panX_max
-    PANY_MIN = panY_min
-    PANY_MAX = panY_max
+def build_overlay_lines(map_info, layout):
+    overlay_lines = []
+    scale = layout["scale"]
+    offset_x = layout["offset_x"]
+    offset_y = layout["offset_y"]
 
-    # Controls HTML
-    home_button_html = '<button onclick="resetZoom()" class="system-button" style="background-color:#222;width:100%;font-size:16pt;">Home</button>'
+    for border in map_info.get("borders", []):
+        points = " ".join(
+            f"{x * scale + offset_x},{y * scale + offset_y}"
+            for x, y in border.get("points", [])
+        )
+        overlay_lines.append(
+            f'<polyline points="{points}" stroke="{border.get("color", "white")}" '
+            f'stroke-width="{border.get("width", 16)}" fill="none">'
+            f'<title>{border.get("hover_text", "")}</title></polyline>'
+        )
 
-    system_list_html = ''.join(
-        f"<button class='system-button' data-system=\"{s['name']}\" data-visible=\"{'true' if system_meta[s['name']]['visible'] else 'false'}\" "
-        f"style=\"{'display:none;' if not system_meta[s['name']]['visible'] else ''}\" "
-        f"onclick=\"document.location.href='{quote(s['name'])}.html'\">"
-        f"<img src=\"Images/Factions/{system_meta[s['name']]['alignment']}.png\" class=\"button-icon\" alt=\"{system_meta[s['name']]['alignment']}\" />"
-        f"{s['name']}</button>"
-        for s in sorted(systems, key=lambda x: x['name'])
+    for text in map_info.get("texts", []):
+        position = text.get("position", [])
+        if len(position) < 2:
+            continue
+        cy = position[2] if len(position) > 2 else position[1]
+        tx = position[0] * scale + offset_x
+        ty = cy * scale + offset_y
+        size = text.get("size", 12)
+        tspans = "".join(
+            f'<tspan x="{tx}" dy="{(1.2 if index else 0)}em">{line}</tspan>'
+            for index, line in enumerate(text.get("lines", []))
+        )
+        overlay_lines.append(
+            f'<text data-base-size="{size}" x="{tx}" y="{ty}" '
+            f'fill="{text.get("color", "white")}" font-size="{size}">{tspans}</text>'
+        )
+
+    return overlay_lines
+
+
+def build_system_list_html(systems, system_meta):
+    return "".join(
+        f"<button class='system-button' type='button' data-system=\"{system['name']}\" "
+        f"data-target-url=\"{quote(system['name'])}.html\" "
+        f"data-visible=\"{'true' if system_meta[system['name']]['visible'] else 'false'}\" "
+        f"style=\"{'display:none;' if not system_meta[system['name']]['visible'] else ''}\">"
+        f"<img src=\"Images/Factions/{system_meta[system['name']]['alignment']}.png\" "
+        f"class=\"button-icon\" alt=\"{system_meta[system['name']]['alignment']}\" />"
+        f"{system['name']}</button>"
+        for system in sorted(systems, key=lambda item: item["name"])
     )
 
-    # Compose final HTMLs
-    # Serialize system metadata for JS
-    meta_json = json.dumps(system_meta)
-    html = f'''<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>System Map</title>
-  <style>
-    body {{ margin:0; background:black; color:white; display:flex; height:100vh; }}
-    #controls {{ width:200px; background:#333; padding:10px; overflow-y:auto; }}
-    .system-button {{ width:100%; padding:2px; font-size:14pt; background:#444; color:white; border:none; margin-bottom:5px; cursor:pointer; text-align:left; display:flex; align-items:center; }}
+
+def build_styles(layout):
+    return f"""
+    * {{ box-sizing: border-box; }}
+    body {{ margin:0; background:black; color:white; display:flex; min-height:100dvh; height:100dvh; overflow:hidden; }}
+    #controls {{ width:220px; min-width:220px; background:#333; padding:10px; overflow-y:auto; }}
+    .system-button {{ width:100%; min-height:42px; padding:6px 8px; font-size:14pt; background:#444; color:white; border:none; margin-bottom:5px; cursor:pointer; text-align:left; display:flex; align-items:center; }}
     .system-button .button-icon {{ height:1em; width:auto; margin-right:0.5em; }}
-    #maparea {{ flex:1; position:relative; background:url("Images/starfield.jpg") center/cover; overflow:hidden; cursor: grab; }}
-    #map {{ width: {pan_w}px; height: {pan_h}px; transform-origin: top left; cursor: grab; }}
+    #system-search {{ font-size:16px; }}
+    #sort-options {{ display:flex; flex-wrap:wrap; gap:8px; }}
+    #maparea {{ flex:1; position:relative; background:url("Images/starfield.jpg") center/cover; overflow:hidden; cursor: grab; touch-action:none; }}
+    #map {{ width: {layout["map_width"]}px; height: {layout["map_height"]}px; transform-origin: top left; cursor: grab; }}
     .map-container {{ position:absolute; top:0; left:0; }}
+    #mobile-toolbar {{
+      display:none;
+      position:absolute;
+      top:12px;
+      left:12px;
+      right:12px;
+      z-index:5;
+      gap:8px;
+      pointer-events:none;
+    }}
+    .mobile-toggle {{
+      flex:1;
+      min-height:42px;
+      border:1px solid rgba(255,255,255,0.18);
+      background:rgba(24,24,24,0.88);
+      color:white;
+      font-size:11pt;
+      pointer-events:auto;
+    }}
     svg {{ position:absolute; top:0; left:0; z-index:0; pointer-events:auto; }}
     svg polyline {{ pointer-events: stroke; }}
     .system {{ position:absolute; width:50px; transform:translate(-50%,-50%); z-index:1; cursor:pointer; text-align:center; }}
@@ -242,32 +383,28 @@ def main():
     .system-name {{
       position: absolute;
       left: 50%;
-      
       text-align: center;
-      top: calc(=100% + 4px);
+      top: calc(100% + 4px);
       transform: translateX(-50%);
-      white-space: wrap;
+      white-space: normal;
       font-size: 90px;
       font-weight: bold;
       color: white;
       text-decoration: none;
       pointer-events: none;
     }}
-    
-@keyframes jumpPulse {{
-  0%   {{ stroke: #50CC50; stroke-width: 12; }}
-  100% {{ stroke: #c8facc; stroke-width: 18; }}
-}}
-
-.jump-arrow {{ stroke: #50CC50; }}
-
-.jump-arrow-active {{
-  animation: jumpPulse 1s infinite alternate ease-in-out !important;
-  pointer-events: none !important;
-
-}}
+    @keyframes jumpPulse {{
+      0%   {{ stroke: #50CC50; stroke-width: 12; }}
+      100% {{ stroke: #c8facc; stroke-width: 18; }}
+    }}
+    .jump-line {{ stroke: #50CC50; }}
+    .jump-arrow-active {{
+      animation: jumpPulse 1s infinite alternate ease-in-out !important;
+      pointer-events: none !important;
+    }}
     #info {{
       width: 300px;
+      min-width: 280px;
       background: #333;
       padding: 10px;
       overflow-y: auto;
@@ -280,12 +417,547 @@ def main():
       max-width: 80%;
       height: auto;
     }}
-    #system-details {{ text-align: left; }}
-</style>
+    #system-details {{ text-align: left; width:100%; }}
+    .system-link-button {{
+      width:100%;
+      min-height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:8px 0;
+      text-decoration:none;
+    }}
+    .system-link-button.is-disabled {{
+      opacity:0.45;
+      pointer-events:none;
+    }}
+    @media (max-width: 960px) {{
+      body {{ display:block; position:relative; }}
+      #mobile-toolbar {{ display:flex; }}
+      #controls {{
+        position:absolute;
+        top:64px;
+        left:12px;
+        right:12px;
+        width:auto;
+        min-width:0;
+        max-height:38dvh;
+        z-index:4;
+        border:1px solid rgba(255,255,255,0.12);
+        box-shadow:0 18px 40px rgba(0,0,0,0.42);
+        transition:transform 0.2s ease, opacity 0.2s ease;
+      }}
+      #maparea {{
+        position:absolute;
+        inset:0;
+        min-height:100dvh;
+      }}
+      #info {{
+        position:absolute;
+        left:12px;
+        right:12px;
+        bottom:12px;
+        width:auto;
+        min-width:0;
+        max-height:42dvh;
+        z-index:4;
+        border:1px solid rgba(255,255,255,0.12);
+        box-shadow:0 18px 40px rgba(0,0,0,0.42);
+        transition:transform 0.2s ease, opacity 0.2s ease;
+      }}
+      #controls.mobile-collapsed {{
+        transform:translateY(calc(-100% - 18px));
+        opacity:0;
+        pointer-events:none;
+      }}
+      #info.mobile-collapsed {{
+        transform:translateY(calc(100% + 18px));
+        opacity:0;
+        pointer-events:none;
+      }}
+      .system-button {{ font-size: 11pt; }}
+      .system-name {{ font-size: 64px; }}
+    }}
+    @media (max-width: 640px) {{
+      #mobile-toolbar {{ top:8px; left:8px; right:8px; }}
+      #controls {{ top:56px; left:8px; right:8px; max-height: 40dvh; padding: 8px; }}
+      #info {{ left:8px; right:8px; bottom:8px; max-height: 34dvh; padding: 8px; }}
+      .system-button {{ min-height: 40px; font-size: 10pt; }}
+      .icon {{ width:60px; height:60px; }}
+      .alignment-img {{ top:12px; left:12px; width:34px; height:34px; }}
+      .tint-img {{ width:58px; height:58px; }}
+      .system-name {{ font-size: 52px; }}
+      #info img {{ max-width: 56%; }}
+    }}
+    """
+
+
+def build_script(layout, system_meta, coords):
+    meta_json = json.dumps(system_meta)
+    coords_json = json.dumps(coords)
+    return f"""
+    function enterGMMode() {{
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+    }}
+    function isGM() {{
+      return document.cookie
+        .split(';')
+        .some(c => c.trim() === 'gmMode=1');
+    }}
+    function exitGMMode() {{
+      document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    }}
+
+    function applyGMVisibility() {{
+      const showHidden = isGM();
+      document.querySelectorAll('.hidden-system').forEach(el => el.style.display = showHidden ? '' : 'none');
+      document.querySelectorAll('.hidden-jump').forEach(el => el.style.display = showHidden ? '' : 'none');
+      document.querySelectorAll('.system-button[data-visible="false"]').forEach(btn => btn.style.display = showHidden ? '' : 'none');
+    }}
+
+    function isMobileLayout() {{
+      return window.matchMedia('(max-width: 960px)').matches;
+    }}
+
+    function syncMobileDrawerState() {{
+      if (!isMobileLayout()) {{
+        controls.classList.remove('mobile-collapsed');
+        infoPanel.classList.remove('mobile-collapsed');
+        return;
+      }}
+      controls.classList.toggle('mobile-collapsed', !systemsDrawerOpen);
+      infoPanel.classList.toggle('mobile-collapsed', !infoDrawerOpen);
+    }}
+
+    function setSelectedSystemLink(name) {{
+      if (!selectedSystemLink) return;
+      if (!name) {{
+        selectedSystemLink.href = '#';
+        selectedSystemLink.classList.add('is-disabled');
+        selectedSystemLink.textContent = 'Open Selected System';
+        return;
+      }}
+      selectedSystemLink.href = `${{encodeURIComponent(name)}}.html`;
+      selectedSystemLink.classList.remove('is-disabled');
+      selectedSystemLink.textContent = `Open ${{name}}`;
+    }}
+
+    const controls = document.getElementById('controls');
+    const infoPanel = document.getElementById('info');
+    const systemsToggleBtn = document.getElementById('mobile-systems-toggle');
+    const infoToggleBtn = document.getElementById('mobile-info-toggle');
+    const selectedSystemLink = document.getElementById('selected-system-link');
+    const oniBtn = document.getElementById('oni-login-btn');
+    if (oniBtn) {{
+      oniBtn.addEventListener('click', toggleOniAuth);
+    }}
+
+    applyGMVisibility();
+
+    const map = document.getElementById('map');
+    const maparea = document.getElementById('maparea');
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    let scale = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
+    let panX = 0;
+    let panY = 0;
+    const INITIAL_CENTER_PY = {layout["center_py_pixel"]};
+    let PANX_MIN = {layout["pan_x_min"]};
+    let PANX_MAX = {layout["pan_x_max"]};
+    let PANY_MIN = {layout["pan_y_min"]};
+    let PANY_MAX = {layout["pan_y_max"]};
+    const systemMeta = {meta_json};
+    const systemCoords = {coords_json};
+
+    function updatePanBounds() {{
+      const mapW = map.clientWidth * scale;
+      const mapH = map.clientHeight * scale;
+      const margin = 400 * scale;
+      PANX_MIN = maparea.clientWidth - mapW - margin;
+      PANX_MAX = margin;
+      PANY_MIN = maparea.clientHeight - mapH - margin;
+      PANY_MAX = margin;
+      console.log(`Bounds -> X:[${{PANX_MIN.toFixed(0)}},${{PANX_MAX.toFixed(0)}}] Y:[${{PANY_MIN.toFixed(0)}},${{PANY_MAX.toFixed(0)}}]`);
+    }}
+
+    updatePanBounds();
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+    let selectedSystem = null;
+    let pinchStartDistance = 0;
+    let pinchStartScale = scale;
+    let systemsDrawerOpen = false;
+    let infoDrawerOpen = true;
+
+    function applyTransform() {{
+      panX = Math.min(PANX_MAX, Math.max(PANX_MIN, panX));
+      panY = Math.min(PANY_MAX, Math.max(PANY_MIN, panY));
+      map.style.transform = `translate(${{panX}}px,${{panY}}px) scale(${{scale}})`;
+
+      document.querySelectorAll('.system-name').forEach(label => {{
+        const minSize = 70;
+        const maxSize = 90;
+        let newSize = minSize + (scale - 1) * (maxSize - minSize);
+        newSize = Math.max(minSize, Math.min(maxSize, newSize));
+        label.style.setProperty('font-size', `${{newSize}}px`, 'important');
+        const offset = (newSize - minSize) / 2;
+        label.style.transform = `translateX(-50%) translateY(-${{offset}}px)`;
+        const halfWidth = label.offsetWidth / 2;
+        label.style.marginLeft = `-${{halfWidth}}px`;
+      }});
+
+      document.querySelectorAll('.icon').forEach(icon => {{
+        const iconGrowFactor = 0.9;
+        const iconScale = scale > 1 ? Math.min(scale, 1 + iconGrowFactor) : 1 / scale;
+        icon.style.transform = `scale(${{iconScale}})`;
+      }});
+
+      document.querySelectorAll('svg text[data-base-size]').forEach(el => {{
+        const baseSize = parseFloat(el.getAttribute('data-base-size'));
+        const screenSize = Math.max(32, baseSize * scale);
+        const attrSize = screenSize / scale;
+        el.setAttribute('font-size', attrSize);
+      }});
+    }}
+
+    function setJumpHighlight(systemName, active) {{
+      const sys = systemName.replace(/ /g, '-');
+      document.querySelectorAll(`.jump-from-${{sys}}`).forEach(line =>
+        line.classList.toggle('jump-arrow-active', active)
+      );
+    }}
+
+    function showSystemDetails(name) {{
+      const m = systemMeta[name] || {{}};
+      const intel = m.intel || {{}};
+      const pirate = intel.pirate || 'Unknown';
+      const enemy = intel.enemy || 'Unknown';
+      const assets = Array.isArray(intel.assets) ? intel.assets : [];
+      document.getElementById('system-details').innerHTML =
+        `<h3>${{name}}</h3>` +
+        `<p>Alignment: ${{m.alignment}}</p>` +
+        `<p>Development Level: ${{m.development}}</p>` +
+        `<p>System Focus: ${{m.focus}}</p>` +
+        `<p>Exports: ${{m.exports}}</p>` +
+        `<div><strong>Intelligence estimate:</strong></div>` +
+        `<div>` +
+        `<img src="Images/SysBadges/${{pirate}}Pirate.png" width="50" height="50" alt="${{pirate}} Pirate" /> ` +
+        `<img src="Images/SysBadges/${{enemy}}Enemy.png" width="50" height="50" alt="${{enemy}} Enemy" />` +
+        `</div>` +
+        `<div>Pirate Activity: ${{pirate}}</div>` +
+        `<div>Enemy Activity: ${{enemy}}</div>` +
+        `<div><strong>Known Important Assets:</strong></div>` +
+        `<div class="asset-icons">` +
+        `${{assets.map(a => `<img src="Images/SysBadges/${{a}}.png" width="50" height="50" alt="${{a}}" title="${{a}}" />`).join('')}}` +
+        `</div>` +
+        `<div class="asset-text">` +
+        `${{assets.map(a => `<div>${{a}}</div>`).join('')}}` +
+        `<p>${{m.description}}</p>`;
+    }}
+
+    function selectSystem(name) {{
+      if (selectedSystem && selectedSystem !== name) {{
+        setJumpHighlight(selectedSystem, false);
+      }}
+      selectedSystem = name;
+      showSystemDetails(name);
+      setJumpHighlight(name, true);
+      setSelectedSystemLink(name);
+      if (isMobileLayout()) {{
+        infoDrawerOpen = true;
+        syncMobileDrawerState();
+      }}
+    }}
+
+    function clearSelectedSystem() {{
+      if (!selectedSystem) return;
+      setJumpHighlight(selectedSystem, false);
+      selectedSystem = null;
+      setSelectedSystemLink(null);
+    }}
+
+    function centerOnSystem(name) {{
+      const coord = systemCoords[name];
+      if (!coord) return;
+      panX = (maparea.clientWidth / 2) - (coord.x * scale);
+      panY = (maparea.clientHeight / 2) - (coord.y * scale);
+      applyTransform();
+    }}
+
+    function zoomAroundPoint(nextScale, clientX, clientY) {{
+      const rect = maparea.getBoundingClientRect();
+      const mx = clientX - rect.left;
+      const my = clientY - rect.top;
+      const prev = scale;
+      scale = nextScale;
+      const minS = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
+      const maxS = Math.min(maparea.clientWidth / 500, maparea.clientHeight / 500);
+      scale = Math.max(minS, Math.min(scale, maxS));
+      const factor = scale / prev;
+      panX -= (mx - panX) * (factor - 1);
+      panY -= (my - panY) * (factor - 1);
+      updatePanBounds();
+      applyTransform();
+    }}
+
+    function getTouchDistance(touchA, touchB) {{
+      const dx = touchA.clientX - touchB.clientX;
+      const dy = touchA.clientY - touchB.clientY;
+      return Math.hypot(dx, dy);
+    }}
+
+    function getTouchMidpoint(touchA, touchB) {{
+      return {{
+        x: (touchA.clientX + touchB.clientX) / 2,
+        y: (touchA.clientY + touchB.clientY) / 2,
+      }};
+    }}
+
+    maparea.addEventListener('mousedown', e => {{
+      if (isCoarsePointer) return;
+      e.preventDefault();
+      isPanning = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+      maparea.style.cursor = 'grabbing';
+    }});
+
+    document.addEventListener('mouseup', () => {{
+      if (!isPanning) return;
+      isPanning = false;
+      maparea.style.cursor = 'grab';
+    }});
+
+    document.addEventListener('mousemove', e => {{
+      if (!isPanning) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      applyTransform();
+    }});
+
+    maparea.addEventListener('wheel', e => {{
+      e.preventDefault();
+      const nextScale = scale * (e.deltaY > 0 ? 0.9 : 1.1);
+      zoomAroundPoint(nextScale, e.clientX, e.clientY);
+    }});
+
+    maparea.addEventListener('touchstart', e => {{
+      if (e.touches.length === 1) {{
+        isPanning = true;
+        startX = e.touches[0].clientX - panX;
+        startY = e.touches[0].clientY - panY;
+      }} else if (e.touches.length === 2) {{
+        isPanning = false;
+        pinchStartDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        pinchStartScale = scale;
+      }}
+    }}, {{ passive: false }});
+
+    maparea.addEventListener('touchmove', e => {{
+      if (e.touches.length === 1 && isPanning) {{
+        e.preventDefault();
+        panX = e.touches[0].clientX - startX;
+        panY = e.touches[0].clientY - startY;
+        applyTransform();
+      }} else if (e.touches.length === 2) {{
+        e.preventDefault();
+        const distance = getTouchDistance(e.touches[0], e.touches[1]);
+        if (!pinchStartDistance) {{
+          pinchStartDistance = distance;
+          pinchStartScale = scale;
+          return;
+        }}
+        const midpoint = getTouchMidpoint(e.touches[0], e.touches[1]);
+        const nextScale = pinchStartScale * (distance / pinchStartDistance);
+        zoomAroundPoint(nextScale, midpoint.x, midpoint.y);
+      }}
+    }}, {{ passive: false }});
+
+    maparea.addEventListener('touchend', e => {{
+      if (e.touches.length === 0) {{
+        isPanning = false;
+        pinchStartDistance = 0;
+      }} else if (e.touches.length === 1) {{
+        isPanning = true;
+        startX = e.touches[0].clientX - panX;
+        startY = e.touches[0].clientY - panY;
+        pinchStartDistance = 0;
+      }}
+    }}, {{ passive: false }});
+
+    if (systemsToggleBtn) {{
+      systemsToggleBtn.addEventListener('click', () => {{
+        systemsDrawerOpen = !systemsDrawerOpen;
+        if (systemsDrawerOpen) {{
+          infoDrawerOpen = false;
+        }}
+        syncMobileDrawerState();
+      }});
+    }}
+
+    if (infoToggleBtn) {{
+      infoToggleBtn.addEventListener('click', () => {{
+        infoDrawerOpen = !infoDrawerOpen;
+        if (infoDrawerOpen) {{
+          systemsDrawerOpen = false;
+        }}
+        syncMobileDrawerState();
+      }});
+    }}
+
+    document.querySelectorAll('.system-button[data-system]').forEach(btn => {{
+      btn.addEventListener('click', () => {{
+        const name = btn.getAttribute('data-system');
+        const targetUrl = btn.getAttribute('data-target-url');
+        if (!name) return;
+        if (isMobileLayout()) {{
+          selectSystem(name);
+          centerOnSystem(name);
+          systemsDrawerOpen = false;
+          infoDrawerOpen = true;
+          syncMobileDrawerState();
+          return;
+        }}
+        if (targetUrl) {{
+          document.location.href = targetUrl;
+        }}
+      }});
+    }});
+
+    function resetZoom() {{
+      scale = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
+      panX = (maparea.clientWidth - map.clientWidth * scale) / 2;
+      panY = (maparea.clientHeight - map.clientHeight * scale) / 2;
+      updatePanBounds();
+      applyTransform();
+    }}
+
+    window.addEventListener('load', resetZoom);
+    window.addEventListener('resize', () => {{
+      resetZoom();
+      syncMobileDrawerState();
+    }});
+    resetZoom();
+    setSelectedSystemLink(null);
+    syncMobileDrawerState();
+
+    document.querySelectorAll('.system').forEach(el => {{
+      const name = el.getAttribute('data-system');
+      el.addEventListener('mouseenter', () => {{
+        if (isCoarsePointer) return;
+        showSystemDetails(name);
+        setJumpHighlight(name, true);
+      }});
+      el.addEventListener('mouseleave', () => {{
+        if (isCoarsePointer || selectedSystem === name) return;
+        setJumpHighlight(name, false);
+      }});
+      el.addEventListener('click', e => {{
+        if (!isCoarsePointer) return;
+        if (selectedSystem !== name) {{
+          e.preventDefault();
+          selectSystem(name);
+        }}
+      }});
+    }});
+
+    const searchInput = document.getElementById('system-search');
+    if (searchInput) {{
+      searchInput.addEventListener('input', () => {{
+        const term = searchInput.value.toLowerCase();
+        document.querySelectorAll('.system-button[data-system]').forEach(btn => {{
+          const nameAttr = btn.getAttribute('data-system');
+          if (!nameAttr) return;
+          const isVisibleFlag = btn.getAttribute('data-visible') === 'true';
+          if (!isGM() && !isVisibleFlag) {{
+            btn.style.display = 'none';
+            return;
+          }}
+          const name = nameAttr.toLowerCase();
+          btn.style.display = name.includes(term) ? '' : 'none';
+        }});
+      }});
+    }}
+
+    document.querySelectorAll('input[name="sort"]').forEach(radio => {{
+      radio.addEventListener('change', reorderButtons);
+    }});
+
+    function reorderButtons() {{
+      const container = document.getElementById('controls');
+      const sortBy = document.querySelector('input[name="sort"]:checked').value;
+      let buttons = Array.from(container.querySelectorAll('.system-button[data-system]'));
+      if (!isGM()) {{
+        buttons = buttons.filter(btn => btn.getAttribute('data-visible') === 'true');
+      }}
+
+      buttons.sort((a, b) => {{
+        const nameA = a.getAttribute('data-system');
+        const nameB = b.getAttribute('data-system');
+        if (sortBy === 'name') {{
+          return nameA.localeCompare(nameB);
+        }}
+        const alignA = systemMeta[nameA].alignment || '';
+        const alignB = systemMeta[nameB].alignment || '';
+        if (alignA !== alignB) {{
+          return alignA.localeCompare(alignB);
+        }}
+        return nameA.localeCompare(nameB);
+      }});
+
+      buttons.forEach(btn => container.appendChild(btn));
+    }}
+
+    reorderButtons();
+
+    function toggleOniAuth() {{
+      if (isGM()) {{
+        exitGMMode();
+        document.getElementById('oni-login-btn').innerText = 'ONI Login';
+        applyGMVisibility();
+        return;
+      }}
+
+      const pwd = prompt('Enter GM password:');
+      if (pwd === 'oni1') {{
+        enterGMMode();
+        document.getElementById('oni-login-btn').innerText = 'ONI Logout';
+        applyGMVisibility();
+      }} else {{
+        alert('Incorrect password');
+      }}
+    }}
+
+    window.addEventListener('load', () => {{
+      if (isGM()) {{
+        document.getElementById('oni-login-btn').innerText = 'ONI Logout';
+      }}
+      applyGMVisibility();
+      syncMobileDrawerState();
+    }});
+    """
+
+
+def build_page_html(system_divs, svg_lines, system_list_html, layout, system_meta, coords):
+    styles = build_styles(layout)
+    script = build_script(layout, system_meta, coords)
+    home_button_html = (
+        '<button onclick="resetZoom()" class="system-button" '
+        'style="background-color:#222;width:100%;font-size:16pt;">Home</button>'
+    )
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>System Map</title>
+  <style>
+{styles}
+  </style>
 </head>
 <body>
   <div id="controls">
-    <!-- Oni authentication control -->
     <div id="oni-login-container" style="margin-bottom:10px;">
       <button id="oni-login-btn" class="system-button">
         ONI Login
@@ -300,11 +972,15 @@ def main():
     {system_list_html}
   </div>
   <div id="maparea">
+    <div id="mobile-toolbar">
+      <button id="mobile-systems-toggle" class="system-button mobile-toggle" type="button">Systems</button>
+      <button id="mobile-info-toggle" class="system-button mobile-toggle" type="button">Info</button>
+    </div>
     <div class="map-container" id="map">
       <svg width="100%" height="100%">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 Z" fill="#70DD70" />
+            <path d="M0,0 L10,5 L0,10 Z" fill="#50CC50" />
           </marker>
         </defs>
         {''.join(svg_lines)}
@@ -315,294 +991,59 @@ def main():
   <div id="info">
     <img src="Images/compass.png" alt="Compass" />
     {home_button_html}
+    <a id="selected-system-link" class="system-button system-link-button is-disabled" href="#">Open Selected System</a>
     <div id="system-details">
       <p>Select a system to view metadata.</p>
     </div>
   </div>
   <script>
-  
-    // ——— ONI GM Authentication Helpers ———
-    function enterGMMode() {{
-      // set a long-lived cookie flag
-      document.cookie = "gmMode=1; path=/; max-age=31536000";
-    }}
-    function isGM() {{
-        return document.cookie
-        .split(';')
-        .some(c => c.trim() === 'gmMode=1');
-    }}
-    function exitGMMode() {{
-      // clear the cookie
-      document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    }}
-
-    // Bind ONI login/logout button directly (element present at end of body)
-    const oniBtn = document.getElementById('oni-login-btn');
-        if (oniBtn) {{
-      oniBtn.addEventListener('click', toggleOniAuth);
-    }}
-    
-  // On initial load, hide any GM-only systems if not in ONI (GM) mode
-  if (!isGM()) {{
-    // hide map icons
-    document.querySelectorAll('.hidden-system').forEach(el => el.style.display = 'none');
-    // hide sidebar buttons for invisible systems
-    document.querySelectorAll('.system-button[data-visible="false"]').forEach(btn => btn.style.display = 'none');
-  }}
-
-    const map     = document.getElementById('map');
-    const maparea = document.getElementById('maparea');
-    let scale = Math.min(maparea.clientWidth/map.clientWidth, maparea.clientHeight/map.clientHeight);
-    let panX = 0, panY = 0;
-    // Initial center of Y (from Python)
-    const INITIAL_CENTER_PY = {center_py_pixel};
-    // Pan bounds
-    let PANX_MIN, PANX_MAX, PANY_MIN, PANY_MAX;    
-    PANX_MIN = {panX_min};
-    PANX_MAX = {panX_max};
-    PANY_MIN = {panY_min};
-    PANY_MAX = {panY_max};
-
-    // Parsed system metadata
-    const systemMeta = {meta_json};
-
-    // Recompute pan bounds based on current scale & viewport
-    function updatePanBounds() {{
-      const mapW = map.clientWidth * scale;
-      const mapH = map.clientHeight * scale;
-      const margin = 400 * scale;  // 400px “buffer” at this zoom
-      PANX_MIN = maparea.clientWidth - mapW - margin;
-      PANX_MAX = margin;
-      PANY_MIN = maparea.clientHeight - mapH - margin;
-      PANY_MAX = margin;
-      console.log(`Bounds → X:[${{PANX_MIN.toFixed(0)}},${{PANX_MAX.toFixed(0)}}] Y:[${{PANY_MIN.toFixed(0)}},${{PANY_MAX.toFixed(0)}}]`);
-    }}
-
-    // Initial bounds calculation
-    updatePanBounds();
-    let isPanning = false, startX = 0, startY = 0;
-
-    function applyTransform() {{ 
-      // Clamp panning to within 400px margin
-      panX = Math.min(PANX_MAX, Math.max(PANX_MIN, panX));
-      panY = Math.min(PANY_MAX, Math.max(PANY_MIN, panY));
-      map.style.transform = `translate(${{panX}}px,${{panY}}px) scale(${{scale}})`;
-     
-      // Dynamic label resizing with enforced min/max font sizes
-      document.querySelectorAll('.system-name').forEach(label => {{
-      const minSize = 70;
-      const maxSize = 90;
-      // interpolate size based on zoom—use (scale - 1) so baseSize at scale=1
-      let newSize = minSize + (scale - 1) * (maxSize - minSize);
-      newSize = Math.max(minSize, Math.min(maxSize, newSize));
-      label.style.setProperty('font-size', `${{newSize}}px`, 'important');
-      // shift label upward by half the extra height
-      const offset = (newSize - minSize) / 2;
-      label.style.transform = `translateY(-${{offset}}px)`;
-      const halfWidth = label.offsetWidth / 2;
-      label.style.marginLeft = `-${{halfWidth}}px`;
-      }});
-      // Icon scaling: keep icons a consistent on-screen size
-      
-      document.querySelectorAll('.icon').forEach(icon => {{
-        // dynamic icon scaling: shrink when zooming out, grow up to a max when zooming in
-        const iconGrowFactor = 0.9; // max 20% growth
-        let iconScale = scale > 1
-          ? Math.min(scale, 1 + iconGrowFactor)
-          : 1 / scale;
-        icon.style.transform = `scale(${{iconScale}})`;
-      }});
-      // Keep free‐floating text at least 24px on‐screen:
-      document.querySelectorAll('svg text[data-base-size]').forEach(el => {{
-        const baseSize   = parseFloat(el.getAttribute('data-base-size'));
-        const screenSize = Math.max(32, baseSize * scale);
-        // undo the map’s scale so font renders at `screenSize` px exactly
-        const attrSize   = screenSize / scale;
-        el.setAttribute('font-size', attrSize);
-      }}); 
-      
-      
-    }}
-
-    maparea.addEventListener('mousedown', e => {{
-      e.preventDefault(); isPanning = true; startX = e.clientX - panX; startY = e.clientY - panY; maparea.style.cursor = 'grabbing';
-    }});
-
-    document.addEventListener('mouseup', () => {{ if (!isPanning) return; isPanning = false; maparea.style.cursor = 'grab'; }});
-    document.addEventListener('mousemove', e => {{
-      if (!isPanning) return;
-      panX = e.clientX - startX;
-      panY = e.clientY - startY;
-      applyTransform();
-    }});
-    
-     maparea.addEventListener('wheel', e => {{ e.preventDefault();
-       const rect = maparea.getBoundingClientRect();
-       const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-       const prev = scale;
-       scale *= e.deltaY > 0 ? 0.9 : 1.1;
-       const minS = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
-       const maxS = Math.min(maparea.clientWidth / 500, maparea.clientHeight / 500);
-       scale = Math.max(minS, Math.min(scale, maxS));
-       const factor = scale / prev;
-       panX -= (mx - panX) * (factor - 1);
-       panY -= (my - panY) * (factor - 1);
-
-       // recalc bounds now that scale has changed
-       updatePanBounds();
-       applyTransform();
-    }});
-
-    function resetZoom() {{
-       scale = Math.min(maparea.clientWidth / map.clientWidth, maparea.clientHeight / map.clientHeight);
-       panX = (maparea.clientWidth - map.clientWidth * scale) / 2;
-       panY = (maparea.clientHeight - map.clientHeight * scale) / 2;
-       updatePanBounds();   // make sure bounds reflect the new scale
-       applyTransform();
-    }}
-
-    // Center map on load and on resize
-    window.addEventListener('load', resetZoom);
-    window.addEventListener('resize', resetZoom);
-    resetZoom();
-    
-    document.querySelectorAll('.system').forEach(el => {{
-      const sys = el.getAttribute('data-system').replace(/ /g, '-');
-      el.addEventListener('mouseenter', () => {{
-        // animate arrows and display metadata on hover
-        document.querySelectorAll(`.jump-from-${{sys}}`).forEach(line =>
-          line.classList.add('jump-arrow-active')
-        );
-        const name = el.getAttribute('data-system');
-        const m = systemMeta[name] || {{}};
-        document.getElementById('system-details').innerHTML =
-          `<h3>${{name}}</h3>` +
-          `<p>Alignment: ${{m.alignment}}</p>` +
-          `<p>Development Level: ${{m.development}}</p>` +
-          `<p>System Focus: ${{m.focus}}</p>` +
-      `<p>Exports: ${{m.exports}}</p>`+
-      `<div><strong>Intelligence estimate:</strong></div>`+
-      `<div>`+
-        `<img src="Images/SysBadges/${{m.intel.pirate}}Pirate.png" width="50" height="50" alt="${{m.intel.pirate}} Pirate" /> `+
-        `<img src="Images/SysBadges/${{m.intel.enemy}}Enemy.png" width="50" height="50" alt="${{m.intel.enemy}} Enemy" />`+
-      `</div>`+
-      `<div>Pirate Activity: ${{m.intel.pirate}}</div>`+
-      `<div>Enemy Activity: ${{m.intel.enemy}}</div>`+
-      `<div><strong>Known Important Assets:</strong></div>` +
-      `<div class="asset-icons">` +
-        `${{m.intel.assets.map(a =>
-          `<img src="Images/SysBadges/${{a}}.png" width="50" height="50" alt="${{a}}" title="${{a}}" />`
-        ).join('')}}` +
-      `</div>` +
-      `<div class="asset-text">` +
-        `${{m.intel.assets.map(a =>
-          `<div>${{a}}</div>`
-        ).join('')}}` +
-      `<p>${{m.description}}</p>`;
-      }});
-      el.addEventListener('mouseleave', () => {{
-        document.querySelectorAll(`.jump-from-${{sys}}`).forEach(line =>
-          line.classList.remove('jump-arrow-active')
-        );
-      }});
-    }});
-  
-  // system search filter
-  const searchInput = document.getElementById('system-search');
-  if (searchInput) {{
-    searchInput.addEventListener('input', () => {{
-      const term = searchInput.value.toLowerCase();
-      document.querySelectorAll('.system-button[data-system]').forEach(btn => {{
-        const nameAttr = btn.getAttribute('data-system');
-        if (!nameAttr) return;
-        const isVisibleFlag = btn.getAttribute('data-visible') === 'true';
-        // always hide GM-only systems when not in GM mode
-        if (!isGM() && !isVisibleFlag) {{
-          btn.style.display = 'none';
-          return;
-        }}
-        const name = nameAttr.toLowerCase();
-        btn.style.display = name.includes(term) ? '' : 'none';
-      }});
-    }});
-  }}
-
-  // sort functionality
-  document.querySelectorAll('input[name="sort"]').forEach(radio => {{
-    radio.addEventListener('change', reorderButtons);
-  }});
-  function reorderButtons() {{
-    const container = document.getElementById('controls');
-    const sortBy = document.querySelector('input[name="sort"]:checked').value;
-    let buttons = Array.from(container.querySelectorAll('.system-button[data-system]'));
-    if (!isGM()) {{
-      buttons = buttons.filter(btn => btn.getAttribute('data-visible') === 'true');
-    }}
-
-    buttons.sort((a, b) => {{
-      const nameA = a.getAttribute('data-system');
-      const nameB = b.getAttribute('data-system');
-      if (sortBy === 'name') {{
-        return nameA.localeCompare(nameB);
-      }}
-      const alignA = systemMeta[nameA].alignment || '';
-      const alignB = systemMeta[nameB].alignment || '';
-      if (alignA !== alignB) {{
-        return alignA.localeCompare(alignB);
-      }}
-      return nameA.localeCompare(nameB);
-    }});
-    buttons.forEach(btn => container.appendChild(btn));
-  }}
-  // initialize sort order
-  reorderButtons();
-  
-    // Toggle ONI authentication (login/logout)
-    function toggleOniAuth() {{
-      if (isGM()) {{
-        // GM is currently logged in → log out
-        exitGMMode();
-        document.getElementById('oni-login-btn').innerText = 'ONI Login';
-        // hide GM‐only systems and buttons again
-        document.querySelectorAll('.hidden-system').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.system-button').forEach(btn => {{
-          if (btn.dataset.visible === 'false') btn.style.display = 'none';
-       }});
-      }} else {{
-        // prompt for GM password
-        const pwd = prompt('Enter GM password:');
-        if (pwd === 'oni1') {{
-          enterGMMode();
-          document.getElementById('oni-login-btn').innerText = 'ONI Logout';
-          // reveal GM‐only systems and buttons
-         document.querySelectorAll('.hidden-system').forEach(el => el.style.display = '');
-          document.querySelectorAll('.system-button').forEach(btn => btn.style.display = '');
-        }} else {{
-          alert('Incorrect password');
-        }}
-      }}
-    }}
-
-  // on GM login, reveal hidden systems and list buttons
-  window.addEventListener('load', () => {{
-    if (isGM()) {{
-      document.querySelectorAll('.hidden-system').forEach(el => el.style.display = '');
-      document.querySelectorAll('.system-button').forEach(btn => {{
-        if (btn.style.display === 'none') btn.style.display = '';
-      }});
-    }}
-  }});
-  
-  
+{script}
   </script>
 </body>
-</html>'''
+</html>"""
 
-    # Write out HTML
+
+def main():
+    warnings = []
+    systems, system_meta = load_systems(JSON_FOLDER, warnings)
+    if not systems:
+        print("GalMapGen summary: built 0 galactic map(s), failed 1, warnings 0.")
+        print("GalMapGen failed outputs:")
+        print("  - index.html: no systems with 'systemMapCoord' found.")
+        sys.exit(1)
+
+    map_info = load_map_info(warnings)
+    bounds = compute_world_bounds(systems, map_info)
+    layout = compute_layout(bounds)
+    coords = build_coords(systems, layout)
+
+    if len(coords) != len(systems):
+        warnings.append(f"coords ({len(coords)}) != systems ({len(systems)})")
+
+    system_divs = build_system_divs(systems, system_meta, coords)
+    jump_lines = build_jump_lines(systems, system_meta, coords)
+    overlay_lines = build_overlay_lines(map_info, layout)
+    system_list_html = build_system_list_html(systems, system_meta)
+    html = build_page_html(
+        system_divs=system_divs,
+        svg_lines=jump_lines + overlay_lines,
+        system_list_html=system_list_html,
+        layout=layout,
+        system_meta=system_meta,
+        coords=coords,
+    )
+
     HTML_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    HTML_OUTPUT.write_text(html, encoding='utf-8')
-    print(f"HTML map written to: {HTML_OUTPUT}")
+    HTML_OUTPUT.write_text(html, encoding="utf-8")
+    print(
+        f"GalMapGen summary: built 1 galactic map(s) from {len(systems)} system(s), "
+        f"failed 0, warnings {len(warnings)}."
+    )
+    if warnings:
+        print("GalMapGen warnings:")
+        for warning in warnings:
+            print(f"  - {warning}")
+
 
 if __name__ == "__main__":
-    os.chdir(default_base)
     main()

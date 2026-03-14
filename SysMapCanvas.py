@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import SystemEditor
 import random
+import re
+import copy
 import math
 import time
 import os
@@ -12,7 +14,7 @@ _DARK_GREEN = "#006400"
 
 def _load_ct_maps(toolbar):
     """
-    Lazy-load and cache cargo_teams faction/race maps on the toolbar so
+    Lazy-load and cache Settings.json faction/race maps on the toolbar so
     SysMapCanvas doesn't need SystemEditor internals.
     """
     rtf = getattr(toolbar, '_race_to_faction_cf', None)
@@ -22,7 +24,7 @@ def _load_ct_maps(toolbar):
     rtf, ftr = {}, {}
     try:
         base = getattr(toolbar, 'base', os.getcwd())
-        ct_path = os.path.join(base, 'cargo_teams.json')
+        ct_path = os.path.join(base, 'Settings.json')
         with open(ct_path, 'r') as f:
             ct = json.load(f)
         races = ct.get('Races', {}) or {}
@@ -97,7 +99,7 @@ def _load_ct_races_display(toolbar, fallback):
     race_to_faction_cf = {}
     try:
         base = getattr(toolbar, 'base', os.getcwd())
-        ct_path = os.path.join(base, 'cargo_teams.json')
+        ct_path = os.path.join(base, 'Settings.json')
         with open(ct_path, 'r') as f:
             ct = json.load(f)
         races_map = ct.get('Races', {}) or {}
@@ -156,6 +158,40 @@ def _ensure_hull_color_binding(cb):
         return
     lb.bind("<Map>", lambda e, _cb=cb: _apply_combobox_item_colors(_cb), add="+")
     cb._hull_color_bound = True
+
+def _randomize_digits_in_name(name: str) -> str:
+    def _repl(match):
+        n = len(match.group(0))
+        return str(random.randrange(0, 10 ** n)).zfill(n)
+    return re.sub(r'\d+', _repl, name)
+
+def _next_sequential_name(base: str, existing: set) -> str:
+    base = base.strip()
+    pattern = re.compile(rf'^{re.escape(base)}\s+(\d+)$')
+    max_n = 1
+    for nm in existing:
+        m = pattern.match(nm)
+        if m:
+            try:
+                max_n = max(max_n, int(m.group(1)))
+            except Exception:
+                pass
+    n = max(2, max_n + 1)
+    candidate = f"{base} {n:02d}"
+    while candidate in existing:
+        n += 1
+        candidate = f"{base} {n:02d}"
+    return candidate
+
+def _make_copy_name(source_name: str, existing: set) -> str:
+    if re.search(r'\d+', source_name):
+        for _ in range(25):
+            candidate = _randomize_digits_in_name(source_name)
+            if candidate not in existing:
+                return candidate
+        base = re.sub(r'\d+', '', source_name).strip() or source_name
+        return _next_sequential_name(base, existing)
+    return _next_sequential_name(source_name, existing)
 
 # Canvas event handlers extracted for modularity
 def on_canvas_press(event, ctx):
@@ -256,13 +292,24 @@ def on_canvas_press(event, ctx):
 
         dlg, body, footer = _dlg("New Planet", near_pointer=True)
         name_var = tk.StringVar(value=f"Planet {random.randint(1,999)}")
+        planet_classes = list(ctx.get('valid_planet_classes') or [SystemEditor.DEFAULT_PLANET_CLASS])
+        class_var = tk.StringVar(value=planet_classes[0] if planet_classes else SystemEditor.DEFAULT_PLANET_CLASS)
         toolbar.labeled_entry(body, "Name:", name_var, width=22, row=0, col=0)
+        tk.Label(body, text="Class:").grid(row=1, column=0, sticky='w', padx=6, pady=4)
+        ttk.Combobox(
+            body,
+            textvariable=class_var,
+            values=planet_classes,
+            state='readonly',
+            width=20
+        ).grid(row=1, column=1, sticky='w', padx=6, pady=4)
 
         def create_planet():
             # integer-like key (timestamp) for terrain dict
             key = str(int(time.time() * 1000))
             sm.data.setdefault('terrain', {})[key] = {
                 'type': 'planet',
+                'class': class_var.get() or SystemEditor.DEFAULT_PLANET_CLASS,
                 'name': name_var.get().strip() or key,
                 'coordinate': [bx, 0, bz]
             }
@@ -275,7 +322,13 @@ def on_canvas_press(event, ctx):
             if getattr(toolbar, 'planet_btn', None):
                 toolbar.planet_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
 
-        tk.Button(dlg, text="Add", command=create_planet).grid(row=1, column=0, columnspan=2, pady=6)
+        def _cancel_planet():
+            dlg.destroy()
+            if getattr(toolbar, 'planet_mode', False):
+                toolbar.toggle_planet_mode()
+
+        dlg.protocol("WM_DELETE_WINDOW", _cancel_planet)
+        tk.Button(dlg, text="Add", command=create_planet).grid(row=2, column=0, columnspan=2, pady=6)
         dlg.update_idletasks()
         dlg.geometry(f"+{event.x_root - dlg.winfo_width()//2}+{event.y_root - dlg.winfo_height()//2}")
         return
@@ -288,6 +341,11 @@ def on_canvas_press(event, ctx):
         # popup to name & size the new black hole
         dlg = tk.Toplevel(win)
         dlg.title("New Blackhole")
+        def _cancel_blackhole():
+            dlg.destroy()
+            if getattr(toolbar, 'blackhole_mode', False):
+                toolbar.toggle_blackhole_mode()
+        dlg.protocol("WM_DELETE_WINDOW", _cancel_blackhole)
         tk.Label(dlg, text="Name:").pack(anchor='w')
         name_var = tk.StringVar(value=f"Blackhole{random.randint(1,99)}")
         tk.Entry(dlg, textvariable=name_var).pack(fill=tk.X)
@@ -380,6 +438,48 @@ def on_canvas_press(event, ctx):
             }
             terrain_keys.append(key)
             ter_lb.insert(tk.END, key)
+    # ── Hidden minefield placement mode (ARMED via toolbar dialog) ─────────
+    if getattr(toolbar, 'minefield_mode', False):
+        cfg = getattr(toolbar, 'minefield_pending', None)
+        if cfg:
+            ctx['push_undo']()
+            pan_x, pan_y, scale = ctx['pan_x'], ctx['pan_y'], ctx['map_scale']
+            cx = (event.x - pan_x) / scale
+            cz = -(event.y - pan_y) / scale
+            sm = ctx['sm']
+            ter_lb = ctx['ter_lb']
+            terrain_keys = ctx['terrain_keys']
+
+            name = (cfg.get('name') or '').strip() or toolbar.gen_minefield_name()
+            # ensure unique name in terrain keys
+            existing = sm.data.setdefault('terrain', {})
+            if name in existing:
+                base = name
+                suffix = 2
+                while f"{base} {suffix}" in existing:
+                    suffix += 1
+                name = f"{base} {suffix}"
+            existing[name] = {
+                'type': 'hidden_minefield',
+                'coordinate': [cx, 0, cz],
+                'height': int(cfg.get('height', 15000)),
+                'width': int(cfg.get('width', 15000)),
+                'density': int(cfg.get('density', 70)),
+                'hideonmap': True
+            }
+            terrain_keys.append(name)
+            ter_lb.insert(tk.END, name)
+            ctx['draw_map'](ctx)
+
+            # disarm mode & clear pending
+            toolbar.minefield_pending = None
+            toolbar.minefield_mode = False
+            if getattr(toolbar, 'minefield_btn', None):
+                toolbar.minefield_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+            return
+        else:
+            return
+
     # ── Platform placement mode (dialog for Name + Hull) ───────────────
     if toolbar.platform_mode:
         # capture undo BEFORE creating anything
@@ -497,6 +597,8 @@ def on_canvas_press(event, ctx):
             # also exit placement mode to avoid accidental re-clicks
             toolbar.toggle_platform_mode()
 
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
+
         # Footer: complete buttons row and exit handler early
         toolbar.footer_buttons(
             footer,
@@ -597,6 +699,11 @@ def on_canvas_press(event, ctx):
             draw_map(ctx)
             dlg.destroy()
             toolbar.toggle_sensor_mode()
+        def _cancel():
+            dlg.destroy()
+            if toolbar.sensor_mode:
+                toolbar.toggle_sensor_mode()
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
         toolbar.footer_buttons(footer, [("Add", add_relay, {"width": 12})])
         return
         
@@ -633,6 +740,12 @@ def on_canvas_press(event, ctx):
             dlg.destroy()
             toolbar.toggle_gate_mode()
 
+        def _cancel():
+            dlg.destroy()
+            if toolbar.gate_mode:
+                toolbar.toggle_gate_mode()
+
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
         tk.Button(dlg, text='Add', command=add_gate)\
             .grid(row=1, column=0, columnspan=2, pady=5)
         dlg.update_idletasks()
@@ -698,6 +811,15 @@ def on_canvas_press(event, ctx):
                 drag_data['new_terrain'] = None
                 if toolbar.asteroid_mode: toolbar.toggle_asteroid_mode()
                 else: toolbar.toggle_nebula_mode()
+            def _cancel_terrain():
+                dlg.destroy()
+                map_canvas.delete('new_terrain_start', 'new_terrain_end')
+                drag_data['new_terrain'] = None
+                if toolbar.asteroid_mode:
+                    toolbar.toggle_asteroid_mode()
+                elif toolbar.nebula_mode:
+                    toolbar.toggle_nebula_mode()
+            dlg.protocol("WM_DELETE_WINDOW", _cancel_terrain)
             tk.Button(dlg, text='Add', command=add_terrain).grid(row=2, column=0, columnspan=2)
             dlg.update_idletasks()  # ensure correct winfo_width/height
             w = dlg.winfo_width()
@@ -718,6 +840,11 @@ def on_canvas_press(event, ctx):
         new_name = toolbar.gen_station_name()
         dlg = tk.Toplevel(win)
         dlg.title('New Station')
+        def _cancel_station():
+            dlg.destroy()
+            if toolbar.station_mode:
+                toolbar.toggle_station_mode()
+        dlg.protocol("WM_DELETE_WINDOW", _cancel_station)
         tk.Label(dlg, text='Name:').grid(row=0, column=0)
         name_var = tk.StringVar(value=new_name)
         tk.Entry(dlg, textvariable=name_var).grid(row=0, column=1)
@@ -817,7 +944,13 @@ def on_canvas_press(event, ctx):
         x1, y1, x2, y2 = map_canvas.bbox(tag)
         if x1 <= event.x <= x2 and y1 <= event.y <= y2:
             tags = map_canvas.gettags(tag)
+            # Some terrain points (e.g., asteroid/nebula dots) only carry ('terrain_pt', key)
+            # and are not intended to be draggable.
+            if len(tags) < 3:
+                continue
             key, pt_type = tags[1], tags[2]
+            if key not in terrain_keys:
+                continue
             idx = terrain_keys.index(key)
             ter_lb.selection_clear(0, tk.END)
             ter_lb.selection_set(idx)
@@ -835,7 +968,7 @@ def on_canvas_press(event, ctx):
             key = map_canvas.gettags(tag)[1]  # the terrain key
             feat = sm.get_terrain_feature(key)
             ttype = feat.get('type','').lower()
-            if ttype in ('blackhole', 'debris_field', 'planet'):
+            if ttype in ('blackhole', 'debris_field', 'planet', 'hidden_minefield'):
                 # capture before blackhole center move
                 ctx['push_undo']()
                 show_terrain(key)
@@ -860,6 +993,24 @@ def on_canvas_press(event, ctx):
                 drag_data['obj'] = name
                 drag_data['x'], drag_data['y'] = event.x, event.y
                 return
+    # Copy object placement on empty space
+    copy_state = ctx.get('copy_state')
+    if event.num == 1 and copy_state and copy_state.get('source_obj') is not None:
+        ctx['push_undo']()
+        src_obj = copy_state.get('source_obj') or {}
+        src_name = copy_state.get('source_name') or 'Object'
+        existing = set(sm.data.setdefault('objects', {}).keys())
+        new_name = _make_copy_name(src_name, existing)
+        x, z = ctx['screen_to_coord'](event.x, event.y)
+        new_obj = copy.deepcopy(src_obj)
+        new_obj['coordinate'] = [x, 0, z]
+        sm.data['objects'][new_name] = new_obj
+        objs.append(new_name)
+        obj_lb.insert(tk.END, new_name)
+        ctx['draw_map'](ctx)
+        copy_state['source_obj'] = None
+        copy_state['source_name'] = None
+        return
     # Otherwise start panning
     drag_data['panning'] = True
     drag_data['x'], drag_data['y'] = event.x, event.y

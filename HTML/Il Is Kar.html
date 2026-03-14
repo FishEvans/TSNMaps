@@ -7,33 +7,215 @@
     <title>Il Is Kar.html</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        html, body { margin: 0; height: 100%; background: black; color: white; }
         /* === Description typography controls ===
            Tweak these two variables to change description sizes globally */
         :root {
             --desc-font-size: 130%;
             --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
         }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
         .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
         .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
-        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
-        #plot { flex: 3; min-width: 400px; }
-        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
         h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
         h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
         .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
-        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
         button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">Il Is Kar</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Il Is Kar</h2>
-        <h3 class="subheader">Alignment: Kraliens</h3>
-        <img src="Images/Factions/Kraliens.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+        <h3 class="subheader">Alignment: Kralien</h3>
+        <img src="Images/Factions/Kralien.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
-        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <input type="text" id="search-box" placeholder="Search objects...">
         <div id="object-buttons">
     </div>
     </div>
@@ -41,22 +223,136 @@
     <div id="info">
         <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
         <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
-        Select an object
+        Loading system info...
     </div>
 <script>
-    var objData = {"JP 12": {"type": "jumpnode", "x": 116666.66666666667, "y": -45000.00000000001, "grid": "J17", "hidden": false, "label": "JP 12", "destinations": {"II Is Kar": "Tjorath"}}};
+    var objData = {"Ii Is Kar": {"type": "planet", "x": -117033.33333333331, "y": -72833.33333333334, "grid": "I06", "hidden": false}, "DS 41": {"type": "station", "x": 350839.6689627472, "y": 146071.94817964718, "grid": "T29", "hidden": false, "label": "DS 41", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonian"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "DS 64": {"type": "station", "x": 242248.3239572246, "y": -41538.15792370982, "grid": "J24", "hidden": true, "label": "**DS 64**", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Eukisra Point": {"type": "jumpnode", "x": -482966.9066666667, "y": 117772.8145183025, "grid": "R87", "hidden": false, "label": "Eukisra Point", "destinations": {"Beta Vector": "Eukisra"}}, "Tjorath Point": {"type": "jumpnode", "x": 495322.1066666667, "y": -18373.90548169756, "grid": "L36", "hidden": false, "label": "Tjorath Point", "destinations": {"II Is Kar": "Tjorath"}}, "DS 22": {"type": "station", "x": 410166.4124544638, "y": -17260.141721364533, "grid": "L32", "hidden": false, "label": "DS 22", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 32": {"type": "station", "x": 413886.0251691232, "y": -14953.859930338076, "grid": "L32", "hidden": false, "label": "DS 32", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 70": {"type": "station", "x": 413682.8896638438, "y": -17780.358933962765, "grid": "L32", "hidden": false, "label": "DS 70", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "Gen FS1": {"type": "station", "x": 410382.86181517155, "y": -15666.343621995333, "grid": "L32", "hidden": false, "label": "Gen FS1", "hull": "hegemony_generator", "facilities": [], "sides": ["Kralien"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "WP 87": {"type": "platform", "x": 413910.56506940763, "y": -16599.348528306182, "grid": "L32", "hidden": false, "label": "WP 87"}, "WP 38": {"type": "platform", "x": 413802.38928354287, "y": -18819.226426256424, "grid": "L32", "hidden": false, "label": "WP 38"}, "DS 90": {"type": "station", "x": 411963.4009238414, "y": -17683.38067467612, "grid": "L32", "hidden": false, "label": "DS 90", "hull": "hegemony_drydock", "facilities": [], "sides": ["Kralien"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": ""}, "DS 71": {"type": "station", "x": -389036.4495170576, "y": 68429.83233302349, "grid": "P92", "hidden": true, "label": "**DS 71**", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonian"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "WP 9": {"type": "platform", "x": -387813.35843648034, "y": 81483.25544522205, "grid": "Q92", "hidden": true, "label": "**WP 9**"}, "DS 81": {"type": "station", "x": -385439.54437177454, "y": 81428.01005021347, "grid": "Q92", "hidden": true, "label": "**DS 81**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 11": {"type": "station", "x": 411848.2780848645, "y": -15369.53925722839, "grid": "L32", "hidden": false, "label": "DS 11", "hull": "starbase_arvonian", "facilities": [], "sides": ["Arvonian"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": ""}, "Gen FS2": {"type": "station", "x": 410518.81770913914, "y": -18866.57194221948, "grid": "L32", "hidden": false, "label": "Gen FS2", "hull": "hegemony_generator", "facilities": [], "sides": ["Kralien"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 85": {"type": "station", "x": 71327.23158347362, "y": 464320.51199999993, "grid": "J15", "hidden": true, "label": "**DS 85**", "hull": "hegemony_gasextractor", "facilities": [], "sides": ["Kralien"], "hullName": "Gas Extractor", "hullImage": "Images/Ships/TSN Mod/Hegemony/GasExtractor256.png", "hullDescription": ""}, "DS 58": {"type": "station", "x": 54842.111583473656, "y": 456376.3199999999, "grid": "I14", "hidden": true, "label": "**DS 58**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 86": {"type": "station", "x": 81678.54148173612, "y": 452368.462346822, "grid": "I16", "hidden": true, "label": "**DS 86**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 16": {"type": "station", "x": 74143.3370064275, "y": 481672.0353063556, "grid": "K15", "hidden": false, "label": "DS 16", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 60": {"type": "station", "x": -236552.99244030332, "y": 129415.6025502971, "grid": "S00", "hidden": true, "label": "**DS 60**", "hull": "starbase_torgoth", "facilities": [], "sides": ["Kralien"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "DS 28": {"type": "station", "x": -258152.99244030332, "y": 99175.60255029709, "grid": "Q99", "hidden": true, "label": "**DS 28**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "WP 85": {"type": "platform", "x": -230792.99244030332, "y": 109255.60255029709, "grid": "R00", "hidden": true, "label": "**WP 85**"}, "DS 67": {"type": "station", "x": 345083.6460040073, "y": 145661.85814694152, "grid": "T29", "hidden": false, "label": "DS 67", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 66": {"type": "station", "x": 355743.01447473717, "y": 151282.25243150815, "grid": "T29", "hidden": false, "label": "DS 66", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 27": {"type": "station", "x": 242187.05016944782, "y": -38391.421331599726, "grid": "K24", "hidden": true, "label": "**DS 27**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 69": {"type": "station", "x": 240975.75829777398, "y": -39333.53723179049, "grid": "K24", "hidden": true, "label": "**DS 69**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "WP 90": {"type": "platform", "x": 242321.63815518934, "y": -39737.30118901511, "grid": "K24", "hidden": true, "label": "**WP 90**"}, "Home Center Admin": {"type": "station", "x": -82500.55264709982, "y": -109892.54639435673, "grid": "G07", "hidden": false, "label": "Home Center Admin", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "Clan Kar Trade": {"type": "station", "x": -82500.55264709982, "y": -37892.54639435674, "grid": "K07", "hidden": false, "label": "Clan Kar Trade", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "Horgoth Mine": {"type": "station", "x": 54299.447352900184, "y": -249572.54639435673, "grid": "Z14", "hidden": false, "label": "Horgoth Mine", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "Henoth Mines": {"type": "station", "x": -26340.552647099812, "y": -265412.54639435676, "grid": "Y10", "hidden": false, "label": "Henoth Mines", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "Domeciles 3": {"type": "station", "x": -16260.552647099812, "y": -199172.54639435673, "grid": "C11", "hidden": false, "label": "Domeciles 3", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "Domeciles 5": {"type": "station", "x": -132900.5526470998, "y": 288987.45360564324, "grid": "A05", "hidden": false, "label": "Domeciles 5", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 79": {"type": "station", "x": 379037.76498124725, "y": 529632.7931899886, "grid": "M30", "hidden": true, "label": "**DS 79**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 14": {"type": "station", "x": 382637.76498124725, "y": 568032.7931899886, "grid": "O31", "hidden": true, "label": "**DS 14**", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}, "DS 56": {"type": "station", "x": -388959.37129399, "y": 76673.29026953036, "grid": "P92", "hidden": false, "label": "DS 56", "hull": "starbase_torgoth", "facilities": [], "sides": ["Torgoth"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": ""}, "WP 13": {"type": "platform", "x": -386125.9977416607, "y": 76139.02549451524, "grid": "P92", "hidden": true, "label": "**WP 13**"}, "DS 89": {"type": "station", "x": 386123.1325110548, "y": -459028.91969084495, "grid": "P31", "hidden": false, "label": "DS 89", "hull": "hegemony_gasextractor", "facilities": [], "sides": ["Kralien"], "hullName": "Gas Extractor", "hullImage": "Images/Ships/TSN Mod/Hegemony/GasExtractor256.png", "hullDescription": ""}, "Gen 32": {"type": "station", "x": 373266.9102888327, "y": -456903.1419130672, "grid": "P30", "hidden": true, "label": "**Gen 32**", "hull": "hegemony_generator", "facilities": [], "sides": ["Kralien"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 26": {"type": "station", "x": 376044.6880666104, "y": -475653.1419130672, "grid": "O30", "hidden": true, "label": "**DS 26**", "hull": "hegemony_generator", "facilities": [], "sides": ["Kralien"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": ""}, "DS 77": {"type": "station", "x": 368405.79917772155, "y": -482597.58635751164, "grid": "N30", "hidden": true, "label": "**DS 77**", "hull": "starbase_skaraan", "facilities": [], "sides": ["Kralien"], "hullName": "Skaraan Base", "hullImage": "Images/Ships/skaraan_station256.png", "hullDescription": ""}, "Repair Yard": {"type": "station", "x": 366325.7255180279, "y": -470792.0308019561, "grid": "O30", "hidden": true, "label": "**Repair Yard**", "hull": "hegemony_drydock", "facilities": [], "sides": ["Kralien"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": ""}, "WP 69": {"type": "platform", "x": 372035.6357356015, "y": -468177.65865975234, "grid": "O30", "hidden": true, "label": "**WP 69**"}, "DS 23": {"type": "station", "x": -274871.3615890165, "y": 413675.9609086876, "grid": "G98", "hidden": false, "label": "DS 23", "hull": "starbase_Kralien", "facilities": [], "sides": ["Kralien"]}};
+    var systemMeta = {"system_name": "Il Is Kar", "description": "", "exports": [], "assets": ["Listening Post", "Fortification"], "focus": "Mining", "intel": {"pirate": "Low", "enemy": "Low"}, "original_author": "Fish Evans", "last_author": "Fish Evans", "revision_number": 18, "version_tag": "30126.18", "all_authors": ["Fish Evans"]};
+    var pageBody = document.body;
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
     function clearAnnotations() {
         Plotly.relayout('plot', {annotations: []});
-        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        setDefaultInfo();
     }
     
     function getInfoHeader() {
@@ -139,24 +435,23 @@
                           + '</p>';
             }
             document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
-            document.getElementById('galactic-map-btn').addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
                 + infoHtml;
          
     }
-         document.getElementById('galactic-map-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+         bindGalacticButton();
     
 
-    var fig = {"data": [{"type": "scatter", "x": [116666.66666666667], "y": [-45000.00000000001], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["JP 12 [J17]"], "hoverinfo": "text", "text": ["JP 12"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}], "layout": {"title": "Il Is Kar", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [-117033.33333333331], "y": [-72833.33333333334], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Ii Is Kar"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Ii Is Kar [I06]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [349429.0321220776, 420229.0321220776, 381926.754544589, 311126.754544589, 349429.0321220776], "y": [-145675.26909667664, 89524.73090332335, 101054.49813328164, -134145.50186671838, -145675.26909667664], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [177626.17248717282, 350426.17248717276, 317329.61417949386, 144529.61417949392, 177626.17248717282], "y": [-293842.7805485244, -147442.78054852437, -108377.99041487063, -254777.99041487064, -293842.7805485244], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-113513.94601895647, 172086.05398104354, 169269.7326856232, -116330.26731437682, -113513.94601895647], "y": [-305977.86131397216, -292777.86131397216, -231842.90964942286, -245042.90964942286, -305977.86131397216], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-520355.48148310446, -88355.48148310444, -38288.731850228825, -470288.7318502288, -520355.48148310446], "y": [-39304.63831952992, -328504.63831952994, -253716.1326438651, 35483.867356134906, -39304.63831952992], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-275480.5670599694, -287424.5030599694, -227473.41777308335, -215529.48177308336, -275480.5670599694], "y": [205751.03703609869, -89861.3789639013, -92283.64503609871, 203328.77096390128, 205751.03703609869], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [99514.38940797876, -179177.4505920213, -218271.7662410316, 60420.07375896846, 99514.38940797876], "y": [-471422.7462167922, -232046.36221679227, -277561.5737832076, -516937.9577832076, -471422.7462167922], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [430594.8585182372, 66304.8105182373, 69741.78064870986, 434031.82864870975, 430594.8585182372], "y": [-434369.772291596, -455271.660291596, -515173.1397084038, -494271.25170840375, -434369.772291596], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-132609.57649565843, -278922.7924956584, -230003.16033739434, -83689.94433739438, -132609.57649565843], "y": [404054.9423170647, 198022.04631706473, 163282.01768293517, 369314.9136829351, 404054.9423170647], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [137718.87747687596, -122061.73052312403, -94237.79030992878, 165542.81769007118, 137718.87747687596], "y": [522998.0043636664, 397586.6763636664, 339951.3716363334, 465362.6996363334, 522998.0043636664], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-160971.32378217208, -223676.98778217207, -261361.09305088068, -198655.4290508807, -160971.32378217208], "y": [-260539.0746894671, -84366.0186894671, -97779.00531053287, -273952.06131053285, -260539.0746894671], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [361990.67502229335, 361819.5722497696, 361309.1915480747, 360468.2656725191, 359311.18309798214, 357857.74182811804, 356132.8106460243, 354165.90360246773, 351990.67502229335, 349644.34366959514, 347167.05592434376, 344601.1988666944, 341990.67502229335, 339380.15117789235, 336814.29412024294, 334337.00637499156, 331990.67502229335, 329815.44644211896, 327848.5393985624, 326123.60821646865, 324670.16694660456, 323513.0843720676, 322672.158496512, 322161.7777948171, 321990.67502229335, 322161.7777948171, 322672.158496512, 323513.0843720676, 324670.16694660456, 326123.60821646865, 327848.5393985624, 329815.4464421189, 331990.67502229335, 334337.00637499156, 336814.29412024294, 339380.1511778923, 341990.67502229335, 344601.19886669435, 347167.05592434376, 349644.34366959514, 351990.67502229335, 354165.90360246773, 356132.8106460243, 357857.74182811804, 359311.18309798214, 360468.2656725191, 361309.1915480747, 361819.5722497696, 361990.67502229335], "y": [167176.356437299, 169786.88028170003, 172352.7373393494, 174830.02508460078, 177176.356437299, 179351.5850174734, 181318.49206102995, 183043.4232431237, 184496.86451298776, 185653.94708752472, 186494.87296308036, 187005.2536647752, 187176.356437299, 187005.2536647752, 186494.87296308036, 185653.94708752472, 184496.86451298776, 183043.4232431237, 181318.49206102995, 179351.5850174734, 177176.356437299, 174830.02508460078, 172352.7373393494, 169786.88028170003, 167176.356437299, 164565.83259289796, 161999.97553524858, 159522.6877899972, 157176.356437299, 155001.12785712458, 153034.22081356804, 151309.2896314743, 149855.84836161023, 148698.76578707327, 147857.83991151763, 147347.4592098228, 147176.356437299, 147347.4592098228, 147857.83991151763, 148698.76578707327, 149855.84836161023, 151309.28963147427, 153034.22081356804, 155001.12785712458, 157176.356437299, 159522.6877899972, 161999.97553524855, 164565.83259289796, 167176.356437299], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-99264.35731897708, -218703.71731897705, -217456.15159587347, -98016.79159587347, -99264.35731897708], "y": [56207.454345408754, 48742.49434540876, 28781.442775750987, 36246.402775750976, 56207.454345408754], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [459926.03500867554, 415136.2750086755, 397840.49607647373, 442630.25607647374, 459926.03500867554], "y": [367264.92373444483, 444402.84373444476, 434360.1333867147, 357222.21338671475, 367264.92373444483], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [543525.5326178954, 396714.6526178955, 401332.19846725394, 548143.0784672538, 543525.5326178954], "y": [421739.7973145851, 386903.31731458515, 367443.6598065745, 402280.1398065745, 421739.7973145851], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [177334.62063480323, 153334.62063480323, 135636.25618716356, 159636.25618716356, 177334.62063480323], "y": [259443.82523701392, 305043.8252370139, 295728.89658036147, 250128.89658036147, 259443.82523701392], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [332273.95419105317, 482273.95419105317, 482273.95419105317, 332273.95419105317, 332273.95419105317], "y": [100810.37816982943, 100810.37816982943, 150810.37816982943, 150810.37816982943, 100810.37816982943], "fill": "toself", "fillcolor": "rgba(204,0,0,0.4)", "line": {"shape": "linear", "color": "rgba(204,0,0,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [407273.95419105317], "y": [125810.37816982943], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none"}, {"type": "scatter", "x": [389018.00163999386, 419018.00163999386, 419018.00163999386, 389018.00163999386, 389018.00163999386], "y": [147556.12838892714, 147556.12838892714, 177556.12838892714, 177556.12838892714, 147556.12838892714], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "linear", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [404018.00163999386], "y": [162556.12838892714], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [417879.0271220088, 567879.0271220088, 567879.0271220088, 417879.0271220088, 417879.0271220088], "y": [-132534.3069296219, -132534.3069296219, -12534.30692962189, -12534.30692962189, -132534.3069296219], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "linear", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [492879.0271220088], "y": [-72534.30692962189], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [417386.7629163607, 447386.7629163607, 447386.7629163607, 417386.7629163607, 417386.7629163607], "y": [-33576.070427283805, -33576.070427283805, -3576.070427283801, -3576.070427283801, -33576.070427283805], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "linear", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [432386.7629163607], "y": [-18576.0704272838], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-42671.048041393646, -12671.04804139365, -12671.04804139365, -42671.048041393646, -42671.048041393646], "y": [-117510.7278522297, -117510.7278522297, -87510.7278522297, -87510.7278522297, -117510.7278522297], "fill": "toself", "fillcolor": "rgba(204,0,0,0.4)", "line": {"shape": "linear", "color": "rgba(204,0,0,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-27671.04804139365], "y": [-102510.7278522297], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none"}, {"type": "scatter", "x": [-128145.71470806038, -76145.71470806038, -76145.71470806038, -128145.71470806038, -128145.71470806038], "y": [16238.60548110366, 16238.60548110366, 72238.60548110366, 72238.60548110366, 16238.60548110366], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "linear", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-102145.71470806038], "y": [44238.60548110366], "mode": "markers+text", "marker": {"symbol": "triangle-up", "size": 18, "color": "#FFA500", "line": {"color": "#FFD700", "width": 2}}, "text": ["Mines"], "textposition": "bottom center", "textfont": {"color": "white", "size": 12}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [350839.6689627472], "y": [146071.94817964718], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 41 [T29]"], "hoverinfo": "text", "text": ["DS 41"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [242248.3239572246], "y": [-41538.15792370982], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 64 [J24]"], "hoverinfo": "text", "text": ["**DS 64**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-482966.9066666667], "y": [117772.8145183025], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Eukisra Point [R87]"], "hoverinfo": "text", "text": ["Eukisra Point"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [495322.1066666667], "y": [-18373.90548169756], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Tjorath Point [L36]"], "hoverinfo": "text", "text": ["Tjorath Point"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [410166.4124544638], "y": [-17260.141721364533], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 22 [L32]"], "hoverinfo": "text", "text": ["DS 22"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [413886.0251691232], "y": [-14953.859930338076], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 32 [L32]"], "hoverinfo": "text", "text": ["DS 32"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [413682.8896638438], "y": [-17780.358933962765], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 70 [L32]"], "hoverinfo": "text", "text": ["DS 70"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [410382.86181517155], "y": [-15666.343621995333], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Gen FS1 [L32]"], "hoverinfo": "text", "text": ["Gen FS1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [413910.56506940763], "y": [-16599.348528306182], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 87 [L32]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [413802.38928354287], "y": [-18819.226426256424], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 38 [L32]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [411963.4009238414], "y": [-17683.38067467612], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 90 [L32]"], "hoverinfo": "text", "text": ["DS 90"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-389036.4495170576], "y": [68429.83233302349], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 71 [P92]"], "hoverinfo": "text", "text": ["**DS 71**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-387813.35843648034], "y": [81483.25544522205], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 9 [Q92]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-385439.54437177454], "y": [81428.01005021347], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 81 [Q92]"], "hoverinfo": "text", "text": ["**DS 81**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [411848.2780848645], "y": [-15369.53925722839], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 11 [L32]"], "hoverinfo": "text", "text": ["DS 11"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [410518.81770913914], "y": [-18866.57194221948], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Gen FS2 [L32]"], "hoverinfo": "text", "text": ["Gen FS2"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [71327.23158347362], "y": [464320.51199999993], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 85 [J15]"], "hoverinfo": "text", "text": ["**DS 85**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [54842.111583473656], "y": [456376.3199999999], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 58 [I14]"], "hoverinfo": "text", "text": ["**DS 58**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [81678.54148173612], "y": [452368.462346822], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 86 [I16]"], "hoverinfo": "text", "text": ["**DS 86**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [74143.3370064275], "y": [481672.0353063556], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 16 [K15]"], "hoverinfo": "text", "text": ["DS 16"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-236552.99244030332], "y": [129415.6025502971], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 60 [S00]"], "hoverinfo": "text", "text": ["**DS 60**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-258152.99244030332], "y": [99175.60255029709], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 28 [Q99]"], "hoverinfo": "text", "text": ["**DS 28**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-230792.99244030332], "y": [109255.60255029709], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 85 [R00]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [345083.6460040073], "y": [145661.85814694152], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 67 [T29]"], "hoverinfo": "text", "text": ["DS 67"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [355743.01447473717], "y": [151282.25243150815], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 66 [T29]"], "hoverinfo": "text", "text": ["DS 66"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [242187.05016944782], "y": [-38391.421331599726], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 27 [K24]"], "hoverinfo": "text", "text": ["**DS 27**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [240975.75829777398], "y": [-39333.53723179049], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 69 [K24]"], "hoverinfo": "text", "text": ["**DS 69**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [242321.63815518934], "y": [-39737.30118901511], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 90 [K24]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-82500.55264709982], "y": [-109892.54639435673], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Home Center Admin [G07]"], "hoverinfo": "text", "text": ["Home Center Admin"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-82500.55264709982], "y": [-37892.54639435674], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Clan Kar Trade [K07]"], "hoverinfo": "text", "text": ["Clan Kar Trade"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [54299.447352900184], "y": [-249572.54639435673], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Horgoth Mine [Z14]"], "hoverinfo": "text", "text": ["Horgoth Mine"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-26340.552647099812], "y": [-265412.54639435676], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Henoth Mines [Y10]"], "hoverinfo": "text", "text": ["Henoth Mines"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-16260.552647099812], "y": [-199172.54639435673], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Domeciles 3 [C11]"], "hoverinfo": "text", "text": ["Domeciles 3"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-132900.5526470998], "y": [288987.45360564324], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Domeciles 5 [A05]"], "hoverinfo": "text", "text": ["Domeciles 5"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [379037.76498124725], "y": [529632.7931899886], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 79 [M30]"], "hoverinfo": "text", "text": ["**DS 79**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [382637.76498124725], "y": [568032.7931899886], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 14 [O31]"], "hoverinfo": "text", "text": ["**DS 14**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-388959.37129399], "y": [76673.29026953036], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 56 [P92]"], "hoverinfo": "text", "text": ["DS 56"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-386125.9977416607], "y": [76139.02549451524], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 13 [P92]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [386123.1325110548], "y": [-459028.91969084495], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 89 [P31]"], "hoverinfo": "text", "text": ["DS 89"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [373266.9102888327], "y": [-456903.1419130672], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Gen 32 [P30]"], "hoverinfo": "text", "text": ["**Gen 32**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [376044.6880666104], "y": [-475653.1419130672], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 26 [O30]"], "hoverinfo": "text", "text": ["**DS 26**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [368405.79917772155], "y": [-482597.58635751164], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 77 [N30]"], "hoverinfo": "text", "text": ["**DS 77**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [366325.7255180279], "y": [-470792.0308019561], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["Repair Yard [O30]"], "hoverinfo": "text", "text": ["**Repair Yard**"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "gmOnly": true, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [372035.6357356015], "y": [-468177.65865975234], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 69 [O30]"], "hoverinfo": "text", "gmOnly": true, "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-274871.3615890165], "y": [413675.9609086876], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "red"}, "hovertext": ["DS 23 [G98]"], "hoverinfo": "text", "text": ["DS 23"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}], "layout": {"title": "Il Is Kar", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Il Is Kar';
     if (!isGM()) {
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
+    setDefaultInfo();
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -176,13 +471,128 @@
         }
         if (picked && objData[picked]) {
             highlight(picked);
+            lastPlotlyClickTs = Date.now();
         }
     });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
 
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {
         var refSpan = null;
-        var planetIdx = [];
+        var planetIdx = [0];
         var bhIdx = [];
         function rescaleMarkers() {
             try {
@@ -272,20 +682,71 @@ function addButton(label, fn, header, color, isHidden) {
 
   renderGMControls();
 
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
+
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
 
   addButton('--- Gates ---', null, true, null);
-  addButton('JP 12',function(){highlight('JP 12');},false,null,false)
+  addButton('Eukisra Point',function(){highlight('Eukisra Point');},false,null,false)
+    addButton('Tjorath Point',function(){highlight('Tjorath Point');},false,null,false)
 
   addButton('--- Nav Points/POI ---', null, true, null);
   
 
     addButton('--- Planets ---', null, true, null);
-    
+    addButton('Ii Is Kar',function(){highlight('Ii Is Kar');},false,null,false)
 
     addButton('--- Stations ---', null, true, null);
-    
+    addButton('Clan Kar Trade',function(){highlight('Clan Kar Trade');},false,'red',false)
+    addButton('DS 11',function(){highlight('DS 11');},false,'red',false)
+    addButton('DS 14',function(){highlight('DS 14');},false,'red',true)
+    addButton('DS 16',function(){highlight('DS 16');},false,'red',false)
+    addButton('DS 22',function(){highlight('DS 22');},false,'red',false)
+    addButton('DS 23',function(){highlight('DS 23');},false,'red',false)
+    addButton('DS 26',function(){highlight('DS 26');},false,'red',true)
+    addButton('DS 27',function(){highlight('DS 27');},false,'red',true)
+    addButton('DS 28',function(){highlight('DS 28');},false,'red',true)
+    addButton('DS 32',function(){highlight('DS 32');},false,'red',false)
+    addButton('DS 41',function(){highlight('DS 41');},false,'red',false)
+    addButton('DS 56',function(){highlight('DS 56');},false,'red',false)
+    addButton('DS 58',function(){highlight('DS 58');},false,'red',true)
+    addButton('DS 60',function(){highlight('DS 60');},false,'red',true)
+    addButton('DS 64',function(){highlight('DS 64');},false,'red',true)
+    addButton('DS 66',function(){highlight('DS 66');},false,'red',false)
+    addButton('DS 67',function(){highlight('DS 67');},false,'red',false)
+    addButton('DS 69',function(){highlight('DS 69');},false,'red',true)
+    addButton('DS 70',function(){highlight('DS 70');},false,'red',false)
+    addButton('DS 71',function(){highlight('DS 71');},false,'red',true)
+    addButton('DS 77',function(){highlight('DS 77');},false,'red',true)
+    addButton('DS 79',function(){highlight('DS 79');},false,'red',true)
+    addButton('DS 81',function(){highlight('DS 81');},false,'red',true)
+    addButton('DS 85',function(){highlight('DS 85');},false,'red',true)
+    addButton('DS 86',function(){highlight('DS 86');},false,'red',true)
+    addButton('DS 89',function(){highlight('DS 89');},false,'red',false)
+    addButton('DS 90',function(){highlight('DS 90');},false,'red',false)
+    addButton('Domeciles 3',function(){highlight('Domeciles 3');},false,'red',false)
+    addButton('Domeciles 5',function(){highlight('Domeciles 5');},false,'red',false)
+    addButton('Gen 32',function(){highlight('Gen 32');},false,'red',true)
+    addButton('Gen FS1',function(){highlight('Gen FS1');},false,'red',false)
+    addButton('Gen FS2',function(){highlight('Gen FS2');},false,'red',false)
+    addButton('Henoth Mines',function(){highlight('Henoth Mines');},false,'red',false)
+    addButton('Home Center Admin',function(){highlight('Home Center Admin');},false,'red',false)
+    addButton('Horgoth Mine',function(){highlight('Horgoth Mine');},false,'red',false)
+    addButton('Repair Yard',function(){highlight('Repair Yard');},false,'red',true)
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {

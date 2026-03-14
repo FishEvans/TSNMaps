@@ -7,33 +7,215 @@
     <title>Kratos.html</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        html, body { margin: 0; height: 100%; background: black; color: white; }
         /* === Description typography controls ===
            Tweak these two variables to change description sizes globally */
         :root {
             --desc-font-size: 130%;
             --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
         }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
         .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
         .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
-        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
-        #plot { flex: 3; min-width: 400px; }
-        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
         h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
         h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
         .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
-        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
         button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">Kratos</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Kratos</h2>
         <h3 class="subheader">Alignment: USFP</h3>
         <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
-        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <input type="text" id="search-box" placeholder="Search objects...">
         <div id="object-buttons">
     </div>
     </div>
@@ -41,22 +223,136 @@
     <div id="info">
         <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
         <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
-        Select an object
+        Loading system info...
     </div>
 <script>
-    var objData = {"Planet Kratos III": {"type": "planet", "x": 24166.666666666668, "y": 80000.0, "grid": "Q13", "hidden": false}, "Keltor Gate": {"type": "jumpnode", "x": -138333.33333333334, "y": 171666.6666666667, "grid": "U05", "hidden": false, "label": "Keltor Gate", "destinations": {"Kratos Gate": "Keltor"}}, "Castor Gate": {"type": "jumpnode", "x": 90833.33333333334, "y": -84166.66666666667, "grid": "H16", "hidden": false, "label": "Castor Gate", "destinations": {"Orantiv Jump Point": "Castor"}}, "Gate Command": {"type": "station", "x": -15000.000000000002, "y": 24166.666666666668, "grid": "N11", "hidden": false, "label": "Gate Command", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "Kratos High Offices": {"type": "station", "x": -5950.681584362143, "y": 36456.18998628257, "grid": "N11", "hidden": false, "label": "Kratos High Offices", "hull": "starbase_command", "facilities": ["Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 75": {"type": "platform", "x": -23150.193258459076, "y": 23503.325065570567, "grid": "N10", "hidden": false, "label": "WP 75"}, "WP 60": {"type": "platform", "x": -8610.039437585727, "y": 29374.892832647492, "grid": "N11", "hidden": false, "label": "WP 60"}, "WP 48": {"type": "platform", "x": -12762.154166984203, "y": 17529.42736117465, "grid": "M11", "hidden": false, "label": "WP 48"}, "Transit Trades": {"type": "station", "x": -7723.1799808210135, "y": 12684.259874479276, "grid": "M11", "hidden": false, "label": "Transit Trades", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "SR 87": {"type": "sensor_relay", "x": -116666.66666666667, "y": 142500.0, "grid": "T06", "hidden": false, "label": "SR 87"}, "SR 23": {"type": "sensor_relay", "x": -90595.2380952381, "y": 113452.38095238095, "grid": "R07", "hidden": false, "label": "SR 23"}, "SR 93": {"type": "sensor_relay", "x": -64523.809523809534, "y": 84404.76190476191, "grid": "Q08", "hidden": false, "label": "SR 93"}, "SR 90": {"type": "sensor_relay", "x": -38452.38095238096, "y": 55357.142857142855, "grid": "O10", "hidden": false, "label": "SR 90"}, "SR 88": {"type": "sensor_relay", "x": 13690.476190476184, "y": -2738.0952380952367, "grid": "L12", "hidden": false, "label": "SR 88"}, "SR 22": {"type": "sensor_relay", "x": 39761.90476190475, "y": -31785.71428571429, "grid": "K13", "hidden": false, "label": "SR 22"}, "SR 32": {"type": "sensor_relay", "x": 65833.33333333333, "y": -60833.33333333334, "grid": "I15", "hidden": false, "label": "SR 32"}};
+    var objData = {"Planet Kratos III": {"type": "planet", "x": 24166.666666666668, "y": 80000.0, "grid": "Q13", "hidden": false}, "Keltor Gate": {"type": "jumpnode", "x": -138333.33333333334, "y": 171666.6666666667, "grid": "U05", "hidden": false, "label": "Keltor Gate", "destinations": {"Kratos Gate": "Keltor"}}, "Castor Gate": {"type": "jumpnode", "x": 90833.33333333334, "y": -84166.66666666667, "grid": "H16", "hidden": false, "label": "Castor Gate", "destinations": {"Orantiv Jump Point": "Castor"}}, "Gate Command": {"type": "station", "x": -15000.000000000002, "y": 24166.666666666668, "grid": "N11", "hidden": false, "label": "Gate Command", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "Kratos High Offices": {"type": "station", "x": -5950.681584362143, "y": 36456.18998628257, "grid": "N11", "hidden": false, "label": "Kratos High Offices", "hull": "starbase_command", "facilities": ["Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "WP 75": {"type": "platform", "x": -23150.193258459076, "y": 23503.325065570567, "grid": "N10", "hidden": false, "label": "WP 75"}, "WP 60": {"type": "platform", "x": -8610.039437585727, "y": 29374.892832647492, "grid": "N11", "hidden": false, "label": "WP 60"}, "WP 48": {"type": "platform", "x": -12762.154166984203, "y": 17529.42736117465, "grid": "M11", "hidden": false, "label": "WP 48"}, "Transit Trades": {"type": "station", "x": -7723.1799808210135, "y": 12684.259874479276, "grid": "M11", "hidden": false, "label": "Transit Trades", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "Kratos Free Anchorage": {"type": "station", "x": -90761.09869684483, "y": -29776.955818472597, "grid": "K07", "hidden": false, "label": "Kratos Free Anchorage", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "SR 87": {"type": "sensor_relay", "x": -116666.66666666667, "y": 142500.0, "grid": "T06", "hidden": false, "label": "SR 87"}, "SR 23": {"type": "sensor_relay", "x": -90595.2380952381, "y": 113452.38095238095, "grid": "R07", "hidden": false, "label": "SR 23"}, "SR 93": {"type": "sensor_relay", "x": -64523.809523809534, "y": 84404.76190476191, "grid": "Q08", "hidden": false, "label": "SR 93"}, "SR 90": {"type": "sensor_relay", "x": -38452.38095238096, "y": 55357.142857142855, "grid": "O10", "hidden": false, "label": "SR 90"}, "SR 88": {"type": "sensor_relay", "x": 13690.476190476184, "y": -2738.0952380952367, "grid": "L12", "hidden": false, "label": "SR 88"}, "SR 22": {"type": "sensor_relay", "x": 39761.90476190475, "y": -31785.71428571429, "grid": "K13", "hidden": false, "label": "SR 22"}, "SR 32": {"type": "sensor_relay", "x": 65833.33333333333, "y": -60833.33333333334, "grid": "I15", "hidden": false, "label": "SR 32"}};
+    var systemMeta = {"system_name": "Kratos", "description": "Kratos is a hard-edged, pragmatic system with a red-brown super-Earth (Kratos III) that never quite terraformed right. As such its considered a dust bowl of a system, there rich asteroids here but explotation has yet to be pushed and only rudimentary surveying has happend.", "exports": ["Denebite", "Mining", "Fusion Fuel"], "assets": [], "focus": "Exploration & Survey", "intel": {"pirate": "Low", "enemy": "Low"}, "original_author": "Draeco", "last_author": "Fish Evans", "revision_number": 17, "version_tag": "6226.17", "all_authors": ["Fish Evans", "Draeco"]};
+    var pageBody = document.body;
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
     function clearAnnotations() {
         Plotly.relayout('plot', {annotations: []});
-        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        setDefaultInfo();
     }
     
     function getInfoHeader() {
@@ -139,24 +435,23 @@
                           + '</p>';
             }
             document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
-            document.getElementById('galactic-map-btn').addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
                 + infoHtml;
          
     }
-         document.getElementById('galactic-map-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+         bindGalacticButton();
     
 
-    var fig = {"data": [{"type": "scatter", "x": [24166.666666666668], "y": [80000.0], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Kratos III"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Kratos III [Q13]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-40737.39615322539, -124070.72948655873, -164658.5205086783, -81325.18717534497, -40737.39615322539], "y": [83202.08460350963, 199035.41793684295, 169835.5682806418, 54002.23494730849, 83202.08460350963], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-69069.91635283873, -148236.58301950543, -150492.6669757316, -71326.00030906494, -69069.91635283873], "y": [132639.91680210957, 150973.25013544294, 141231.06941537524, 122897.73608204188, 132639.91680210957], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-138333.33333333334], "y": [171666.6666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Keltor Gate [U05]"], "hoverinfo": "text", "text": ["Keltor Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [90833.33333333334], "y": [-84166.66666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Castor Gate [H16]"], "hoverinfo": "text", "text": ["Castor Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-15000.000000000002], "y": [24166.666666666668], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Gate Command [N11]"], "hoverinfo": "text", "text": ["Gate Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-5950.681584362143], "y": [36456.18998628257], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Kratos High Offices [N11]"], "hoverinfo": "text", "text": ["Kratos High Offices"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-23150.193258459076], "y": [23503.325065570567], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 75 [N10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-8610.039437585727], "y": [29374.892832647492], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 60 [N11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-12762.154166984203], "y": [17529.42736117465], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 48 [M11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-7723.1799808210135], "y": [12684.259874479276], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Transit Trades [M11]"], "hoverinfo": "text", "text": ["Transit Trades"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-116666.66666666667], "y": [142500.0], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 87 [T06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-90595.2380952381], "y": [113452.38095238095], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 23 [R07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-64523.809523809534], "y": [84404.76190476191], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 93 [Q08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-38452.38095238096], "y": [55357.142857142855], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 90 [O10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [13690.476190476184], "y": [-2738.0952380952367], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 88 [L12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [39761.90476190475], "y": [-31785.71428571429], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 22 [K13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [65833.33333333333], "y": [-60833.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 32 [I15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Kratos", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [24166.666666666668], "y": [80000.0], "mode": "markers+text", "marker": {"symbol": "circle", "size": 50, "color": "#98FB98"}, "text": ["Planet Kratos III"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "hovertext": ["Planet Kratos III [Q13]"], "hoverinfo": "text", "meta": {"base_marker_size": 50, "base_text_size": 14}}, {"type": "scatter", "x": [-40737.39615322539, -124070.72948655873, -164658.5205086783, -81325.18717534497, -40737.39615322539], "y": [83202.08460350963, 199035.41793684295, 169835.5682806418, 54002.23494730849, 83202.08460350963], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-69069.91635283873, -148236.58301950543, -150492.6669757316, -71326.00030906494, -69069.91635283873], "y": [132639.91680210957, 150973.25013544294, 141231.06941537524, 122897.73608204188, 132639.91680210957], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-254090.8400140354, -269042.8500140354, -286900.50998596457, -271948.49998596456, -254090.8400140354], "y": [-131782.78591221172, -98286.49591221171, -106257.7640877883, -139754.0540877883, -131782.78591221172], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-242476.09786136026, -257542.5078613603, -275424.15213863977, -260357.7421386397, -242476.09786136026], "y": [-151316.3079163252, -123831.0579163252, -133633.1220836748, -161118.3720836748, -151316.3079163252], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-227598.53991267039, -246935.90991267038, -263837.2700873296, -244499.90008732962, -227598.53991267039], "y": [-173410.61825065198, -144089.508250652, -155236.01174934802, -184557.121749348, -173410.61825065198], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-211503.59380172368, -232975.4238017237, -248540.53619827633, -227068.7061982763, -211503.59380172368], "y": [-193744.51330487608, -166340.7733048761, -178536.60669512392, -205940.3466951239, -193744.51330487608], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-194256.81371869647, -216501.67371869646, -232159.10628130357, -209914.24628130358, -194256.81371869647], "y": [-210726.3846405231, -186666.23464052306, -201142.3453594769, -225202.49535947692, -210726.3846405231], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-177621.83650094512, -199170.20650094512, -215106.97349905487, -193558.60349905488, -177621.83650094512], "y": [-224023.63119333852, -204229.6911933385, -221579.0088066615, -241372.9488066615, -224023.63119333852], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-160283.81613066496, -183166.99613066495, -198266.88386933506, -175383.70386933506, -160283.81613066496], "y": [-236470.04692974282, -218659.19692974284, -238059.3630702572, -255870.2130702572, -236470.04692974282], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-284973.80773761583, -335332.6677376158, -331877.43226238416, -281518.5722623842, -284973.80773761583], "y": [-277635.39698910987, -282053.39698910987, -321438.12301089015, -317020.12301089015, -277635.39698910987], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-312499.49732644844, -307770.1673264485, -269252.11267355154, -273981.4426735515, -312499.49732644844], "y": [-251839.6921540918, -305747.2321540918, -302368.0278459082, -248460.48784590812, -251839.6921540918], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-332799.48262875935, -285466.3126287594, -289000.2073712406, -336333.3773712405, -332799.48262875935], "y": [-280184.2510272182, -276031.6910272182, -235750.40897278176, -239902.96897278176, -280184.2510272182], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-305581.9956796245, -310045.06567962456, -349194.69432037545, -344731.6243203754, -305581.9956796245], "y": [-302849.7827115904, -251977.25271159035, -255411.86728840964, -306284.39728840964, -302849.7827115904], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [330589.34057856526, 311716.9305785652, 292142.04942143476, 311014.4594214348, 330589.34057856526], "y": [-178765.20795764544, -141925.70795764544, -151953.67204235456, -188793.17204235456, -178765.20795764544], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-301515.1405921404, -378878.9622656659, -372880.1377343341, -295516.3160608086, -301515.1405921404], "y": [-373640.8516547305, -386899.2250955171, -421902.9149044829, -408644.5414636963, -373640.8516547305], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [130093.74121393179, 70589.0612139318, 83210.9987860682, 142715.6787860682, 130093.74121393179], "y": [-136463.8817013432, -153043.5017013432, -198343.95829865677, -181764.33829865677, -136463.8817013432], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-224971.2039567113, -142622.3239567113, -145794.4960432887, -228143.3760432887, -224971.2039567113], "y": [-305555.35630644846, -297785.1263064485, -264166.4536935516, -271936.6836935516, -305555.35630644846], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-355099.0952377483, -390766.03523774823, -374285.94476225175, -338619.0047622518, -355099.0952377483], "y": [-259212.3811862843, -295258.84118628426, -311565.41881371575, -275518.9588137158, -259212.3811862843], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-293597.16940024786, -444430.05370751827, -450506.6262924818, -299673.7419852114, -293597.16940024786], "y": [212553.27718119667, 238617.57921366108, 203452.74078633898, 177388.43875387457, 212553.27718119667], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-282522.27839599736, -363107.2427032677, -355333.59729673225, -274748.6329894619, -282522.27839599736], "y": [262762.1645507322, 222561.01658319653, 206978.4034168034, 247179.55138433905, 262762.1645507322], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-336080.4674897918, -374654.49748979183, -397620.72251020814, -359046.6925102081, -336080.4674897918], "y": [-136690.76395218138, -105779.2639521814, -134438.49604781863, -165349.99604781863, -136690.76395218138], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [84165.57473231805, 121640.18473231804, 91210.15526768193, 53735.54526768194, 84165.57473231805], "y": [-105175.65975853946, -73144.22975853947, -37543.150241460535, -69574.58024146053, -105175.65975853946], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [340051.57931298116, 370376.5393129811, 349684.7406870189, 319359.78068701894, 340051.57931298116], "y": [170791.78526622086, 221465.01526622084, 233847.84473377914, 183174.61473377916, 170791.78526622086], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [265096.2998686353, 244562.99986863535, 255926.60013136463, 276459.90013136464, 265096.2998686353], "y": [-207571.02773724933, -220253.88773724932, -238651.33226275066, -225968.47226275067, -207571.02773724933], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-190966.87099028716, -218050.25668301678, -185220.65470244247, -158137.26900971285, -190966.87099028716], "y": [368204.05038360617, 187430.10835114183, 182511.60758392935, 363285.5496163937, 368204.05038360617], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [255873.80944271534, 267034.3194427153, 309332.1805572847, 298171.67055728467, 255873.80944271534], "y": [-324700.97227689007, -352737.2322768901, -335899.54772310995, -307863.28772310994, -324700.97227689007], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-127574.96142144801, -91340.511421448, -111059.56857855196, -147294.01857855197, -127574.96142144801], "y": [105610.18021162573, 134822.54021162572, 159281.67978837425, 130069.31978837427, 105610.18021162573], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-153200.75527840524, -117130.57555275378, -141010.26444724618, -177080.44417289764, -153200.75527840524], "y": [79701.29395702071, 111595.0096931888, 138601.7303068112, 106708.0145706431, 79701.29395702071], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-177733.38188552708, -142162.6418855271, -171911.5981144729, -207482.3381144729, -177733.38188552708], "y": [47721.8401952143, 85779.47019521431, 113584.4698047857, 75526.83980478569, 47721.8401952143], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-202306.8982318366, -171288.7082318366, -198560.3317681634, -229578.5217681634, -202306.8982318366], "y": [21118.469627923158, 59373.279627923155, 81485.96037207684, 43231.15037207684, 21118.469627923158], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-224445.0096167524, -196202.7696167524, -222007.15038324764, -250249.39038324764, -224445.0096167524], "y": [-8118.696245400266, 32205.023754599737, 50278.09624540026, 9954.376245400259, -8118.696245400266], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [207463.35331125697, 231598.05331125698, 257330.72668874305, 233196.02668874303, 207463.35331125697], "y": [118781.21046272418, 67096.87046272415, 79113.08953727581, 130797.42953727584, 118781.21046272418], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [184150.68141782345, 213712.39141782347, 239338.46858217657, 209776.75858217655, 184150.68141782345], "y": [146028.07323089582, 104873.4232308958, 123280.83676910424, 164435.48676910423, 146028.07323089582], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [153446.0566325416, 195028.5666325416, 215316.77336745843, 173734.26336745842, 153446.0566325416], "y": [174941.5717880458, 135272.5517880458, 156539.38821195415, 196208.40821195417, 174941.5717880458], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [49232.39203197247, 16656.012031972467, 10560.087968027528, 43136.46796802753, 49232.39203197247], "y": [-554751.6362389801, -544547.80623898, -564009.4337610197, -574213.2637610198, -554751.6362389801], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [310395.0305367979, 222043.1505367979, 219379.16946320204, 307731.0494632021, 310395.0305367979], "y": [-96223.56917605149, -87992.8291760515, -116589.01082394853, -124819.75082394852, -96223.56917605149], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-300596.46622008376, -352773.21622008376, -359901.6437799162, -307724.8937799162, -300596.46622008376], "y": [42016.81143791821, 50018.131437918215, 3533.528562081785, -4467.791437918222, 42016.81143791821], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-18018.187317745185, -69812.20731774518, -38553.212682254816, 13240.807317745179, -18018.187317745185], "y": [-124251.40586444979, -158340.32586444984, -205834.61413555022, -171745.69413555018, -124251.40586444979], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-64776.52582465859, -94702.4758246586, -68971.94417534141, -39045.9941753414, -64776.52582465859], "y": [-410688.02477655053, -459132.7247765505, -475027.3552234495, -426582.6552234495, -410688.02477655053], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [517337.02891490195, 431821.068914902, 436970.411085098, 522486.37108509796, 517337.02891490195], "y": [153021.15400749317, 138077.52400749316, 108610.05599250684, 123553.68599250686, 153021.15400749317], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-197158.00875375813, -296965.9044464877, -260305.0069389715, -160497.11124624187, -197158.00875375813], "y": [557001.8143992878, 451275.13236682344, 416666.5835682478, 522393.2656007122, 557001.8143992878], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [467013.7766888782, 445940.3166888782, 453890.4833111218, 474963.9433111218, 467013.7766888782], "y": [-186945.45947415277, -190286.33947415277, -240434.06052584725, -237093.18052584725, -186945.45947415277], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-253695.90999999997, -253772.9062476357, -254002.57756339837, -254380.99420739838, -254901.68136594002, -255555.72993737887, -256331.94896932103, -257217.0571389215, -258195.90999999997, -259251.75910871418, -260366.53859407728, -261521.17427001952, -262695.91, -263870.64572998043, -265025.28140592267, -266140.0608912858, -267195.91, -268174.7628610785, -269059.8710306789, -269836.0900626211, -270490.1386340599, -271010.82579260156, -271389.2424366016, -271618.9137523643, -271695.91, -271618.9137523643, -271389.2424366016, -271010.82579260156, -270490.1386340599, -269836.0900626211, -269059.8710306789, -268174.7628610785, -267195.91, -266140.0608912858, -265025.28140592267, -263870.64572998043, -262695.91, -261521.17427001952, -260366.53859407728, -259251.75910871418, -258195.90999999997, -257217.0571389215, -256331.94896932103, -255555.72993737887, -254901.68136594002, -254380.99420739838, -254002.57756339837, -253772.9062476357, -253695.90999999997], "y": [-310202.85, -309028.1142700195, -307873.4785940773, -306758.6991087142, -305702.85, -304723.99713892146, -303838.88896932104, -303062.66993737884, -302408.62136594, -301887.9342073984, -301509.51756339835, -301279.84624763567, -301202.85, -301279.84624763567, -301509.51756339835, -301887.9342073984, -302408.62136594, -303062.66993737884, -303838.88896932104, -304723.99713892146, -305702.85, -306758.6991087142, -307873.4785940773, -309028.1142700195, -310202.85, -311377.58572998043, -312532.22140592267, -313647.0008912858, -314702.85, -315681.7028610785, -316566.8110306789, -317343.0300626211, -317997.07863405993, -318517.76579260157, -318896.1824366016, -319125.8537523643, -319202.85, -319125.8537523643, -318896.1824366016, -318517.76579260157, -317997.07863405993, -317343.0300626211, -316566.8110306789, -315681.7028610785, -314702.85, -313647.0008912858, -312532.22140592267, -311377.58572998043, -310202.85], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [277562.48, 277514.5712236933, 277371.66462721874, 277136.20538206317, 276812.22226119286, 276405.2587056309, 275922.2779746447, 275371.5440024488, 274762.48, 274105.5072212445, 273411.8666525741, 272693.42667643225, 271962.48, 271231.5333235677, 270513.09334742586, 269819.45277875545, 269162.48, 268553.4159975512, 268002.6820253553, 267519.70129436906, 267112.7377388071, 266788.7546179368, 266553.2953727812, 266410.38877630665, 266362.48, 266410.38877630665, 266553.2953727812, 266788.7546179368, 267112.7377388071, 267519.70129436906, 268002.6820253553, 268553.4159975512, 269162.48, 269819.45277875545, 270513.09334742586, 271231.5333235677, 271962.48, 272693.42667643225, 273411.8666525741, 274105.5072212445, 274762.48, 275371.5440024488, 275922.2779746447, 276405.2587056309, 276812.22226119286, 277136.20538206317, 277371.66462721874, 277514.5712236933, 277562.48], "y": [144454.4, 145185.3466764323, 145903.7866525741, 146597.4272212445, 147254.4, 147863.46400244883, 148414.19797464466, 148897.1787056309, 149304.14226119284, 149628.1253820632, 149863.58462721878, 150006.49122369333, 150054.4, 150006.49122369333, 149863.58462721878, 149628.1253820632, 149304.14226119284, 148897.1787056309, 148414.19797464466, 147863.46400244883, 147254.4, 146597.4272212445, 145903.7866525741, 145185.3466764323, 144454.4, 143723.4533235677, 143005.01334742588, 142311.3727787555, 141654.4, 141045.33599755116, 140494.60202535533, 140011.62129436908, 139604.65773880715, 139280.67461793678, 139045.2153727812, 138902.30877630666, 138854.4, 138902.30877630666, 139045.2153727812, 139280.67461793678, 139604.65773880715, 140011.62129436908, 140494.60202535533, 141045.33599755116, 141654.4, 142311.3727787555, 143005.01334742588, 143723.4533235677, 144454.4], "fill": "toself", "fillcolor": "rgba(64,64,64,0.7054380449545107)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.7054380449545107)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [385655.87, 385609.14183282375, 385469.7568631909, 385240.1000065766, 384924.1007554706, 384527.16594467073, 384056.08723884093, 383518.92492524564, 382924.87, 382284.0869075781, 381607.53962434997, 380906.80406190595, 380193.87, 379480.9359380941, 378780.20037565, 378103.6530924219, 377462.87, 376868.81507475436, 376331.65276115906, 375860.57405532926, 375463.6392445294, 375147.63999342336, 374917.9831368091, 374778.59816717624, 374731.87, 374778.59816717624, 374917.9831368091, 375147.63999342336, 375463.6392445294, 375860.57405532926, 376331.65276115906, 376868.81507475436, 377462.87, 378103.6530924219, 378780.20037565, 379480.9359380941, 380193.87, 380906.8040619059, 381607.53962434997, 382284.0869075781, 382924.87, 383518.92492524564, 384056.08723884093, 384527.16594467073, 384924.1007554706, 385240.1000065766, 385469.7568631909, 385609.14183282375, 385655.87], "y": [144783.32, 145496.25406190593, 146196.98962434998, 146873.53690757812, 147514.32, 148108.37492524565, 148645.53723884092, 149116.61594467075, 149513.5507554706, 149829.55000657667, 150059.2068631909, 150198.59183282376, 150245.32, 150198.59183282376, 150059.2068631909, 149829.55000657667, 149513.5507554706, 149116.61594467075, 148645.53723884092, 148108.37492524565, 147514.32, 146873.53690757812, 146196.98962434998, 145496.25406190593, 144783.32, 144070.38593809408, 143369.65037565003, 142693.1030924219, 142052.32, 141458.26507475437, 140921.1027611591, 140450.02405532927, 140053.0892445294, 139737.08999342335, 139507.43313680912, 139368.04816717625, 139321.32, 139368.04816717625, 139507.43313680912, 139737.08999342335, 140053.0892445294, 140450.02405532927, 140921.10276115907, 141458.26507475437, 142052.32, 142693.1030924219, 143369.65037565003, 144070.38593809408, 144783.32], "fill": "toself", "fillcolor": "rgba(64,64,64,0.6988565431814808)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.6988565431814808)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [132260.18, 132190.22463145363, 131981.5554815657, 131637.7429373448, 131164.66972674534, 130570.43026356143, 129865.1921497624, 129061.02220500431, 128171.68, 127212.38242644933, 126199.5433318033, 125150.49267378336, 124083.18, 123015.86732621663, 121966.81666819668, 120953.97757355066, 119994.68, 119105.33779499568, 118301.1678502376, 117595.92973643856, 117001.69027325464, 116528.6170626552, 116184.80451843428, 115976.13536854634, 115906.18, 115976.13536854634, 116184.80451843428, 116528.6170626552, 117001.69027325464, 117595.92973643856, 118301.16785023759, 119105.33779499568, 119994.68, 120953.97757355066, 121966.81666819668, 123015.86732621663, 124083.18, 125150.49267378336, 126199.5433318033, 127212.38242644933, 128171.68, 129061.0222050043, 129865.19214976238, 130570.43026356141, 131164.66972674534, 131637.7429373448, 131981.5554815657, 132190.22463145363, 132260.18], "y": [-426881.61, -425814.29732621665, -424765.2466681967, -423752.40757355065, -422793.11, -421903.7677949957, -421099.59785023757, -420394.35973643855, -419800.12027325464, -419327.0470626552, -418983.23451843427, -418774.56536854635, -418704.61, -418774.56536854635, -418983.23451843427, -419327.0470626552, -419800.12027325464, -420394.35973643855, -421099.59785023757, -421903.7677949957, -422793.11, -423752.40757355065, -424765.2466681967, -425814.29732621665, -426881.61, -427948.9226737833, -428997.9733318033, -430010.8124264493, -430970.11, -431859.4522050043, -432663.6221497624, -433368.8602635614, -433963.09972674533, -434436.17293734476, -434779.9854815657, -434988.6546314536, -435058.61, -434988.6546314536, -434779.9854815657, -434436.17293734476, -433963.09972674533, -433368.8602635614, -432663.6221497624, -431859.4522050043, -430970.11, -430010.8124264493, -428997.9733318033, -427948.9226737833, -426881.61], "fill": "toself", "fillcolor": "rgba(255,255,0,0.6)", "line": {"shape": "spline", "color": "yellow", "width": 2}, "hoverinfo": "none", "gmOnly": true}, {"type": "scatter", "x": [-138333.33333333334], "y": [171666.6666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Keltor Gate [U05]"], "hoverinfo": "text", "text": ["Keltor Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [90833.33333333334], "y": [-84166.66666666667], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Castor Gate [H16]"], "hoverinfo": "text", "text": ["Castor Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-15000.000000000002], "y": [24166.666666666668], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Gate Command [N11]"], "hoverinfo": "text", "text": ["Gate Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-5950.681584362143], "y": [36456.18998628257], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Kratos High Offices [N11]"], "hoverinfo": "text", "text": ["Kratos High Offices"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-23150.193258459076], "y": [23503.325065570567], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 75 [N10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-8610.039437585727], "y": [29374.892832647492], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 60 [N11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-12762.154166984203], "y": [17529.42736117465], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 48 [M11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-7723.1799808210135], "y": [12684.259874479276], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Transit Trades [M11]"], "hoverinfo": "text", "text": ["Transit Trades"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-90761.09869684483], "y": [-29776.955818472597], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Kratos Free Anchorage [K07]"], "hoverinfo": "text", "text": ["Kratos Free Anchorage"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-116666.66666666667], "y": [142500.0], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 87 [T06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-90595.2380952381], "y": [113452.38095238095], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 23 [R07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-64523.809523809534], "y": [84404.76190476191], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 93 [Q08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-38452.38095238096], "y": [55357.142857142855], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 90 [O10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [13690.476190476184], "y": [-2738.0952380952367], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 88 [L12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [39761.90476190475], "y": [-31785.71428571429], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 22 [K13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [65833.33333333333], "y": [-60833.33333333334], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 32 [I15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Kratos", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Kratos';
     if (!isGM()) {
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
+    setDefaultInfo();
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -176,8 +471,123 @@
         }
         if (picked && objData[picked]) {
             highlight(picked);
+            lastPlotlyClickTs = Date.now();
         }
     });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
 
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {
@@ -272,6 +682,21 @@ function addButton(label, fn, header, color, isHidden) {
 
   renderGMControls();
 
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
+
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
 
@@ -287,6 +712,7 @@ function addButton(label, fn, header, color, isHidden) {
 
     addButton('--- Stations ---', null, true, null);
     addButton('Gate Command',function(){highlight('Gate Command');},false,'blue',false)
+    addButton('Kratos Free Anchorage',function(){highlight('Kratos Free Anchorage');},false,'blue',false)
     addButton('Kratos High Offices',function(){highlight('Kratos High Offices');},false,'blue',false)
     addButton('Transit Trades',function(){highlight('Transit Trades');},false,'blue',false)
     

@@ -1,7 +1,8 @@
 import os
 import json
 import tkinter as tk
-from tkinter import filedialog, Menu, ttk
+from tkinter import ttk, messagebox, filedialog
+import importlib.util
 from PIL import Image, ImageTk
 import math
 import LocMapGen, GalMapGen
@@ -10,6 +11,10 @@ import sys
 import SystemTemplates
 import copy
 import re
+import datetime
+import webbrowser
+from pathlib import Path
+import SystemMetaOptions as smopts
 
 # Helper to locate resources in bundled or source context
 def get_base_path():
@@ -22,6 +27,49 @@ def get_base_path():
 class SystemMapEditor:
     INITIAL_SCALE = 10000
     ICON_RADIUS = 18000000  # half-size for click detection
+
+    def _get_index_html_path(self):
+        return Path(get_base_path()) / "HTML" / "index.html"
+
+    def _get_ship_image_extractor_path(self):
+        return Path(get_base_path()) / "scripts" / "ShipImageExtractor.py"
+
+    def _run_generators(self):
+        LocMapGen.main()
+        GalMapGen.main()
+
+    def _open_index_html(self):
+        index_path = self._get_index_html_path()
+        if not index_path.exists():
+            return False
+        return webbrowser.open(index_path.resolve().as_uri())
+
+    def open_or_generate_maps(self):
+        index_path = self._get_index_html_path()
+        if index_path.exists():
+            opened = self._open_index_html()
+            if not opened:
+                messagebox.showerror("Open Map", f"Unable to open {index_path}.")
+            return
+
+        should_generate = messagebox.askyesno(
+            "Open Map",
+            "HTML/index.html was not found.\n\nGenerate the maps now and open the galactic map?",
+        )
+        if not should_generate:
+            return
+
+        try:
+            self._run_generators()
+        except Exception as exc:
+            messagebox.showerror("Generate Maps", f"Error running generators:\n{exc}")
+            return
+
+        if not self._open_index_html():
+            messagebox.showerror(
+                "Open Map",
+                f"Maps were generated, but {index_path} could not be opened.",
+            )
 
     def show_help(self):
         help_text = """
@@ -59,6 +107,202 @@ class SystemMapEditor:
         text.pack(expand=True, fill=tk.BOTH)
 
         tk.Button(top, text="Close", command=top.destroy).pack(pady=5)
+
+    def _load_cargo_teams(self):
+        base = get_base_path()
+        ct_path = os.path.join(base, "cargo_teams.json")
+        try:
+            with open(ct_path, "r") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def _load_settings(self):
+        base = get_base_path()
+        settings_path = os.path.join(base, "Settings.json")
+        try:
+            with open(settings_path, "r") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def _get_valid_alignments(self):
+        settings = getattr(self, "settings_config", None) or {}
+        ct = getattr(self, "ct_config", None) or {}
+        factions = settings.get("Factions", []) or ct.get("Factions", []) or []
+        races_map = settings.get("Races", {}) if isinstance(settings.get("Races", {}), dict) else ct.get("Races", {})
+        races = list(races_map.keys()) if isinstance(races_map, dict) else []
+        valid = sorted(set(factions) | set(races), key=str.casefold)
+        if valid:
+            return valid
+        fallback = {s.get("alignment", "") for s in self.systems.values() if s.get("alignment")}
+        fallback |= {"USFP", "TSN", "Arvonians", "Kralien", "Torgoth", "Ximni"}
+        return sorted(fallback, key=str.casefold)
+
+    def _get_skyboxes(self):
+        ct = getattr(self, "ct_config", None) or {}
+        skyboxes = ct.get("skyboxes", [])
+        return skyboxes if isinstance(skyboxes, list) else []
+
+    def _get_systems_dir(self):
+        return os.path.join(get_base_path(), "data", "missions", "Map Designer", "Terrain")
+
+    def _get_system_file_path(self, filename):
+        return os.path.join(self._get_systems_dir(), filename)
+
+    def _iter_system_filenames(self):
+        systems_dir = self._get_systems_dir()
+        for filename in os.listdir(systems_dir):
+            if filename.endswith(".json") and filename != "package.json":
+                yield filename
+
+    def _load_system_json(self, filename):
+        with open(self._get_system_file_path(filename), "r") as f:
+            return json.load(f)
+
+    def _write_system_json(self, filename, data):
+        with open(self._get_system_file_path(filename), "w") as f:
+            json.dump(data, f, indent=4)
+
+    def _build_author_meta(self, meta, fallback=None):
+        if not isinstance(meta, dict):
+            meta = {}
+        if not isinstance(fallback, dict):
+            fallback = {}
+        all_authors = meta.get("all_authors", fallback.get("all_authors", []))
+        if not isinstance(all_authors, list):
+            all_authors = []
+        return {
+            "original_author": meta.get("original_author", fallback.get("original_author", "")),
+            "last_revision_author": meta.get(
+                "last_revision_author",
+                meta.get("last_author", fallback.get("last_revision_author", "")),
+            ),
+            "revision_number": meta.get("revision_number", fallback.get("revision_number", 0)),
+            "revision_date": meta.get("revision_date", fallback.get("revision_date", "")),
+            "all_authors": list(all_authors),
+        }
+
+    def _normalize_system_record(self, data, fallback_author_meta=None):
+        if not isinstance(data, dict) or "systemMapCoord" not in data:
+            return None
+
+        meta = data.get("metadata", {})
+        if not isinstance(meta, dict):
+            meta = {}
+
+        objects = data.get("objects", {})
+        if not isinstance(objects, dict):
+            objects = {}
+
+        jump_points = [
+            {"name": key, **value}
+            for key, value in objects.items()
+            if isinstance(value, dict) and value.get("type") in ("jumpnode", "jumppoint")
+        ]
+
+        intel = meta.get("intel", {})
+        if not isinstance(intel, dict):
+            intel = {}
+
+        traffic = data.get("traffic", {})
+        if not isinstance(traffic, dict):
+            traffic = {}
+
+        coord = data.get("systemMapCoord", [0, 0, 0])
+        if not isinstance(coord, list):
+            coord = list(coord) if isinstance(coord, tuple) else [0, 0, 0]
+
+        exports = meta.get("exports", [])
+        if not isinstance(exports, list):
+            exports = []
+
+        return {
+            "coord": list(coord),
+            "alignment": data.get("systemalignment", "Unknown"),
+            "description": meta.get("sysdescription", ""),
+            "security": meta.get("security", "Neutral"),
+            "exports": list(exports),
+            "focus": meta.get("focus", ""),
+            "intel": dict(intel),
+            "development": meta.get("development", "Unclaimed"),
+            "visible": meta.get("visible", True),
+            "skybox": meta.get("skybox", ""),
+            "traffic": dict(traffic),
+            "author_meta": self._build_author_meta(meta, fallback_author_meta),
+            "jump_points": jump_points,
+            "canvas_items": [],
+            "link_lines": [],
+            "incoming_lines": [],
+        }
+
+    def _build_author_source(self, data, author_meta):
+        meta = data.get("metadata", {})
+        if not isinstance(meta, dict):
+            meta = {}
+
+        author_source = dict(meta)
+        if isinstance(author_meta, dict):
+            for key, value in author_meta.items():
+                if author_source.get(key) in (None, "", []):
+                    author_source[key] = value
+
+        for key in (
+            "original_author",
+            "last_revision_author",
+            "last_author",
+            "revision_number",
+            "revision_date",
+            "all_authors",
+        ):
+            if author_source.get(key) in (None, "", []):
+                top_level_value = data.get(key)
+                if top_level_value not in (None, "", []):
+                    author_source[key] = top_level_value
+        return author_source
+
+    def _apply_system_record_to_data(self, data, system_data, coord_override=None):
+        if not isinstance(data, dict):
+            data = {}
+
+        coord = coord_override if coord_override is not None else system_data.get("coord")
+        if coord:
+            data["systemMapCoord"] = coord
+
+        data["systemalignment"] = system_data.get("alignment", data.get("systemalignment", ""))
+        metadata = data.get("metadata", {})
+        if not isinstance(metadata, dict):
+            metadata = {}
+
+        metadata.update({
+            "sysdescription": system_data.get("description", ""),
+            "security": system_data.get("security", "Neutral"),
+            "exports": system_data.get("exports", []),
+            "focus": system_data.get("focus", ""),
+            "intel": system_data.get("intel", {}),
+            "development": system_data.get("development", "Unclaimed"),
+            "visible": system_data.get("visible", True),
+            "skybox": system_data.get("skybox", metadata.get("skybox", "")),
+        })
+
+        author_meta = system_data.get("author_meta", {})
+        if isinstance(author_meta, dict):
+            metadata.update(author_meta)
+
+        data["metadata"] = metadata
+
+        traffic = system_data.get("traffic", {})
+        if isinstance(traffic, dict):
+            data["traffic"] = traffic
+
+        return data
+
+    def _save_system_record(self, filename, coord_override=None):
+        data = self._load_system_json(filename)
+        data = self._apply_system_record_to_data(data, self.systems[filename], coord_override=coord_override)
+        self._write_system_json(filename, data)
 
     def auto_link_gates(self):
         base = get_base_path()
@@ -176,6 +420,69 @@ class SystemMapEditor:
         self.draw_scale()
         print("Systems reloaded.")
 
+    def regenerate_ship_data(self):
+        should_proceed = messagebox.askyesno(
+            "Re-generate Ship Data",
+            "Caution this script will delete old data and regenerate new do you wish to proceed?",
+        )
+        if not should_proceed:
+            return
+
+        executable_path = filedialog.askopenfilename(
+            title="Select Game Executable",
+            initialdir=get_base_path(),
+            filetypes=[
+                ("Executable files", "*.exe"),
+                ("All files", "*.*"),
+            ],
+        )
+        if not executable_path:
+            return
+
+        script_path = self._get_ship_image_extractor_path()
+        if not script_path.exists():
+            messagebox.showerror(
+                "Re-generate Ship Data",
+                f"Ship image extractor script was not found:\n{script_path}",
+            )
+            return
+
+        validation_error_cls = None
+        try:
+            spec = importlib.util.spec_from_file_location("ShipImageExtractor", script_path)
+            if spec is None or spec.loader is None:
+                raise ImportError(f"Unable to load module spec from {script_path}")
+
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            validation_error_cls = getattr(module, "ValidationError", None)
+            if not hasattr(module, "main"):
+                raise AttributeError("ShipImageExtractor.py does not define a main() function.")
+
+            prev_cwd = os.getcwd()
+            try:
+                os.chdir(get_base_path())
+                module.main(executable_path)
+            finally:
+                os.chdir(prev_cwd)
+        except Exception as exc:
+            if validation_error_cls and isinstance(exc, validation_error_cls):
+                messagebox.showwarning(
+                    "Re-generate Ship Data",
+                    f"Ship data regeneration was aborted:\n{exc}",
+                )
+                return
+            messagebox.showerror(
+                "Re-generate Ship Data",
+                f"Failed to re-generate ship data:\n{exc}",
+            )
+            return
+
+        messagebox.showinfo(
+            "Re-generate Ship Data",
+            "Ship data re-generation completed.",
+        )
+
     def create_new_system(self):
         top = tk.Toplevel(self.root)
         top.title("Create New System")
@@ -185,21 +492,21 @@ class SystemMapEditor:
         name_entry.pack(fill=tk.X, padx=5)
 
         tk.Label(top, text="Alignment:").pack()
-        align_var = tk.StringVar(value="USFP")
-        alignments = sorted({s.get("alignment", "Unknown") for s in self.systems.values()} | {"USFP", "TSN", "Arvonians", "Kraliens", "Torgoth", "Ximni"})
-        align_cb = ttk.Combobox(top, textvariable=align_var, values=alignments)
+        alignments = self._get_valid_alignments()
+        default_align = "USFP" if "USFP" in alignments else (alignments[0] if alignments else "")
+        align_var = tk.StringVar(value=default_align)
+        align_cb = ttk.Combobox(top, textvariable=align_var, values=alignments, state="normal")
         align_cb.pack(fill=tk.X, padx=5)
 
         def add_system():
             name = name_entry.get().strip()
             if not name:
-                tk.messagebox.showerror("Invalid Input", "System name cannot be empty.")
+                messagebox.showerror("Invalid Input", "System name cannot be empty.")
                 return
             filename = f"{name}.json"
-            systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
-            file_path = os.path.join(systems_dir, filename)
+            file_path = self._get_system_file_path(filename)
             if os.path.exists(file_path):
-                tk.messagebox.showerror("File Exists", f"{filename} already exists.")
+                messagebox.showerror("File Exists", f"{filename} already exists.")
                 return
 
             # Copy and modify template
@@ -216,26 +523,10 @@ class SystemMapEditor:
             template["systemMapCoord"] = [nx, 0, ny]
 
             # Save new file
-            with open(file_path, 'w') as f:
-                json.dump(template, f, indent=4)
+            self._write_system_json(filename, template)
 
             # Add to in-memory system list
-            self.systems[filename] = {
-                "coord": [nx, 0, ny],
-                "alignment": template["systemalignment"],
-                "description": "",
-                "security": "Neutral",
-                "exports": [],
-                "focus": "",
-                "intel": {},
-                "development": "Unclaimed",
-                "visible": True,
-                "jump_points": [],
-                "canvas_items": [],
-                "warning_circle": None,
-                "link_lines": [],
-                "incoming_lines": []
-            }
+            self.systems[filename] = self._normalize_system_record(template)
 
             self.redraw_map()
             SystemEditor.open_system_editor(file_path)
@@ -246,14 +537,22 @@ class SystemMapEditor:
     def __init__(self, root):
         self.root = root
         self.root.title("Stellar Cartography")
+        self.ct_config = self._load_cargo_teams()
+        self.settings_config = self._load_settings()
         control_frame = tk.Frame(root)
         control_frame.pack(side=tk.TOP, fill=tk.X)
-        self.selected_text = None
-        self.selected_text_index = None
+        open_map_button = tk.Button(control_frame, text="Open Map", command=self.open_or_generate_maps)
+        open_map_button.pack(side=tk.LEFT)
         auto_link_button = tk.Button(control_frame, text="Auto Link Gates", command=self.auto_link_gates)
         auto_link_button.pack(side=tk.LEFT)
         reload_button = tk.Button(control_frame, text="Reload Systems", command=self.reload_systems_data)
         reload_button.pack(side=tk.LEFT)
+        regenerate_ship_data_button = tk.Button(
+            control_frame,
+            text="Re-generate Ship Data",
+            command=self.regenerate_ship_data,
+        )
+        regenerate_ship_data_button.pack(side=tk.LEFT)
         save_button = tk.Button(control_frame, text="Save Changes", command=self.save_changes)
         save_button.pack(side=tk.LEFT)
 
@@ -269,12 +568,21 @@ class SystemMapEditor:
         help_button = tk.Button(control_frame, text="Help", command=self.show_help)
         help_button.pack(side=tk.LEFT)
 
-        self.drag_data = {"item": None, "x": 0, "y": 0, "panning": False, "dragged": False}
+        self.drag_data = {
+            "item": None,
+            "x": 0,
+            "y": 0,
+            "panning": False,
+            "dragged": False,
+            "press_x": 0,
+            "press_y": 0,
+            "drag_distance": 0.0,
+            "system_start_coord": None,
+            "system_start_fname": None,
+        }
         # Selection state
         self.selected_type = None
         self.selected_id = None
-        self.selected_border = None
-        self.selected_point_index = None
 
         self.canvas = tk.Canvas(root, bg="black", width=1200, height=800)
         self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -299,7 +607,10 @@ class SystemMapEditor:
         self.pan_offset_y = 400
         # Initialize SCALE to sweet spot selected by user
         self.SCALE = 0.7053834425211398
+        self.min_zoom_scale = self.SCALE
         self.scale_indicator = None
+        self.icon_cache = {}
+        self.icon_base_images = {}
 
         self.load_galmapinfo()
         self.load_systems()
@@ -325,42 +636,13 @@ class SystemMapEditor:
 
     def load_systems(self):
         """Load system JSON files and cache their data for rendering."""
-        base = get_base_path()
-        systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
-        for filename in os.listdir(systems_dir):
-            if not filename.endswith(".json") or filename == "package.json":
-                continue
-            file_path = os.path.join(systems_dir, filename)
+        for filename in self._iter_system_filenames():
             try:
-                with open(file_path, 'r') as f:
-                    data = json.load(f)
-                if isinstance(data, dict) and "systemMapCoord" in data:
-                    coord = data.get("systemMapCoord", [0, 0, 0])
-                    align = data.get("systemalignment", "Unknown")
-                    objects = data.get("objects", {})
-                    jump_points = [
-                        {"name": key, **value}
-                        for key, value in objects.items()
-                        if value.get("type") in ("jumpnode", "jumppoint")
-                    ]
-                    meta = data.get("metadata", {})
-                    self.systems[filename] = {
-                        "coord": coord,
-                        "alignment": align,
-                        "description": meta.get("sysdescription", ""),
-                        "security": meta.get("security", "Neutral"),
-                        "exports": meta.get("exports", []),
-                        "focus": meta.get("focus", ""),
-                        "intel": meta.get("intel", {}),
-                        "development": meta.get("development", "Unclaimed"),
-                        "visible": meta.get("visible", True),
-                        "jump_points": jump_points,
-                        "canvas_items": [],
-                        "warning_circle": None,
-                        "link_lines": [],
-                        "incoming_lines": []
-                    }
-            except json.JSONDecodeError:
+                data = self._load_system_json(filename)
+                system_record = self._normalize_system_record(data)
+                if system_record is not None:
+                    self.systems[filename] = system_record
+            except (OSError, json.JSONDecodeError):
                 print(f"Warning: Could not parse {filename}, skipping.")
 
     def auto_center_and_zoom(self):
@@ -377,13 +659,7 @@ class SystemMapEditor:
         spread_y = max_y - min_y
 
         # Size of canvas in pixels
-        self.root.update_idletasks()
-        canvas_w = self.canvas.winfo_width()
-        canvas_h = self.canvas.winfo_height()
-        if canvas_w < 100:
-            canvas_w = int(self.canvas.cget("width"))
-        if canvas_h < 100:
-            canvas_h = int(self.canvas.cget("height"))
+        canvas_w, canvas_h = self._get_canvas_size()
 
         # Find the best scale to fit everything
         if spread_x == 0: spread_x = 1
@@ -391,12 +667,45 @@ class SystemMapEditor:
         scale_x = canvas_w / (spread_x + 1000)  # Add small padding
         scale_y = canvas_h / (spread_y + 1000)
         self.SCALE = min(scale_x, scale_y)
+        self.min_zoom_scale = self.SCALE
 
         # Center the map
         screen_cx = canvas_w / 2
         screen_cy = canvas_h / 2
         self.pan_offset_x = screen_cx - center_x * self.SCALE
         self.pan_offset_y = screen_cy - center_y * self.SCALE
+
+    def _get_canvas_size(self):
+        self.root.update_idletasks()
+        canvas_w = self.canvas.winfo_width()
+        canvas_h = self.canvas.winfo_height()
+        if canvas_w < 100:
+            canvas_w = int(self.canvas.cget("width"))
+        if canvas_h < 100:
+            canvas_h = int(self.canvas.cget("height"))
+        return canvas_w, canvas_h
+
+    def _get_icon_image(self, alignment, size):
+        cache_key = (alignment, size)
+        cached = self.icon_cache.get(cache_key)
+        if cached:
+            return cached
+        base = get_base_path()
+        icon_path = os.path.join(base, "HTML", "Images", "Factions", f"{alignment}.png")
+        if not os.path.exists(icon_path):
+            return None
+        base_img = self.icon_base_images.get(alignment)
+        if base_img is None:
+            try:
+                with Image.open(icon_path) as img:
+                    base_img = img.convert("RGBA")
+                self.icon_base_images[alignment] = base_img
+            except OSError:
+                return None
+        resized = base_img.resize((size, size), Image.LANCZOS)
+        tk_img = ImageTk.PhotoImage(resized)
+        self.icon_cache[cache_key] = tk_img
+        return tk_img
 
     def build_gate_index(self):
         gate_index = {}
@@ -436,30 +745,18 @@ class SystemMapEditor:
         """Draw each system with dynamic icon sizing based on current SCALE"""
         gate_index = self.build_gate_index()
         system_name_map = {filename.replace(".json", "").lower(): filename for filename in self.systems.keys()}
+        canvas_w, _ = self._get_canvas_size()
+        max_scale = canvas_w / 1000.0
+        size = max(70, int(160 * (self.SCALE / max_scale)))
+        half = size // 2
         for filename, system in self.systems.items():
             x, _, y = system["coord"]
             sx, sy = self.coord_to_screen(x, y)
 
             # Dynamic icon size: 80px at max zoom in, scales proportionally
             # Compute max_scale from current canvas width (1000 units spans canvas width at max zoom)
-            # Ensure canvas is rendered to get correct width
-            self.root.update_idletasks()
-            canvas_w = self.canvas.winfo_width()
-            # Fallback to configured width if not yet mapped
-            if canvas_w < 100:
-                canvas_w = int(self.canvas.cget('width'))
-            max_scale = canvas_w / 1000.0
-            # At max_scale, size should be 160; scale linearly with current SCALE
-            size = max(70, int(160 * (self.SCALE / max_scale)))
-            half = size // 2
-
-            icon_path = f"HTML/Images/Factions/{system['alignment']}.png"
-            # Determine full path for bundled resources
-            base = get_base_path()
-            icon_full = os.path.join(base, icon_path)
-            if os.path.exists(icon_full):
-                img = Image.open(icon_full).resize((size, size))
-                tk_img = ImageTk.PhotoImage(img)
+            tk_img = self._get_icon_image(system["alignment"], size)
+            if tk_img:
                 system["icon"] = tk_img
                 img_id = self.canvas.create_image(sx, sy, image=tk_img, tags=("map",))
             else:
@@ -480,7 +777,10 @@ class SystemMapEditor:
             system["canvas_items"] = [img_id, text_id]
 
     def draw_jump_links(self):
-        system_names = {filename.replace(".json", ""): filename for filename in self.systems.keys()}
+        system_names = {filename.replace(".json", "").lower(): filename for filename in self.systems.keys()}
+        for system in self.systems.values():
+            system["link_lines"].clear()
+            system["incoming_lines"].clear()
         # Collect all jump lines by src/dest pair for offsetting
         links = []
 
@@ -490,7 +790,10 @@ class SystemMapEditor:
                     continue
                 destinations = jp.get("destinations", {})
                 for dest_system in destinations.values():
-                    dest_file = system_names.get(dest_system)
+                    dest_key = str(dest_system).lower()
+                    if dest_key.endswith(".json"):
+                        dest_key = dest_key[:-5]
+                    dest_file = system_names.get(dest_key)
                     if not dest_file:
                         continue
                     links.append((src_filename, dest_file, jp))
@@ -546,8 +849,8 @@ class SystemMapEditor:
                  tags = ("map",)
             )
 
-            src_system["link_lines"].append((line_id, dest))
-            self.systems[dest]["incoming_lines"].append((line_id, src))
+            src_system["link_lines"].append({"line_id": line_id, "dest": dest, "offset": (offset_x, offset_y)})
+            self.systems[dest]["incoming_lines"].append({"line_id": line_id, "src": src, "offset": (offset_x, offset_y)})
 
     def coord_to_screen(self, x, y):
         return (x * self.SCALE + self.pan_offset_x, y * self.SCALE + self.pan_offset_y)
@@ -556,25 +859,10 @@ class SystemMapEditor:
         return ((x - self.pan_offset_x) / self.SCALE, 0, (y - self.pan_offset_y) / self.SCALE)
 
     def find_nearest_border_node(self, x, y, radius=40):
-        for i, border in enumerate(self.borders):
-            for j, point in enumerate(border.get("points", [])):
-                screen_x, screen_y = self.coord_to_screen(point[0], point[1])
-                if math.hypot(screen_x - x, screen_y - y) <= radius:
-                    return (i, j)
-        return None
-
-    def point_near_line(self, px, py, x1, y1, x2, y2, tolerance):
-        if x1 == x2 and y1 == y2:
-            return math.hypot(px - x1, py - y1) <= tolerance
-
-        length_sq = (x2 - x1) ** 2 + (y2 - y1) ** 2
-        if length_sq == 0:
-            return False
-
-        t = max(0, min(1, ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / length_sq))
-        proj_x = x1 + t * (x2 - x1)
-        proj_y = y1 + t * (y2 - y1)
-        return math.hypot(px - proj_x, py - proj_y) <= tolerance
+        hit = self._find_border_node_hit(x, y, radius)
+        if hit is None:
+            return None
+        return (hit["border_index"], hit["point_index"])
 
     def zoom_in(self, center_x=600, center_y=400):
         """Zoom in, capped so 1000 units span no more than canvas width"""
@@ -589,22 +877,23 @@ class SystemMapEditor:
             self.pan_offset_x = center_x + factor * (self.pan_offset_x - center_x)
             self.pan_offset_y = center_y + factor * (self.pan_offset_y - center_y)
             self.SCALE *= factor
-            print(f"Scale: {self.SCALE}")
         self.draw_scale()
         # Redraw icons at new size
         self.redraw_map()
 
     def zoom_out(self, center_x=600, center_y=400):
-        """Zoom out, capped so 1000 units cover at least 25% of canvas width"""
+        """Zoom out, capped at the initial auto-fit scale."""
         factor = 1 / 1.3
-        min_scale = self.canvas.winfo_width() * 0.05 / 1500.0
-        if self.SCALE * factor >= min_scale:
-            self.canvas.scale("map", center_x, center_y, factor, factor)
-            self.canvas.scale("hover", center_x, center_y, factor, factor)
-            self.canvas.scale("selection", center_x, center_y, factor, factor)
-            self.pan_offset_x = center_x + factor * (self.pan_offset_x - center_x)
-            self.pan_offset_y = center_y + factor * (self.pan_offset_y - center_y)
-            self.SCALE *= factor
+        min_scale = getattr(self, "min_zoom_scale", self.SCALE)
+        target_scale = max(self.SCALE * factor, min_scale)
+        if target_scale < self.SCALE:
+            applied_factor = target_scale / self.SCALE
+            self.canvas.scale("map", center_x, center_y, applied_factor, applied_factor)
+            self.canvas.scale("hover", center_x, center_y, applied_factor, applied_factor)
+            self.canvas.scale("selection", center_x, center_y, applied_factor, applied_factor)
+            self.pan_offset_x = center_x + applied_factor * (self.pan_offset_x - center_x)
+            self.pan_offset_y = center_y + applied_factor * (self.pan_offset_y - center_y)
+            self.SCALE = target_scale
         self.draw_scale()
         # Redraw icons at new size
         self.redraw_map()
@@ -625,18 +914,82 @@ class SystemMapEditor:
         self.draw_borders()
         self.draw_texts()
 
-    def get_clicked_system(self, event, radius=30):
+    def _find_system_hit(self, x, y, radius=30):
+        radius_sq = radius ** 2
         closest_fname = None
-        min_dist = float('inf')
+        closest_pos = None
+        min_dist_sq = float("inf")
         for fname, system in self.systems.items():
+            if not system.get("canvas_items"):
+                continue
             coords = self.canvas.coords(system["canvas_items"][0])
-            if coords:
-                sx, sy = coords[0], coords[1]
-                dist = (event.x - sx) ** 2 + (event.y - sy) ** 2
-                if dist < radius ** 2 and dist < min_dist:
-                    min_dist = dist
-                    closest_fname = fname
-        return closest_fname
+            if not coords:
+                continue
+            sx, sy = coords[0], coords[1]
+            dist_sq = (x - sx) ** 2 + (y - sy) ** 2
+            if dist_sq < radius_sq and dist_sq < min_dist_sq:
+                min_dist_sq = dist_sq
+                closest_fname = fname
+                closest_pos = (sx, sy)
+        if closest_fname is None:
+            return None
+        return {"filename": closest_fname, "position": closest_pos, "distance_sq": min_dist_sq}
+
+    def _get_text_node_center(self, index):
+        items = self.canvas.find_withtag("text_node")
+        if index >= len(items):
+            return None
+        coords = self.canvas.coords(items[index])
+        if len(coords) < 4:
+            return None
+        return (coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2
+
+    def _find_text_node_hit(self, x, y, radius):
+        radius_sq = radius ** 2
+        closest_index = None
+        closest_pos = None
+        min_dist_sq = float("inf")
+        for idx in range(len(self.canvas.find_withtag("text_node"))):
+            center = self._get_text_node_center(idx)
+            if center is None:
+                continue
+            cx, cy = center
+            dist_sq = (x - cx) ** 2 + (y - cy) ** 2
+            if dist_sq < radius_sq and dist_sq < min_dist_sq:
+                min_dist_sq = dist_sq
+                closest_index = idx
+                closest_pos = center
+        if closest_index is None:
+            return None
+        return {"index": closest_index, "position": closest_pos, "distance_sq": min_dist_sq}
+
+    def _find_text_item_hit(self, x, y):
+        for idx, item in enumerate(self.canvas.find_withtag("text")):
+            bbox = self.canvas.bbox(item)
+            if bbox and bbox[0] <= x <= bbox[2] and bbox[1] <= y <= bbox[3]:
+                return idx
+        return None
+
+    def _find_border_node_hit(self, x, y, radius=40):
+        closest = None
+        min_distance = float("inf")
+        for border_index, border in enumerate(self.borders):
+            for point_index, point in enumerate(border.get("points", [])):
+                screen_x, screen_y = self.coord_to_screen(point[0], point[1])
+                distance = math.hypot(screen_x - x, screen_y - y)
+                if distance <= radius and distance < min_distance:
+                    min_distance = distance
+                    closest = {
+                        "border_index": border_index,
+                        "point_index": point_index,
+                        "position": (screen_x, screen_y),
+                        "distance": distance,
+                    }
+        return closest
+
+    def get_clicked_system(self, event, radius=30):
+        hit = self._find_system_hit(event.x, event.y, radius)
+        return hit["filename"] if hit else None
 
 
     def save_galmapinfo(self):
@@ -685,46 +1038,22 @@ class SystemMapEditor:
     def hover_highlight(self, event):
         """Highlights nearest system, text node, or border node with appropriate radius matching interaction zone"""
         self.canvas.delete("hover")
-        closest = None
-        min_distance = float('inf')
-        # Interaction radii
-        system_radius = 30
-        text_radius = 13
-        border_radius = 13
-        closest_radius = 13
+        candidates = []
 
-        # Check systems
-        for system in self.systems.values():
-            coords = self.canvas.coords(system["canvas_items"][0])
-            if not coords:
-                continue
-            x, y = coords[0], coords[1]
-            dist = math.hypot(event.x - x, event.y - y)
-            if dist < system_radius and dist < min_distance:
-                closest, min_distance, closest_radius = (x, y), dist, system_radius
+        system_hit = self._find_system_hit(event.x, event.y, radius=30)
+        if system_hit:
+            candidates.append((math.sqrt(system_hit["distance_sq"]), system_hit["position"], 30))
 
-        # Check text nodes
-        for item in self.canvas.find_withtag("text_node"):
-            coords = self.canvas.coords(item)
-            if len(coords) >= 4:
-                cx = (coords[0] + coords[2]) / 2
-                cy = (coords[1] + coords[3]) / 2
-                dist = math.hypot(event.x - cx, event.y - cy)
-                if dist < text_radius and dist < min_distance:
-                    closest, min_distance, closest_radius = (cx, cy), dist, text_radius
+        text_hit = self._find_text_node_hit(event.x, event.y, radius=13)
+        if text_hit:
+            candidates.append((math.sqrt(text_hit["distance_sq"]), text_hit["position"], 13))
 
-        # Check border nodes
-        for border in self.borders:
-            for px, py in border.get("points", []):
-                sx, sy = self.coord_to_screen(px, py)
-                dist = math.hypot(event.x - sx, event.y - sy)
-                if dist < border_radius and dist < min_distance:
-                    closest, min_distance, closest_radius = (sx, sy), dist, border_radius
+        border_hit = self._find_border_node_hit(event.x, event.y, radius=13)
+        if border_hit:
+            candidates.append((border_hit["distance"], border_hit["position"], 13))
 
-        # Draw highlight if something is close enough
-        if closest:
-            x, y = closest
-            r = closest_radius
+        if candidates:
+            _, (x, y), r = min(candidates, key=lambda item: item[0])
             self.canvas.create_oval(x - r, y - r, x + r, y + r, outline="cyan", width=2, tags="hover")
 
     # Selection utility methods
@@ -734,28 +1063,15 @@ class SystemMapEditor:
         self.selected_type = None
         self.selected_id = None
 
-    def select_system(self, filename):
-        """Highlights a system"""
-        coords = self.canvas.coords(self.systems[filename]["canvas_items"][0])
-        if coords:
-            x, y = coords[0], coords[1]
-            r = 25
-            self.canvas.create_oval(x-r, y-r, x+r, y+r, outline="white", width=2, tags=("selection","map"))
-            self.selected_type = "system"
-            self.selected_id = filename
-
     def select_text(self, index):
         """Highlights a text node"""
-        items = self.canvas.find_withtag("text_node")
-        if index < len(items):
-            coords = self.canvas.coords(items[index])
-            if len(coords) >= 4:
-                cx = (coords[0] + coords[2]) / 2
-                cy = (coords[1] + coords[3]) / 2
-                r = 10 * self.SCALE / self.INITIAL_SCALE + 5
-                self.canvas.create_oval(cx-r, cy-r, cx+r, cy+r, outline="white", width=2, tags=("selection","map"))
-                self.selected_type = "text"
-                self.selected_id = index
+        center = self._get_text_node_center(index)
+        if center:
+            cx, cy = center
+            r = 10 * self.SCALE / self.INITIAL_SCALE + 5
+            self.canvas.create_oval(cx-r, cy-r, cx+r, cy+r, outline="white", width=2, tags=("selection","map"))
+            self.selected_type = "text"
+            self.selected_id = index
 
     def select_border(self, border_index):
         """Highlights all points of a border"""
@@ -768,66 +1084,69 @@ class SystemMapEditor:
 
     def on_left_click(self, event):
         """Handles left-click selection"""
-        # Ignore if this was a drag
-        if self.drag_data.get("dragged"):
-            self.drag_data["dragged"] = False
+        # Ignore if this was a drag (thresholded)
+        drag_distance = self.drag_data.get("drag_distance")
+        if drag_distance is None:
+            px = self.drag_data.get("press_x", event.x)
+            py = self.drag_data.get("press_y", event.y)
+            drag_distance = math.hypot(event.x - px, event.y - py)
+        if drag_distance > 10:
             return
-        # Only treat as click if minimal movement
-        if abs(event.x - self.drag_data.get("x", 0)) > 5 or abs(event.y - self.drag_data.get("y", 0)) > 5:
-            return
+
+        # If we nudged a system less than the threshold, restore its original coord
+        start_fname = self.drag_data.get("system_start_fname")
+        start_coord = self.drag_data.get("system_start_coord")
+        if start_fname and start_coord:
+            self.systems[start_fname]["coord"] = start_coord
+            self.redraw_map()
         # Left-click on a system opens the system editor
-        fname = self.get_clicked_system(event, radius=30)
-        if fname:
-            systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
-            file_path = os.path.join(systems_dir, fname)
+        system_hit = self._find_system_hit(event.x, event.y, radius=30)
+        if system_hit:
+            file_path = self._get_system_file_path(system_hit["filename"])
             SystemEditor.open_system_editor(file_path)
             return
         # Select text node
-        items = self.canvas.find_withtag("text_node")
-        for idx, item in enumerate(items):
-            coords = self.canvas.coords(item)
-            if len(coords) >= 4:
-                cx = (coords[0] + coords[2]) / 2
-                cy = (coords[1] + coords[3]) / 2
-                if (event.x - cx)**2 + (event.y - cy)**2 < 60**2:
-                    self.clear_selection()
-                    self.select_text(idx)
-                    return
-        # Select border node
-        node = self.find_nearest_border_node(event.x, event.y, radius=40)
-        if node:
+        text_hit = self._find_text_node_hit(event.x, event.y, radius=60)
+        if text_hit:
             self.clear_selection()
-            self.select_border(node[0])
+            self.select_text(text_hit["index"])
+            return
+        # Select border node
+        border_hit = self._find_border_node_hit(event.x, event.y, radius=40)
+        if border_hit:
+            self.clear_selection()
+            self.select_border(border_hit["border_index"])
             return
         # Empty space click
         self.clear_selection()
+
     def start_pan(self, event):
         """Begin panning or item dragging"""
         x, y = event.x, event.y
+        self.drag_data["dragged"] = False
+        self.drag_data["press_x"], self.drag_data["press_y"] = x, y
+        self.drag_data["drag_distance"] = 0.0
+        self.drag_data["system_start_coord"] = None
+        self.drag_data["system_start_fname"] = None
         # Detect system under pointer for dragging
-        for fname, system in self.systems.items():
-            coords = self.canvas.coords(system["canvas_items"][0])
-            if coords:
-                sx, sy = coords[0], coords[1]
-                if (x - sx)**2 + (y - sy)**2 < 30**2:
-                    self.drag_data["item"] = ("system", fname)
-                    self.drag_data["x"], self.drag_data["y"] = x, y
-                    return
+        system_hit = self._find_system_hit(x, y, radius=30)
+        if system_hit:
+            fname = system_hit["filename"]
+            self.drag_data["item"] = ("system", fname)
+            self.drag_data["x"], self.drag_data["y"] = x, y
+            self.drag_data["system_start_coord"] = list(self.systems[fname].get("coord", [0, 0, 0]))
+            self.drag_data["system_start_fname"] = fname
+            return
         # Detect text node under pointer
-        items = self.canvas.find_withtag("text_node")
-        for idx, item in enumerate(items):
-            coords = self.canvas.coords(item)
-            if len(coords) >= 4:
-                cx = (coords[0] + coords[2]) / 2
-                cy = (coords[1] + coords[3]) / 2
-                if (x - cx)**2 + (y - cy)**2 < (10 * self.SCALE / self.INITIAL_SCALE + 5)**2:
-                    self.drag_data["item"] = ("text", idx)
-                    self.drag_data["x"], self.drag_data["y"] = x, y
-                    return
+        text_hit = self._find_text_node_hit(x, y, radius=10 * self.SCALE / self.INITIAL_SCALE + 5)
+        if text_hit:
+            self.drag_data["item"] = ("text", text_hit["index"])
+            self.drag_data["x"], self.drag_data["y"] = x, y
+            return
         # Detect border node under pointer
-        node = self.find_nearest_border_node(x, y, radius=40)
-        if node:
-            self.drag_data["item"] = ("border", node)
+        border_hit = self._find_border_node_hit(x, y, radius=40)
+        if border_hit:
+            self.drag_data["item"] = ("border", (border_hit["border_index"], border_hit["point_index"]))
             self.drag_data["x"], self.drag_data["y"] = x, y
             return
         # Otherwise start panning
@@ -839,6 +1158,11 @@ class SystemMapEditor:
         x, y = event.x, event.y
         dx = x - self.drag_data.get("x", 0)
         dy = y - self.drag_data.get("y", 0)
+        if dx or dy:
+            self.drag_data["dragged"] = True
+        px = self.drag_data.get("press_x", x)
+        py = self.drag_data.get("press_y", y)
+        self.drag_data["drag_distance"] = math.hypot(x - px, y - py)
         # Drag a selected item
         item = self.drag_data.get("item")
         if item:
@@ -851,17 +1175,23 @@ class SystemMapEditor:
                 nx, _, ny = self.screen_to_coord(new_x, new_y)
                 self.systems[fname]["coord"] = [nx, 0, ny]
                                 # Update outgoing jump lines
-                for line_id, dest in self.systems[fname]["link_lines"]:
+                for link in self.systems[fname]["link_lines"]:
+                    line_id = link["line_id"]
+                    dest = link["dest"]
+                    offset_x, offset_y = link["offset"]
                     srcx, srcy = self.coord_to_screen(nx, ny)
                     dest_coord = self.systems[dest]["coord"]
                     dx_s, dy_s = self.coord_to_screen(dest_coord[0], dest_coord[2])
-                    self.canvas.coords(line_id, srcx, srcy, dx_s, dy_s)
+                    self.canvas.coords(line_id, srcx + offset_x, srcy + offset_y, dx_s + offset_x, dy_s + offset_y)
                 # Update incoming jump lines
-                for line_id, src in self.systems[fname]["incoming_lines"]:
+                for link in self.systems[fname]["incoming_lines"]:
+                    line_id = link["line_id"]
+                    src = link["src"]
+                    offset_x, offset_y = link["offset"]
                     src_coord = self.systems[src]["coord"]
                     sx_s, sy_s = self.coord_to_screen(src_coord[0], src_coord[2])
                     dstx, dsty = self.coord_to_screen(nx, ny)
-                    self.canvas.coords(line_id, sx_s, sy_s, dstx, dsty)
+                    self.canvas.coords(line_id, sx_s + offset_x, sy_s + offset_y, dstx + offset_x, dsty + offset_y)
             elif item_type == "text":
                 idx = info
                 text_id = self.canvas.find_withtag("text")[idx]
@@ -888,6 +1218,14 @@ class SystemMapEditor:
 
     def end_pan(self, event):
         # End dragging or panning
+        item = self.drag_data.get("item")
+        dist = self.drag_data.get("drag_distance", 0.0)
+        if item and item[0] == "system" and dist <= 10:
+            fname = self.drag_data.get("system_start_fname")
+            start_coord = self.drag_data.get("system_start_coord")
+            if fname and start_coord is not None:
+                self.systems[fname]["coord"] = start_coord
+                self.redraw_map()
         self.drag_data["panning"] = False
         self.drag_data["item"] = None
 
@@ -946,49 +1284,21 @@ class SystemMapEditor:
         """Save galmap info and persist system property and coordinate changes to each system JSON file"""
         # Save borders and texts
         self.save_galmapinfo()
-        base = get_base_path()
-        # Define keys to sync other properties between memory and JSON
-        props = ["security", "exports", "focus", "intel", "development", "visible"]
 
         for fn, sys_data in self.systems.items():
-            file_path = os.path.join(base, "data", "missions", "Map Designer", "Terrain", fn)
-            # Load existing JSON
-            try:
-                with open(file_path, 'r') as f:
-                    orig_data = json.load(f)
-            except (IOError, json.JSONDecodeError):
-                continue
-
             coords = self.canvas.coords(sys_data["canvas_items"][0])
+            coord_override = None
             if coords:
                 nx, _, ny = self.screen_to_coord(coords[0], coords[1])
-                orig_data["systemMapCoord"] = [nx, 0, ny]
-
-            orig_data["systemalignment"] = sys_data.get("alignment", orig_data.get("systemalignment", ""))
-
-            # Update metadata block without affecting other data
-            if "metadata" not in orig_data:
-                orig_data["metadata"] = {}
-
-            orig_data["metadata"].update({
-                "sysdescription": sys_data.get("description", ""),
-                "security": sys_data.get("security", "Neutral"),
-                "exports": sys_data.get("exports", []),
-                "focus": sys_data.get("focus", ""),
-                "intel": sys_data.get("intel", {}),
-                "development": sys_data.get("development", "Unclaimed"),
-                "visible": sys_data.get("visible", True)
-            })
+                coord_override = [nx, 0, ny]
             try:
-                with open(file_path, 'w') as f:
-                    json.dump(orig_data, f, indent=4)
-            except IOError:
+                self._save_system_record(fn, coord_override=coord_override)
+            except (OSError, json.JSONDecodeError):
                 print(f"Failed to write {fn}")
         print("Changes saved.")
         # Invoke integrated map generator modules
         try:
-            LocMapGen.main()
-            GalMapGen.main()
+            self._run_generators()
             print("Generators ran successfully.")
         except Exception as e:
             print(f"Error running generators: {e}")
@@ -1020,8 +1330,7 @@ class SystemMapEditor:
         # Check for shift+right-click on a system icon using closest match
         fname = self.get_clicked_system(event, radius=100)
         if fname:
-            systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
-            file_path = os.path.join(systems_dir, fname)
+            file_path = self._get_system_file_path(fname)
             SystemEditor.open_system_editor(file_path)
             return
         # Fallback: original behavior
@@ -1056,18 +1365,10 @@ class SystemMapEditor:
             self.edit_system_properties(fname)
             return
         # Existing text edit
-        items = self.canvas.find_withtag("text")
-        for idx, item in enumerate(items):
-            bbox = self.canvas.bbox(item)
-            if bbox and bbox[0] <= event.x <= bbox[2] and bbox[1] <= event.y <= bbox[3]:
-                self.edit_text_properties(idx)
-                return
-        # Check if clicked near a border line point
-        node = self.find_nearest_border_node(event.x, event.y, radius=100)
-        if node:
-            self.edit_border_properties(node[0])
+        text_index = self._find_text_item_hit(event.x, event.y)
+        if text_index is not None:
+            self.edit_text_properties(text_index)
             return
-        return
         # Check if clicked near a border line point
         node = self.find_nearest_border_node(event.x, event.y, radius=100)
         if node:
@@ -1110,44 +1411,38 @@ class SystemMapEditor:
     # Edit system properties
     def edit_system_properties(self, filename):
         system = self.systems[filename]
-        meta = {}  # default empty metadata
-        systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
-        file_path = os.path.join(systems_dir, filename)
+        prev_system = system if isinstance(system, dict) else {}
         try:
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-                meta = data.get("metadata", {})
+            data = self._load_system_json(filename)
         except Exception as e:
-            print(f"Failed to load system metadata from {file_path}: {e}")
+            print(f"Failed to load system metadata from {self._get_system_file_path(filename)}: {e}")
+            return
 
         # Fully reload this system's data from disk
-        objects = data.get("objects", {})
-        jump_points = [
-            {"name": key, **value}
-            for key, value in objects.items()
-            if value.get("type") in ("jumppoint", "jumpnode")
-        ]
+        prev_author_meta = prev_system.get("author_meta", {}) if isinstance(prev_system, dict) else {}
         meta = data.get("metadata", {})
-        self.systems[filename] = {
-            "coord": data.get("systemMapCoord", [0, 0, 0]),
-            "alignment": data.get("systemalignment", "Unknown"),
-            "description": meta.get("sysdescription", ""),
-            "security": meta.get("security", "Neutral"),
-            "exports": meta.get("exports", []),
-            "focus": meta.get("focus", ""),
-            "intel": meta.get("intel", {}),
-            "development": meta.get("development", "Unclaimed"),
-            "visible": meta.get("visible", True),
-            "jump_points": jump_points,
-            "canvas_items": [],
-            "warning_circle": None,
-            "link_lines": [],
-            "incoming_lines": []
-        }
+        if not isinstance(meta, dict):
+            meta = {}
+        self.systems[filename] = self._normalize_system_record(data, fallback_author_meta=prev_author_meta)
         system = self.systems[filename]
+        author_source = self._build_author_source(data, system.get("author_meta", {}))
         self.root.after(100, self.redraw_map)
         top = tk.Toplevel(self.root)
         top.title(f"Edit System: {filename}")
+
+        # Coordinates
+        tk.Label(top, text="Coordinates (X,Y,Z):").pack(anchor="w")
+        coord_frame = tk.Frame(top)
+        coord_frame.pack(fill=tk.X)
+        coord_vals = list(system.get("coord", [0, 0, 0]))
+        while len(coord_vals) < 3:
+            coord_vals.append(0)
+        coord_vals = coord_vals[:3]
+        coord_vars = []
+        for val in coord_vals:
+            var = tk.StringVar(value=str(val))
+            coord_vars.append(var)
+            tk.Entry(coord_frame, textvariable=var, width=10).pack(side=tk.LEFT, padx=2)
 
         # Description
         tk.Label(top, text="Description:").pack(anchor="w")
@@ -1157,12 +1452,25 @@ class SystemMapEditor:
 
         # Alignment selection (editable combobox)
         tk.Label(top, text="Alignment:").pack(anchor="w", pady=(10,0))
-        alignments = sorted({s.get("alignment","") for s in self.systems.values()})
+        alignments = self._get_valid_alignments()
         align_var = tk.StringVar(value=system.get("alignment",""))
         align_cb = ttk.Combobox(top, textvariable=align_var, values=alignments)
         align_cb.pack(fill=tk.X)
 
+        # Skybox
+        skyboxes = self._get_skyboxes()
+        skybox_val = system.get("skybox", "")
+        if skyboxes and skybox_val not in skyboxes:
+            skybox_val = skyboxes[0]
+        skybox_var = tk.StringVar(value=skybox_val)
+        tk.Label(top, text="Skybox:").pack(anchor="w", pady=(10, 0))
+        skybox_state = "readonly" if skyboxes else "normal"
+        skybox_cb = ttk.Combobox(top, textvariable=skybox_var, values=skyboxes, state=skybox_state)
+        skybox_cb.pack(fill=tk.X)
+
         intel = system.get("intel", {})
+        if not isinstance(intel, dict):
+            intel = {}
 
         # Dropdowns row
         dd_frame = tk.Frame(top)
@@ -1170,28 +1478,46 @@ class SystemMapEditor:
         # Security
         tk.Label(dd_frame, text="Security Level:").grid(row=0, column=0, sticky="w")
         sec_var = tk.StringVar(value=system.get("security","Neutral"))
-        sec_menu = tk.OptionMenu(dd_frame, sec_var, *["None","Neutral","Low","Normal","High"])
+        sec_menu = tk.OptionMenu(dd_frame, sec_var, *smopts.SECURITY_LEVELS)
         sec_menu.grid(row=0, column=1, sticky="w", padx=5)
         # Pirate
         tk.Label(dd_frame, text="Pirate Activity:").grid(row=0, column=2, sticky="w")
         pirate_var = tk.StringVar(value=intel.get("pirate","Low"))
-        pirate_menu = tk.OptionMenu(dd_frame, pirate_var, *["None","Low","Mid","High"])
+        pirate_menu = tk.OptionMenu(dd_frame, pirate_var, *smopts.PIRATE_LEVELS)
         pirate_menu.grid(row=0, column=3, sticky="w", padx=5)
         # Enemy
         tk.Label(dd_frame, text="Enemy Strength:").grid(row=0, column=4, sticky="w")
         enemy_var = tk.StringVar(value=intel.get("enemy","Low"))
-        enemy_menu = tk.OptionMenu(dd_frame, enemy_var, *["None","Low","Mid","High"])
+        enemy_menu = tk.OptionMenu(dd_frame, enemy_var, *smopts.ENEMY_LEVELS)
         enemy_menu.grid(row=0, column=5, sticky="w", padx=5)
         # Development
         tk.Label(dd_frame, text="Development Stage:").grid(row=0, column=6, sticky="w")
         dev_var = tk.StringVar(value=system.get("development","Unclaimed"))
-        dev_menu = tk.OptionMenu(dd_frame, dev_var, *["Unclaimed","Uninhabited","Outpost","Colony","Administrative Center","Regional Capital"])
+        dev_menu = tk.OptionMenu(dd_frame, dev_var, *smopts.DEVELOPMENT_STAGES)
         dev_menu.grid(row=0, column=7, sticky="w", padx=5)
 
-                # Strategic Assets
+        # Traffic
+        traffic = system.get("traffic", {})
+        if not isinstance(traffic, dict):
+            traffic = {}
+        traffic_frame = tk.Frame(top)
+        traffic_frame.pack(fill=tk.X, pady=(5, 5))
+        tk.Label(traffic_frame, text="Traffic:").grid(row=0, column=0, sticky="w")
+        traffic_vars = {}
+        for i, cat in enumerate(("commercial", "civilian", "security")):
+            tk.Label(traffic_frame, text=f"{cat.capitalize()}:").grid(row=0, column=1 + i * 2, sticky="w")
+            var = tk.StringVar(value=traffic.get(cat, "none"))
+            cb = ttk.Combobox(
+                traffic_frame, textvariable=var,
+                values=smopts.TRAFFIC_LEVELS, state="readonly", width=8
+            )
+            cb.grid(row=0, column=2 + i * 2, sticky="w", padx=5)
+            traffic_vars[cat] = var
+
+        # Strategic Assets
         tk.Label(top, text="Strategic Assets:").pack(anchor="w", pady=(10, 0))
         assets_vars = {}
-        assets_opts = ["Armory", "Shipyard", "Slingshot", "Listening Post", "Fortification"]
+        assets_opts = smopts.ASSET_OPTIONS
         sa_frame = tk.Frame(top)
         sa_frame.pack(fill=tk.X)
         for i, opt in enumerate(assets_opts):
@@ -1203,7 +1529,7 @@ class SystemMapEditor:
         # Exports
         tk.Label(top, text="Exports:").pack(anchor="w", pady=(10, 0))
         export_vars = {}
-        export_opts = [("Oil", "Oil"), ("Agriculture", "Agriculture"), ("Mining", "Mining"), ("Industry", "Industry"), ("Research", "Research")]
+        export_opts = [(v, v) for v in smopts.EXPORT_OPTIONS]
         ex_frame = tk.Frame(top)
         ex_frame.pack(fill=tk.X)
         for idx, (label, val) in enumerate(export_opts):
@@ -1215,12 +1541,9 @@ class SystemMapEditor:
         # Primary Focus
         tk.Label(top, text="Primary Focus:").pack(anchor="w", pady=(10, 0))
         focus_var = tk.StringVar(value=system.get("focus", ""))
-        focus_opts = ["Research", "Agriculture", "Mining", "Industry", "Military"]
-        pf_frame = tk.Frame(top)
-        pf_frame.pack(fill=tk.X)
-        for i, opt in enumerate(focus_opts):
-            rb = tk.Radiobutton(pf_frame, text=opt, variable=focus_var, value=opt)
-            rb.grid(row=0, column=i, sticky="w", padx=5)
+        focus_opts = smopts.FOCUS_OPTIONS
+        focus_cb = ttk.Combobox(top, textvariable=focus_var, values=focus_opts)
+        focus_cb.pack(fill=tk.X)
 
         # Display on Galactic Map
         tk.Label(top, text="Display on Galactic Map:").pack(anchor="w", pady=(10, 0))
@@ -1230,25 +1553,118 @@ class SystemMapEditor:
         tk.Radiobutton(vis_frame, text="Show System on Galactic Map", variable=vis_var, value="Show").grid(row=0, column=0, sticky="w", padx=5)
         tk.Radiobutton(vis_frame, text="Hide System on Galactic Map", variable=vis_var, value="Hide").grid(row=0, column=1, sticky="w", padx=5)
 
+        # Author & Revision Metadata
+        editor_settings = {}
+        try:
+            editor_settings = SystemEditor.load_editor_settings()
+        except Exception:
+            editor_settings = {}
+        current_author_default = str(editor_settings.get("author", "") or "").strip()
+        if not current_author_default:
+            current_author_default = str(author_source.get("last_revision_author", "") or author_source.get("last_author", "") or "").strip()
+        if not current_author_default:
+            current_author_default = str(author_source.get("original_author", "") or "").strip()
+
+        tk.Label(top, text="Author (current):").pack(anchor="w", pady=(10, 0))
+        author_var = tk.StringVar(value=current_author_default)
+        author_entry = tk.Entry(top, textvariable=author_var)
+        author_entry.pack(fill=tk.X)
+
+        orig_author_var = tk.StringVar(value=str(author_source.get("original_author", "") or ""))
+        last_author_var = tk.StringVar(value=str(author_source.get("last_revision_author", "") or author_source.get("last_author", "") or ""))
+        rev_num_var = tk.StringVar(value=str(SystemEditor._coerce_revision_number(author_source.get("revision_number", 0))))
+        rev_date_var = tk.StringVar(value=str(author_source.get("revision_date", "") or ""))
+        all_authors_raw = author_source.get("all_authors", [])
+        all_authors_var = tk.StringVar(value=", ".join(SystemEditor._normalize_author_list(all_authors_raw)))
+        # Keep readonly vars alive for the life of the dialog (avoid GC clearing ttk.Entry values)
+        top._author_vars = {
+            "orig_author": orig_author_var,
+            "last_author": last_author_var,
+            "rev_num": rev_num_var,
+            "rev_date": rev_date_var,
+            "all_authors": all_authors_var,
+        }
+
+        meta_frame = tk.Frame(top)
+        meta_frame.pack(fill=tk.X, pady=(5, 0))
+        tk.Label(meta_frame, text="Original Author:").grid(row=0, column=0, sticky="w")
+        ttk.Entry(meta_frame, textvariable=orig_author_var, state="readonly", width=25).grid(row=0, column=1, sticky="w", padx=5)
+        tk.Label(meta_frame, text="Last Revision Author:").grid(row=0, column=2, sticky="w")
+        ttk.Entry(meta_frame, textvariable=last_author_var, state="readonly", width=25).grid(row=0, column=3, sticky="w", padx=5)
+        tk.Label(meta_frame, text="Revision #:").grid(row=1, column=0, sticky="w")
+        ttk.Entry(meta_frame, textvariable=rev_num_var, state="readonly", width=10).grid(row=1, column=1, sticky="w", padx=5)
+        tk.Label(meta_frame, text="Revision Date:").grid(row=1, column=2, sticky="w")
+        ttk.Entry(meta_frame, textvariable=rev_date_var, state="readonly", width=15).grid(row=1, column=3, sticky="w", padx=5)
+        tk.Label(meta_frame, text="All Authors:").grid(row=2, column=0, sticky="nw")
+        ttk.Entry(meta_frame, textvariable=all_authors_var, state="readonly", width=60).grid(row=2, column=1, columnspan=3, sticky="w", padx=5)
+
         def save_system_changes():
+            def _merge_with_extras(selected, existing, known):
+                extras = [x for x in (existing or []) if x not in known]
+                for x in extras:
+                    if x not in selected:
+                        selected.append(x)
+                return selected
+
+            # Save coordinates
+            try:
+                new_coord = [float(v.get()) for v in coord_vars]
+            except ValueError:
+                new_coord = system.get("coord", [0, 0, 0])
+            system["coord"] = new_coord
+
             system["description"] = desc_text.get("1.0", tk.END).strip()
             # Save alignment
             system["alignment"] = align_var.get()
             # Save security and intel
             system["security"] = sec_var.get()
-            system["intel"] = {
-                "pirate": pirate_var.get(),
-                "enemy": enemy_var.get(),
-                "assets": [k for k, v in assets_vars.items() if v.get()]
-            }
+            intel_data = system.get("intel", {})
+            if not isinstance(intel_data, dict):
+                intel_data = {}
+            intel_assets = [k for k, v in assets_vars.items() if v.get()]
+            intel_data["pirate"] = pirate_var.get()
+            intel_data["enemy"] = enemy_var.get()
+            intel_data["assets"] = _merge_with_extras(intel_assets, intel_data.get("assets", []), assets_opts)
+            system["intel"] = intel_data
             # Save development stage
             system["development"] = dev_var.get()
             # Save exports
-            system["exports"] = [k for k, v in export_vars.items() if v.get()]
+            selected_exports = [k for k, v in export_vars.items() if v.get()]
+            system["exports"] = _merge_with_extras(selected_exports, system.get("exports", []), smopts.EXPORT_OPTIONS)
             # Save primary focus
             system["focus"] = focus_var.get()
             # Save visibility preference
             system["visible"] = True if vis_var.get() == "Show" else False
+            # Save skybox
+            system["skybox"] = skybox_var.get()
+            # Save traffic
+            system["traffic"] = {k: v.get() for k, v in traffic_vars.items()}
+
+            # Save author settings
+            current_author = author_var.get().strip()
+            if current_author:
+                editor_settings["author"] = current_author
+                try:
+                    SystemEditor.save_editor_settings(editor_settings)
+                except Exception:
+                    pass
+            author_meta = system.get("author_meta", {})
+            if not isinstance(author_meta, dict):
+                author_meta = {}
+            authors = SystemEditor._normalize_author_list(author_meta.get("all_authors") or meta.get("all_authors"))
+            if current_author:
+                if not any(a.casefold() == current_author.casefold() for a in authors):
+                    authors.append(current_author)
+                if not str(author_meta.get("original_author") or meta.get("original_author", "") or "").strip():
+                    author_meta["original_author"] = current_author
+                author_meta["last_revision_author"] = current_author
+            if authors:
+                author_meta["all_authors"] = authors
+            rev_num = SystemEditor._coerce_revision_number(author_meta.get("revision_number", meta.get("revision_number", 0)))
+            author_meta["revision_number"] = rev_num + 1
+            author_meta["revision_date"] = datetime.date.today().isoformat()
+            system["author_meta"] = author_meta
+
             # Persist all changes
             self.save_system_properties(filename)
             top.destroy()
@@ -1257,28 +1673,15 @@ class SystemMapEditor:
         tk.Button(top, text="Save", command=save_system_changes).pack(pady=10)
 
     def save_system_properties(self, filename):
-        systems_dir = os.path.join(get_base_path(), "data/missions/Map Designer/Terrain")
-        file_path = os.path.join(systems_dir, filename)
-        with open(file_path,'r') as f:
-            data = json.load(f)
-        # Copy properties
-        data["systemalignment"] = self.systems[filename].get("alignment", data.get("systemalignment", ""))
-        if "metadata" not in data:
-            data["metadata"] = {}
-
-        data["metadata"].update({
-            "sysdescription": self.systems[filename].get("description", ""),
-            "security": self.systems[filename].get("security", "Neutral"),
-            "exports": self.systems[filename].get("exports", []),
-            "focus": self.systems[filename].get("focus", ""),
-            "intel": self.systems[filename].get("intel", {}),
-            "development": self.systems[filename].get("development", "Unclaimed"),
-            "visible": self.systems[filename].get("visible", True)
-        })
-        with open(file_path,'w') as f:
-            json.dump(data,f,indent=4)
+        self._save_system_record(filename)
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = SystemMapEditor(root)
-    root.mainloop()
+    try:
+        root.mainloop()
+    except KeyboardInterrupt:
+        try:
+            root.destroy()
+        except tk.TclError:
+            pass

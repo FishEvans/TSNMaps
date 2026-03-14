@@ -1,0 +1,731 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeneratedTerrain.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        html, body { margin: 0; height: 100%; background: black; color: white; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
+        }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
+        button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">GeneratedTerrain</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">GeneratedTerrain</h2>
+        <h3 class="subheader">Alignment: USFP</h3>
+        <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects...">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Loading system info...
+    </div>
+<script>
+    var objData = {};
+    var systemMeta = {"system_name": "GeneratedTerrain", "description": "Autogenerated terrain (small, 300000 radius) on 2026-01-24.", "exports": [], "assets": [], "focus": "", "intel": {"pirate": "Low", "enemy": "Low"}, "original_author": "Fish Evans", "last_author": "Fish Evans", "revision_number": 15, "version_tag": "29126.15", "all_authors": ["Fish Evans"]};
+    var pageBody = document.body;
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        setDefaultInfo();
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
+                + infoHtml;
+         
+    }
+         bindGalacticButton();
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [67796.80898740966, 71077.40898740967, 110458.01101259034, 107177.41101259034, 67796.80898740966], "y": [-70693.05187799655, -93441.39187799655, -87762.20812200346, -65013.868122003456, -70693.05187799655], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [69831.98116497378, 93714.88116497378, 87527.83883502622, 63644.93883502624, 69831.98116497378], "y": [-94976.16518937584, -91531.94518937584, -48629.77481062416, -52073.994810624165, -94976.16518937584], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [95221.0069783864, 91312.85697838641, 46773.6230216136, 50681.7730216136, 95221.0069783864], "y": [-93889.0634607603, -66789.20346076031, -73212.33653923972, -100312.19653923971, -93889.0634607603], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [95118.36823881771, 66314.64823881771, 72039.2317611823, 100842.9517611823, 95118.36823881771], "y": [-70451.46772152191, -74605.33772152191, -114300.68227847808, -110146.81227847809, -70451.46772152191], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-149761.93576266617, -148527.13576266618, -177105.24423733383, -178340.04423733382, -149761.93576266617], "y": [-10605.6960332469, 22483.693966753097, 23550.1460332469, -9539.243966753102, -10605.6960332469], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-145738.65801481003, -148958.67801481005, -179601.42198518993, -176381.4019851899, -145738.65801481003], "y": [-38036.13915000535, -618.5491500053565, -3255.550849994649, -40673.14084999465, -38036.13915000535], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-139997.2875563265, -146644.5275563265, -177752.5924436735, -171105.3524436735, -139997.2875563265], "y": [-59464.1510153463, -28122.0210153463, -34719.61898465369, -66061.74898465369, -59464.1510153463], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-133260.0666552333, -144478.0166552333, -170747.3633447667, -159529.41334476668, -133260.0666552333], "y": [-83387.62286556438, -50863.462865564376, -59924.057134435614, -92448.21713443562, -83387.62286556438], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [78115.61254477219, 9457.11254477218, 18259.42745522783, 86917.92745522782, 78115.61254477219], "y": [-140876.0988922635, -150080.8688922635, -215737.45110773656, -206532.68110773654, -140876.0988922635], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [59407.88919455167, 19866.75919455167, 15520.040805448327, 55061.170805448324, 59407.88919455167], "y": [-145754.9667379334, -137386.81673793338, -157925.9032620666, -166294.05326206662, -145754.9667379334], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [100313.0118887155, 163442.7618887155, 149743.4781112845, 86613.7281112845, 100313.0118887155], "y": [-146138.5931751959, -130996.93317519591, -73880.84682480409, -89022.50682480409, -146138.5931751959], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-86667.22745942773, -144857.78745942772, -129606.1725405723, -71415.6125405723, -86667.22745942773], "y": [217029.63707608436, 149790.37707608435, 136591.24292391565, 203830.50292391566, 217029.63707608436], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [89764.6818681205, 128310.56186812051, 134911.2581318795, 96365.3781318795, 89764.6818681205], "y": [104492.39223293783, 96962.96223293783, 130754.3177670622, 138283.7477670622, 104492.39223293783], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [82895.66500595407, 112483.23500595408, 89369.92499404593, 59782.35499404592, 82895.66500595407], "y": [80401.2021751263, 114374.53217512628, 134504.0478248737, 100530.71782487372, 80401.2021751263], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [100129.46258591753, 86401.96258591753, 59936.07741408248, 73663.57741408248, 100129.46258591753], "y": [63555.47078243187, 103542.70078243186, 94457.03921756813, 54469.809217568145, 63555.47078243187], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [120610.68376213456, 84079.76376213458, 78115.17623786542, 114646.09623786541, 120610.68376213456], "y": [72581.5409960351, 79717.3709960351, 49182.4690039649, 42046.6390039649, 72581.5409960351], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [120984.84793445596, 98608.05793445595, 123054.62206554404, 145431.41206554405, 120984.84793445596], "y": [91511.8102694726, 65818.1202694726, 44527.4597305274, 70221.1497305274, 91511.8102694726], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [106664.89542224605, 117070.14542224605, 146583.45457775393, 136178.20457775393, 106664.89542224605], "y": [99648.35958285429, 69338.62958285431, 79470.47041714573, 109780.20041714571, 99648.35958285429], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [51860.39816010178, 41562.98816010178, 22737.471839898215, 33034.88183989822, 51860.39816010178], "y": [217951.7282715746, 255683.2882715746, 250545.5717284254, 212814.0117284254, 217951.7282715746], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-122559.16173784171, -87175.97173784171, -144046.18826215825, -179429.37826215825, -122559.16173784171], "y": [142190.51013259264, 196964.92013259267, 233701.95986740733, 178927.5498674073, 142190.51013259264], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-242951.26, -243035.02336228904, -243284.88023480374, -243696.555497182, -244263.00527154657, -244974.53744520852, -245818.97750540252, -246781.87684857563, -247846.76, -248995.40651371342, -250208.16272940123, -251464.2780519735, -252742.26, -254020.24194802652, -255276.3572705988, -256489.1134862866, -257637.76, -258702.6431514244, -259665.5424945975, -260509.9825547915, -261221.51472845345, -261787.964502818, -262199.63976519625, -262449.496637711, -262533.26, -262449.496637711, -262199.6397651963, -261787.964502818, -261221.51472845345, -260509.9825547915, -259665.5424945975, -258702.6431514244, -257637.76, -256489.1134862866, -255276.3572705988, -254020.24194802652, -252742.26, -251464.2780519735, -250208.16272940123, -248995.40651371342, -247846.76, -246781.87684857563, -245818.97750540252, -244974.53744520852, -244263.00527154657, -243696.555497182, -243284.88023480374, -243035.02336228904, -242951.26], "y": [-82638.89, -81360.90805197347, -80104.79272940122, -78892.0365137134, -77743.39, -76678.50684857562, -75715.60750540251, -74871.16744520851, -74159.63527154656, -73593.18549718198, -73181.51023480373, -72931.65336228903, -72847.89, -72931.65336228903, -73181.51023480373, -73593.18549718198, -74159.63527154656, -74871.16744520851, -75715.60750540251, -76678.50684857562, -77743.39, -78892.0365137134, -80104.79272940122, -81360.90805197347, -82638.89, -83916.87194802653, -85172.98727059878, -86385.74348628659, -87534.39, -88599.27315142438, -89562.17249459749, -90406.61255479149, -91118.14472845344, -91684.59450281801, -92096.26976519627, -92346.12663771097, -92429.89, -92346.12663771099, -92096.26976519627, -91684.59450281801, -91118.14472845344, -90406.61255479149, -89562.17249459749, -88599.2731514244, -87534.39, -86385.74348628659, -85172.9872705988, -83916.87194802653, -82638.89], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-238353.39, -238403.56588804262, -238553.23502881464, -238799.8365418213, -239139.15100680428, -239565.37265919193, -240071.20872834092, -240648.00421886388, -241285.89, -241973.95166917876, -242700.41630047373, -243452.85388262942, -244218.39, -244983.9261173706, -245736.3636995263, -246462.82833082127, -247150.89, -247788.77578113615, -248365.5712716591, -248871.4073408081, -249297.62899319574, -249636.94345817872, -249883.5449711854, -250033.2141119574, -250083.39, -250033.2141119574, -249883.5449711854, -249636.94345817872, -249297.62899319574, -248871.4073408081, -248365.5712716591, -247788.77578113615, -247150.89, -246462.82833082127, -245736.3636995263, -244983.9261173706, -244218.39, -243452.85388262942, -242700.41630047373, -241973.95166917876, -241285.89, -240648.00421886388, -240071.20872834092, -239565.37265919193, -239139.15100680428, -238799.8365418213, -238553.23502881464, -238403.56588804262, -238353.39], "y": [-105191.33, -104425.7938826294, -103673.35630047372, -102946.89166917875, -102258.83, -101620.94421886385, -101044.1487283409, -100538.31265919191, -100112.09100680427, -99772.77654182131, -99526.17502881461, -99376.50588804261, -99326.33, -99376.50588804261, -99526.17502881461, -99772.77654182131, -100112.09100680427, -100538.31265919191, -101044.1487283409, -101620.94421886385, -102258.83, -102946.89166917875, -103673.35630047372, -104425.7938826294, -105191.33, -105956.8661173706, -106709.30369952628, -107435.76833082126, -108123.83, -108761.71578113615, -109338.5112716591, -109844.34734080809, -110270.56899319573, -110609.8834581787, -110856.48497118539, -111006.1541119574, -111056.33, -111006.1541119574, -110856.48497118539, -110609.8834581787, -110270.56899319573, -109844.3473408081, -109338.51127165911, -108761.71578113615, -108123.83, -107435.76833082126, -106709.3036995263, -105956.8661173706, -105191.33], "fill": "toself", "fillcolor": "rgba(64,64,64,0.5135787873705804)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.5135787873705804)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-226012.86, -226078.51213381736, -226274.34520905768, -226597.00846750836, -227040.9810513582, -227598.66646660503, -228260.5225611744, -229015.22479378706, -229849.86, -230750.1473400303, -231700.68264788325, -232685.20200090331, -233686.86, -234688.51799909666, -235673.03735211672, -236623.57265996968, -237523.86, -238358.49520621292, -239113.19743882556, -239775.05353339494, -240332.73894864178, -240776.7115324916, -241099.3747909423, -241295.2078661826, -241360.86, -241295.2078661826, -241099.3747909423, -240776.7115324916, -240332.73894864178, -239775.05353339494, -239113.19743882556, -238358.49520621292, -237523.86, -236623.57265996968, -235673.03735211672, -234688.51799909666, -233686.86, -232685.20200090331, -231700.68264788325, -230750.1473400303, -229849.86, -229015.22479378706, -228260.5225611744, -227598.66646660503, -227040.98105135822, -226597.00846750836, -226274.34520905768, -226078.51213381736, -226012.86], "y": [-126879.02, -125877.36200090333, -124892.84264788326, -123942.30734003031, -123042.02, -122207.38479378709, -121452.68256117444, -120790.82646660507, -120233.14105135822, -119789.1684675084, -119466.5052090577, -119270.67213381738, -119205.02, -119270.67213381738, -119466.5052090577, -119789.1684675084, -120233.14105135822, -120790.82646660507, -121452.68256117444, -122207.38479378707, -123042.02, -123942.30734003031, -124892.84264788326, -125877.36200090332, -126879.02, -127880.67799909668, -128865.19735211675, -129815.7326599697, -130716.02, -131550.65520621292, -132305.35743882557, -132967.21353339494, -133524.89894864178, -133968.8715324916, -134291.53479094233, -134487.3678661826, -134553.02000000002, -134487.3678661826, -134291.53479094233, -133968.8715324916, -133524.89894864178, -132967.21353339494, -132305.35743882557, -131550.65520621292, -130716.02, -129815.7326599697, -128865.19735211675, -127880.67799909668, -126879.02], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-215306.27, -215356.98486177603, -215508.2617017584, -215757.51213127308, -216100.47140636583, -216531.27139875354, -217042.54100112614, -217625.5322488363, -218270.27, -218965.72261293975, -219699.99070063225, -220460.51073251953, -221234.27, -222008.02926748045, -222768.54929936773, -223502.81738706023, -224198.27, -224843.00775116368, -225425.99899887384, -225937.26860124644, -226368.06859363415, -226711.0278687269, -226960.27829824158, -227111.55513822395, -227162.27, -227111.55513822395, -226960.27829824158, -226711.0278687269, -226368.06859363415, -225937.26860124644, -225425.99899887384, -224843.00775116368, -224198.27, -223502.81738706023, -222768.54929936773, -222008.02926748045, -221234.27, -220460.51073251953, -219699.99070063225, -218965.72261293975, -218270.27, -217625.5322488363, -217042.54100112614, -216531.27139875354, -216100.47140636583, -215757.51213127308, -215508.2617017584, -215356.98486177603, -215306.27], "y": [-147523.67, -146749.91073251955, -145989.39070063227, -145255.12261293977, -144559.67, -143914.93224883633, -143331.94100112616, -142820.67139875356, -142389.87140636586, -142046.9121312731, -141797.66170175842, -141646.38486177605, -141595.67, -141646.38486177605, -141797.66170175842, -142046.9121312731, -142389.87140636586, -142820.67139875356, -143331.94100112616, -143914.93224883633, -144559.67, -145255.12261293977, -145989.39070063227, -146749.91073251955, -147523.67, -148297.42926748047, -149057.94929936776, -149792.21738706026, -150487.67, -151132.4077511637, -151715.39899887386, -152226.66860124646, -152657.46859363417, -153000.42786872693, -153249.6782982416, -153400.95513822397, -153451.67, -153400.95513822397, -153249.6782982416, -153000.42786872693, -152657.46859363417, -152226.66860124646, -151715.39899887386, -151132.4077511637, -150487.67, -149792.21738706026, -149057.94929936776, -148297.42926748047, -147523.67], "fill": "toself", "fillcolor": "rgba(64,64,64,0.5751848820082643)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.5751848820082643)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-197752.97, -197831.7628267472, -198066.79313987767, -198454.03950557104, -198986.8760311453, -199656.18573591774, -200450.5165452719, -201356.27723882967, -202357.97, -203438.45558791753, -204579.2465946058, -205760.82376965333, -206962.97, -208165.11623034667, -209346.6934053942, -210487.48441208247, -211567.97, -212569.66276117033, -213475.4234547281, -214269.75426408226, -214939.0639688547, -215471.90049442896, -215859.14686012233, -216094.1771732528, -216172.97, -216094.1771732528, -215859.14686012233, -215471.90049442896, -214939.0639688547, -214269.75426408226, -213475.4234547281, -212569.66276117033, -211567.97, -210487.48441208247, -209346.6934053942, -208165.11623034667, -206962.97, -205760.82376965333, -204579.2465946058, -203438.45558791753, -202357.97, -201356.2772388297, -200450.5165452719, -199656.18573591774, -198986.87603114534, -198454.03950557104, -198066.79313987767, -197831.7628267472, -197752.97], "y": [-166955.58, -165753.43376965332, -164571.85659460578, -163431.06558791752, -162350.58, -161348.88723882966, -160443.1265452719, -159648.79573591772, -158979.4860311453, -158446.64950557103, -158059.40313987766, -157824.3728267472, -157745.58, -157824.3728267472, -158059.40313987766, -158446.64950557103, -158979.4860311453, -159648.79573591772, -160443.1265452719, -161348.88723882966, -162350.58, -163431.06558791752, -164571.85659460578, -165753.43376965332, -166955.58, -168157.72623034666, -169339.3034053942, -170480.09441208246, -171560.58, -172562.27276117032, -173468.03345472808, -174262.36426408225, -174931.67396885465, -175464.51049442895, -175851.75686012232, -176086.7871732528, -176165.58, -176086.7871732528, -175851.75686012232, -175464.51049442895, -174931.67396885468, -174262.36426408228, -173468.03345472808, -172562.27276117032, -171560.58, -170480.09441208246, -169339.30340539422, -168157.72623034666, -166955.58], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-63884.75, -63936.705356876846, -64091.68245694649, -64347.02959905896, -64698.3777228171, -65139.71516441133, -65663.4905178541, -66260.74184163004, -66921.25, -67633.71351524681, -68385.94193909239, -69165.06443464763, -69957.75, -70750.43556535237, -71529.55806090761, -72281.78648475319, -72994.25, -73654.75815836996, -74252.0094821459, -74775.78483558867, -75217.12227718289, -75568.47040094105, -75823.8175430535, -75978.79464312315, -76030.75, -75978.79464312315, -75823.8175430535, -75568.47040094105, -75217.12227718289, -74775.78483558867, -74252.0094821459, -73654.75815836996, -72994.25, -72281.78648475319, -71529.55806090761, -70750.43556535237, -69957.75, -69165.06443464763, -68385.9419390924, -67633.71351524681, -66921.25, -66260.74184163005, -65663.4905178541, -65139.71516441133, -64698.37772281711, -64347.02959905895, -64091.68245694649, -63936.705356876846, -63884.75], "y": [-183539.03, -182746.34443464762, -181967.2219390924, -181214.9935152468, -180502.53, -179842.02184163005, -179244.7705178541, -178720.99516441132, -178279.6577228171, -177928.30959905896, -177672.9624569465, -177517.98535687686, -177466.03, -177517.98535687686, -177672.9624569465, -177928.30959905896, -178279.6577228171, -178720.99516441132, -179244.7705178541, -179842.02184163005, -180502.53, -181214.9935152468, -181967.2219390924, -182746.34443464762, -183539.03, -184331.71556535238, -185110.8380609076, -185863.0664847532, -186575.53, -187236.03815836995, -187833.2894821459, -188357.06483558868, -188798.4022771829, -189149.75040094103, -189405.0975430535, -189560.07464312314, -189612.03, -189560.07464312314, -189405.0975430535, -189149.75040094103, -188798.4022771829, -188357.06483558868, -187833.2894821459, -187236.03815836995, -186575.53, -185863.0664847532, -185110.8380609076, -184331.71556535238, -183539.03], "fill": "toself", "fillcolor": "rgba(64,64,64,0.5135237460649953)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.5135237460649953)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [45078.07, 45006.21539067863, 44791.88101500188, 44438.7341935623, 43952.8173663855, 43342.444705106085, 42618.05985518581, 41792.05724224424, 40878.57, 39893.22814843439, 38852.89115981607, 37775.35948845621, 36679.07, 35582.78051154379, 34505.24884018393, 33464.911851565616, 32479.57, 31566.082757755754, 30740.080144814186, 30015.695294893914, 29405.322633614498, 28919.405806437702, 28566.258984998116, 28351.924609321366, 28280.07, 28351.924609321366, 28566.258984998116, 28919.405806437702, 29405.322633614498, 30015.695294893914, 30740.080144814183, 31566.082757755754, 32479.569999999996, 33464.911851565616, 34505.24884018393, 35582.78051154379, 36679.07, 37775.35948845621, 38852.89115981607, 39893.228148434384, 40878.57, 41792.057242244235, 42618.05985518581, 43342.444705106085, 43952.8173663855, 44438.7341935623, 44791.88101500188, 45006.21539067863, 45078.07], "y": [-113940.03, -112843.74051154379, -111766.20884018393, -110725.87185156561, -109740.53, -108827.04275775576, -108001.04014481418, -107276.65529489392, -106666.2826336145, -106180.36580643771, -105827.21898499811, -105612.88460932137, -105541.03, -105612.88460932137, -105827.21898499811, -106180.3658064377, -106666.2826336145, -107276.65529489392, -108001.04014481418, -108827.04275775576, -109740.53, -110725.87185156561, -111766.20884018393, -112843.74051154379, -113940.03, -115036.31948845621, -116113.85115981607, -117154.18814843439, -118139.53, -119053.01724224424, -119879.0198551858, -120603.40470510608, -121213.7773663855, -121699.6941935623, -122052.84101500189, -122267.17539067863, -122339.03, -122267.17539067863, -122052.84101500189, -121699.6941935623, -121213.7773663855, -120603.40470510609, -119879.01985518582, -119053.01724224424, -118139.53, -117154.18814843439, -116113.85115981608, -115036.31948845621, -113940.03], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}], "layout": {"title": "GeneratedTerrain", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = 'GeneratedTerrain';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    setDefaultInfo();
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+            lastPlotlyClickTs = Date.now();
+        }
+    });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var planetIdx = [];
+        var bhIdx = [];
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                planetIdx.forEach(pushForIndex);
+                bhIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': [markerSizes], 'textfont.size': [textSizes]}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+    }
+    ctrl.appendChild(btn);
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addButton('--- Gates ---', null, true, null);
+  
+
+  addButton('--- Nav Points/POI ---', null, true, null);
+  
+
+    addButton('--- Planets ---', null, true, null);
+    
+
+    addButton('--- Stations ---', null, true, null);
+    
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = document.querySelectorAll('#object-buttons button');
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = ''; // always show section headers
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>

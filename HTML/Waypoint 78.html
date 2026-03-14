@@ -7,33 +7,215 @@
     <title>Waypoint 78.html</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        html, body { margin: 0; height: 100%; background: black; color: white; }
         /* === Description typography controls ===
            Tweak these two variables to change description sizes globally */
         :root {
             --desc-font-size: 130%;
             --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
         }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
         .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
         .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
-        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
-        #plot { flex: 3; min-width: 400px; }
-        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
         h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
         h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
         .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
-        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
         button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">Waypoint 78</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Waypoint 78</h2>
         <h3 class="subheader">Alignment: Unknown</h3>
         <img src="Images/Factions/Unknown.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
-        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <input type="text" id="search-box" placeholder="Search objects...">
         <div id="object-buttons">
     </div>
     </div>
@@ -41,22 +223,136 @@
     <div id="info">
         <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
         <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
-        Select an object
+        Loading system info...
     </div>
 <script>
     var objData = {};
+    var systemMeta = {"system_name": "Waypoint 78", "description": "", "exports": [], "assets": [], "focus": "", "intel": {"pirate": "", "enemy": ""}, "original_author": "Fish Evans", "last_author": "Fish Evans", "revision_number": 15, "version_tag": "29126.15", "all_authors": ["Fish Evans"]};
+    var pageBody = document.body;
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
     function clearAnnotations() {
         Plotly.relayout('plot', {annotations: []});
-        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        setDefaultInfo();
     }
     
     function getInfoHeader() {
@@ -139,24 +435,23 @@
                           + '</p>';
             }
             document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
-            document.getElementById('galactic-map-btn').addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
                 + infoHtml;
          
     }
-         document.getElementById('galactic-map-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+         bindGalacticButton();
     
 
-    var fig = {"data": [], "layout": {"title": "Waypoint 78", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [{"type": "scatter", "x": [5162.414083479565, -29099.505916520433, -31055.774083479566, 3206.145916520432, 5162.414083479565], "y": [-178188.08953809016, -174788.39953809016, -194503.58046190982, -197903.27046190982, -178188.08953809016], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [33125.87756043547, -3709.6824395645353, -4328.857560435462, 32506.70243956454, 33125.87756043547], "y": [-180028.55981019957, -178728.90981019955, -196277.99018980048, -197577.6401898005, -180028.55981019957], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [58797.82809855765, 24366.24809855765, 24820.07190144234, 59251.65190144235, 58797.82809855765], "y": [-179792.07871069465, -180769.08871069466, -196762.65128930533, -195785.64128930532, -179792.07871069465], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [84326.45595313834, 50301.94595313833, 51949.97404686165, 85974.48404686166, 84326.45595313834], "y": [-176193.51277090725, -179332.74277090724, -197194.87722909276, -194055.64722909278, -176193.51277090725], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [112482.31577196185, 75622.43577196184, 78320.56422803816, 115180.44422803816, 112482.31577196185], "y": [-171772.72593683205, -177556.33593683204, -194751.944063168, -188968.334063168, -171772.72593683205], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [138043.4309715814, 103603.9909715814, 107605.08902841862, 142044.52902841862, 138043.4309715814], "y": [-165271.55813872628, -172946.66813872627, -190900.23186127376, -183225.12186127377, -165271.55813872628], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [163490.33286190158, 129686.41286190155, 134653.06713809844, 168456.98713809848, 163490.33286190158], "y": [-157898.41070498177, -167725.46070498182, -184810.1792950182, -174983.12929501815, -157898.41070498177], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [189166.91452483417, 155467.62452483413, 160902.0354751658, 194601.32547516582, 189166.91452483417], "y": [-149284.9767733272, -161454.41677332713, -176503.24322667278, -164333.80322667284, -149284.9767733272], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-212965.5612028651, -264815.8212028651, -257397.03879713488, -205546.77879713487, -212965.5612028651], "y": [-412792.67232091195, -424975.6123209119, -456549.747679088, -444366.80767908803, -412792.67232091195], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-227078.59667871223, -231950.76667871227, -199651.37332128774, -194779.2033212877, -227078.59667871223], "y": [-377065.544035217, -435362.30403521704, -438061.735964783, -379764.975964783, -377065.544035217], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-262297.41142836027, -211035.46142836034, -200116.99857163974, -251378.9485716397, -262297.41142836027], "y": [-379102.01582309086, -400626.77582309087, -374624.0841769091, -353099.3241769091, -379102.01582309086], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-267942.88227405667, -236463.9622740566, -258118.35772594335, -289597.27772594336, -267942.88227405667], "y": [-410209.1199704298, -373711.3599704298, -355034.68002957024, -391532.44002957025, -410209.1199704298], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-240683.96128049036, -263806.97128049034, -291804.90871950967, -268681.89871950966, -240683.96128049036], "y": [-421919.018349809, -383772.33834980906, -400743.5816501911, -438890.26165019104, -421919.018349809], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-209429.2248450211, -214152.8748450211, -249048.06515497895, -244324.41515497892, -209429.2248450211], "y": [-44860.597902768335, -3497.7779027683337, -7482.822097231672, -48845.64209723167, -44860.597902768335], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-203709.47966733467, -212022.66966733467, -244739.47033266534, -236426.28033266534, -203709.47966733467], "y": [-71236.29857225151, -34134.16857225151, -41464.77142774849, -78566.9014277485, -71236.29857225151], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-192840.87148220572, -206843.6014822057, -238441.97851779425, -224439.24851779427, -192840.87148220572], "y": [-101764.05021011531, -60498.010210115295, -71220.22978988469, -112486.2697898847, -101764.05021011531], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-181232.38954815984, -198823.03954815987, -225747.86045184016, -208157.21045184013, -181232.38954815984], "y": [-129714.68762977979, -91745.65762977979, -104219.6423702202, -142188.6723702202, -129714.68762977979], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [284634.1653608225, 281775.43536082254, 350123.4646391775, 352982.19463917747, 284634.1653608225], "y": [-227428.7112193556, -263195.1812193556, -268658.0787806444, -232891.60878064446, -227428.7112193556], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-165624.78604581417, -217555.85604581417, -234115.5039541858, -182184.4339541858, -165624.78604581417], "y": [-316361.8756766615, -299801.08567666146, -351728.57432333846, -368289.3643233385, -316361.8756766615], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [292672.5923078774, 372800.30230787734, 369747.3576921226, 289619.6476921226, 292672.5923078774], "y": [269116.50759359106, 275636.0275935911, 313158.032406409, 306638.51240640896, 269116.50759359106], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-79698.43270743321, -54211.10270743323, -79062.81729256679, -104550.14729256678, -79698.43270743321], "y": [392851.7193029695, 403509.86930296954, 462938.9306970305, 452280.7806970305, 392851.7193029695], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-424339.54789564497, -389552.01789564494, -437619.60210435506, -472407.1321043551, -424339.54789564497], "y": [-230998.03725597123, -178556.53725597123, -146670.4827440288, -199111.9827440288, -230998.03725597123], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-13086.327315165707, -30091.727315165706, -60276.4326848343, -43271.0326848343, -13086.327315165707], "y": [535264.2777999804, 567840.2677999804, 552083.1722000196, 519507.18220001966, 535264.2777999804], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-383950.61843153666, -347477.3084315366, -343297.99156846345, -379771.3015684635, -383950.61843153666], "y": [375526.2040381254, 369310.11403812544, 393832.5259618746, 400048.61596187454, 375526.2040381254], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [98810.29766487108, 138599.15766487108, 153379.16233512893, 113590.30233512896, 98810.29766487108], "y": [256891.96793804027, 237644.0079380403, 268196.8320619598, 287444.79206195974, 256891.96793804027], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [67056.5357475156, 110207.85574751561, 121332.7842524844, 78181.4642524844, 67056.5357475156], "y": [269990.7799161706, 253494.00991617056, 282593.9700838294, 299090.74008382944, 269990.7799161706], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [37152.145933630585, 78434.48593363058, 86288.19406636941, 45005.854066369415, 37152.145933630585], "y": [279459.30050535273, 267599.7505053527, 294938.0094946473, 306797.5594946474, 279459.30050535273], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [10978.102253077546, 47288.41225307754, 52775.58774692246, 16465.27774692246, 10978.102253077546], "y": [284142.44130958006, 276995.84130957996, 304874.97869041987, 312021.57869041996, 284142.44130958006], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-12309.906250857042, 20068.983749142957, 23225.736250857044, -9153.153749142955, -12309.906250857042], "y": [285956.8084858179, 282415.878485818, 311281.78151418216, 314822.7115141821, 285956.8084858179], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-35361.32705834883, -3710.4470583488283, -2976.5129416511745, -34627.392941651175, -35361.32705834883], "y": [285038.0651173315, 284293.60511733155, 315496.9748826685, 316241.4348826685, 285038.0651173315], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-55796.80934673167, -26942.35934673168, -29083.600653268328, -57938.05065326833, -55796.80934673167], "y": [281696.1524983651, 283484.322498365, 318036.03750163486, 316247.86750163493, 281696.1524983651], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-80123.48884586577, -47256.99884586577, -52234.58115413425, -85101.07115413423, -80123.48884586577], "y": [278091.0151738507, 282967.6651738507, 316514.39482614934, 311637.7448261493, 278091.0151738507], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-103453.70467160338, -71563.20467160338, -78717.43532839663, -110607.93532839663, -103453.70467160338], "y": [273648.0187286978, 281206.2787286978, 311392.06127130217, 303833.80127130216, 273648.0187286978], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [238286.42469937232, 250453.72469937237, 268060.0953006277, 255892.79530062765, 238286.42469937232], "y": [56829.331254763085, 14338.941254763085, 19380.598745236923, 61870.98874523692, 56829.331254763085], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [217739.74681812743, 243014.9668181274, 259804.83318187253, 234529.61318187256, 217739.74681812743], "y": [83077.24793051301, 44496.07793051302, 55495.422069486965, 94076.59206948696, 83077.24793051301], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-149032.74337438954, -114943.73337438951, -123994.76662561049, -158083.77662561048, -149032.74337438954], "y": [-260986.83791876532, -252127.09791876533, -217302.0620812347, -226161.8020812347, -260986.83791876532], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [61821.03700501722, 78180.76700501722, 35334.63299498278, 18974.90299498278, 61821.03700501722], "y": [-435765.46216189535, -414581.97216189536, -381492.4678381046, -402675.9578381046, -435765.46216189535], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-368412.7993872177, -375655.14938721777, -416942.6506127823, -409700.3006127822, -368412.7993872177], "y": [56747.956054564784, 94611.28605456479, 86713.97394543522, 48850.64394543521, 56747.956054564784], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [358668.68556795176, 361510.3355679518, 299980.32443204825, 297138.6744320482, 358668.68556795176], "y": [-3262.437700163448, 49854.13229983655, 53145.887700163454, 29.317700163452628, -3262.437700163448], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [233387.55288397547, 291330.9628839755, 285640.97711602447, 227697.56711602453, 233387.55288397547], "y": [-118679.40819769747, -113237.18819769747, -52655.81180230253, -58098.03180230253, -118679.40819769747], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-129875.26999999999, -129931.83657659635, -130100.56843657666, -130378.57853103537, -130761.11003017728, -131241.61771399435, -131811.87996279454, -132462.13943139432, -133181.27, -133956.967145202, -134775.9584737821, -135624.230817041, -136487.27, -137350.30918295897, -138198.58152621787, -139017.57285479797, -139793.27, -140512.40056860566, -141162.66003720544, -141732.92228600563, -142213.4299698227, -142595.9614689646, -142873.9715634233, -143042.7034234036, -143099.27, -143042.7034234036, -142873.9715634233, -142595.9614689646, -142213.4299698227, -141732.92228600563, -141162.66003720544, -140512.40056860566, -139793.27, -139017.57285479797, -138198.58152621787, -137350.30918295897, -136487.27, -135624.230817041, -134775.9584737821, -133956.967145202, -133181.27, -132462.13943139435, -131811.87996279454, -131241.61771399435, -130761.11003017728, -130378.57853103537, -130100.56843657666, -129931.83657659635, -129875.26999999999], "y": [291531.22, 292394.259182959, 293242.5315262178, 294061.52285479795, 294837.22, 295556.35056860565, 296206.61003720545, 296776.87228600564, 297257.3799698227, 297639.9114689646, 297917.9215634233, 298086.6534234036, 298143.22, 298086.6534234036, 297917.9215634233, 297639.9114689646, 297257.3799698227, 296776.87228600564, 296206.61003720545, 295556.35056860565, 294837.22, 294061.52285479795, 293242.5315262178, 292394.259182959, 291531.22, 290668.18081704096, 289819.9084737821, 289000.917145202, 288225.22, 287506.0894313943, 286855.8299627945, 286285.5677139943, 285805.06003017724, 285422.52853103535, 285144.51843657665, 284975.7865765963, 284919.22, 284975.7865765963, 285144.51843657665, 285422.52853103535, 285805.06003017724, 286285.5677139943, 286855.8299627945, 287506.0894313943, 288225.22, 289000.917145202, 289819.9084737821, 290668.18081704096, 291531.22], "fill": "toself", "fillcolor": "rgba(64,64,64,0.49146003850004405)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.49146003850004405)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-284580.22, -284639.6867685906, -284817.06958146463, -285109.33336951403, -285511.47741829435, -286016.6209316356, -286616.1207639723, -287299.71930696035, -288055.72, -288871.1874616302, -289732.1688174924, -290623.9324378784, -291531.22, -292438.50756212155, -293330.27118250757, -294191.25253836974, -295006.72, -295762.7206930396, -296446.31923602766, -297045.81906836433, -297550.9625817056, -297953.1066304859, -298245.3704185353, -298422.75323140936, -298482.22, -298422.75323140936, -298245.3704185353, -297953.1066304859, -297550.9625817056, -297045.81906836433, -296446.31923602766, -295762.7206930396, -295006.72, -294191.25253836974, -293330.27118250757, -292438.50756212155, -291531.22, -290623.9324378784, -289732.1688174924, -288871.1874616302, -288055.72, -287299.71930696035, -286616.1207639723, -286016.6209316356, -285511.47741829435, -285109.33336951403, -284817.06958146463, -284639.6867685906, -284580.22], "y": [-136487.27, -135579.9824378784, -134688.21881749236, -133827.23746163025, -133011.77, -132255.76930696037, -131572.1707639723, -130972.67093163561, -130467.52741829435, -130065.38336951403, -129773.11958146468, -129595.73676859064, -129536.26999999999, -129595.73676859064, -129773.11958146468, -130065.38336951403, -130467.52741829435, -130972.67093163561, -131572.1707639723, -132255.76930696037, -133011.77, -133827.23746163025, -134688.21881749236, -135579.9824378784, -136487.27, -137394.55756212157, -138286.3211825076, -139147.30253836972, -139962.77, -140718.7706930396, -141402.36923602768, -142001.86906836435, -142507.0125817056, -142909.15663048596, -143201.4204185353, -143378.80323140934, -143438.27, -143378.80323140934, -143201.4204185353, -142909.15663048596, -142507.0125817056, -142001.86906836438, -141402.36923602768, -140718.7706930396, -139962.77, -139147.30253836972, -138286.3211825076, -137394.55756212157, -136487.27], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4611620810263858)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4611620810263858)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [144307.27, 144240.3688159432, 144040.8099615805, 143712.00794423826, 143259.5886575943, 142691.29312107744, 142016.8450288788, 141247.78437484818, 140397.27, 139479.854441095, 138511.23493270171, 137507.9848231608, 136487.27, 135466.55517683917, 134463.30506729826, 133494.68555890498, 132577.27, 131726.7556251518, 130957.6949711212, 130283.24687892254, 129714.95134240568, 129262.53205576172, 128933.73003841948, 128734.17118405679, 128667.26999999999, 128734.17118405679, 128933.73003841948, 129262.53205576172, 129714.95134240568, 130283.24687892252, 130957.69497112118, 131726.7556251518, 132577.27, 133494.68555890498, 134463.30506729826, 135466.55517683917, 136487.27, 137507.9848231608, 138511.2349327017, 139479.854441095, 140397.27, 141247.78437484818, 142016.8450288788, 142691.29312107744, 143259.5886575943, 143712.00794423826, 144040.8099615805, 144240.3688159432, 144307.27], "y": [-291531.22, -290510.5051768392, -289507.25506729825, -288538.63555890496, -287621.22, -286770.70562515175, -286001.64497112116, -285327.1968789225, -284758.90134240565, -284306.48205576173, -283977.68003841944, -283778.1211840568, -283711.22, -283778.1211840568, -283977.68003841944, -284306.48205576173, -284758.90134240565, -285327.1968789225, -286001.64497112116, -286770.70562515175, -287621.22, -288538.63555890496, -289507.25506729825, -290510.5051768392, -291531.22, -292551.93482316076, -293555.1849327017, -294523.804441095, -295441.22, -296291.7343748482, -297060.7950288788, -297735.2431210774, -298303.5386575943, -298755.9579442382, -299084.7599615805, -299284.31881594314, -299351.22, -299284.31881594314, -299084.7599615805, -298755.9579442382, -298303.5386575943, -297735.2431210774, -297060.7950288788, -296291.7343748482, -295441.22, -294523.804441095, -293555.1849327017, -292551.93482316076, -291531.22], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [298760.22, 298698.37490287126, 298513.8977982436, 298209.94514052407, 297791.7176439577, 297266.3712969653, 296642.8949211975, 295931.956370304, 295145.72, 294297.6385325672, 293402.2228770461, 292474.7938435587, 291531.22, 290587.64615644125, 289660.21712295385, 288764.80146743276, 287916.72, 287130.48362969595, 286419.54507880245, 285796.06870303466, 285270.72235604224, 284852.4948594759, 284548.5422017563, 284364.0650971287, 284302.22, 284364.0650971287, 284548.5422017563, 284852.4948594759, 285270.72235604224, 285796.06870303466, 286419.5450788024, 287130.48362969595, 287916.72, 288764.80146743276, 289660.21712295385, 290587.64615644125, 291531.22, 292474.7938435587, 293402.2228770461, 294297.6385325672, 295145.72, 295931.956370304, 296642.8949211975, 297266.3712969653, 297791.7176439577, 298209.94514052407, 298513.8977982436, 298698.37490287126, 298760.22], "y": [136487.27, 137430.84384355874, 138358.2728770461, 139253.68853256723, 140101.77, 140888.00637030404, 141598.94492119754, 142222.42129696533, 142747.7676439577, 143165.9951405241, 143469.94779824367, 143654.42490287125, 143716.27, 143654.42490287125, 143469.94779824367, 143165.9951405241, 142747.7676439577, 142222.42129696533, 141598.94492119754, 140888.00637030404, 140101.77, 139253.68853256723, 138358.2728770461, 137430.84384355874, 136487.27, 135543.69615644123, 134616.26712295387, 133720.85146743275, 132872.77, 132086.53362969594, 131375.59507880243, 130752.11870303465, 130226.77235604229, 129808.5448594759, 129504.59220175631, 129320.11509712871, 129258.26999999999, 129320.11509712871, 129504.59220175631, 129808.5448594759, 130226.77235604229, 130752.11870303465, 131375.59507880243, 132086.53362969594, 132872.77, 133720.85146743275, 134616.26712295387, 135543.69615644123, 136487.27], "fill": "toself", "fillcolor": "rgba(64,64,64,0.43246605690072415)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.43246605690072415)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [7373.32, 7305.623188050961, 7103.691063425397, 6770.978740761811, 6313.179020146264, 5738.124981724543, 5055.655959529151, 4277.449187746006, 3416.820000000001, 2488.494000304956, 1508.3551038962469, 493.1737590372692, -539.6799999999995, -1572.5337590372683, -2587.7151038962456, -3567.854000304953, -4496.1799999999985, -5356.8091877460065, -6135.015959529151, -6817.484981724543, -7392.539020146264, -7850.338740761812, -8183.051063425397, -8384.983188050961, -8452.68, -8384.983188050961, -8183.051063425398, -7850.338740761813, -7392.539020146265, -6817.484981724544, -6135.015959529154, -5356.809187746008, -4496.180000000004, -3567.854000304953, -2587.7151038962456, -1572.5337590372683, -539.6800000000014, 493.17375903726577, 1508.3551038962432, 2488.494000304951, 3416.820000000001, 4277.4491877460005, 5055.655959529149, 5738.124981724542, 6313.179020146261, 6770.978740761812, 7103.691063425395, 7305.623188050961, 7373.32], "y": [-90827.32, -89794.46624096273, -88779.28489610377, -87799.14599969506, -86870.82, -86010.190812254, -85231.98404047085, -84549.51501827546, -83974.46097985374, -83516.6612592382, -83183.94893657461, -82982.01681194904, -82914.32, -82982.01681194904, -83183.94893657461, -83516.6612592382, -83974.46097985374, -84549.51501827546, -85231.98404047085, -86010.190812254, -86870.82, -87799.14599969506, -88779.28489610375, -89794.46624096273, -90827.32, -91860.17375903728, -92875.35510389626, -93855.49400030496, -94783.82, -95644.44918774601, -96422.65595952916, -97105.12498172456, -97680.17902014627, -98137.97874076181, -98470.6910634254, -98672.62318805097, -98740.32, -98672.62318805097, -98470.6910634254, -98137.97874076181, -97680.17902014627, -97105.12498172456, -96422.65595952916, -95644.44918774601, -94783.82, -93855.49400030496, -92875.35510389626, -91860.17375903728, -90827.32], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [360274.45, 360216.9081376003, 360045.2671076203, 359762.4637356709, 359373.33686585416, 358884.54456679884, 358304.45021026075, 357642.97937151266, 356911.45, 356122.3787660876, 355289.2668973596, 354426.3691688721, 353548.45, 352670.53083112795, 351807.63310264045, 350974.52123391244, 350185.45, 349453.92062848737, 348792.4497897393, 348212.3554332012, 347723.56313414586, 347334.4362643291, 347051.6328923797, 346879.99186239974, 346822.45, 346879.99186239974, 347051.6328923797, 347334.4362643291, 347723.56313414586, 348212.3554332012, 348792.4497897393, 349453.92062848737, 350185.45, 350974.52123391244, 351807.63310264045, 352670.53083112795, 353548.45, 354426.3691688721, 355289.2668973596, 356122.3787660876, 356911.45, 357642.97937151266, 358304.45021026075, 358884.54456679884, 359373.33686585416, 359762.4637356709, 360045.2671076203, 360216.9081376003, 360274.45], "y": [220298.91, 221176.82916887206, 222039.72689735956, 222872.8387660876, 223661.91, 224393.43937151265, 225054.9102102607, 225635.00456679886, 226123.79686585415, 226512.92373567092, 226795.72710762027, 226967.36813760025, 227024.91, 226967.36813760025, 226795.72710762027, 226512.92373567092, 226123.79686585415, 225635.00456679886, 225054.9102102607, 224393.43937151265, 223661.91, 222872.8387660876, 222039.72689735956, 221176.82916887206, 220298.91, 219420.99083112794, 218558.09310264044, 217724.9812339124, 216935.91, 216204.38062848736, 215542.9097897393, 214962.81543320115, 214474.02313414586, 214084.8962643291, 213802.09289237973, 213630.45186239976, 213572.91, 213630.45186239976, 213802.09289237973, 214084.8962643291, 214474.02313414586, 214962.81543320115, 215542.9097897393, 216204.38062848736, 216935.91, 217724.9812339124, 218558.09310264044, 219420.99083112794, 220298.91], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4538330459900308)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4538330459900308)", "width": 0}, "hoverinfo": "none"}], "layout": {"title": "Waypoint 78", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Waypoint 78';
     if (!isGM()) {
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
+    setDefaultInfo();
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -176,8 +471,123 @@
         }
         if (picked && objData[picked]) {
             highlight(picked);
+            lastPlotlyClickTs = Date.now();
         }
     });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
 
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {
@@ -271,6 +681,21 @@ function addButton(label, fn, header, color, isHidden) {
   }
 
   renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);

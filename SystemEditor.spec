@@ -3,10 +3,10 @@
 
 a = Analysis(
     ['SystemEditor.py'],
-    pathex=[],
+    pathex=['scripts'],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=['generate_system_terrain'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

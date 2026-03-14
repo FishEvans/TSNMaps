@@ -7,33 +7,215 @@
     <title>Volantis.html</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; display: flex; height: 100vh; }
+        html, body { margin: 0; height: 100%; background: black; color: white; }
         /* === Description typography controls ===
            Tweak these two variables to change description sizes globally */
         :root {
             --desc-font-size: 130%;
             --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
         }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
         .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
         .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
-        #controls { flex: 1; min-width: 200px; max-width: 350px; overflow-y: auto; background: #333; padding: 10px; }
-        #plot { flex: 3; min-width: 400px; }
-        #info { flex: 1; min-width: 200px; background: #333; padding: 10px; overflow-y: auto; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
         h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
         h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
         .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
-        button { display: block; width: 100%; margin-bottom: 5px; background: #555; color: white; border: none; padding: 5px; text-align: left; cursor: pointer; font-size: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 10px;
+        }
         button.header { background: #444; cursor: default; font-size: 24px; }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">Volantis</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
     <div id="controls">
         <div id="gm-controls" style="margin-bottom:10px;"></div>
         <h2 class="header">Volantis</h2>
         <h3 class="subheader">Alignment: USFP</h3>
         <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
 
-        <input type="text" id="search-box" placeholder="Search objects..." style="width: 95%; padding: 6px; margin-bottom: 10px; font-size: 16px;">
+        <input type="text" id="search-box" placeholder="Search objects...">
         <div id="object-buttons">
     </div>
     </div>
@@ -41,22 +223,136 @@
     <div id="info">
         <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
         <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
-        Select an object
+        Loading system info...
     </div>
 <script>
     var objData = {"Volantis Command": {"type": "station", "x": -51251.5, "y": -47446.12109375, "grid": "J09", "hidden": false, "label": "Volantis Command", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "Sierra Gate": {"type": "jumpnode", "x": 167911.5626237714, "y": 64260.774978111185, "grid": "P20", "hidden": false, "label": "Sierra Gate", "destinations": {"Desolation Point": "Sierra"}}, "DS 93": {"type": "station", "x": -50682.54689313953, "y": -50898.69294379421, "grid": "J09", "hidden": false, "label": "DS 93", "hull": "starbase_industry", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 71": {"type": "station", "x": -48340.31982263772, "y": -48996.59856404612, "grid": "J09", "hidden": false, "label": "DS 71", "hull": "starbase_industry", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 53": {"type": "station", "x": -75713.42970123097, "y": 49869.105750420815, "grid": "O08", "hidden": false, "label": "DS 53", "hull": "starbase_industry", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "DS 34": {"type": "station", "x": 49063.72159644151, "y": 48649.36997806377, "grid": "O14", "hidden": false, "label": "DS 34", "hull": "starbase_command", "facilities": ["Docking", "Refuel", "Repair"], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": ""}, "DS 17": {"type": "station", "x": 42736.18796674425, "y": -65761.40188807424, "grid": "I14", "hidden": false, "label": "DS 17", "hull": "starbase_industry", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": ""}, "Outpost 16": {"type": "station", "x": 38346.98634266922, "y": 42956.104374497234, "grid": "O13", "hidden": false, "label": "Outpost 16", "hull": "starbase_civil", "facilities": ["Docking", "Refuel"], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": ""}, "WP 14": {"type": "platform", "x": -74742.37787150257, "y": 50944.840857631396, "grid": "O08", "hidden": false, "label": "WP 14"}, "WP 92": {"type": "platform", "x": 44137.20606277941, "y": -64411.060765708964, "grid": "I14", "hidden": false, "label": "WP 92"}, "WP 78": {"type": "platform", "x": 47739.562445418334, "y": 49728.162669534766, "grid": "O14", "hidden": false, "label": "WP 78"}, "WP 1": {"type": "platform", "x": 50900.58560386793, "y": 47397.99600972959, "grid": "O14", "hidden": false, "label": "WP 1"}, "WP 12": {"type": "platform", "x": 41710.726163402534, "y": -67386.14303397431, "grid": "I14", "hidden": false, "label": "WP 12"}, "WP 87": {"type": "platform", "x": -77063.31115854684, "y": 48774.87892967857, "grid": "O08", "hidden": false, "label": "WP 87"}, "Promethean Gate": {"type": "jumpnode", "x": -108168.74691358025, "y": 72550.91975308642, "grid": "P06", "hidden": false, "label": "Promethean Gate", "destinations": {"Volantis Gate": "Promethean"}}, "Waypoint 52 Gate": {"type": "jumpnode", "x": 85446.70987654322, "y": -105652.83333333333, "grid": "G16", "hidden": false, "label": "Waypoint 52 Gate", "destinations": {"Volantis Gate": "Waypoint 52"}}, "WP 86": {"type": "platform", "x": -50609.6638146587, "y": -44135.11213283773, "grid": "J09", "hidden": false, "label": "WP 86"}, "WP 75": {"type": "platform", "x": -53897.105914536754, "y": -51525.271155785005, "grid": "J09", "hidden": false, "label": "WP 75"}, "WP 32": {"type": "platform", "x": -45874.78963480386, "y": -50746.40549755851, "grid": "J09", "hidden": false, "label": "WP 32"}, "QRF 63": {"type": "platform", "x": -58539.87217884765, "y": -44774.06363027776, "grid": "J09", "hidden": false, "label": "QRF 63"}, "QRF 18": {"type": "platform", "x": -43062.25381857075, "y": -43697.35974434545, "grid": "J09", "hidden": false, "label": "QRF 18"}, "QRF 4": {"type": "platform", "x": -49253.30116268151, "y": -56886.98234701619, "grid": "J09", "hidden": false, "label": "QRF 4"}, "WP 61": {"type": "platform", "x": 169067.47541389934, "y": 68759.03995062043, "grid": "P20", "hidden": false, "label": "WP 61"}, "WP 47": {"type": "platform", "x": 172767.08729047517, "y": 61359.81619746873, "grid": "P20", "hidden": false, "label": "WP 47"}, "WP 98": {"type": "platform", "x": 164069.754106946, "y": 61684.343555063104, "grid": "P20", "hidden": false, "label": "WP 98"}, "WP 57": {"type": "platform", "x": 167899.1769265596, "y": 63112.26392847834, "grid": "P20", "hidden": false, "label": "WP 57"}, "QRF 48": {"type": "platform", "x": 157059.96318290755, "y": 56556.81130507202, "grid": "O19", "hidden": false, "label": "QRF 48"}, "QRF 35": {"type": "platform", "x": 169031.78052002657, "y": 75143.15043711726, "grid": "P20", "hidden": false, "label": "QRF 35"}, "QRF 76": {"type": "platform", "x": 179109.72889235296, "y": 56925.32068714266, "grid": "O20", "hidden": false, "label": "QRF 76"}, "WP 99": {"type": "platform", "x": -73889.0552771867, "y": 47600.58839138723, "grid": "O08", "hidden": false, "label": "WP 99"}, "WP 23": {"type": "platform", "x": 45686.00215932029, "y": 45465.468440563774, "grid": "O14", "hidden": false, "label": "WP 23"}, "WP 24": {"type": "platform", "x": 39753.41830304561, "y": -63846.507150574995, "grid": "I13", "hidden": false, "label": "WP 24"}, "QRF 74": {"type": "platform", "x": 51250.84091253724, "y": 41449.95361999646, "grid": "O14", "hidden": false, "label": "QRF 74"}, "QRF 71": {"type": "platform", "x": 45606.60096005736, "y": -69394.804108971, "grid": "I14", "hidden": false, "label": "QRF 71"}, "WP 9": {"type": "platform", "x": 85105.0207013257, "y": -98982.5773121365, "grid": "H16", "hidden": false, "label": "WP 9"}, "WP 70": {"type": "platform", "x": 86109.71463136685, "y": -113048.29233271263, "grid": "G16", "hidden": false, "label": "WP 70"}, "WP 19": {"type": "platform", "x": -108325.92075592802, "y": 78727.40181735245, "grid": "P06", "hidden": false, "label": "WP 19"}, "WP 30": {"type": "platform", "x": -108164.41517303819, "y": 64837.92168882572, "grid": "P06", "hidden": false, "label": "WP 30"}, "SR 98": {"type": "sensor_relay", "x": -3390.112005427087, "y": -46007.42991474234, "grid": "J11", "hidden": false, "label": "SR 98"}, "SR 36": {"type": "sensor_relay", "x": -9418.968835127343, "y": -23507.42991474234, "grid": "K11", "hidden": false, "label": "SR 36"}, "SR 75": {"type": "sensor_relay", "x": -25890.112005427083, "y": -7036.286744442601, "grid": "L10", "hidden": false, "label": "SR 75"}, "SR 31": {"type": "sensor_relay", "x": -48390.11200542709, "y": -1007.4299147423371, "grid": "L09", "hidden": false, "label": "SR 31"}, "SR 77": {"type": "sensor_relay", "x": -70890.11200542707, "y": -7036.286744442594, "grid": "L08", "hidden": false, "label": "SR 77"}, "SR 51": {"type": "sensor_relay", "x": -87361.25517572684, "y": -23507.42991474234, "grid": "K07", "hidden": false, "label": "SR 51"}, "SR 29": {"type": "sensor_relay", "x": -93390.11200542709, "y": -46007.42991474233, "grid": "J07", "hidden": false, "label": "SR 29"}, "SR 43": {"type": "sensor_relay", "x": -87361.25517572684, "y": -68507.42991474233, "grid": "I07", "hidden": false, "label": "SR 43"}, "SR 35": {"type": "sensor_relay", "x": -70890.1120054271, "y": -84978.57308504207, "grid": "H08", "hidden": false, "label": "SR 35"}, "SR 42": {"type": "sensor_relay", "x": -48390.112005427094, "y": -91007.42991474233, "grid": "H09", "hidden": false, "label": "SR 42"}, "SR 70": {"type": "sensor_relay", "x": -25890.112005427083, "y": -84978.57308504207, "grid": "H10", "hidden": false, "label": "SR 70"}, "SR 73": {"type": "sensor_relay", "x": -9418.968835127358, "y": -68507.42991474236, "grid": "I11", "hidden": false, "label": "SR 73"}, "SR 74": {"type": "sensor_relay", "x": 19761.462626292236, "y": -61992.04947883795, "grid": "I12", "hidden": false, "label": "SR 74"}, "SR 78": {"type": "sensor_relay", "x": 43150.73731765026, "y": -76459.64207143054, "grid": "I14", "hidden": false, "label": "SR 78"}, "SR 84": {"type": "sensor_relay", "x": 66540.0120090083, "y": -90927.23466402314, "grid": "H15", "hidden": false, "label": "SR 84"}, "SR 26": {"type": "sensor_relay", "x": -80547.17934901643, "y": 13721.685089063296, "grid": "M07", "hidden": false, "label": "SR 26"}, "SR 20": {"type": "sensor_relay", "x": -91397.87379346087, "y": 34458.56780511269, "grid": "N07", "hidden": false, "label": "SR 20"}, "SR 10": {"type": "sensor_relay", "x": -102248.56823790532, "y": 55195.45052116207, "grid": "O06", "hidden": false, "label": "SR 10"}, "SR 19": {"type": "sensor_relay", "x": 4445.104601600851, "y": -3928.7778738996535, "grid": "L12", "hidden": false, "label": "SR 19"}, "SR 56": {"type": "sensor_relay", "x": 25374.888552218155, "y": 10808.876447088005, "grid": "M13", "hidden": false, "label": "SR 56"}, "SR 39": {"type": "sensor_relay", "x": 50644.95028061321, "y": 24582.024595236144, "grid": "N14", "hidden": false, "label": "SR 39"}, "SR 97": {"type": "sensor_relay", "x": 75429.70167617028, "y": 40130.52198987874, "grid": "O15", "hidden": false, "label": "SR 97"}, "SR 91": {"type": "sensor_relay", "x": 106947.5128901621, "y": 49958.08971964555, "grid": "O17", "hidden": false, "label": "SR 91"}, "SR 53": {"type": "sensor_relay", "x": 140793.96350744605, "y": 53617.42613939863, "grid": "O19", "hidden": false, "label": "SR 53"}};
+    var systemMeta = {"system_name": "Volantis", "description": "Volantis is a frount line system on the border of the Hegemony, even in peace time its offten host to Diplomatic and tradeing missions - Check your fire!", "exports": ["Agriculture"], "assets": ["Shipyard"], "focus": "Mining", "intel": {"pirate": "High", "enemy": "High"}, "original_author": "Draeco", "last_author": "Draeco", "revision_number": 15, "version_tag": "231205.15", "all_authors": ["Fish Evans", "Draeco"]};
+    var pageBody = document.body;
         console.log("[DEBUG JS] objData keys:", Object.keys(objData));
         console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
 
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
     function clearAnnotations() {
         Plotly.relayout('plot', {annotations: []});
-        document.getElementById('info').innerHTML = getInfoHeader() + 'Select an object';
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
-        document.getElementById('galactic-map-btn').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        setDefaultInfo();
     }
     
     function getInfoHeader() {
@@ -139,15 +435,13 @@
                           + '</p>';
             }
             document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
-            document.getElementById('galactic-map-btn').addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
                 + infoHtml;
          
     }
-         document.getElementById('galactic-map-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+         bindGalacticButton();
     
 
     var fig = {"data": [{"type": "scatter", "x": [20538.762142729094, 72353.76214272909, 82070.23785727091, 30255.237857270906, 20538.762142729094], "y": [-29650.54420425654, -77034.54420425654, -66409.45579574346, -19025.45579574346, -29650.54420425654], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-53910.489689776565, -54106.489689776565, -45967.510310223435, -45771.510310223435, -53910.489689776565], "y": [18175.44893173854, 5799.448931738543, 5670.551068261457, 18046.55106826146, 18175.44893173854], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-54058.347583716044, -53538.347583716044, -45405.652416283956, -45925.652416283956, -54058.347583716044], "y": [29555.61285312797, 17289.61285312797, 17634.38714687203, 29900.38714687203, 29555.61285312797], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-62501.86901178691, -54809.86901178691, -50124.13098821309, -57816.13098821309, -62501.86901178691], "y": [16805.957813727622, 11390.957813727624, 18047.042186272378, 23462.042186272378, 16805.957813727622], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-68985.11806250234, -61528.11806250233, -62021.88193749767, -69478.88193749766, -68985.11806250234], "y": [13270.352771421414, 14079.352771421414, 18630.647228578586, 17821.647228578586, 13270.352771421414], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [48767.86171397764, 85086.86171397763, 86139.13828602237, 49820.13828602236, 48767.86171397764], "y": [-74284.56538905905, -81738.56538905905, -76611.43461094095, -69157.43461094095, -74284.56538905905], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-26864.48127059402, -46803.44212119227, -48635.33950235538, -28696.378651757135, -26864.48127059402], "y": [-51345.011237019404, -45347.745668675394, -51438.209689165764, -57435.475257509774, -51345.011237019404], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-45221.06777512201, -59941.62871560274, -63692.089735744, -48971.528795263264, -45221.06777512201], "y": [-46681.47942178604, -35933.13333826041, -41069.6343006278, -51817.98038415342, -46681.47942178604], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-42311.91841190822, -46157.075646920086, -52129.238823103646, -48284.08158809178, -42311.91841190822], "y": [-73903.99495835046, -49526.43589321763, -50468.44597651669, -74846.00504164954, -73903.99495835046], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-50220.89024763709, -59488.89024763709, -61183.10975236291, -51915.10975236291, -50220.89024763709], "y": [-79770.3192590823, -77199.3192590823, -83306.6807409177, -85877.6807409177, -79770.3192590823], "fill": "toself", "fillcolor": "rgba(128,0,128,0.5167419082886658)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.5167419082886658)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-77116.67911045309, -58023.18033160797, -58043.82211070178, -77137.32088954691, -77116.67911045309], "y": [-78382.97332962636, -78284.29304730262, -74290.3463880499, -74389.02667037364, -78382.97332962636], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-51727.9792429546, -54408.9792429546, -51589.0207570454, -48908.0207570454, -51727.9792429546], "y": [21078.17052429067, 17358.17052429067, 15325.829475709332, 19045.82947570933, 21078.17052429067], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-78515.25982160568, -76215.25982160568, -73134.74017839432, -75434.74017839432, -78515.25982160568], "y": [18151.86418416067, 13751.864184160671, 15362.135815839329, 19762.13581583933, 18151.86418416067], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-74624.66824609705, -68850.66824609705, -68107.33175390295, -73881.33175390295, -74624.66824609705], "y": [13608.205337844665, 12344.205337844665, 15739.794662155335, 17003.794662155335, 13608.205337844665], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [90347.09406872069, 43124.87184649847, 37961.40597004919, 85183.62819227141, 90347.09406872069], "y": [67586.76351054205, 96058.98573276427, 87495.18866938498, 59022.966447162755, 67586.76351054205], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [86587.990193985, 28949.10130509609, 22970.509844784894, 80609.39873367379, 86587.990193985], "y": [24236.505621699547, 42292.061177255106, 23206.557669338577, 5151.002113783023, 24236.505621699547], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [196624.88068844267, 168152.65846622043, 164322.5082392161, 192794.73046143836, 196624.88068844267], "y": [81812.46443559945, 93618.01999115502, 84380.5988554387, 72575.04329988314, 81812.46443559945], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [187672.16334505565, 191838.83001172228, 182303.00336038088, 178136.33669371426, 187672.16334505565], "y": [33326.985916944686, 46521.430361389124, 49532.744040760095, 36338.29959631566, 33326.985916944686], "fill": "toself", "fillcolor": "rgba(128,0,128,1)", "line": {"shape": "spline", "color": "rgba(128,0,128,1)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [173773.54698650597, 131412.43587539488, 121896.06416337506, 164257.1752744862, 173773.54698650597], "y": [-42483.03389337174, -19566.36722670507, -37157.236148923475, -60073.90281559015, -42483.03389337174], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [201989.29609807013, 163100.40720918126, 149930.3150518109, 188819.20394069978, 201989.29609807013], "y": [-117363.81251852328, -83336.0347407455, -98387.56863488306, -132415.34641266085, -117363.81251852328], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-14848.897870501329, -81848.89787050133, -88342.60209072885, -21342.602090728848, -14848.897870501329], "y": [-180002.3457556686, -157002.3457556686, -175918.78848415747, -198918.78848415747, -180002.3457556686], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-30560.216074682357, -41560.21607468236, -48631.28388654783, -37631.28388654783, -30560.216074682357], "y": [-152925.0332139803, -141925.0332139803, -148996.10102584577, -159996.10102584577, -152925.0332139803], "fill": "toself", "fillcolor": "rgba(128,0,128,0.8035304331665313)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.8035304331665313)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-46955.31825691986, -65955.31825691987, -70236.18170431031, -51236.181704310315, -46955.31825691986], "y": [-120941.87792544534, -111941.87792544534, -120979.25631438072, -129979.25631438072, -120941.87792544534], "fill": "toself", "fillcolor": "rgba(128,0,128,0.5945643676931178)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.5945643676931178)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-146826.04798282738, -172289.0109457903, -181004.34086729182, -155541.3779043289, -146826.04798282738], "y": [-134283.28566660942, -114028.65603697981, -124985.07079543889, -145239.7004250685, -134283.28566660942], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-152899.41815453154, -181255.899636013, -176667.08180669878, -148310.60032521733, -152899.41815453154], "y": [-164976.90046611926, -174814.86342908224, -188041.45599592905, -178203.49303296607, -164976.90046611926], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-129567.44183918183, -192646.14554288553, -182637.94701093738, -119559.24330723366, -129567.44183918183], "y": [36141.76335613739, -316.56997719595165, -17632.34204040787, 18825.99129292547, 36141.76335613739], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-142237.15480847537, -166542.71036403094, -191380.2710786809, -167074.71552312534, -142237.15480847537], "y": [64831.78468725935, 100711.41431688899, 83885.96996180352, 48006.34033217389, 64831.78468725935], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-18960.289664175252, -59469.54892343452, -58870.09918594392, -18360.839926684654, -18960.289664175252], "y": [97556.16129895883, 95820.05018784771, 81832.88964640033, 83569.00075751146, 97556.16129895883], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-131849.18512966437, -163677.88883336808, -161837.68520193634, -130008.98149823262, -131849.18512966437], "y": [33691.430590451884, 26168.282442303735, 18382.805540092453, 25905.9536882406, 33691.430590451884], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [44713.86331780126, 26658.3077622457, 25441.85028821417, 43497.40584376973, 44713.86331780126], "y": [89875.80345572218, 92653.58123349996, 84746.60765229502, 81968.82987451724, 89875.80345572218], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4276608307142093)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4276608307142093)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [170701.74036182524, 121935.20115025366, 117664.9569002062, 166431.49611177776, 170701.74036182524], "y": [87811.47694218913, 98469.49839151351, 78930.69049428147, 68272.66904495709, 87811.47694218913], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-53463.901975607056, -62290.074410148525, -66801.64425406928, -57975.47181952782, -53463.901975607056], "y": [-74447.55610326267, -68420.16774981361, -75026.65982529699, -81054.04817874604, -74447.55610326267], "fill": "toself", "fillcolor": "rgba(165,42,42,0.7309683178424575)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.7309683178424575)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-128790.52526150303, -172885.4255244203, -178233.40145789823, -134138.50119498096, -128790.52526150303], "y": [-65250.13974550394, -37341.97502213859, -45791.77699703368, -73699.94172039903, -65250.13974550394], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-108635.15694123995, -187671.07943781064, -196432.04656814708, -117396.1240715764, -108635.15694123995], "y": [-76668.13250938818, -38154.865191143996, -56133.89338905181, -94647.16070729599, -76668.13250938818], "fill": "toself", "fillcolor": "rgba(128,0,128,0.4)", "line": {"shape": "spline", "color": "rgba(128,0,128,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-141222.68931107208, -153279.0164715659, -160174.4901928281, -148118.16303233427, -141222.68931107208], "y": [-138492.9483037345, -117997.19213089501, -122053.35314340217, -142549.10931624167, -138492.9483037345], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-169119.4706464542, -148623.71447361464, -149558.44445415383, -170054.20062699338, -169119.4706464542], "y": [-172223.1836964154, -169811.91826431663, -161866.71342973365, -164277.9788618324, -172223.1836964154], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-22022.594767165578, -46537.12666016969, -54725.021979532925, -30210.49008652881, -22022.594767165578], "y": [-177838.31696289193, -142874.9681974598, -148615.90629494438, -183579.2550603765, -177838.31696289193], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [63406.25892133002, 53761.19719293497, 50737.97103979044, 60383.0327681855, 63406.25892133002], "y": [-166864.877292478, -161238.59128424752, -166421.2646896381, -172047.55069786857, -166864.877292478], "fill": "toself", "fillcolor": "rgba(165,42,42,0.5597287277821844)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.5597287277821844)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [188506.39977096897, 138673.5808409278, 113716.5338938552, 163549.35282389636, 188506.39977096897], "y": [-168294.14082293253, -128508.26119330285, -159767.59272296954, -199553.4723525992, -168294.14082293253], "fill": "toself", "fillcolor": "rgba(165,42,42,0.4)", "line": {"shape": "spline", "color": "rgba(165,42,42,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-51251.5], "y": [-47446.12109375], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Volantis Command [J09]"], "hoverinfo": "text", "text": ["Volantis Command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [167911.5626237714], "y": [64260.774978111185], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Sierra Gate [P20]"], "hoverinfo": "text", "text": ["Sierra Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-50682.54689313953], "y": [-50898.69294379421], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 93 [J09]"], "hoverinfo": "text", "text": ["DS 93"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-48340.31982263772], "y": [-48996.59856404612], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 71 [J09]"], "hoverinfo": "text", "text": ["DS 71"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-75713.42970123097], "y": [49869.105750420815], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 53 [O08]"], "hoverinfo": "text", "text": ["DS 53"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [49063.72159644151], "y": [48649.36997806377], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 34 [O14]"], "hoverinfo": "text", "text": ["DS 34"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [42736.18796674425], "y": [-65761.40188807424], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["DS 17 [I14]"], "hoverinfo": "text", "text": ["DS 17"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [38346.98634266922], "y": [42956.104374497234], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["Outpost 16 [O13]"], "hoverinfo": "text", "text": ["Outpost 16"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-74742.37787150257], "y": [50944.840857631396], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 14 [O08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [44137.20606277941], "y": [-64411.060765708964], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 92 [I14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [47739.562445418334], "y": [49728.162669534766], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 78 [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [50900.58560386793], "y": [47397.99600972959], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 1 [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [41710.726163402534], "y": [-67386.14303397431], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 12 [I14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-77063.31115854684], "y": [48774.87892967857], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 87 [O08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-108168.74691358025], "y": [72550.91975308642], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Promethean Gate [P06]"], "hoverinfo": "text", "text": ["Promethean Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [85446.70987654322], "y": [-105652.83333333333], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["Waypoint 52 Gate [G16]"], "hoverinfo": "text", "text": ["Waypoint 52 Gate"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20}}, {"type": "scatter", "x": [-50609.6638146587], "y": [-44135.11213283773], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 86 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-53897.105914536754], "y": [-51525.271155785005], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 75 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-45874.78963480386], "y": [-50746.40549755851], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 32 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-58539.87217884765], "y": [-44774.06363027776], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 63 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-43062.25381857075], "y": [-43697.35974434545], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 18 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-49253.30116268151], "y": [-56886.98234701619], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 4 [J09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [169067.47541389934], "y": [68759.03995062043], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 61 [P20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [172767.08729047517], "y": [61359.81619746873], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 47 [P20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [164069.754106946], "y": [61684.343555063104], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 98 [P20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [167899.1769265596], "y": [63112.26392847834], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 57 [P20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [157059.96318290755], "y": [56556.81130507202], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 48 [O19]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [169031.78052002657], "y": [75143.15043711726], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 35 [P20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [179109.72889235296], "y": [56925.32068714266], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 76 [O20]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-73889.0552771867], "y": [47600.58839138723], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 99 [O08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [45686.00215932029], "y": [45465.468440563774], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 23 [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [39753.41830304561], "y": [-63846.507150574995], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 24 [I13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [51250.84091253724], "y": [41449.95361999646], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 74 [O14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [45606.60096005736], "y": [-69394.804108971], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["QRF 71 [I14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [85105.0207013257], "y": [-98982.5773121365], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 9 [H16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [86109.71463136685], "y": [-113048.29233271263], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 70 [G16]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-108325.92075592802], "y": [78727.40181735245], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 19 [P06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-108164.41517303819], "y": [64837.92168882572], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["WP 30 [P06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-3390.112005427087], "y": [-46007.42991474234], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 98 [J11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-9418.968835127343], "y": [-23507.42991474234], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 36 [K11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-25890.112005427083], "y": [-7036.286744442601], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 75 [L10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-48390.11200542709], "y": [-1007.4299147423371], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 31 [L09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-70890.11200542707], "y": [-7036.286744442594], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 77 [L08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-87361.25517572684], "y": [-23507.42991474234], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 51 [K07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-93390.11200542709], "y": [-46007.42991474233], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 29 [J07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-87361.25517572684], "y": [-68507.42991474233], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 43 [I07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-70890.1120054271], "y": [-84978.57308504207], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 35 [H08]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-48390.112005427094], "y": [-91007.42991474233], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 42 [H09]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-25890.112005427083], "y": [-84978.57308504207], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 70 [H10]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-9418.968835127358], "y": [-68507.42991474236], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 73 [I11]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [19761.462626292236], "y": [-61992.04947883795], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 74 [I12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [43150.73731765026], "y": [-76459.64207143054], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 78 [I14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [66540.0120090083], "y": [-90927.23466402314], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 84 [H15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-80547.17934901643], "y": [13721.685089063296], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 26 [M07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-91397.87379346087], "y": [34458.56780511269], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 20 [N07]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [-102248.56823790532], "y": [55195.45052116207], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 10 [O06]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [4445.104601600851], "y": [-3928.7778738996535], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 19 [L12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [25374.888552218155], "y": [10808.876447088005], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 56 [M13]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [50644.95028061321], "y": [24582.024595236144], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 39 [N14]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [75429.70167617028], "y": [40130.52198987874], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 97 [O15]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [106947.5128901621], "y": [49958.08971964555], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 91 [O17]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [140793.96350744605], "y": [53617.42613939863], "mode": "markers", "marker": {"symbol": "circle", "size": 3, "color": "white"}, "hovertext": ["SR 53 [O19]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}], "layout": {"title": "Volantis", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
@@ -157,6 +451,7 @@
     if (!isGM()) {
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
+    setDefaultInfo();
     Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
@@ -176,8 +471,123 @@
         }
         if (picked && objData[picked]) {
             highlight(picked);
+            lastPlotlyClickTs = Date.now();
         }
     });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
 
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {
@@ -271,6 +681,21 @@ function addButton(label, fn, header, color, isHidden) {
   }
 
   renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
 
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
