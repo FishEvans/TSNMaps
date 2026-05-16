@@ -10,6 +10,8 @@ REM Build using spec files (keeps hidden imports + data definitions in sync)
 pyinstaller "StellarCartography.spec" || goto :error
 pyinstaller "LocMapGen.spec" || goto :error
 pyinstaller "GalMapGen.spec" || goto :error
+pyinstaller "LibraryGen.spec" || goto :error
+pyinstaller "ProductionFlowGen.spec" || goto :error
 pyinstaller "SystemEditor.spec" || goto :error
 
 REM Stage distributable data (terrain JSON + settings with blank author)
