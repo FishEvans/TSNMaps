@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -2908.6089249470915,
+        -2908.6089249470865,
         0,
-        11236.089457768954
+        11236.08945776896
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -19,12 +19,12 @@
         "visible": true,
         "skybox": "sky-delight.png",
         "original_author": "Fish Evans",
-        "revision_date": "2026-01-29",
-        "revision_number": 15,
+        "revision_date": "2026-04-12",
+        "revision_number": 16,
         "all_authors": [
             "Fish Evans"
         ],
-        "last_revision_author": ""
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Merex Gate": {
@@ -96,26 +96,42 @@
             "type": "station",
             "facilities": [
                 "Docking",
-                "Refuel",
                 "Repair"
             ],
             "cargo": {
-                "Homing": 20,
-                "EMP": 6,
-                "High Yield Warhead": 2,
-                "Warhead": 5,
+                "Comms Relay": 5,
+                "Coolant": 5,
+                "Fuel Cell 100": 6,
+                "Fuel Cell 200": 3,
+                "Sensor Relay": 1,
+                "Warning Buoy": 4,
+                "Disruptor": 4,
+                "EMP": 3,
+                "Homing": 10,
+                "Mine": 4,
+                "Nuke": 2,
+                "Penetration": 4,
+                "Scorch": 8,
+                "Aid Package": 6,
+                "Casing": 5,
+                "Coffee": 2,
+                "Guidance System": 5,
+                "Medical Supplies": 3,
+                "Power Relay": 6,
+                "Rations": 15,
+                "Repair Materials": 10,
+                "Sensor Suite": 3,
+                "Tea": 2,
+                "Tharium Plating": 10,
                 "Torpedo Casing": 25,
-                "Casing": 25,
-                "Navigational Array": 1,
-                "Tactical Array": 10,
-                "Guidance System": 10,
-                "Transmitter": 4,
-                "Receiver": 5,
-                "Sensor Relay": 2,
-                "Comms Relay": 2
+                "Warhead": 7
             },
             "teams": {
-                "DamCon": 1
+                "Combat Engineers": 1,
+                "DamCon": 2,
+                "Diplomats": 1,
+                "Marines": 1,
+                "Medics": 1
             },
             "description": "Emergency Refuge station"
         },
@@ -131,10 +147,412 @@
             "hull": "pirate_military_base",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 1,
+                "Fuel Cell 200": 4,
+                "Aid Package": 14,
+                "Alcohol": 8,
+                "Casing": 7,
+                "Coffee": 5,
+                "Container": 28,
+                "Iso B Circuit": 27,
+                "Life Support": 0,
+                "Meals": 30,
+                "Medical Supplies": 7,
+                "Micro Controller": 11,
+                "Packaging": 14,
+                "Pets": 5,
+                "Power Relay": 15,
+                "Produce": 11,
+                "Rations": 20,
+                "Repair Materials": 14,
+                "Tea": 9,
+                "Torpedo Casing": 3,
+                "Ashfilum": 18,
+                "Ice": 92,
+                "Sensor Scrambler": 1,
+                "Data Chip": 2
+            },
+            "teams": {
+                "Diplomats": 2,
+                "Medics": 2
+            },
             "description": "This is an Error - this is not really a pirate base operated by the Black Flag, k Thx Bye.",
             "hideonmap": true
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                1853.6032941389665,
+                0,
+                -62883.180540871654
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                44095.04851753963,
+                0,
+                -70985.07454181733
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                15701.55486575883,
+                0,
+                -32526.526916953313
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -89280.56624080228,
+                0,
+                142449.98732081408
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -218931.65895087036,
+                0,
+                360968.2889212015
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": true
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -208677.00476636068,
+                0,
+                333405.56430876086
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": true
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -137248.62048679742,
+                0,
+                319398.5983005615
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": true
+        },
+        "FCS8": {
+            "type": "fcs_zone",
+            "coordinate": [
+                8632.529732482662,
+                0,
+                -221604.4473649668
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS9": {
+            "type": "fcs_zone",
+            "coordinate": [
+                86332.45624090744,
+                0,
+                152445.16718460753
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS10": {
+            "type": "fcs_zone",
+            "coordinate": [
+                64801.975896207,
+                0,
+                169960.778427381
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS11": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -201251.58187483373,
+                0,
+                -152200.83271736398
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS12": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -58036.82458881223,
+                0,
+                -52884.31080419858
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS13": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -80185.11760176334,
+                0,
+                -48591.54815675341
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS14": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -31164.39778541373,
+                0,
+                -63869.29390663152
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS15": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -162109.43220017813,
+                0,
+                -24466.73267240396
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS16": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -100960.39647573324,
+                0,
+                -37973.97001908375
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS17": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -138861.64731988628,
+                0,
+                -39611.54111129797
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS18": {
+            "type": "fcs_zone",
+            "coordinate": [
+                29729.419618510095,
+                0,
+                -51047.45632201127
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS19": {
+            "type": "fcs_zone",
+            "coordinate": [
+                22651.13494378661,
+                0,
+                -84496.1628377154
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS20": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -125841.18791810363,
+                0,
+                -19294.47687323327
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS21": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -20370.718566601066,
+                0,
+                -85076.83395873907
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS22": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -1590.1735127636534,
+                0,
+                -1228.2427377915878
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS23": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -117777.35223980204,
+                0,
+                -52817.11156784309
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS24": {
+            "type": "fcs_zone",
+            "coordinate": [
+                71014.94374423719,
+                0,
+                -114403.2219315646
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS25": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -191635.87081286393,
+                0,
+                -10847.925297214737
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS26": {
+            "type": "fcs_zone",
+            "coordinate": [
+                48132.379599173684,
+                0,
+                -93978.17220555093
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS27": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -57865.20762916278,
+                0,
+                -76959.28181087175
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS28": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -55927.91837458254,
+                0,
+                81154.50164732829
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS29": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -37121.38869750205,
+                0,
+                -40656.76105573567
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS30": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -98907.4084409399,
+                0,
+                -65691.53736758261
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS31": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -37598.693912426956,
+                0,
+                61668.629330706164
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS32": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -8847.233764432745,
+                0,
+                -36734.04102677134
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS33": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -76728.11715282247,
+                0,
+                107883.43273398471
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS34": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -20333.796367536797,
+                0,
+                34003.759832970994
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -143,168 +561,192 @@
                 -40140.108694700895,
                 0,
                 15598.42271484873
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 15": {
             "coordinate": [
                 -70670.26572227561,
                 0,
                 -8748.565073043213
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 59": {
             "coordinate": [
                 -70670.26572227561,
                 0,
                 -47798.10159362345
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 36": {
             "coordinate": [
                 -40140.10869470091,
                 0,
                 -72145.0893815154
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 29": {
             "coordinate": [
                 -2069.6255830237496,
                 0,
                 -63455.75004439468
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 45": {
             "coordinate": [
                 -24976.2037037038,
                 0,
                 179001.50805898488
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 88": {
             "coordinate": [
                 -19142.870370370467,
                 0,
                 137439.00805898488
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 85": {
             "coordinate": [
                 -13309.537037037131,
                 0,
                 95876.50805898488
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 98": {
             "coordinate": [
                 -7476.203703703799,
                 0,
                 54314.00805898488
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 62": {
             "coordinate": [
                 -1642.8703703704632,
                 0,
                 12751.50805898488
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 26": {
             "coordinate": [
                 4190.462962962873,
                 0,
                 -28810.99194101512
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 10": {
             "coordinate": [
                 10023.796296296201,
                 0,
                 -70373.49194101512
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 76": {
             "coordinate": [
                 15857.129629629537,
                 0,
                 -111935.99194101512
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 79": {
             "coordinate": [
                 -232476.20370370382,
                 0,
                 79834.84139231821
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 17": {
             "coordinate": [
                 -191761.13703703714,
                 0,
                 74210.84139231822
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 38": {
             "coordinate": [
                 -179518.2925925927,
                 0,
                 101225.73028120714
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 89": {
             "coordinate": [
                 -201997.6703703705,
                 0,
                 34490.619170096004
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 90": {
             "coordinate": [
                 -160588.15925925932,
                 0,
                 125394.39694787381
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 39": {
             "coordinate": [
                 -95567.53703703712,
                 0,
                 132964.84139231828
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 14": {
             "coordinate": [
                 11814.196296296199,
                 0,
                 46090.841392318274
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 71": {
             "coordinate": [
                 52529.26296296285,
                 0,
                 40466.84139231828
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 49": {
             "coordinate": [
                 93244.32962962962,
                 0,
                 34842.84139231829
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 41": {
             "coordinate": [
                 133959.39629629627,
                 0,
                 29218.841392318296
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 96": {
             "coordinate": [
                 174674.46296296292,
                 0,
                 23594.84139231831
-            ]
+            ],
+            "type": "Sensor Relay"
         }
     },
     "terrain": {

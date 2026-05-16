@@ -1,28 +1,28 @@
 {
     "systemMapCoord": [
-        38761.28751152047,
+        38761.28751152048,
         0,
-        25185.51520762122
+        25185.51520762123
     ],
     "systemalignment": "USFP",
     "metadata": {
         "sysdescription": "Toray is a cold, dim system with long orbital periods and plenty of empty. Notable for its Comercial Damage control and Navigation Facility, otherwise unremarkable.",
-        "security": "Low",
+        "security": "Normal",
         "exports": [
             "Industrial Goods"
         ],
-        "focus": "Administration",
+        "focus": "Exploration & Survey",
         "intel": {
             "pirate": "Low",
-            "enemy": "Low",
+            "enemy": "None",
             "assets": []
         },
-        "development": "Unclaimed",
+        "development": "Outpost",
         "visible": true,
         "skybox": "sky1.png",
         "original_author": "Draeco",
-        "revision_date": "2026-02-06",
-        "revision_number": 16,
+        "revision_date": "2026-03-21",
+        "revision_number": 17,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -131,6 +131,83 @@
             "facilities": [],
             "cargo": {},
             "teams": {}
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -92671.32450899381,
+                0,
+                112699.80402736623
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                78977.99964889683,
+                0,
+                62122.040785520665
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -98339.07737271213,
+                0,
+                5169.883965612535
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                123468.01918511468,
+                0,
+                47225.80117542521
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                67461.98646715321,
+                0,
+                137896.0690075865
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -32768.90194562387,
+                0,
+                -30024.522677965928
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -10387.425124933992,
+                0,
+                126101.68822355963
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -139,77 +216,88 @@
                 -102325.23148148152,
                 0,
                 -19918.724279835373
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 89": {
             "coordinate": [
                 -65991.89814814819,
                 0,
                 -6585.390946502041
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 23": {
             "coordinate": [
                 -29658.56481481486,
                 0,
                 6747.9423868312915
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 68": {
             "coordinate": [
                 43008.101851851796,
                 0,
                 33414.60905349796
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 12": {
             "coordinate": [
                 79341.43518518517,
                 0,
                 46747.9423868313
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 27": {
             "coordinate": [
                 115674.76851851848,
                 0,
                 60081.27572016463
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "Nav Alpha": {
             "coordinate": [
                 -118081.27572016462,
                 0,
                 113078.06069958852
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "Nav Baker": {
             "coordinate": [
                 -140586.41975308643,
                 0,
                 68067.77263374488
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "Nav Charlie": {
             "coordinate": [
                 -104015.56069958847,
                 0,
                 15823.688271604955
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "Nav Dog": {
             "coordinate": [
                 -71061.59979423867,
                 0,
                 -33607.25308641975
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "Nav Easy": {
             "coordinate": [
                 -44939.55761316871,
                 0,
                 39936.34259259261
-            ]
+            ],
+            "type": "Sensor Relay"
         }
     },
     "terrain": {

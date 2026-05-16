@@ -1,7 +1,7 @@
 {
     "systemMapCoord": [
-        43436.266681729365,
-        0.0,
+        43436.26668172937,
+        0,
         1217.5609231146686
     ],
     "systemalignment": "USFP",
@@ -26,8 +26,8 @@
         "visible": true,
         "skybox": "sky1.png",
         "original_author": "Tetra",
-        "revision_date": "2026-03-14",
-        "revision_number": 21,
+        "revision_date": "2026-04-15",
+        "revision_number": 25,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -93,23 +93,43 @@
                 "Refuel"
             ],
             "cargo": {
-                "Repair Materials": 16,
-                "Medical Supplies": 10,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
-                "Micro Controller": 8,
-                "Power Relay": 16,
-                "Aid Package": 16,
-                "Pets": 4,
-                "Torpedo Casing": 5,
-                "Casing": 6,
-                "Coffee": 5,
+                "Comms Relay": 5,
+                "Coolant": 5,
+                "Fuel Cell 100": 4,
+                "Fuel Cell 200": 2,
+                "Fuel Cell 400": 1,
+                "Sensor Relay": 1,
+                "Warning Buoy": 5,
+                "Disruptor": 4,
+                "EMP": 3,
+                "Homing": 15,
+                "Mine": 4,
+                "Nuke": 2,
+                "Penetration": 4,
+                "Scorch": 8,
+                "Aid Package": 6,
+                "Alcohol": 2,
+                "Analysis Suite": 2,
+                "Casing": 5,
+                "Coffee": 10,
+                "Guidance System": 25,
+                "Meals": 5,
+                "Pets": 1,
+                "Power Relay": 10,
+                "Rations": 15,
+                "Repair Materials": 10,
+                "Sensor Suite": 11,
                 "Tea": 5,
-                "Alcohol": 5
+                "Tharium Plating": 10,
+                "Torpedo Casing": 25,
+                "Warhead": 5
             },
             "teams": {
-                "Diplomats": 1
+                "Combat Engineers": 1,
+                "DamCon": 3,
+                "Diplomats": 1,
+                "Marines": 1,
+                "Medics": 1
             },
             "description": ""
         },
@@ -130,22 +150,32 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 47,
-                "Nuke": 2,
+                "Fuel Cell 100": 0,
+                "Fuel Cell 200": 0,
+                "Navigational Array": 2,
+                "Tactical Array": 12,
+                "Disruptor": 6,
                 "EMP": 6,
-                "Mine": 5,
-                "High Yield Warhead": 15,
-                "Warhead": 67,
-                "Torpedo Casing": 67,
-                "Casing": 65,
-                "Navigational Array": 1,
-                "Tactical Array": 10,
-                "Guidance System": 55
+                "Homing": 48,
+                "Mine": 6,
+                "Nuke": 1,
+                "Penetration": 2,
+                "Scorch": 7,
+                "Casing": 20,
+                "Guidance System": 28,
+                "High Yield Warhead": 17,
+                "Power Relay": 5,
+                "Sensor Suite": 9,
+                "Tharium Plating": 9,
+                "Torpedo Casing": 27,
+                "Warhead": 23,
+                "Mexalon": 3
             },
             "teams": {
-                "DamCon": 4,
-                "Medics": 3,
-                "Combat Engineers": 4
+                "Combat Engineers": 3,
+                "DamCon": 1,
+                "Marines": 0,
+                "Medics": 2
             },
             "description": ""
         },
@@ -287,19 +317,52 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_science",
+            "hull": "starbase_command",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": "",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Coolant": 8,
+                "Fuel Cell 400": 1,
+                "Data Chip": 5,
+                "Data Core": 2,
+                "Computer Core": 2,
+                "Life Support": 2,
+                "EMP": 10,
+                "Homing": 35,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Denebite Crystals": 2,
+                "Guidance System": 15,
+                "High Yield Warhead": 10,
+                "Iso B Circuit": 2,
+                "Meals": 15,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Rations": 8,
+                "Receiver": 6,
+                "Repair Materials": 6,
+                "Sensor Suite": 8,
+                "Transmitter": 8,
+                "Wild Animals": 15,
+                "Ice": 40,
+                "Mexalon": 9
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 5
+            },
+            "description": "Classified",
             "hideonmap": true
         },
         "SBA   01": {
             "coordinate": [
-                39464.138532920355,
+                40045.5586313238,
                 0,
-                -171283.9141245783
+                -171865.33422298174
             ],
             "sides": [
                 "USFP"
@@ -314,9 +377,9 @@
         },
         "SBA   02": {
             "coordinate": [
-                72023.66404351326,
+                59813.84197704091,
                 0,
-                -172911.89040010795
+                -171361.43680436545
             ],
             "sides": [
                 "USFP"
@@ -331,9 +394,9 @@
         },
         "SBA   03": {
             "coordinate": [
-                103885.48543602203,
+                80241.06810094861,
                 0,
-                -170353.64196713277
+                -170935.0620655362
             ],
             "sides": [
                 "USFP"
@@ -348,9 +411,9 @@
         },
         "SBA   04": {
             "coordinate": [
-                41092.114808449995,
+                40510.69471004655,
                 0,
-                -197331.53453305262
+                -196750.11443464918
             ],
             "sides": [
                 "USFP"
@@ -365,14 +428,14 @@
         },
         "SBA   05": {
             "coordinate": [
-                72023.66404351326,
+                59813.84197704091,
                 0,
-                -198029.23865113675
+                -197447.8185527333
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_science",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -382,9 +445,9 @@
         },
         "SBA   06": {
             "coordinate": [
-                102257.5091604924,
+                79969.73872169368,
                 0,
-                -198029.23865113675
+                -197447.8185527333
             ],
             "sides": [
                 "USFP"
@@ -406,7 +469,7 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_science",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -416,14 +479,14 @@
         },
         "SBA   08": {
             "coordinate": [
-                71325.95992542912,
+                59309.944558424584,
                 0,
-                -220123.20239046766
+                -220317.00908993545
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_science",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -433,14 +496,14 @@
         },
         "SBA   09": {
             "coordinate": [
-                101327.23700304687,
+                79620.88666265161,
                 0,
-                -219425.49827238353
+                -219619.30497185135
             ],
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_science",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -450,9 +513,9 @@
         },
         "SBA   10": {
             "coordinate": [
-                72023.66404351326,
+                59232.42187863746,
                 0,
-                -243845.14240532822
+                -239775.2017165041
             ],
             "sides": [
                 "USFP"
@@ -477,8 +540,38 @@
             "hull": "starbase_science",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Coolant": 9,
+                "Fuel Cell 400": 0,
+                "Data Chip": 6,
+                "Data Core": 3,
+                "Computer Core": 2,
+                "Life Support": 2,
+                "EMP": 11,
+                "Homing": 36,
+                "Analysis Suite": 7,
+                "Casing": 14,
+                "Denebite Crystals": 3,
+                "Guidance System": 14,
+                "High Yield Warhead": 10,
+                "Iso B Circuit": 2,
+                "Meals": 16,
+                "Medical Supplies": 17,
+                "Micro Controller": 24,
+                "Power Relay": 16,
+                "Rations": 8,
+                "Receiver": 7,
+                "Repair Materials": 7,
+                "Sensor Suite": 9,
+                "Transmitter": 8,
+                "Wild Animals": 16,
+                "Ice": 44,
+                "Mexalon": 10
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 5
+            },
             "description": "A Secritive Private Corporation. This Lab is licensed to perfom Biological experiments up to level 5 Hazard.",
             "hideonmap": true
         },
@@ -498,23 +591,30 @@
                 "Refuel"
             ],
             "cargo": {
-                "Repair Materials": 15,
-                "Medical Supplies": 9,
-                "Iso B Circuit": 22,
-                "Container": 24,
-                "Life Support": 3,
-                "Micro Controller": 7,
-                "Power Relay": 17,
-                "Aid Package": 14,
-                "Pets": 3,
-                "Torpedo Casing": 4,
-                "Casing": 7,
-                "Coffee": 3,
-                "Tea": 4,
-                "Alcohol": 4
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 3,
+                "Iso B Circuit": 5,
+                "Meals": 45,
+                "Medical Supplies": 8,
+                "Micro Controller": 2,
+                "Packaging": 15,
+                "Pets": 2,
+                "Power Relay": 16,
+                "Rations": 52,
+                "Repair Materials": 18,
+                "Tea": 10,
+                "Ashfilum": 20,
+                "Ice": 54
             },
             "teams": {
-                "Diplomats": 0
+                "Diplomats": 5,
+                "Medics": 1
             },
             "description": "This Station is In High Orbit of Helios and houses a Vistors center, museum and"
         },
@@ -534,30 +634,45 @@
                 "Refuel"
             ],
             "cargo": {
-                "High Yield Warhead": 3,
-                "Warhead": 12,
-                "Life Support": 4,
-                "Micro Controller": 22,
-                "Medical Supplies": 24,
-                "Power Relay": 17,
-                "Transmitter": 9,
-                "Receiver": 7,
-                "Analysis Suite": 7,
-                "Sensor Suite": 7,
-                "Guidance System": 12,
-                "Wild Animals": 16,
-                "Pets": 6,
+                "Coolant": 15,
+                "Fuel Cell 100": 7,
+                "Fuel Cell 200": 1,
+                "Fuel Cell 400": 1,
+                "Life Support": 3,
+                "EMP": 10,
+                "Homing": 35,
+                "Alcohol": 16,
+                "Analysis Suite": 8,
                 "Casing": 15,
-                "EMP": 8,
-                "Homing": 38,
-                "Coolant": 16,
-                "Tea": 11,
-                "Coffee": 16,
-                "Alcohol": 14
+                "Coffee": 15,
+                "Container": 18,
+                "Denebite Crystals": 5,
+                "Guidance System": 15,
+                "High Yield Warhead": 3,
+                "Iso B Circuit": 7,
+                "Meals": 14,
+                "Medical Supplies": 25,
+                "Micro Controller": 25,
+                "Packaging": 8,
+                "Pets": 4,
+                "Power Relay": 16,
+                "Produce": 15,
+                "Rations": 25,
+                "Receiver": 6,
+                "Repair Materials": 8,
+                "Sensor Suite": 8,
+                "Tea": 12,
+                "Tharium Plating": 16,
+                "Torpedo Casing": 21,
+                "Transmitter": 8,
+                "Warhead": 13,
+                "Wild Animals": 15,
+                "Scorch": 8,
+                "Warning Buoy": 12
             },
             "teams": {
                 "DamCon": 2,
-                "Medics": 1
+                "Medics": 2
             },
             "description": ""
         },
@@ -577,23 +692,32 @@
                 "Refuel"
             ],
             "cargo": {
-                "Repair Materials": 15,
-                "Medical Supplies": 10,
-                "Iso B Circuit": 21,
-                "Container": 26,
-                "Life Support": 3,
-                "Micro Controller": 6,
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
                 "Power Relay": 16,
-                "Aid Package": 18,
-                "Pets": 4,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
                 "Torpedo Casing": 5,
-                "Casing": 7,
-                "Coffee": 4,
-                "Tea": 5,
-                "Alcohol": 4
+                "Ashfilum": 20,
+                "Ice": 100
             },
             "teams": {
-                "Diplomats": 2
+                "Diplomats": 1,
+                "Medics": 1
             },
             "description": ""
         },
@@ -683,27 +807,38 @@
                 "Refuel"
             ],
             "cargo": {
-                "Iron": 69,
-                "Tharium": 56,
-                "Reisium": 66,
-                "Alerite": 50,
-                "Cabrite": 34,
-                "Ashfilum": 58,
-                "Denebite": 29,
-                "Aegirine": 145,
-                "Nuidinium": 162,
-                "Gredian": 9,
-                "Warhead": 10,
-                "Life Support": 0,
+                "Comms Relay": 0,
+                "Fuel Cell 100": 3,
+                "Sensor Relay": 2,
+                "Data Chip": 2,
+                "Life Support": 2,
+                "Homing": 34,
+                "Casing": 16,
+                "Denebite Crystals": 5,
+                "Iso B Circuit": 3,
+                "Meals": 14,
                 "Micro Controller": 7,
-                "Power Relay": 16,
-                "Casing": 17,
-                "Homing": 29,
-                "Torpedo Casing": 7
+                "Packaging": 25,
+                "Power Relay": 18,
+                "Rations": 30,
+                "Sensor Suite": 10,
+                "Tharium Plating": 23,
+                "Torpedo Casing": 11,
+                "Warhead": 8,
+                "Aegirine": 140,
+                "Alerite": 50,
+                "Ashfilum": 56,
+                "Cabrite": 34,
+                "Denebite": 28,
+                "Gredian": 10,
+                "Iron": 60,
+                "Nuidinium": 159,
+                "Reisium": 67,
+                "Tharium": 56
             },
             "teams": {
                 "DamCon": 0,
-                "Medics": 0
+                "Medics": 2
             },
             "description": ""
         },
@@ -791,7 +926,7 @@
                 "USFP"
             ],
             "hull": "usfp_industrial_storage",
-            "type": "station",
+            "type": "platform",
             "facilities": [],
             "cargo": {
                 "Iron": 66,
@@ -872,8 +1007,37 @@
                 "Docking",
                 "Refuel"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 10,
+                "Fuel Cell 200": 2,
+                "Fuel Cell 400": 3,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 150,
+                "Container": 8,
+                "Denebite Crystals": 15,
+                "Meals": 7,
+                "Micro Controller": 8,
+                "Power Relay": 25,
+                "Warhead": 5,
+                "Aegirine": 65,
+                "Alerite": 1,
+                "Ashfilum": 14,
+                "Cabrite": 21,
+                "Denebite": 61,
+                "Gredian": 2,
+                "Ice": 60,
+                "Iron": 12,
+                "Mexalon": 18,
+                "Nuidinium": 3,
+                "Reisium": 2,
+                "Tharium": 5
+            },
+            "teams": {
+                "Combat Engineers": 1,
+                "DamCon": 1,
+                "Marines": 1
+            },
             "description": ""
         },
         "Helios Command": {
@@ -893,30 +1057,36 @@
                 "Repair"
             ],
             "cargo": {
-                "High Yield Warhead": 3,
-                "Warhead": 13,
-                "Life Support": 3,
-                "Micro Controller": 25,
-                "Medical Supplies": 25,
-                "Power Relay": 16,
-                "Transmitter": 8,
-                "Receiver": 6,
-                "Analysis Suite": 8,
-                "Sensor Suite": 8,
-                "Guidance System": 15,
-                "Wild Animals": 15,
-                "Pets": 4,
-                "Casing": 15,
-                "EMP": 10,
-                "Homing": 35,
-                "Coolant": 15,
-                "Tea": 12,
-                "Coffee": 15
+                "Fuel Cell 100": 3,
+                "Fuel Cell 200": 3,
+                "Warning Buoy": 5,
+                "Data Chip": 4,
+                "Data Core": 2,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Disruptor": 7,
+                "EMP": 11,
+                "Homing": 68,
+                "Mine": 12,
+                "Nuke": 12,
+                "Penetration": 7,
+                "Scorch": 22,
+                "Casing": 18,
+                "Guidance System": 59,
+                "High Yield Warhead": 14,
+                "Power Relay": 8,
+                "Receiver": 14,
+                "Sensor Suite": 6,
+                "Torpedo Casing": 40,
+                "Transmitter": 34,
+                "Warhead": 55,
+                "Mexalon": 4
             },
             "teams": {
-                "Diplomats": 16,
-                "DamCon": 2,
-                "Medics": 2
+                "Combat Engineers": 3,
+                "DamCon": 3,
+                "Marines": 4,
+                "Medics": 0
             },
             "description": ""
         },
@@ -933,27 +1103,190 @@
             "type": "station",
             "facilities": [],
             "cargo": {
-                "Repair Materials": 16,
-                "Medical Supplies": 10,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
-                "Micro Controller": 8,
-                "Power Relay": 16,
-                "Aid Package": 16,
-                "Pets": 4,
-                "Torpedo Casing": 5,
-                "Casing": 6,
-                "Coffee": 5,
-                "Tea": 5,
-                "Alcohol": 5
+                "Fuel Cell 100": 5,
+                "Fuel Cell 200": 2,
+                "Warning Buoy": 5,
+                "Data Core": 1,
+                "Tactical Array": 2,
+                "Disruptor": 15,
+                "EMP": 12,
+                "Homing": 30,
+                "Mine": 5,
+                "Nuke": 5,
+                "Penetration": 10,
+                "Scorch": 25,
+                "Casing": 16,
+                "Guidance System": 20,
+                "High Yield Warhead": 10,
+                "Power Relay": 8,
+                "Receiver": 15,
+                "Sensor Suite": 6,
+                "Torpedo Casing": 40,
+                "Transmitter": 35,
+                "Warhead": 20,
+                "Mexalon": 5
             },
             "teams": {
-                "Marines": 6,
-                "Combat Engineers": 3,
+                "Combat Engineers": 2,
+                "DamCon": 5,
+                "Marines": 10,
                 "Medics": 2
             },
             "description": ""
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -490074.3466904799,
+                0,
+                190859.14620913076
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -496588.2616988991,
+                0,
+                150741.88046621246
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -497443.54082450876,
+                0,
+                125606.60426679037
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                185579.85319971008,
+                0,
+                -306689.86122113385
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                149220.5283765499,
+                0,
+                -316626.097121905
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                134612.30471372433,
+                0,
+                -335555.02069249854
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                107424.81009304202,
+                0,
+                -340677.2792613624
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS8": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -65967.5797455524,
+                0,
+                -29489.19342266827
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS9": {
+            "type": "fcs_zone",
+            "coordinate": [
+                85084.97721288785,
+                0,
+                -352796.6096247971
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS10": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -308899.7659526771,
+                0,
+                246142.64368441852
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS11": {
+            "type": "fcs_zone",
+            "coordinate": [
+                75966.45685269544,
+                0,
+                -187688.77291350305
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS12": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -140217.7071442486,
+                0,
+                -217638.1376088466
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS13": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -487433.9359659152,
+                0,
+                215918.1883858505
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS14": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -470505.29555991234,
+                0,
+                229156.51514734578
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -962,119 +1295,136 @@
                 290571.974952693,
                 0,
                 6464.522250710206
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 15": {
             "coordinate": [
                 273629.016036336,
                 0,
                 41646.93896177155
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 37": {
             "coordinate": [
                 235558.53292465885,
                 0,
                 50336.27829889227
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 40": {
             "coordinate": [
                 205028.37589708416,
                 0,
                 25989.290511000327
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 52": {
             "coordinate": [
                 205028.37589708416,
                 0,
                 -13060.246009579905
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 43": {
             "coordinate": [
                 235558.53292465885,
                 0,
                 -37407.233797471854
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 98": {
             "coordinate": [
                 273629.016036336,
                 0,
                 -28717.89446035114
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 34": {
             "coordinate": [
                 39224.613970370665,
                 0,
                 25638.38371358021
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 45": {
             "coordinate": [
                 22281.655054013674,
                 0,
                 60820.80042464155
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 24": {
             "coordinate": [
                 -15788.828057663482,
                 0,
                 69510.13976176227
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 54": {
             "coordinate": [
                 -46318.98508523819,
                 0,
                 45163.15197387033
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 99": {
             "coordinate": [
                 -46318.98508523819,
                 0,
                 6113.615453290098
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 77": {
             "coordinate": [
                 -15788.828057663493,
                 0,
                 -18233.372334601852
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 42": {
             "coordinate": [
                 22281.655054013667,
                 0,
                 -9544.03299748114
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 59": {
             "coordinate": [
                 53059.19550725903,
                 0,
                 -38447.483679627345
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "Semelie Industrys": {
             "coordinate": [
                 78762.61521747852,
                 0,
                 -64662.553076441865
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "LD Bouy Alpha": {
             "coordinate": [
                 -58362.25026103298,
                 0,
                 -41964.077816488265
-            ]
+            ],
+            "type": "Sensor Relay"
         }
     },
     "terrain": {

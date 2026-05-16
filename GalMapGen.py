@@ -348,7 +348,9 @@ def build_styles(layout):
     * {{ box-sizing: border-box; }}
     body {{ margin:0; background:black; color:white; display:flex; min-height:100dvh; height:100dvh; overflow:hidden; }}
     #controls {{ width:220px; min-width:220px; background:#333; padding:10px; overflow-y:auto; }}
-    .system-button {{ width:100%; min-height:42px; padding:6px 8px; font-size:14pt; background:#444; color:white; border:none; margin-bottom:5px; cursor:pointer; text-align:left; display:flex; align-items:center; }}
+    .system-button {{ width:100%; min-height:42px; padding:6px 10px; font-size:14pt; background:rgba(54,54,54,0.94); color:white; border:1px solid rgba(255,255,255,0.12); border-radius:999px; margin-bottom:5px; cursor:pointer; text-align:left; display:flex; align-items:center; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03); transition:transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease; }}
+    .system-button:hover,
+    .system-button:focus-visible {{ transform:translateY(-1px); filter:brightness(1.06); outline:none; }}
     .system-button .button-icon {{ height:1em; width:auto; margin-right:0.5em; }}
     #system-search {{ font-size:16px; }}
     #sort-options {{ display:flex; flex-wrap:wrap; gap:8px; }}
@@ -376,8 +378,8 @@ def build_styles(layout):
     }}
     svg {{ position:absolute; top:0; left:0; z-index:0; pointer-events:auto; }}
     svg polyline {{ pointer-events: stroke; }}
-    .system {{ position:absolute; width:50px; transform:translate(-50%,-50%); z-index:1; cursor:pointer; text-align:center; }}
-    .icon {{ position:relative; width:75px; height:75px; }}
+    .system {{ position:absolute; width:75px; transform:translate(-50%,-50%); z-index:1; cursor:pointer; text-align:center; }}
+    .icon {{ position:relative; width:75px; height:75px; margin:0 auto; }}
     .alignment-img {{ position:absolute; top:15px; left:15px; width:40px; height:40px; }}
     .tint-img {{ position:absolute; top:0; left:0; width:70px; height:70px; opacity:0.3; }}
     .system-name {{
@@ -410,22 +412,66 @@ def build_styles(layout):
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+       align-items: stretch;
+       justify-content: flex-start;
+       gap: 10px;
+    }}
+    .page-nav-stack {{
+      display: grid;
+      gap: 8px;
+      width: 100%;
+    }}
+    .page-nav-link {{
+      width: 100%;
+      min-height: 44px;
+      padding: 12px 18px;
+      display: inline-flex;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      color: #f1f5fb;
+      background: rgba(54,54,54,0.94);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      font-family: "Consolas", "Lucida Console", monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }}
+    .page-nav-link:hover,
+    .page-nav-link:focus-visible {{
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+      outline: none;
+    }}
+    .page-nav-link.page-nav-map {{
+      border-color: rgba(255,255,255,0.18);
+      background: linear-gradient(180deg, rgba(77,77,77,0.96), rgba(54,54,54,0.96));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 8px 18px rgba(0,0,0,0.24);
+    }}
+    .page-nav-link.page-nav-library {{
+      border-color: rgba(125,183,255,0.45);
+      background: linear-gradient(180deg, rgba(27,51,84,0.96), rgba(18,35,58,0.96));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 8px 18px rgba(6,14,28,0.28);
+    }}
+    .page-nav-link.page-nav-production {{
+      border-color: rgba(147,255,215,0.3);
+      background: linear-gradient(180deg, rgba(18,46,39,0.96), rgba(12,29,25,0.96));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 8px 18px rgba(0,0,0,0.28);
     }}
     #info img {{
+      align-self: center;
       max-width: 80%;
       height: auto;
     }}
     #system-details {{ text-align: left; width:100%; }}
     .system-link-button {{
-      width:100%;
-      min-height:42px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin:8px 0;
-      text-decoration:none;
+      display: none;
+      margin: 0;
     }}
     .system-link-button.is-disabled {{
       opacity:0.45;
@@ -433,57 +479,59 @@ def build_styles(layout):
     }}
     @media (max-width: 960px) {{
       body {{ display:block; position:relative; }}
-      #mobile-toolbar {{ display:flex; }}
+      #mobile-toolbar {{ display:flex; z-index:6; }}
       #controls {{
-        position:absolute;
-        top:64px;
-        left:12px;
-        right:12px;
-        width:auto;
-        min-width:0;
-        max-height:38dvh;
+        position:fixed;
+        inset:0 auto 0 0;
+        width:100vw;
+        height:100dvh;
+        min-height:100dvh;
         z-index:4;
+        padding: max(env(safe-area-inset-top, 0px), 10px) 10px max(env(safe-area-inset-bottom, 0px), 10px);
         border:1px solid rgba(255,255,255,0.12);
         box-shadow:0 18px 40px rgba(0,0,0,0.42);
         transition:transform 0.2s ease, opacity 0.2s ease;
+        overscroll-behavior:contain;
       }}
       #maparea {{
-        position:absolute;
+        position:fixed;
         inset:0;
         min-height:100dvh;
       }}
       #info {{
-        position:absolute;
-        left:12px;
-        right:12px;
-        bottom:12px;
-        width:auto;
-        min-width:0;
-        max-height:42dvh;
+        position:fixed;
+        inset:0 0 0 auto;
+        width:100vw;
+        height:100dvh;
+        min-height:100dvh;
         z-index:4;
+        padding: max(env(safe-area-inset-top, 0px), 10px) 10px max(env(safe-area-inset-bottom, 0px), 10px);
         border:1px solid rgba(255,255,255,0.12);
         box-shadow:0 18px 40px rgba(0,0,0,0.42);
         transition:transform 0.2s ease, opacity 0.2s ease;
+        overscroll-behavior:contain;
       }}
       #controls.mobile-collapsed {{
-        transform:translateY(calc(-100% - 18px));
+        transform:translateX(-100%);
         opacity:0;
         pointer-events:none;
       }}
       #info.mobile-collapsed {{
-        transform:translateY(calc(100% + 18px));
+        transform:translateX(100%);
         opacity:0;
         pointer-events:none;
       }}
+      .system-link-button {{ display: inline-flex; }}
       .system-button {{ font-size: 11pt; }}
       .system-name {{ font-size: 64px; }}
     }}
     @media (max-width: 640px) {{
       #mobile-toolbar {{ top:8px; left:8px; right:8px; }}
-      #controls {{ top:56px; left:8px; right:8px; max-height: 40dvh; padding: 8px; }}
-      #info {{ left:8px; right:8px; bottom:8px; max-height: 34dvh; padding: 8px; }}
+      #controls {{ width:100vw; height:100dvh; padding: max(env(safe-area-inset-top, 0px), 8px) 8px max(env(safe-area-inset-bottom, 0px), 8px); }}
+      #info {{ width:100vw; height:100dvh; padding: max(env(safe-area-inset-top, 0px), 8px) 8px max(env(safe-area-inset-bottom, 0px), 8px); }}
       .system-button {{ min-height: 40px; font-size: 10pt; }}
-      .icon {{ width:60px; height:60px; }}
+      .system {{ width:60px; }}
+      .icon {{ width:60px; height:60px; margin:0 auto; }}
       .alignment-img {{ top:12px; left:12px; width:34px; height:34px; }}
       .tint-img {{ width:58px; height:58px; }}
       .system-name {{ font-size: 52px; }}
@@ -520,13 +568,33 @@ def build_script(layout, system_meta, coords):
     }}
 
     function syncMobileDrawerState() {{
+      const systemsOpen = activeMobileDrawer === 'systems';
+      const infoOpen = activeMobileDrawer === 'info';
       if (!isMobileLayout()) {{
         controls.classList.remove('mobile-collapsed');
         infoPanel.classList.remove('mobile-collapsed');
-        return;
+      }} else {{
+        controls.classList.toggle('mobile-collapsed', !systemsOpen);
+        infoPanel.classList.toggle('mobile-collapsed', !infoOpen);
       }}
-      controls.classList.toggle('mobile-collapsed', !systemsDrawerOpen);
-      infoPanel.classList.toggle('mobile-collapsed', !infoDrawerOpen);
+      if (systemsToggleBtn) {{
+        systemsToggleBtn.setAttribute('aria-expanded', systemsOpen ? 'true' : 'false');
+      }}
+      if (infoToggleBtn) {{
+        infoToggleBtn.setAttribute('aria-expanded', infoOpen ? 'true' : 'false');
+      }}
+    }}
+
+    function setActiveMobileDrawer(drawerName) {{
+      if (!isMobileLayout()) return;
+      activeMobileDrawer = drawerName;
+      syncMobileDrawerState();
+    }}
+
+    function toggleMobileDrawer(drawerName) {{
+      if (!isMobileLayout()) return;
+      activeMobileDrawer = activeMobileDrawer === drawerName ? null : drawerName;
+      syncMobileDrawerState();
     }}
 
     function setSelectedSystemLink(name) {{
@@ -586,8 +654,7 @@ def build_script(layout, system_meta, coords):
     let selectedSystem = null;
     let pinchStartDistance = 0;
     let pinchStartScale = scale;
-    let systemsDrawerOpen = false;
-    let infoDrawerOpen = true;
+    let activeMobileDrawer = null;
 
     function applyTransform() {{
       panX = Math.min(PANX_MAX, Math.max(PANX_MIN, panX));
@@ -602,8 +669,6 @@ def build_script(layout, system_meta, coords):
         label.style.setProperty('font-size', `${{newSize}}px`, 'important');
         const offset = (newSize - minSize) / 2;
         label.style.transform = `translateX(-50%) translateY(-${{offset}}px)`;
-        const halfWidth = label.offsetWidth / 2;
-        label.style.marginLeft = `-${{halfWidth}}px`;
       }});
 
       document.querySelectorAll('.icon').forEach(icon => {{
@@ -664,8 +729,7 @@ def build_script(layout, system_meta, coords):
       setJumpHighlight(name, true);
       setSelectedSystemLink(name);
       if (isMobileLayout()) {{
-        infoDrawerOpen = true;
-        syncMobileDrawerState();
+        setActiveMobileDrawer('info');
       }}
     }}
 
@@ -787,21 +851,13 @@ def build_script(layout, system_meta, coords):
 
     if (systemsToggleBtn) {{
       systemsToggleBtn.addEventListener('click', () => {{
-        systemsDrawerOpen = !systemsDrawerOpen;
-        if (systemsDrawerOpen) {{
-          infoDrawerOpen = false;
-        }}
-        syncMobileDrawerState();
+        toggleMobileDrawer('systems');
       }});
     }}
 
     if (infoToggleBtn) {{
       infoToggleBtn.addEventListener('click', () => {{
-        infoDrawerOpen = !infoDrawerOpen;
-        if (infoDrawerOpen) {{
-          systemsDrawerOpen = false;
-        }}
-        syncMobileDrawerState();
+        toggleMobileDrawer('info');
       }});
     }}
 
@@ -813,9 +869,6 @@ def build_script(layout, system_meta, coords):
         if (isMobileLayout()) {{
           selectSystem(name);
           centerOnSystem(name);
-          systemsDrawerOpen = false;
-          infoDrawerOpen = true;
-          syncMobileDrawerState();
           return;
         }}
         if (targetUrl) {{
@@ -942,8 +995,9 @@ def build_page_html(system_divs, svg_lines, system_list_html, layout, system_met
     styles = build_styles(layout)
     script = build_script(layout, system_meta, coords)
     home_button_html = (
-        '<button onclick="resetZoom()" class="system-button" '
-        'style="background-color:#222;width:100%;font-size:16pt;">Home</button>'
+        '<button onclick="resetZoom()" class="page-nav-link page-nav-map" type="button">'
+        "Galactic Map"
+        "</button>"
     )
 
     return f"""<!DOCTYPE html>
@@ -989,9 +1043,13 @@ def build_page_html(system_divs, svg_lines, system_list_html, layout, system_met
     </div>
   </div>
   <div id="info">
+    <div class="page-nav-stack">
+      {home_button_html}
+      <a id="selected-system-link" class="page-nav-link page-nav-map system-link-button is-disabled" href="#">Open Selected System</a>
+      <a href="Library.html" class="page-nav-link page-nav-library">Ship Library</a>
+      <a href="ProductionFlow.html" class="page-nav-link page-nav-production">Production Flow</a>
+    </div>
     <img src="Images/compass.png" alt="Compass" />
-    {home_button_html}
-    <a id="selected-system-link" class="system-button system-link-button is-disabled" href="#">Open Selected System</a>
     <div id="system-details">
       <p>Select a system to view metadata.</p>
     </div>

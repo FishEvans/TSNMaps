@@ -4,6 +4,8 @@ import argparse
 import sys
 import json
 import datetime
+import ast
+from pathlib import Path
 #import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 from typing import Any, Dict, List, Optional, Tuple
@@ -16,6 +18,385 @@ import copy
 from PIL import Image, ImageTk
 import re
 import SystemMetaOptions as smopts
+
+# Icon display constants (from ProductionFlowGen.py)
+SPRITE_COLUMNS = 20
+SPRITE_ROWS = 20
+SPRITE_SOURCE = Path("HTML") / "Images" / "Production" / "grid-icon-sheet2.png"
+DATABASE_SOURCE = Path("scripts") / "Referance" / "tsn_databases.py"
+CARGO_ITEM_CATEGORY_ORDER = (
+    "team",
+    "usable_deployable",
+    "intel_special",
+    "ship_items",
+    "ordnance",
+    "commodity",
+    "raw",
+)
+CARGO_ITEM_CATEGORY_LABELS = {
+    "team": "Team",
+    "usable_deployable": "Useable/Deployable",
+    "intel_special": "Intel/Special",
+    "ship_items": "Ship Items",
+    "ordnance": "Ordnance",
+    "commodity": "Commodity",
+    "raw": "Raw Material",
+}
+CARGO_ITEM_CATEGORY_COLORS = {
+    "team": "darkblue",
+    "usable_deployable": "#006b8f",
+    "intel_special": "#d56b00",
+    "ship_items": "#6a2c91",
+    "ordnance": "#b00020",
+    "commodity": "#0b7d26",
+    "raw": "#7a4a12",
+}
+CARGO_ITEM_CATEGORY_RANK = {
+    category: index for index, category in enumerate(CARGO_ITEM_CATEGORY_ORDER)
+}
+TARGET_ASSIGNMENTS = {
+    "rawMaterials",
+    "shipItems", 
+    "commoditiesDatabase",
+    "intelfragmentsDatabase",
+    "ordnanceDatabase",
+}
+TEAM_ICON_META = {
+    # Team names are stored in cargo_teams.json, not the TSN item database.
+    "DamCon": {"icon": 168, "colour": "#8bd6ff", "category": "team"},
+    "Medics": {"icon": 170, "colour": "#71d983", "category": "team"},
+    "Marines": {"icon": 360, "colour": "#b8c4d6", "category": "team"},
+    "Combat Engineers": {"icon": 166, "colour": "#f1c46a", "category": "team"},
+    "Evacuees": {"icon": 366, "colour": "#a7d8ff", "category": "team"},
+    "Diplomats": {"icon": 368, "colour": "#d6c2ff", "category": "team"},
+}
+USABLE_DEPLOYABLE_ITEMS = {
+    # Manual category override list for cargo/team dropdown grouping.
+    "Comms Relay",
+    "Coolant",
+    "Fuel Cell 100",
+    "Fuel Cell 200",
+    "Fuel Cell 400",
+    "Sensor Relay",
+    "Warning Beacon",
+    "Warning Buoy",
+    "Warp Inhibitor",
+}
+INTEL_SPECIAL_ITEMS = {
+    # Manual category override list for cargo/team dropdown grouping.
+    "Data Chip",
+    "Data Core",
+    "Vaccine",
+    "Virus",
+    "Virus Sample",
+}
+ZONE_STYLE_MAP = {
+    "fcs_zone": {
+        "label": "Fuel Collection Zone",
+        "fill": "#2f7986",
+        "outline": "#7fe7ff",
+        "text": "#c9fbff",
+    }
+}
+DEFAULT_ZONE_STYLE = {
+    "label": "Zone",
+    "fill": "#7a5622",
+    "outline": "#ffd37f",
+    "text": "#fff0bf",
+}
+FCS_ZONE_TYPE = "fcs_zone"
+DEFAULT_FCS_ZONE_RADIUS = 5000
+DEFAULT_FCS_MIN_SPACING = 30000
+DEFAULT_FCS_DENSITY_RADIUS = 12500
+DEFAULT_FCS_DENSITY_PERCENTILE = 56
+DEFAULT_FCS_MIN_SCORE = 8.0
+DEFAULT_FCS_SPACING_JITTER = 0.30
+DEFAULT_FCS_DESCRIPTION = "Auto-generated from nebula density."
+
+def get_zone_style(zone_type: Any) -> Optional[Dict[str, str]]:
+    zone_key = str(zone_type or "").strip().lower()
+    if not zone_key:
+        return None
+    if zone_key in ZONE_STYLE_MAP:
+        return ZONE_STYLE_MAP[zone_key]
+    if zone_key.endswith("_zone"):
+        return {
+            **DEFAULT_ZONE_STYLE,
+            "label": zone_key.replace("_", " ").title(),
+        }
+    return None
+
+def is_zone_type(zone_type: Any) -> bool:
+    return get_zone_style(zone_type) is not None
+
+def parse_database_snapshot(path):
+    source = path.read_text(encoding="utf-8")
+    module = ast.parse(source, filename=str(path))
+    snapshot = {}
+
+    for node in module.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
+            continue
+
+        name = node.targets[0].id
+        if name not in TARGET_ASSIGNMENTS:
+            continue
+
+        try:
+            snapshot[name] = ast.literal_eval(node.value)
+        except Exception as exc:
+            raise ValueError(f"Could not parse {name} from {path}: {exc}") from exc
+
+    return snapshot
+
+def build_item_meta(snapshot):
+    meta_sources = (
+        (snapshot["rawMaterials"], "raw"),
+        (snapshot["shipItems"], "ship_items"),
+        (snapshot["commoditiesDatabase"], "commodity"),
+        (snapshot["intelfragmentsDatabase"], "commodity"),
+        (snapshot["ordnanceDatabase"], "ordnance"),
+    )
+
+    item_meta = {}
+    for source, category in meta_sources:
+        for item, data in source.items():
+            if not isinstance(data, dict):
+                continue
+            item_meta[str(item).strip()] = {
+                "icon": data.get("icon"),
+                "colour": data.get("colour", "#5f86a8"),
+                "size": data.get("size"),
+                "signatures": data.get("signatures", data.get("signature")),
+                "category": category,
+            }
+    return item_meta
+
+class CategorizedItemDropdown(tk.Button):
+    def __init__(self, parent, variable, category_lookup, width=28):
+        super().__init__(
+            parent,
+            textvariable=variable,
+            command=self.show_dropdown,
+            relief='sunken',
+            borderwidth=1,
+            anchor='w',
+            width=width,
+            padx=4,
+            bg='white',
+        )
+        self.variable = variable
+        self.category_lookup = category_lookup
+        self.dropdown = None
+        self.has_blank = False
+        self.category_items = {category: [] for category in CARGO_ITEM_CATEGORY_ORDER}
+        self.variable.trace_add('write', lambda *_: self._sync_foreground())
+        self._sync_foreground()
+
+    def set_values(self, values):
+        seen = set()
+        unique_values = []
+        for value in values:
+            if value in seen:
+                continue
+            seen.add(value)
+            unique_values.append(value)
+
+        self.has_blank = '' in unique_values
+        grouped = {category: [] for category in CARGO_ITEM_CATEGORY_ORDER}
+        for value in unique_values:
+            if not value:
+                continue
+            category = self.category_lookup(value)
+            grouped.setdefault(category, []).append(value)
+
+        self.category_items = {
+            category: sorted(grouped.get(category, []), key=lambda item: item.casefold())
+            for category in CARGO_ITEM_CATEGORY_ORDER
+        }
+        self._sync_foreground()
+
+    def show_dropdown(self):
+        if self.dropdown and self.dropdown.winfo_exists():
+            try:
+                self.dropdown.grab_release()
+            except tk.TclError:
+                pass
+            self.dropdown.destroy()
+            return
+
+        self.update_idletasks()
+        parent_window = self.winfo_toplevel()
+        parent_window.update_idletasks()
+
+        categories = [
+            category for category in CARGO_ITEM_CATEGORY_ORDER
+            if self.category_items.get(category)
+        ]
+        if not categories and not self.has_blank:
+            return
+
+        self.dropdown = tk.Toplevel(parent_window)
+        self.dropdown.withdraw()
+        self.dropdown.transient(parent_window)
+        self.dropdown.title("Select Item")
+        self.dropdown.resizable(False, False)
+
+        x = self.winfo_rootx()
+        y = self.winfo_rooty() + self.winfo_height()
+        width = max(self.winfo_width(), 500)
+        visible_rows = min(
+            max((len(items) for items in self.category_items.values()), default=1),
+            14
+        )
+        visible_rows = max(visible_rows, min(len(categories), 5), 5)
+        height = visible_rows * 22 + 64
+        screen_w = self.winfo_screenwidth()
+        screen_h = self.winfo_screenheight()
+        x = max(0, min(x, screen_w - width))
+        if y + height > screen_h:
+            y = max(0, self.winfo_rooty() - height)
+        self.dropdown.geometry(f"{width}x{height}+{x}+{y}")
+
+        frame = tk.Frame(self.dropdown, borderwidth=1, relief='solid', bg='white')
+        frame.pack(fill='both', expand=True)
+
+        if self.has_blank:
+            clear_btn = tk.Button(
+                frame,
+                text="Clear selection",
+                command=lambda: (self.variable.set(''), close_dropdown()),
+                anchor='w'
+            )
+            clear_btn.grid(row=0, column=0, columnspan=3, sticky='ew', padx=4, pady=(4, 2))
+
+        tk.Label(frame, text="Category", bg='white', anchor='w').grid(
+            row=1, column=0, sticky='ew', padx=(4, 2)
+        )
+        tk.Label(frame, text="Item", bg='white', anchor='w').grid(
+            row=1, column=1, columnspan=2, sticky='ew', padx=(2, 4)
+        )
+
+        category_list = tk.Listbox(
+            frame,
+            activestyle='none',
+            exportselection=False,
+            height=visible_rows,
+            width=20,
+            selectbackground='#d9e8ff',
+            selectforeground='black',
+        )
+        item_scrollbar = tk.Scrollbar(frame, orient='vertical')
+        item_list = tk.Listbox(
+            frame,
+            activestyle='none',
+            exportselection=False,
+            height=visible_rows,
+            width=34,
+            selectbackground='#d9e8ff',
+            selectforeground='black',
+            yscrollcommand=item_scrollbar.set,
+        )
+        item_scrollbar.config(command=item_list.yview)
+
+        category_list.grid(row=2, column=0, sticky='ns', padx=(4, 2), pady=(0, 4))
+        item_list.grid(row=2, column=1, sticky='nsew', padx=(2, 0), pady=(0, 4))
+        item_scrollbar.grid(row=2, column=2, sticky='ns', padx=(0, 4), pady=(0, 4))
+        frame.grid_columnconfigure(1, weight=1)
+        frame.grid_rowconfigure(2, weight=1)
+
+        current = self.variable.get().strip()
+        current_category = self.category_lookup(current) if current else None
+        if current_category not in categories:
+            current_category = categories[0] if categories else None
+
+        for index, category in enumerate(categories):
+            category_list.insert('end', CARGO_ITEM_CATEGORY_LABELS.get(category, category.title()))
+            color = CARGO_ITEM_CATEGORY_COLORS.get(category, 'black')
+            category_list.itemconfig(index, foreground=color)
+            if category == current_category:
+                category_list.selection_set(index)
+                category_list.see(index)
+
+        def selected_category():
+            selection = category_list.curselection()
+            if not selection:
+                return current_category
+            return categories[selection[0]]
+
+        def render_items(event=None):
+            category = selected_category()
+            item_list.delete(0, 'end')
+            if not category:
+                return
+            color = CARGO_ITEM_CATEGORY_COLORS.get(category, 'black')
+            selected_item_index = None
+            for index, item in enumerate(self.category_items.get(category, [])):
+                item_list.insert('end', item)
+                item_list.itemconfig(index, foreground=color)
+                if item == current:
+                    selected_item_index = index
+            if selected_item_index is not None:
+                item_list.selection_set(selected_item_index)
+                item_list.see(selected_item_index)
+
+        def choose_current(event=None):
+            selection = item_list.curselection()
+            if not selection:
+                return "break"
+            category = selected_category()
+            if not category:
+                return "break"
+            items = self.category_items.get(category, [])
+            if selection[0] >= len(items):
+                return "break"
+            self.variable.set(items[selection[0]])
+            return close_dropdown()
+
+        def close_dropdown(event=None):
+            if self.dropdown and self.dropdown.winfo_exists():
+                try:
+                    self.dropdown.grab_release()
+                except tk.TclError:
+                    pass
+                self.dropdown.destroy()
+            return "break"
+
+        def close_if_outside(event=None):
+            if not (self.dropdown and self.dropdown.winfo_exists() and event):
+                return
+            x = event.x_root
+            y = event.y_root
+            left = self.dropdown.winfo_rootx()
+            top = self.dropdown.winfo_rooty()
+            right = left + self.dropdown.winfo_width()
+            bottom = top + self.dropdown.winfo_height()
+            if not (left <= x <= right and top <= y <= bottom):
+                close_dropdown()
+
+        category_list.bind('<<ListboxSelect>>', render_items)
+        category_list.bind('<Return>', lambda event: item_list.focus_set())
+        category_list.bind('<Escape>', close_dropdown)
+        item_list.bind('<Double-Button-1>', choose_current)
+        item_list.bind('<Return>', choose_current)
+        item_list.bind('<Escape>', close_dropdown)
+        item_list.bind('<ButtonRelease-1>', choose_current)
+        self.dropdown.bind('<ButtonPress-1>', close_if_outside, add='+')
+        self.dropdown.protocol("WM_DELETE_WINDOW", close_dropdown)
+        render_items()
+        self.dropdown.grab_set()
+        self.dropdown.deiconify()
+        self.dropdown.lift(parent_window)
+        self.dropdown.focus_force()
+        category_list.focus_set()
+
+    def _sync_foreground(self):
+        value = self.variable.get().strip()
+        category = self.category_lookup(value) if value else ''
+        color = CARGO_ITEM_CATEGORY_COLORS.get(category, 'black')
+        self.configure(fg=color, activeforeground=color)
 
 def distance_to_spine(px, pz, ax, az, bx, bz):
     abx = bx - ax
@@ -43,78 +424,347 @@ def influence(dist, radius):
 
 
 def generate_line_coords(start, end, count, radius, seed=None, y_range=(-600, 600),
-                         clump_count=10, void_count=6, clump_radius_range=(300, 800),
-                         void_radius_range=(400, 900), clump_strength_range=(0.3, 0.9),
-                         void_strength_range=(0.4, 1.0)):
+                         clumps=(), voids=()):
+    # Match the reference TerrainHandling.generateLineCoords placement so the
+    # editor preview uses the same asteroid/nebula dot distribution as runtime.
     rng = random.Random(seed)
     coords = []
-    # --- Bounding volume (intentionally oversized) ---
-    min_x = min(start[0], end[0]) - radius * 2.0
-    max_x = max(start[0], end[0]) + radius * 2.0
-    min_z = min(start[2], end[2]) - radius * 2.0
-    max_z = max(start[2], end[2]) + radius * 2.0
 
-    # --- Pre-generate clumps & voids ---
-    clumps = []
-    voids = []
+    dx = end[0] - start[0]
+    dz = end[2] - start[2]
+    length = math.hypot(dx, dz)
 
-    for _ in range(clump_count):
+    if length == 0:
+        return []
+
+    for _ in range(count):
+        # Position uniformly along the terrain spine.
         t = rng.random()
-        x = start[0] + t * (end[0] - start[0]) + rng.uniform(-radius, radius)
-        z = start[2] + t * (end[2] - start[2]) + rng.uniform(-radius, radius)
-        r = rng.uniform(*clump_radius_range)
-        s = rng.uniform(*clump_strength_range)
-        clumps.append((x, z, r, s))
+        cx = start[0] + t * dx
+        cz = start[2] + t * dz
 
-    for _ in range(void_count):
-        t = rng.random()
-        x = start[0] + t * (end[0] - start[0]) + rng.uniform(-radius, radius)
-        z = start[2] + t * (end[2] - start[2]) + rng.uniform(-radius, radius)
-        r = rng.uniform(*void_radius_range)
-        s = rng.uniform(*void_strength_range)
-        voids.append((x, z, r, s))
+        # Scatter with the same Gaussian-style radial falloff as the reference.
+        u = max(1e-6, rng.random())
+        d = radius * math.sqrt(-math.log(u))
 
-    attempts = 0
-    max_attempts = count * 8
+        angle = rng.uniform(0, 2 * math.pi)
+        ox = math.cos(angle) * d
+        oz = math.sin(angle) * d
 
-    while len(coords) < count and attempts < max_attempts:
-        attempts += 1
-
-        x = rng.uniform(min_x, max_x)
-        z = rng.uniform(min_z, max_z)
+        x = cx + ox
+        z = cz + oz
         y = rng.uniform(*y_range)
 
-        # --- Base density from distance to spine ---
-        d = distance_to_spine(
-            x, z,
-            start[0], start[2],
-            end[0], end[2]
-        )
+        density_bias = 0.0
 
-        t = d / radius
-        density = math.exp(-t * t)
+        for cx_, cz_, r, s in clumps:
+            dist = math.hypot(x - cx_, z - cz_)
+            if dist < r:
+                density_bias += (1 - dist / r) ** 2 * s
 
-        if density < 0.01:
-            continue
+        for vx_, vz_, r, s in voids:
+            dist = math.hypot(x - vx_, z - vz_)
+            if dist < r:
+                density_bias -= (1 - dist / r) ** 2 * s
 
-        # --- Clumps ---
-        for cx, cz, r, s in clumps:
-            density += influence(math.hypot(x - cx, z - cz), r) * s
+        if density_bias != 0:
+            push = density_bias * radius * 0.15
+            x += rng.uniform(-push, push)
+            z += rng.uniform(-push, push)
 
-        # --- Voids ---
-        for vx, vz, r, s in voids:
-            density -= influence(math.hypot(x - vx, z - vz), r) * s
-
-        density = max(0.0, min(density, 1.0))
-
-        if rng.random() < density:
-            coords.append((x, y, z))
+        coords.append((x, y, z))
 
     return coords
+
+
+def distance_sq_2d(ax, az, bx, bz):
+    dx = ax - bx
+    dz = az - bz
+    return dx * dx + dz * dz
+
+
+def percentile_value(values, percentile):
+    if not values:
+        return 0.0
+    pct = max(0.0, min(100.0, float(percentile)))
+    ordered = sorted(float(v) for v in values)
+    if len(ordered) == 1:
+        return ordered[0]
+    index = int((len(ordered) - 1) * (pct / 100.0))
+    index = max(0, min(len(ordered) - 1, index))
+    return ordered[index]
+
+
+def jittered_fcs_spacing(candidate, base_spacing, jitter_ratio=DEFAULT_FCS_SPACING_JITTER):
+    """
+    Return a deterministic spacing value for a candidate so repeated runs stay stable.
+    """
+    base_spacing = max(1.0, float(base_spacing))
+    jitter_ratio = max(0.0, float(jitter_ratio))
+    key = f"{candidate['source']}|{float(candidate['x']):.3f}|{float(candidate['z']):.3f}"
+    rng = random.Random(key)
+    factor = 1.0 + rng.uniform(-jitter_ratio, jitter_ratio)
+    return base_spacing * max(0.01, factor)
+
+
+def collect_nebula_points_for_fcs(terrain_data, cache=None):
+    nebula_points = []
+    if not isinstance(terrain_data, dict):
+        return nebula_points
+
+    cache_dict = cache if isinstance(cache, dict) else None
+
+    for key, feat in terrain_data.items():
+        if not isinstance(feat, dict):
+            continue
+        if str(feat.get("type", "")).strip().lower() != "nebulas":
+            continue
+
+        start = feat.get("start", [0, 0, 0])
+        end = feat.get("end", [0, 0, 0])
+        density = int(feat.get("density", 0) or 0)
+        scatter = float(feat.get("scatter", 0) or 0)
+        seed = feat.get("seed")
+        hide_on_map = bool(feat.get("hideonmap", False))
+
+        if density <= 0 or scatter <= 0:
+            continue
+        if not (isinstance(start, (list, tuple)) and isinstance(end, (list, tuple))):
+            continue
+        if len(start) < 3 or len(end) < 3:
+            continue
+
+        cache_key = (
+            "nebulas",
+            tuple(start),
+            tuple(end),
+            float(scatter),
+            int(density),
+            seed,
+        )
+        cache_token = (key, cache_key)
+        coords = cache_dict.get(cache_token) if cache_dict is not None else None
+        if coords is None:
+            coords = generate_line_coords(start, end, density, scatter, seed=seed)
+            if cache_dict is not None:
+                cache_dict[cache_token] = coords
+
+        for gx, _, gz in coords:
+            nebula_points.append((float(gx), float(gz), key, hide_on_map))
+
+    return nebula_points
+
+
+def collect_fcs_blocked_centers(system_data, replace_existing=False):
+    blocked = []
+    if not isinstance(system_data, dict):
+        return blocked
+
+    objects = system_data.get("objects", {})
+    if isinstance(objects, dict) and not replace_existing:
+        for obj in objects.values():
+            if not isinstance(obj, dict):
+                continue
+            if str(obj.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
+                continue
+            coord = obj.get("coordinate")
+            if isinstance(coord, (list, tuple)) and len(coord) >= 3:
+                blocked.append((float(coord[0]), float(coord[2])))
+
+    terrain_data = system_data.get("terrain", {})
+    if isinstance(terrain_data, dict):
+        for feat in terrain_data.values():
+            if not isinstance(feat, dict):
+                continue
+            if str(feat.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
+                continue
+            coord = feat.get("coordinate")
+            if isinstance(coord, (list, tuple)) and len(coord) >= 3:
+                blocked.append((float(coord[0]), float(coord[2])))
+
+    return blocked
+
+
+def generate_zone_name(existing_objects, zone_type=FCS_ZONE_TYPE):
+    prefix = "ZONE"
+    zone_key = str(zone_type or "").strip().lower()
+    if zone_key == FCS_ZONE_TYPE:
+        prefix = "FCS"
+    elif zone_key.endswith("_zone"):
+        candidate_prefix = zone_key[:-5].replace("_", "").upper()
+        if candidate_prefix:
+            prefix = candidate_prefix
+
+    if isinstance(existing_objects, dict):
+        existing_names = {str(name) for name in existing_objects.keys()}
+    else:
+        existing_names = {str(name) for name in (existing_objects or [])}
+
+    pattern = re.compile(rf'^{re.escape(prefix)}\s*(\d+)$', re.IGNORECASE)
+    used_numbers = []
+    for name in existing_names:
+        match = pattern.match(name.strip())
+        if not match:
+            continue
+        try:
+            used_numbers.append(int(match.group(1)))
+        except ValueError:
+            continue
+
+    next_value = (max(used_numbers) + 1) if used_numbers else 1
+    candidate = f"{prefix}{next_value}"
+    while candidate in existing_names:
+        next_value += 1
+        candidate = f"{prefix}{next_value}"
+    return candidate
+
+
+def select_fcs_zone_centers(points, min_spacing=DEFAULT_FCS_MIN_SPACING,
+                            density_radius=DEFAULT_FCS_DENSITY_RADIUS,
+                            percentile=DEFAULT_FCS_DENSITY_PERCENTILE,
+                            min_score=DEFAULT_FCS_MIN_SCORE,
+                            blocked_centers=()):
+    """
+    Pick zone centers from nebula dots using local point density.
+
+    Points are scored by nearby dot concentration, then greedily selected with a
+    minimum center-to-center spacing so zones track dense clusters without
+    piling into the same pocket.
+    """
+    if not points:
+        return []
+
+    min_spacing = max(1.0, float(min_spacing))
+    density_radius = max(1.0, float(density_radius))
+    cell_size = density_radius
+    radius_sq = density_radius * density_radius
+    min_spacing_sq = min_spacing * min_spacing
+
+    grid = {}
+    for idx, (x, z, source_key, source_hidden) in enumerate(points):
+        cell_key = (int(math.floor(x / cell_size)), int(math.floor(z / cell_size)))
+        grid.setdefault(cell_key, []).append(idx)
+
+    candidates = []
+    raw_scores = []
+
+    for idx, (x, z, source_key, source_hidden) in enumerate(points):
+        gx = int(math.floor(x / cell_size))
+        gz = int(math.floor(z / cell_size))
+        score = 0.0
+        weighted_x = 0.0
+        weighted_z = 0.0
+
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                for other_idx in grid.get((gx + dx, gz + dz), []):
+                    ox, oz, _, _ = points[other_idx]
+                    dist_sq = distance_sq_2d(x, z, ox, oz)
+                    if dist_sq > radius_sq:
+                        continue
+                    weight = 1.0 - (dist_sq / radius_sq)
+                    score += weight
+                    weighted_x += ox * weight
+                    weighted_z += oz * weight
+
+        if score <= 0:
+            continue
+
+        raw_scores.append(score)
+        candidates.append({
+            "score": float(score),
+            "x": float(weighted_x / score),
+            "z": float(weighted_z / score),
+            "source": source_key,
+            "hideonmap": bool(source_hidden),
+        })
+
+    if not candidates:
+        return []
+
+    threshold = max(float(min_score), percentile_value(raw_scores, percentile))
+    blocked = [
+        {"x": float(x), "z": float(z), "spacing": float(min_spacing)}
+        for x, z in blocked_centers
+    ]
+    selected = []
+    selected_signatures = set()
+
+    def _candidate_signature(candidate):
+        return (
+            candidate["source"],
+            round(float(candidate["x"]), 6),
+            round(float(candidate["z"]), 6),
+        )
+
+    def _try_select_candidate(candidate):
+        cx = float(candidate["x"])
+        cz = float(candidate["z"])
+        candidate_spacing = jittered_fcs_spacing(candidate, min_spacing)
+        for blocked_item in blocked:
+            bx = float(blocked_item["x"])
+            bz = float(blocked_item["z"])
+            blocked_spacing = float(blocked_item.get("spacing", min_spacing))
+            required_spacing = (candidate_spacing + blocked_spacing) / 2.0
+            if distance_sq_2d(cx, cz, bx, bz) < required_spacing * required_spacing:
+                return False
+        selected.append({
+            "x": cx,
+            "z": cz,
+            "score": float(candidate["score"]),
+            "source": candidate["source"],
+            "hideonmap": bool(candidate["hideonmap"]),
+        })
+        blocked.append({
+            "x": cx,
+            "z": cz,
+            "spacing": candidate_spacing,
+        })
+        selected_signatures.add(_candidate_signature(candidate))
+        return True
+
+    candidates_by_source = {}
+    for candidate in candidates:
+        candidates_by_source.setdefault(candidate["source"], []).append(candidate)
+
+    # Pass 1: try to guarantee one zone per nebula field, unless spacing blocks it.
+    source_priority = sorted(
+        (
+            max(source_candidates, key=lambda item: item["score"])
+            for source_candidates in candidates_by_source.values()
+        ),
+        key=lambda item: item["score"],
+        reverse=True,
+    )
+
+    for source_head in source_priority:
+        source_candidates = sorted(
+            candidates_by_source.get(source_head["source"], []),
+            key=lambda item: item["score"],
+            reverse=True,
+        )
+        for candidate in source_candidates:
+            if _try_select_candidate(candidate):
+                break
+
+    # Pass 2: add extra zones only for stronger dense pockets.
+    for candidate in sorted(candidates, key=lambda item: item["score"], reverse=True):
+        if candidate["score"] < threshold:
+            break
+        if _candidate_signature(candidate) in selected_signatures:
+            continue
+        _try_select_candidate(candidate)
+
+    return selected
 
 # valid names: letters, digits, dot, space; 1–20 chars
 _VALID_NAME = re.compile(r'^[A-Za-z0-9. ]{1,20}$')
 DEFAULT_PLANET_CLASS = 'EarthLike'
+RELAY_TYPE_SENSOR = 'Sensor Relay'
+RELAY_TYPE_WARNING_BUOY = 'Warning Buoy'
+RELAY_TYPE_OPTIONS = [RELAY_TYPE_SENSOR, RELAY_TYPE_WARNING_BUOY]
+WARNING_BUOY_DEFAULT_PING = 2
+WARNING_BUOY_DEFAULT_RANGE = 15000
 
 g_obj_lb = None
 g_relay_lb = None
@@ -221,6 +871,27 @@ def _coerce_revision_number(value: Any) -> int:
     except Exception:
         return 0
     return 0
+
+def normalize_relay_type(value: Any) -> str:
+    text = str(value or '').strip().casefold()
+    if text == RELAY_TYPE_WARNING_BUOY.casefold():
+        return RELAY_TYPE_WARNING_BUOY
+    return RELAY_TYPE_SENSOR
+
+def ensure_relay_dict(entry: Any) -> Dict[str, Any]:
+    if isinstance(entry, dict):
+        coord = entry.get('coordinate', [0, 0, 0])
+        if not (isinstance(coord, (list, tuple)) and len(coord) >= 3):
+            coord = [0, 0, 0]
+        entry['coordinate'] = [coord[0], coord[1], coord[2]]
+        entry['type'] = normalize_relay_type(entry.get('type'))
+        return entry
+
+    coord = entry if isinstance(entry, (list, tuple)) and len(entry) >= 3 else [0, 0, 0]
+    return {
+        'coordinate': [coord[0], coord[1], coord[2]],
+        'type': RELAY_TYPE_SENSOR,
+    }
 
 def build_gate_index_for_systems(data_base: str, current_filename: str):
     system_files = {}
@@ -417,6 +1088,8 @@ def open_system_editor(filename: str) -> None:
     current_selection = {'type': None, 'name': None}
     last_desc_widget = None
     last_desc_obj = None
+    pending_text_widgets = []
+    text_dirty = False
     copy_state = {'source_name': None, 'source_obj': None}
     session_revision_bumped = False
     # base for images, data_base for system JSON files
@@ -426,6 +1099,50 @@ def open_system_editor(filename: str) -> None:
     editor_settings = load_editor_settings()
     if not isinstance(editor_settings, dict):
         editor_settings = {}
+
+    def _commit_text_widget(widget, setter):
+        try:
+            setter(widget.get('1.0', 'end').strip())
+            return True
+        except tk.TclError:
+            return False
+
+    def flush_pending_text_widgets():
+        alive = []
+        for widget, setter in pending_text_widgets:
+            try:
+                if not widget.winfo_exists():
+                    continue
+            except tk.TclError:
+                continue
+            if _commit_text_widget(widget, setter):
+                alive.append((widget, setter))
+        pending_text_widgets[:] = alive
+
+    def register_text_widget(widget, setter):
+        pending_text_widgets.append((widget, setter))
+
+        def _on_modified(event=None, w=widget):
+            nonlocal text_dirty
+            try:
+                if w.edit_modified():
+                    text_dirty = True
+                    w.edit_modified(False)
+            except tk.TclError:
+                pass
+
+        widget.bind('<FocusOut>', lambda e, w=widget, s=setter: _commit_text_widget(w, s), add='+')
+        widget.bind('<<Modified>>', _on_modified, add='+')
+        try:
+            widget.edit_modified(False)
+        except tk.TclError:
+            pass
+
+    def has_unsaved_changes():
+        try:
+            return bool(undo_stack) or text_dirty
+        except Exception:
+            return bool(text_dirty)
     # Load ShipMap for valid hulls and sides
     # ─── Load Cargo/Teams presets and master lists from JSON ─────────────
     try:
@@ -433,6 +1150,102 @@ def open_system_editor(filename: str) -> None:
             ct_config = json.load(cf)
     except Exception:
         ct_config = {"cargo": [], "teams": [], "presets": {}, "skyboxes": []}
+    
+    # ─── Load item metadata for icons from tsn_databases.py ─────────────
+    try:
+        db_path = Path(base) / DATABASE_SOURCE
+        snapshot = parse_database_snapshot(db_path)
+        item_meta = build_item_meta(snapshot)
+    except Exception as e:
+        print(f"Warning: Could not load item metadata: {e}")
+        item_meta = {}
+    for team_name, team_meta in TEAM_ICON_META.items():
+        item_meta.setdefault(team_name, team_meta)
+    sprite_sheet_cache = {"path": None, "image": None, "tile_size": None}
+    
+    def resolve_icon_style(item_name):
+        meta = item_meta.get(item_name, {})
+        icon = meta.get("icon")
+        accent = str(meta.get("colour", "#5f86a8"))
+
+        if not isinstance(icon, int) or icon < 0 or icon >= SPRITE_COLUMNS * SPRITE_ROWS:
+            return "", accent
+
+        col = icon % SPRITE_COLUMNS
+        row = icon // SPRITE_COLUMNS
+        style = f'--icon-col:{col}; --icon-row:{row}; --item-accent:{accent};'
+        return style, accent
+    
+    def create_icon_label(parent, item_name, size=20):
+        """Create a tkinter Label with the item's icon from the sprite sheet."""
+        from PIL import Image, ImageTk
+        
+        style, accent = resolve_icon_style(item_name)
+        
+        # Create a label for the icon
+        icon_label = tk.Label(parent, width=size, height=size)
+        
+        if style:
+            try:
+                # Parse the style to get icon position
+                style_parts = style.split(';')
+                col = None
+                row = None
+                for part in style_parts:
+                    part = part.strip()
+                    if part.startswith('--icon-col:'):
+                        col = int(part.split(':')[1])
+                    elif part.startswith('--icon-row:'):
+                        row = int(part.split(':')[1])
+                
+                if col is not None and row is not None:
+                    # Load the sprite sheet
+                    sprite_path = Path(base) / SPRITE_SOURCE
+                    if sprite_path.exists():
+                        if sprite_sheet_cache["path"] != sprite_path:
+                            with Image.open(str(sprite_path)) as img:
+                                sprite_sheet_cache["image"] = img.convert("RGBA")
+                            sprite_sheet_cache["path"] = sprite_path
+                            sheet = sprite_sheet_cache["image"]
+                            tile_w = sheet.width // SPRITE_COLUMNS
+                            tile_h = sheet.height // SPRITE_ROWS
+                            sprite_sheet_cache["tile_size"] = (tile_w, tile_h)
+
+                        sprite_sheet = sprite_sheet_cache["image"]
+                        tile_w, tile_h = sprite_sheet_cache["tile_size"]
+                        if tile_w <= 0 or tile_h <= 0:
+                            raise ValueError(f"Invalid sprite sheet tile size for {sprite_path}")
+
+                        x = col * tile_w
+                        y = row * tile_h
+                        
+                        # Extract the sprite
+                        sprite = sprite_sheet.crop((x, y, x + tile_w, y + tile_h))
+                        
+                        # Resize to desired size
+                        sprite = sprite.resize((size, size), Image.Resampling.LANCZOS)
+                        
+                        # Convert to PhotoImage for tkinter
+                        photo = ImageTk.PhotoImage(sprite)
+                        icon_label.config(image=photo)
+                        icon_label.image = photo  # Keep reference
+                        return icon_label
+            except Exception as e:
+                print(f"Error loading icon for {item_name}: {e}")
+        
+        # Fallback: show colored square with first letter
+        fallback = item_name[:1].upper() or "?"
+        color = accent if accent.startswith('#') else '#5f86a8'
+        
+        # Create a small canvas for the fallback
+        canvas = tk.Canvas(icon_label, width=size, height=size, highlightthickness=0)
+        canvas.pack()
+        canvas.create_rectangle(0, 0, size, size, fill=color, outline=color)
+        canvas.create_text(size//2, size//2, text=fallback, 
+                          fill='white', font=("Arial", 10, "bold"))
+        
+        return icon_label
+    
     try:
         with open(os.path.join(base, 'HTML', 'Images', 'Ships', 'ShipMap.json'), 'r') as sf:
             ship_entries = json.load(sf)
@@ -864,6 +1677,7 @@ def open_system_editor(filename: str) -> None:
     desc_text = tk.Text(md_parent, height=5, width=60)
     desc_text.insert('1.0', sm.get_description())
     desc_text.grid(row=row, column=1, columnspan=4, sticky='w')
+    register_text_widget(desc_text, lambda value: sm.set_description(value))
     preview_label.grid(row=row, column=4, padx=(10, 0))
     def _update_sky_preview(*args):
         img_path = os.path.join(base, 'data', 'graphics', skybox_var.get())
@@ -1287,18 +2101,10 @@ def open_system_editor(filename: str) -> None:
     def clear_edit_pane():
         # before destroying widgets, commit any pending description safely
         nonlocal last_desc_widget, last_desc_obj
-        if last_desc_widget and last_desc_obj:
-            try:
-                text = last_desc_widget.get('1.0', 'end').strip()
-                last_desc_obj['description'] = text
-            except tk.TclError:
-        # widget no longer exists; skip saving
-                pass
-            finally:
-            # clear references to avoid calling a destroyed widget again
-                last_desc_widget = None
-                last_desc_obj = None
-          # now clear the pane
+        flush_pending_text_widgets()
+        last_desc_widget = None
+        last_desc_obj = None
+        # now clear the pane
 
         if not edit_frame.winfo_exists():
             return
@@ -1386,7 +2192,7 @@ def open_system_editor(filename: str) -> None:
                 txt = tk.Text(edit_frame, height=4, width=30)
                 txt.insert('1.0', getter())
                 txt.pack(anchor='w', pady=2)
-                txt.bind('<FocusOut>', lambda e, s=setter, t=txt: s(t.get('1.0', 'end').strip()))
+                register_text_widget(txt, setter)
             elif widget_type == 'combo':
                 tk.Label(edit_frame, text=label_text, wraplength=230, justify='left')\
                     .pack(anchor='w', pady=2)
@@ -1550,7 +2356,10 @@ def open_system_editor(filename: str) -> None:
         dlg.grab_set()
 
         # --- Presets loaded from cargo_teams.json ---
-        presets = ct_config.get('presets', {})
+        presets = ct_config.setdefault('presets', {})
+        if not isinstance(presets, dict):
+            presets = {}
+            ct_config['presets'] = presets
         preset_names = ["Custom"] + list(presets.keys())
         preset_var = tk.StringVar(value="Custom")
         tk.Label(dlg, text="Preset:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
@@ -1564,12 +2373,31 @@ def open_system_editor(filename: str) -> None:
 
         # --- Items Table ---
         table = tk.Frame(dlg)
-        table.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky='nsew')
-        tk.Label(table, text="Item").grid(row=0, column=0, padx=5, pady=2)
-        tk.Label(table, text="Quantity").grid(row=0, column=1, padx=5, pady=2)
+        table.grid(row=1, column=0, columnspan=4, padx=5, pady=5, sticky='nsew')
+        tk.Label(table, text="Icon").grid(row=0, column=0, padx=5, pady=2)
+        tk.Label(table, text="Item").grid(row=0, column=1, padx=5, pady=2)
+        tk.Label(table, text="Quantity").grid(row=0, column=2, padx=5, pady=2)
 
-        # master lists from JSON file: cargo (A-Z), then teams (A-Z)
-        valid_items = sorted(ct_config.get('cargo', [])) + sorted(ct_config.get('teams', []))
+        cargo_keys = set(ct_config.get('cargo', []))
+        team_keys = set(ct_config.get('teams', []))
+
+        def item_category(item_name):
+            if item_name in team_keys:
+                return "team"
+            if item_name in USABLE_DEPLOYABLE_ITEMS:
+                return "usable_deployable"
+            if item_name in INTEL_SPECIAL_ITEMS:
+                return "intel_special"
+            category = item_meta.get(item_name, {}).get("category")
+            if category in CARGO_ITEM_CATEGORY_RANK:
+                return category
+            return "commodity"
+
+        def item_sort_key(item_name):
+            category = item_category(item_name)
+            return (CARGO_ITEM_CATEGORY_RANK.get(category, 99), item_name.casefold())
+
+        valid_items = sorted(cargo_keys | team_keys, key=item_sort_key)
         rows = []
 
         def refresh_dropdowns():
@@ -1580,16 +2408,17 @@ def open_system_editor(filename: str) -> None:
                 curr = e['iv'].get().strip()
                 # Allow blank plus any item not chosen by other rows (or this row's current)
                 vals = [''] + [it for it in valid_items if it not in selected or it == curr]
-                e['cb']['values'] = vals
+                e['cb'].set_values(vals)
         def remove_row(idx):
             """Remove row at index `idx` and re-grid the rest."""
             entry = rows.pop(idx)
             # destroy widgets for this row
-            for w in (entry['cb'], entry['sb'], entry['btn']):
+            for w in (entry['icon'], entry['cb'], entry['sb'], entry['btn']):
                 w.destroy()
             # re-grid subsequent rows
             for j, e in enumerate(rows):
                 rn = j + 1
+                e['icon'].grid_configure(row=rn)
                 e['cb'].grid_configure(row=rn)
                 e['sb'].grid_configure(row=rn)
                 e['btn'].grid_configure(row=rn)
@@ -1603,25 +2432,41 @@ def open_system_editor(filename: str) -> None:
             r = len(rows) + 1
             iv = tk.StringVar(value=item)
             qv = tk.IntVar(value=qty)
+            
+            # Icon label
+            icon_label = create_icon_label(table, item)
+            icon_label.grid(row=r, column=0, padx=2, pady=2)
+            
             # Item dropdown
-            cb = ttk.Combobox(table, textvariable=iv,
-                              values=valid_items, state='readonly')
-            cb.grid(row=r, column=0, padx=5, pady=2, sticky='w')
+            cb = CategorizedItemDropdown(table, iv, item_category)
+            cb.set_values(valid_items)
+            cb.grid(row=r, column=1, padx=5, pady=2, sticky='w')
             # Quantity spinner
             sb = tk.Spinbox(table, from_=0, to=99999,
                             textvariable=qv, width=6)
-            sb.grid(row=r, column=1, padx=5, pady=2, sticky='w')
+            sb.grid(row=r, column=2, padx=5, pady=2, sticky='w')
             # Remove button
             def _remove_this():
                 remove_row(rows.index(entry))
             btn = tk.Button(table, text='X', command=_remove_this, width=2)
-            btn.grid(row=r, column=2, padx=5, pady=2, sticky='w')
+            btn.grid(row=r, column=3, padx=5, pady=2, sticky='w')
             # Track this row's widgets and vars
-            entry = {'iv': iv, 'qv': qv, 'cb': cb, 'sb': sb, 'btn': btn}
+            entry = {'iv': iv, 'qv': qv, 'cb': cb, 'sb': sb, 'btn': btn, 'icon': icon_label}
             rows.append(entry)
 
             # when last blank row gets a value, append another blank
             def on_change(*_):
+                # Update icon when item changes
+                selected_item = iv.get().strip()
+                # Remove old icon and create new one
+                entry['icon'].destroy()
+                entry['icon'] = create_icon_label(table, selected_item)
+                try:
+                    row_number = rows.index(entry) + 1
+                except ValueError:
+                    row_number = r
+                entry['icon'].grid(row=row_number, column=0, padx=2, pady=2)
+                
                 # if this was the last blank row, add another
                 if rows and rows[-1]['iv'] is iv and iv.get().strip():
                     add_row()
@@ -1629,13 +2474,266 @@ def open_system_editor(filename: str) -> None:
                 refresh_dropdowns()
             iv.trace_add('write', on_change)
 
+        def refresh_preset_selector(select_name=None):
+            names = ["Custom"] + list(presets.keys())
+            preset_cb['values'] = names
+            if select_name and select_name in presets:
+                preset_var.set(select_name)
+            elif preset_var.get() not in names:
+                preset_var.set("Custom")
+
+        def save_cargo_team_config():
+            try:
+                with open(os.path.join(base, 'cargo_teams.json'), 'w', encoding='utf-8') as cf:
+                    json.dump(ct_config, cf, indent=4)
+                return True
+            except Exception as exc:
+                messagebox.showerror(
+                    "Preset Editor",
+                    f"Could not save cargo_teams.json:\n{exc}",
+                    parent=dlg
+                )
+                return False
+
+        def open_preset_editor():
+            editor = tk.Toplevel(dlg)
+            editor.title("Edit Cargo/Teams Presets")
+            editor.transient(dlg)
+            editor.grab_set()
+
+            current = {'name': None}
+            preset_rows = []
+
+            left = tk.Frame(editor)
+            left.grid(row=0, column=0, rowspan=3, sticky='ns', padx=6, pady=6)
+            right = tk.Frame(editor)
+            right.grid(row=0, column=1, sticky='nsew', padx=6, pady=6)
+            buttons = tk.Frame(editor)
+            buttons.grid(row=2, column=1, sticky='e', padx=6, pady=6)
+            editor.grid_columnconfigure(1, weight=1)
+            editor.grid_rowconfigure(0, weight=1)
+
+            tk.Label(left, text="Presets").pack(anchor='w')
+            preset_list_frame = tk.Frame(left)
+            preset_list_frame.pack(fill='both', expand=True)
+            preset_scroll = tk.Scrollbar(preset_list_frame, orient='vertical')
+            preset_lb = tk.Listbox(
+                preset_list_frame,
+                height=14,
+                width=24,
+                exportselection=False,
+                yscrollcommand=preset_scroll.set
+            )
+            preset_scroll.config(command=preset_lb.yview)
+            preset_lb.pack(side='left', fill='both', expand=True)
+            preset_scroll.pack(side='right', fill='y')
+
+            name_var = tk.StringVar()
+            tk.Label(right, text="Preset Name:").grid(row=0, column=0, sticky='w', padx=2, pady=2)
+            tk.Entry(right, textvariable=name_var, width=32).grid(row=0, column=1, sticky='w', padx=2, pady=2)
+
+            preset_table = tk.Frame(right)
+            preset_table.grid(row=1, column=0, columnspan=3, sticky='nsew', pady=(6, 0))
+            right.grid_rowconfigure(1, weight=1)
+            right.grid_columnconfigure(1, weight=1)
+
+            def build_preset_headers():
+                tk.Label(preset_table, text="Icon").grid(row=0, column=0, padx=5, pady=2)
+                tk.Label(preset_table, text="Item").grid(row=0, column=1, padx=5, pady=2)
+                tk.Label(preset_table, text="Quantity").grid(row=0, column=2, padx=5, pady=2)
+
+            def refresh_preset_dropdowns():
+                selected = [e['iv'].get().strip() for e in preset_rows if e['iv'].get().strip()]
+                for e in preset_rows:
+                    curr = e['iv'].get().strip()
+                    vals = [''] + [it for it in valid_items if it not in selected or it == curr]
+                    e['cb'].set_values(vals)
+
+            def remove_preset_row(idx):
+                entry = preset_rows.pop(idx)
+                for w in (entry['icon'], entry['cb'], entry['sb'], entry['btn']):
+                    w.destroy()
+                for j, e in enumerate(preset_rows):
+                    rn = j + 1
+                    e['icon'].grid_configure(row=rn)
+                    e['cb'].grid_configure(row=rn)
+                    e['sb'].grid_configure(row=rn)
+                    e['btn'].grid_configure(row=rn)
+                if not preset_rows or preset_rows[-1]['iv'].get().strip():
+                    add_preset_row()
+                refresh_preset_dropdowns()
+
+            def add_preset_row(item="", qty=0):
+                r = len(preset_rows) + 1
+                iv = tk.StringVar(value=item)
+                qv = tk.IntVar(value=qty)
+                icon_label = create_icon_label(preset_table, item)
+                icon_label.grid(row=r, column=0, padx=2, pady=2)
+                cb = CategorizedItemDropdown(preset_table, iv, item_category)
+                cb.set_values(valid_items)
+                cb.grid(row=r, column=1, padx=5, pady=2, sticky='w')
+                sb = tk.Spinbox(preset_table, from_=0, to=99999, textvariable=qv, width=6)
+                sb.grid(row=r, column=2, padx=5, pady=2, sticky='w')
+
+                def _remove_this():
+                    remove_preset_row(preset_rows.index(entry))
+
+                btn = tk.Button(preset_table, text='X', command=_remove_this, width=2)
+                btn.grid(row=r, column=3, padx=5, pady=2, sticky='w')
+                entry = {'iv': iv, 'qv': qv, 'cb': cb, 'sb': sb, 'btn': btn, 'icon': icon_label}
+                preset_rows.append(entry)
+
+                def on_change(*_):
+                    selected_item = iv.get().strip()
+                    entry['icon'].destroy()
+                    entry['icon'] = create_icon_label(preset_table, selected_item)
+                    try:
+                        row_number = preset_rows.index(entry) + 1
+                    except ValueError:
+                        row_number = r
+                    entry['icon'].grid(row=row_number, column=0, padx=2, pady=2)
+                    if preset_rows and preset_rows[-1]['iv'] is iv and selected_item:
+                        add_preset_row()
+                    refresh_preset_dropdowns()
+
+                iv.trace_add('write', on_change)
+
+            def clear_preset_table():
+                for widget in preset_table.winfo_children():
+                    widget.destroy()
+                preset_rows.clear()
+                build_preset_headers()
+
+            def preset_row_data():
+                cargo = {}
+                teams = {}
+                for entry in preset_rows:
+                    name = entry['iv'].get().strip()
+                    if not name:
+                        continue
+                    qty = entry['qv'].get()
+                    if name in cargo_keys:
+                        cargo[name] = qty
+                    else:
+                        teams[name] = qty
+                return {"cargo": cargo, "teams": teams}
+
+            def load_preset(name):
+                current['name'] = name
+                name_var.set(name)
+                clear_preset_table()
+                cfg = presets.get(name, {"cargo": {}, "teams": {}})
+                preset_items = []
+                for section in ('cargo', 'teams'):
+                    preset_items.extend((it, qt) for it, qt in cfg.get(section, {}).items())
+                for item, qty in sorted(preset_items, key=lambda entry: item_sort_key(entry[0])):
+                    add_preset_row(item, qty)
+                add_preset_row()
+                refresh_preset_dropdowns()
+
+            def refresh_preset_list(select_name=None):
+                preset_lb.delete(0, 'end')
+                names = list(presets.keys())
+                for name in names:
+                    preset_lb.insert('end', name)
+                if not names:
+                    current['name'] = None
+                    name_var.set('')
+                    clear_preset_table()
+                    add_preset_row()
+                    return
+                if select_name not in presets:
+                    select_name = names[0]
+                idx = names.index(select_name)
+                preset_lb.selection_clear(0, 'end')
+                preset_lb.selection_set(idx)
+                preset_lb.see(idx)
+                load_preset(select_name)
+
+            def selected_preset_name():
+                sel = preset_lb.curselection()
+                if not sel:
+                    return None
+                return preset_lb.get(sel[0])
+
+            def save_current_preset():
+                old_name = current.get('name')
+                new_name = name_var.get().strip()
+                if not old_name:
+                    messagebox.showwarning("Preset Editor", "Select or add a preset first.", parent=editor)
+                    return False
+                if not new_name:
+                    messagebox.showwarning("Preset Editor", "Preset name cannot be blank.", parent=editor)
+                    return False
+                if new_name != old_name and new_name in presets:
+                    messagebox.showwarning("Preset Editor", f"Preset '{new_name}' already exists.", parent=editor)
+                    return False
+                data = preset_row_data()
+                if new_name != old_name:
+                    presets[new_name] = presets.pop(old_name)
+                    current['name'] = new_name
+                presets[new_name] = data
+                refresh_preset_list(new_name)
+                refresh_preset_selector(new_name)
+                return True
+
+            def add_preset():
+                name = simpledialog.askstring("Add Preset", "Preset name:", parent=editor)
+                if not name:
+                    return
+                name = name.strip()
+                if not name:
+                    return
+                if name in presets:
+                    messagebox.showwarning("Preset Editor", f"Preset '{name}' already exists.", parent=editor)
+                    return
+                presets[name] = {"cargo": {}, "teams": {}}
+                refresh_preset_list(name)
+                refresh_preset_selector(name)
+
+            def delete_preset():
+                name = selected_preset_name()
+                if not name:
+                    return
+                if not messagebox.askyesno("Delete Preset", f"Delete preset '{name}'?", parent=editor):
+                    return
+                presets.pop(name, None)
+                refresh_preset_list()
+                refresh_preset_selector()
+
+            def on_preset_select(event=None):
+                name = selected_preset_name()
+                old_name = current.get('name')
+                if old_name and old_name in presets and name != old_name:
+                    presets[old_name] = preset_row_data()
+                if name:
+                    load_preset(name)
+
+            def save_and_close():
+                if current.get('name') and not save_current_preset():
+                    return
+                if save_cargo_team_config():
+                    editor.destroy()
+
+            preset_lb.bind('<<ListboxSelect>>', on_preset_select)
+
+            tk.Button(left, text="Add", command=add_preset).pack(fill='x', pady=(6, 2))
+            tk.Button(left, text="Delete", command=delete_preset).pack(fill='x', pady=2)
+            tk.Button(buttons, text="Save Preset", command=lambda: save_current_preset() and save_cargo_team_config())\
+              .pack(side='left', padx=4)
+            tk.Button(buttons, text="Save & Close", command=save_and_close).pack(side='left', padx=4)
+            tk.Button(buttons, text="Close", command=editor.destroy).pack(side='left', padx=4)
+
+            refresh_preset_list()
+            editor.wait_window()
+
         # populate existing cargo+teams
         existing = {}
         for k,v in (obj.get('cargo') or {}).items():
             existing[k] = int(v)
         for k,v in (obj.get('teams') or {}).items():
             existing[k] = int(v)
-        for key,val in existing.items():
+        for key,val in sorted(existing.items(), key=lambda entry: item_sort_key(entry[0])):
             add_row(key, val)
         add_row()  # always end with a blank row
         # initial filter
@@ -1650,14 +2748,19 @@ def open_system_editor(filename: str) -> None:
                     w.destroy()
                 rows.clear()
                 # header
-                tk.Label(table, text="Item").grid(row=0, column=0, padx=5, pady=2)
-                tk.Label(table, text="Quantity").grid(row=0, column=1, padx=5, pady=2)
+                tk.Label(table, text="Icon").grid(row=0, column=0, padx=5, pady=2)
+                tk.Label(table, text="Item").grid(row=0, column=1, padx=5, pady=2)
+                tk.Label(table, text="Quantity").grid(row=0, column=2, padx=5, pady=2)
                 cfg = presets[name]
+                preset_items = []
                 for d in ('cargo','teams'):
-                    for it,qt in cfg[d].items():
-                        add_row(it, qt)
+                    preset_items.extend((it, qt) for it, qt in cfg.get(d, {}).items())
+                for it, qt in sorted(preset_items, key=lambda entry: item_sort_key(entry[0])):
+                    add_row(it, qt)
                 add_row()
         preset_cb.bind("<<ComboboxSelected>>", apply_preset)
+        tk.Button(dlg, text="Edit Presets", command=open_preset_editor)\
+          .grid(row=0, column=3, padx=5)
 
         # --- Randomize handler ---
         def randomize():
@@ -1672,7 +2775,6 @@ def open_system_editor(filename: str) -> None:
 
         # --- Save & Cancel ---
         def save():
-            cargo_keys = set(ct_config.get('cargo', []))
             cargo = {}
             teams = {}
             # each entry in rows is a dict with keys 'iv' and 'qv'
@@ -1713,6 +2815,34 @@ def open_system_editor(filename: str) -> None:
         edit_title.config(text=f"Station: {name}" if obj.get('type')=='station' else f"Object: {name}")
         # Bring title to front
         edit_title.lift()
+
+        zone_style = get_zone_style(obj.get('type'))
+        if zone_style is not None:
+            coord = obj.get('coordinate', [0,0,0])
+            zone_types = sorted(ZONE_STYLE_MAP.keys())
+
+            def _set_zone_type(value):
+                obj['type'] = value
+                draw_map(ctx)
+
+            fields = [
+                ("Type:", lambda: obj.get('type', ''), _set_zone_type, 'combo', zone_types),
+                ("X:", lambda: coord[0], lambda v: obj.__setitem__('coordinate', [v, coord[1], coord[2]])),
+                ("Z:", lambda: coord[2], lambda v: obj.__setitem__('coordinate', [coord[0], coord[1], v])),
+                ("Radius:", lambda: obj.get('radius', 5000), lambda v: obj.__setitem__('radius', int(v))),
+                ("Description:", lambda: obj.get('description', ''), lambda v: obj.__setitem__('description', v), 'text'),
+            ]
+            show_item(zone_style['label'], name, fields, rename_object, delete_object)
+            set_selection('object', name)
+            edit_title.config(text=f"{zone_style['label']}: {name}")
+            hide_var = tk.BooleanVar(value=obj.get('hideonmap', False))
+            tk.Checkbutton(
+                edit_frame,
+                text="Hide on map",
+                variable=hide_var,
+                command=lambda: obj.__setitem__('hideonmap', hide_var.get())
+            ).pack(anchor='w', pady=2)
+            return
         
         # ─── Platform‐type custom layout ──────────────────────────────
         if obj.get('type') == 'platform':
@@ -2050,6 +3180,10 @@ def open_system_editor(filename: str) -> None:
 
             last_desc_widget = desc_text
             last_desc_obj = obj
+            register_text_widget(
+                desc_text,
+                lambda value, target=obj: target.__setitem__('description', value)
+            )
 
             # Hide on map at row 7
             hide_var = tk.BooleanVar(value=obj.get('hideonmap', False))
@@ -2175,7 +3309,7 @@ def open_system_editor(filename: str) -> None:
             is_center = True
         elif isinstance(feat.get('coordinate'), (list, tuple)):
             coord = feat.get('coordinate')
-            if ttype in ('blackhole', 'planet', 'debris_field', 'hidden_minefield'):
+            if ttype in ('blackhole', 'planet', 'debris_field', 'hidden_minefield', 'minefield') or is_zone_type(ttype):
                 is_center = True
         update_coord_display(coord, is_center)
         clear_edit_pane()
@@ -2187,8 +3321,10 @@ def open_system_editor(filename: str) -> None:
                 ("X:", lambda: coord[0], lambda v: feat.__setitem__('coordinate',[v,coord[1],coord[2]])),
                 ("Z:", lambda: coord[2], lambda v: feat.__setitem__('coordinate',[coord[0],coord[1],v])),
                 ("Name:", lambda: feat.get('name', key), lambda v: feat.__setitem__('name',v)),
-                ("Size:", lambda: feat.get('size',0), lambda v: feat.__setitem__('size',int(v))),
-                ("Strength:", lambda: feat.get('strength',0), lambda v: feat.__setitem__('strength',int(v))),
+                ("Size:", lambda: feat.get('size',500), lambda v: feat.__setitem__('size',int(v))),
+                ("Gravity Radius:", lambda: feat.get('GravityRadius',5000), lambda v: feat.__setitem__('GravityRadius',int(v))),
+                ("Strength:", lambda: feat.get('strength',10), lambda v: feat.__setitem__('strength',int(v))),
+                ("Turbulence Strength:", lambda: feat.get('turbulence_strength',2), lambda v: feat.__setitem__('turbulence_strength',int(v))),
                 ("Description:", lambda: feat.get('description',''), lambda v: feat.__setitem__('description',v), 'text'),
             ]
             show_item("Blackhole", key, fields, rename_terrain, delete_terrain)
@@ -2223,16 +3359,46 @@ def open_system_editor(filename: str) -> None:
             if 'seed' in feat:
                 fields.append(("Seed:", lambda: feat.get('seed',2010), lambda v: feat.__setitem__('seed', int(v))))
             show_item("Debris Field", key, fields, rename_terrain, delete_terrain)
-        elif ttype == 'hidden_minefield':
+        elif ttype in ('hidden_minefield', 'minefield'):
             coord = feat.get('coordinate', [0,0,0])
+            def _set_minefield_type(value):
+                feat['type'] = value
+                feat['hideonmap'] = (value == 'hidden_minefield')
+                draw_map(ctx)
             fields = [
+                (
+                    "Type:",
+                    lambda: feat.get('type', 'hidden_minefield'),
+                    _set_minefield_type,
+                    'combo',
+                    ['hidden_minefield', 'minefield'],
+                ),
                 ("X:", lambda: coord[0], lambda v: feat.__setitem__('coordinate', [v, coord[1], coord[2]])),
                 ("Z:", lambda: coord[2], lambda v: feat.__setitem__('coordinate', [coord[0], coord[1], v])),
                 ("Width:", lambda: feat.get('width', 15000), lambda v: feat.__setitem__('width', int(v))),
                 ("Height:", lambda: feat.get('height', 15000), lambda v: feat.__setitem__('height', int(v))),
                 ("Density:", lambda: feat.get('density', 70), lambda v: feat.__setitem__('density', int(v))),
             ]
-            show_item("Hidden Mine Field", key, fields, rename_terrain, delete_terrain)
+            show_item("Hidden Mine Field" if ttype == 'hidden_minefield' else "Mine Field", key, fields, rename_terrain, delete_terrain)
+        elif is_zone_type(ttype):
+            coord = feat.get('coordinate', [0,0,0])
+            zone_style = get_zone_style(ttype) or DEFAULT_ZONE_STYLE
+            zone_types = sorted(ZONE_STYLE_MAP.keys())
+
+            def _set_zone_type(value):
+                feat['type'] = value
+                draw_map(ctx)
+
+            fields = [
+                ("Type:", lambda: feat.get('type', ttype), _set_zone_type, 'combo', zone_types),
+                ("X:", lambda: coord[0], lambda v: feat.__setitem__('coordinate', [v, coord[1], coord[2]])),
+                ("Z:", lambda: coord[2], lambda v: feat.__setitem__('coordinate', [coord[0], coord[1], v])),
+                ("Radius:", lambda: feat.get('radius', 5000), lambda v: feat.__setitem__('radius', int(v))),
+                ("Description:", lambda: feat.get('description', ''), lambda v: feat.__setitem__('description', v), 'text'),
+            ]
+            show_item(zone_style['label'], key, fields, rename_terrain, delete_terrain)
+            set_selection('terrain', key)
+            edit_title.config(text=f"{zone_style['label']}: {key}")
         else:
             fields = [
                 ("Density:", lambda: feat.get('density',1), lambda v: feat.__setitem__('density',int(v))),
@@ -2267,9 +3433,10 @@ def open_system_editor(filename: str) -> None:
 
     # Save All button
     def save_all():
-        nonlocal session_revision_bumped
+        nonlocal session_revision_bumped, text_dirty
         old_md = {}
         try:
+            flush_pending_text_widgets()
             # Update in-memory state
             sm.set_system_map_coord([float(var.get()) for var in coord_vars])
             sm.set_alignment(align_var.get())
@@ -2338,6 +3505,7 @@ def open_system_editor(filename: str) -> None:
                 redo_stack.clear()
             except Exception:
                 pass
+            text_dirty = False
             # Inform user with a sound only (no popup)
             try:
                 win.bell()
@@ -2359,8 +3527,9 @@ def open_system_editor(filename: str) -> None:
 
    # ─── Reload button (clear & reload from disk) ──────────────────
     def reload_all():
-        nonlocal sm
+        nonlocal sm, text_dirty
         try:
+            clear_edit_pane()
             # re-instantiate from file
             sm = SystemMap(file_path)
             # refresh metadata fields
@@ -2369,6 +3538,10 @@ def open_system_editor(filename: str) -> None:
             align_var.set(sm.get_alignment() or '')
             desc_text.delete('1.0', tk.END)
             desc_text.insert('1.0', sm.get_description())
+            try:
+                desc_text.edit_modified(False)
+            except tk.TclError:
+                pass
             refresh_author_metadata_display(sm.data.get('metadata', {}))
 
             md = sm.data.setdefault('metadata', {})
@@ -2434,6 +3607,7 @@ def open_system_editor(filename: str) -> None:
             # update drawing context and redraw
             ctx['sm'] = sm
             draw_map(ctx)
+            text_dirty = False
         except Exception as e:
             messagebox.showerror("Error", f"Reload failed: {e}")
             return
@@ -2462,25 +3636,51 @@ def open_system_editor(filename: str) -> None:
         open_system_editor(newfname)
 
 
-    # ─── Validation: Cargo & Teams against cargo_teams.json ─────────────
-    def validate_and_report():
-        """
-        Validate every object's cargo and teams against cargo_teams.json.
-        - Flags unknown item names.
-        - Flags items placed under the wrong section (cargo vs teams).
-        - Flags non-integer or negative quantities.
-        Shows a summary warning on problems; silent if all OK.
-        """
+    def is_number_like(value):
+        if isinstance(value, bool):
+            return False
+        if not isinstance(value, (int, float)):
+            return False
+        try:
+            return math.isfinite(float(value))
+        except Exception:
+            return False
+
+    def validate_coordinate_value(value, label, issues, required_len=3):
+        if not isinstance(value, (list, tuple)) or len(value) < required_len:
+            issues.append(f"{label}: expected a coordinate list with at least {required_len} values.")
+            return False
+        ok = True
+        for idx in range(required_len):
+            if is_number_like(value[idx]):
+                continue
+            issues.append(f"{label}: coordinate index {idx} is not a finite number ({value[idx]!r}).")
+            ok = False
+        return ok
+
+    def collect_cargo_team_validation_issues():
         cargo_set = set(ct_config.get('cargo', []))
         team_set  = set(ct_config.get('teams', []))
         issues    = []
         # Nothing to validate against? Skip quietly.
         if not cargo_set and not team_set:
-            return
-        for obj_name in sm.list_objects():
-            obj   = sm.get_object(obj_name)
+            return issues
+        objects = sm.data.get('objects', {})
+        if not isinstance(objects, dict):
+            issues.append("objects must be a JSON object for cargo/team validation.")
+            return issues
+        for obj_name, obj in objects.items():
+            if not isinstance(obj, dict):
+                issues.append(f"{obj_name}: object entry is not a JSON object.")
+                continue
             carg  = obj.get('cargo') or {}
             tms   = obj.get('teams') or {}
+            if not isinstance(carg, dict):
+                issues.append(f"{obj_name}: cargo must be a JSON object.")
+                carg = {}
+            if not isinstance(tms, dict):
+                issues.append(f"{obj_name}: teams must be a JSON object.")
+                tms = {}
             # Cargo checks
             for item, qty in carg.items():
                 if item in team_set:
@@ -2497,6 +3697,18 @@ def open_system_editor(filename: str) -> None:
                     issues.append(f"{obj_name}: Unknown team '{item}'.")
                 if not isinstance(qty, int) or qty < 0:
                     issues.append(f"{obj_name}: Team '{item}' has invalid qty {qty} (non-negative integer required).")
+        return issues
+
+    # ─── Validation: Cargo & Teams against cargo_teams.json ─────────────
+    def validate_and_report(show_success=False):
+        """
+        Validate every object's cargo and teams against cargo_teams.json.
+        - Flags unknown item names.
+        - Flags items placed under the wrong section (cargo vs teams).
+        - Flags non-integer or negative quantities.
+        Shows a summary warning on problems; silent if all OK unless requested.
+        """
+        issues = collect_cargo_team_validation_issues()
         if issues:
             # If message too long for a messagebox, print full list and summarize.
             report = "\n".join(issues)
@@ -2509,8 +3721,212 @@ def open_system_editor(filename: str) -> None:
             else:
                 messagebox.showwarning("Cargo/Teams Validation", "Issues found:\n\n" + report)
         else:
-            # Optional: log OK to console
             print("Cargo/Teams validation: OK")
+            if show_success:
+                messagebox.showinfo("Cargo/Teams Validation", "No cargo or team issues were found.")
+
+    def show_validation_results(title, errors, warnings):
+        if not errors and not warnings:
+            messagebox.showinfo(title, "No malformed JSON or structural issues were found.")
+            return
+
+        dlg = tk.Toplevel(win)
+        dlg.title(title)
+        dlg.transient(win)
+        dlg.resizable(True, True)
+        dlg.geometry("780x520")
+
+        body = tk.Frame(dlg, padx=10, pady=10)
+        body.pack(fill='both', expand=True)
+
+        summary_parts = []
+        if errors:
+            summary_parts.append(f"{len(errors)} error(s)")
+        if warnings:
+            summary_parts.append(f"{len(warnings)} warning(s)")
+        summary_text = ", ".join(summary_parts) if summary_parts else "No issues found"
+
+        tk.Label(
+            body,
+            text=summary_text,
+            font=('Arial', 10, 'bold'),
+            anchor='w',
+            justify='left',
+        ).pack(fill='x', pady=(0, 8))
+
+        text_frame = tk.Frame(body)
+        text_frame.pack(fill='both', expand=True)
+
+        report_text = tk.Text(text_frame, wrap='word', width=100, height=24)
+        report_text.pack(side='left', fill='both', expand=True)
+        scroll = ttk.Scrollbar(text_frame, orient='vertical', command=report_text.yview)
+        scroll.pack(side='right', fill='y')
+        report_text.configure(yscrollcommand=scroll.set)
+
+        if errors:
+            report_text.insert('end', "Errors\n")
+            report_text.insert('end', "======\n")
+            for item in errors:
+                report_text.insert('end', f"- {item}\n")
+        if warnings:
+            if errors:
+                report_text.insert('end', "\n")
+            report_text.insert('end', "Warnings\n")
+            report_text.insert('end', "========\n")
+            for item in warnings:
+                report_text.insert('end', f"- {item}\n")
+        report_text.configure(state='disabled')
+
+        footer = tk.Frame(dlg, padx=10, pady=10)
+        footer.pack(fill='x')
+        tk.Button(footer, text="Close", width=12, command=dlg.destroy).pack(side='right')
+
+        dlg.update_idletasks()
+        dlg.lift()
+        try:
+            dlg.focus_force()
+        except Exception:
+            dlg.focus_set()
+
+    def verify_system_data():
+        errors = []
+        warnings = []
+
+        try:
+            encoded = json.dumps(sm.data, indent=4, allow_nan=False)
+            decoded = json.loads(encoded)
+            if not isinstance(decoded, dict):
+                errors.append("JSON round-trip did not produce an object at the root.")
+        except Exception as exc:
+            errors.append(f"Current system data cannot be serialized as valid JSON: {exc}")
+            show_validation_results("Verify System", errors, warnings)
+            return
+
+        if not isinstance(sm.data, dict):
+            errors.append("System root must be a JSON object.")
+            show_validation_results("Verify System", errors, warnings)
+            return
+
+        system_coord = sm.data.get('systemMapCoord')
+        validate_coordinate_value(system_coord, "systemMapCoord", errors)
+
+        metadata = sm.data.get('metadata', {})
+        if metadata is not None and not isinstance(metadata, dict):
+            errors.append("metadata must be a JSON object when present.")
+
+        objects = sm.data.get('objects', {})
+        if not isinstance(objects, dict):
+            errors.append("objects must be a JSON object.")
+            objects = {}
+
+        terrain_data = sm.data.get('terrain', {})
+        if not isinstance(terrain_data, dict):
+            errors.append("terrain must be a JSON object.")
+            terrain_data = {}
+
+        relay_data = sm.data.get('sensor_relay', {})
+        if relay_data is not None and not isinstance(relay_data, dict):
+            errors.append("sensor_relay must be a JSON object when present.")
+            relay_data = {}
+
+        current_gate_names = {
+            str(obj_name).lower()
+            for obj_name, obj in objects.items()
+            if isinstance(obj, dict)
+            and str(obj.get('type', '') or '').strip().lower() in ('jumpnode', 'jumppoint', 'jump_point')
+        }
+        gate_index = dict(other_gate_index)
+        gate_index[filename] = current_gate_names
+        for obj_name, obj in objects.items():
+            if not isinstance(obj, dict):
+                errors.append(f"Object '{obj_name}' must be a JSON object.")
+                continue
+            obj_type = str(obj.get('type', '') or '').strip().lower()
+            if not obj_type:
+                errors.append(f"Object '{obj_name}' is missing a type.")
+            coord = obj.get('coordinate')
+            validate_coordinate_value(coord, f"Object '{obj_name}' coordinate", errors)
+            if obj_type in ('jumpnode', 'jumppoint', 'jump_point'):
+                destinations = obj.get('destinations')
+                if not isinstance(destinations, dict) or not destinations:
+                    warnings.append(f"Jump object '{obj_name}' has no valid destinations.")
+                else:
+                    for dest_gate_name, dest_system_name in destinations.items():
+                        gate_name = str(dest_gate_name or '').strip()
+                        system_name = str(dest_system_name or '').strip()
+                        if not gate_name or not system_name:
+                            errors.append(f"Jump object '{obj_name}' has a blank destination entry.")
+                            continue
+                        dest_system_key = system_name.lower()
+                        if dest_system_key.endswith('.json'):
+                            dest_system_key = dest_system_key[:-5]
+                        dest_filename = system_files.get(dest_system_key)
+                        if not dest_filename:
+                            warnings.append(
+                                f"Jump object '{obj_name}' points to missing system '{system_name}'."
+                            )
+                            continue
+                        if gate_name.lower() not in gate_index.get(dest_filename, set()):
+                            warnings.append(
+                                f"Jump object '{obj_name}' points to missing gate '{gate_name}' in system '{system_name}'."
+                            )
+            if is_zone_type(obj_type):
+                radius = obj.get('radius')
+                if not is_number_like(radius) or float(radius) <= 0:
+                    errors.append(f"Zone object '{obj_name}' must have a positive numeric radius.")
+            cargo = obj.get('cargo')
+            if cargo is not None and not isinstance(cargo, dict):
+                errors.append(f"Object '{obj_name}' cargo must be a JSON object.")
+            teams = obj.get('teams')
+            if teams is not None and not isinstance(teams, dict):
+                errors.append(f"Object '{obj_name}' teams must be a JSON object.")
+
+        line_terrain_types = {'asteroids', 'nebulas'}
+        coord_terrain_types = {'blackhole', 'planet'}
+        box_terrain_types = {'hidden_minefield', 'minefield'}
+
+        for terr_name, feat in terrain_data.items():
+            if not isinstance(feat, dict):
+                errors.append(f"Terrain '{terr_name}' must be a JSON object.")
+                continue
+            terr_type = str(feat.get('type', '') or '').strip().lower()
+            if not terr_type:
+                errors.append(f"Terrain '{terr_name}' is missing a type.")
+                continue
+
+            if terr_type in line_terrain_types:
+                validate_coordinate_value(feat.get('start'), f"Terrain '{terr_name}' start", errors)
+                validate_coordinate_value(feat.get('end'), f"Terrain '{terr_name}' end", errors)
+                density = feat.get('density')
+                scatter = feat.get('scatter')
+                if not isinstance(density, int) or density < 0:
+                    errors.append(f"Terrain '{terr_name}' density must be a non-negative integer.")
+                if not is_number_like(scatter) or float(scatter) < 0:
+                    errors.append(f"Terrain '{terr_name}' scatter must be a non-negative number.")
+            elif terr_type in coord_terrain_types or is_zone_type(terr_type):
+                validate_coordinate_value(feat.get('coordinate'), f"Terrain '{terr_name}' coordinate", errors)
+                if is_zone_type(terr_type):
+                    radius = feat.get('radius')
+                    if not is_number_like(radius) or float(radius) <= 0:
+                        errors.append(f"Terrain zone '{terr_name}' must have a positive numeric radius.")
+            elif terr_type in box_terrain_types:
+                validate_coordinate_value(feat.get('coordinate'), f"Terrain '{terr_name}' coordinate", errors)
+                width = feat.get('width')
+                height = feat.get('height')
+                if not is_number_like(width) or float(width) <= 0:
+                    errors.append(f"Terrain '{terr_name}' width must be a positive number.")
+                if not is_number_like(height) or float(height) <= 0:
+                    errors.append(f"Terrain '{terr_name}' height must be a positive number.")
+
+        for relay_name, relay in relay_data.items():
+            if isinstance(relay, dict):
+                coord = relay.get('coordinate')
+            else:
+                coord = relay
+            validate_coordinate_value(coord, f"Sensor relay '{relay_name}' coordinate", errors)
+
+        warnings.extend(collect_cargo_team_validation_issues())
+        show_validation_results("Verify System", errors, warnings)
 
     def show_station_list():
         list_win = tk.Toplevel(win)
@@ -2815,6 +4231,132 @@ def open_system_editor(filename: str) -> None:
             sm.data["terrain"] = new_terrain
         _refresh_ui()
 
+    def generate_fcs_zones():
+        terrain_data = sm.data.get("terrain", {})
+        cache = ctx.setdefault("terrain_points_cache", {})
+        nebula_points = collect_nebula_points_for_fcs(terrain_data, cache=cache)
+
+        if not nebula_points:
+            messagebox.showinfo(
+                "Generate FCS Zones",
+                "No nebula dots are available in this system."
+            )
+            return
+
+        existing_objects = sm.data.setdefault("objects", {})
+        existing_fcs_objects = {
+            name: obj for name, obj in existing_objects.items()
+            if str(obj.get("type", "")).strip().lower() == FCS_ZONE_TYPE
+        }
+
+        dlg, body, footer = toolbar.make_dialog("Generate Fuel Collection Zones", near="toolbar")
+
+        zone_radius_var = tk.IntVar(value=DEFAULT_FCS_ZONE_RADIUS)
+        spacing_var = tk.IntVar(value=DEFAULT_FCS_MIN_SPACING)
+        density_radius_var = tk.IntVar(value=DEFAULT_FCS_DENSITY_RADIUS)
+        percentile_var = tk.IntVar(value=DEFAULT_FCS_DENSITY_PERCENTILE)
+        replace_var = tk.BooleanVar(value=bool(existing_fcs_objects))
+
+        tk.Label(
+            body,
+            text=f"Nebula dots available: {len(nebula_points)}"
+        ).grid(row=0, column=0, columnspan=2, padx=6, pady=(2, 2), sticky="w")
+        tk.Label(
+            body,
+            text=f"Existing FCS object zones: {len(existing_fcs_objects)}"
+        ).grid(row=1, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w")
+
+        toolbar.labeled_spinbox(body, "Zone Radius:", zone_radius_var,
+                                frm=1, to=1000000, width=10, row=2, col=0)
+        toolbar.labeled_spinbox(body, "Min Spacing:", spacing_var,
+                                frm=1000, to=1000000, width=10, row=3, col=0)
+        toolbar.labeled_spinbox(body, "Density Radius:", density_radius_var,
+                                frm=1000, to=1000000, width=10, row=4, col=0)
+        toolbar.labeled_spinbox(body, "Density Percentile:", percentile_var,
+                                frm=0, to=100, width=10, row=5, col=0)
+
+        tk.Checkbutton(
+            body,
+            text="Replace existing FCS object zones",
+            variable=replace_var
+        ).grid(row=6, column=0, columnspan=2, padx=6, pady=(2, 4), sticky="w")
+
+        tk.Label(
+            body,
+            text="Higher percentile favors tighter nebula clusters.",
+            fg="#3a86ff"
+        ).grid(row=7, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w")
+
+        def _apply():
+            try:
+                zone_radius = max(1, int(zone_radius_var.get() or DEFAULT_FCS_ZONE_RADIUS))
+                min_spacing = max(1, int(spacing_var.get() or DEFAULT_FCS_MIN_SPACING))
+                density_radius = max(1, int(density_radius_var.get() or DEFAULT_FCS_DENSITY_RADIUS))
+                percentile = max(0, min(100, int(percentile_var.get() or DEFAULT_FCS_DENSITY_PERCENTILE)))
+            except Exception:
+                messagebox.showerror("Generate FCS Zones", "Invalid FCS zone settings.")
+                return
+
+            replace_existing = bool(replace_var.get())
+            blocked_centers = collect_fcs_blocked_centers(sm.data, replace_existing=replace_existing)
+            selected = select_fcs_zone_centers(
+                nebula_points,
+                min_spacing=min_spacing,
+                density_radius=density_radius,
+                percentile=percentile,
+                min_score=DEFAULT_FCS_MIN_SCORE,
+                blocked_centers=blocked_centers,
+            )
+
+            if not selected:
+                messagebox.showinfo(
+                    "Generate FCS Zones",
+                    "No fuel collection zones met the current density settings."
+                )
+                return
+
+            push_undo()
+            removed = 0
+
+            if replace_existing:
+                for name in list(existing_objects.keys()):
+                    obj = existing_objects.get(name, {})
+                    if str(obj.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
+                        continue
+                    del existing_objects[name]
+                    removed += 1
+
+            created = []
+            for zone in selected:
+                name = toolbar.gen_zone_name(FCS_ZONE_TYPE)
+                existing_objects[name] = {
+                    "type": FCS_ZONE_TYPE,
+                    "coordinate": [zone["x"], 0, zone["z"]],
+                    "radius": zone_radius,
+                    "description": DEFAULT_FCS_DESCRIPTION,
+                    "hideonmap": bool(zone.get("hideonmap", False)),
+                }
+                created.append(name)
+
+            dlg.destroy()
+            refresh_objects_list()
+            clear_edit_pane()
+            draw_map(ctx)
+            current_selection["type"] = None
+            current_selection["name"] = None
+
+        def _cancel():
+            dlg.destroy()
+
+        toolbar.footer_buttons(
+            footer,
+            [
+                ("Generate", _apply, {"width": 12}),
+                ("Cancel", _cancel, {"width": 12}),
+            ]
+        )
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
+
     # ─── Meta Ribbon ────────────────────────────────────────────────────
     button_frame = tk.Frame(frame)
     # span all columns and allow horizontal expansion
@@ -2827,7 +4369,9 @@ def open_system_editor(filename: str) -> None:
         ("Load Different System", load_different_system),
         ("Undo",             do_undo),
         ("Redo",             do_redo),
+        ("Verify System",    verify_system_data),
         ("Generate Terrain", generate_terrain),
+        ("Generate FCS Zones", generate_fcs_zones),
         ("Stations Overview", show_station_list),
         ("Info",             show_info),
     ]
@@ -2846,10 +4390,7 @@ def open_system_editor(filename: str) -> None:
         - No    → Discard changes and exit
         - Cancel→ Do not close
         """
-        try:
-            has_unsaved = bool(undo_stack)
-        except Exception:
-            has_unsaved = False
+        has_unsaved = has_unsaved_changes()
         if not has_unsaved:
             win.destroy()
             return
@@ -3025,16 +4566,42 @@ def open_system_editor(filename: str) -> None:
                         z += spacing
         # draw sensor relays (interactive)
         for rname, entry in sm.list_sensor_relays().items():
-            # Support both list and dict entries for relays
-            coord = entry.get('coordinate', entry) if isinstance(entry, dict) else entry
+            relay_entry = ensure_relay_dict(entry)
+            if relay_entry is not entry:
+                sm.data.setdefault('sensor_relay', {})[rname] = relay_entry
+            coord = relay_entry['coordinate']
+            relay_type = normalize_relay_type(relay_entry.get('type'))
             sx, sy = coord_to_screen(coord[0], coord[2])
-            rr = 5
-            color = 'green' if (rname.startswith('SR-') or rname.startswith('Relay ')) else 'cyan'
-            map_canvas.create_oval(sx-rr, sy-rr, sx+rr, sy+rr,
-                fill=color, outline='', tags=('relay_pt', rname))
-            if color == 'cyan':
-                map_canvas.create_text(sx, sy-10,
-                    text=rname, fill='cyan', font=('Arial',8), tags=('relay_pt', rname))
+            if relay_type == RELAY_TYPE_WARNING_BUOY:
+                rr = 6
+                color = 'orange'
+                map_canvas.create_polygon(
+                    sx, sy - rr,
+                    sx + rr, sy + rr,
+                    sx - rr, sy + rr,
+                    fill=color,
+                    outline='',
+                    tags=('relay_pt', rname)
+                )
+                map_canvas.create_text(
+                    sx, sy - 12,
+                    text=rname,
+                    fill=color,
+                    font=('Arial', 8),
+                    tags=('relay_pt', rname)
+                )
+            else:
+                rr = 5
+                color = 'green' if (rname.startswith('SR-') or rname.startswith('Relay ')) else 'cyan'
+                map_canvas.create_oval(
+                    sx-rr, sy-rr, sx+rr, sy+rr,
+                    fill=color, outline='', tags=('relay_pt', rname)
+                )
+                if color == 'cyan':
+                    map_canvas.create_text(
+                        sx, sy-10,
+                        text=rname, fill='cyan', font=('Arial',8), tags=('relay_pt', rname)
+                    )
         # draw objects (jumpnodes/jumppoints in green)
         # Use the *live* object names from the SystemMap so newly created items
         # always appear, regardless of how the sidebar list is sorted/colored.
@@ -3042,9 +4609,40 @@ def open_system_editor(filename: str) -> None:
             obj = sm.get_object(name)
             coord = obj.get('coordinate', [0,0,0])
             otype = obj.get('type','').lower()
+            sx, sy = coord_to_screen(coord[0], coord[2])
+
+            zone_style = get_zone_style(otype)
+            if zone_style is not None:
+                try:
+                    radius = float(obj.get('radius', 0) or 0)
+                except Exception:
+                    radius = 0.0
+                if radius > 0:
+                    rpx = radius * map_scale
+                    map_canvas.create_oval(
+                        sx - rpx, sy - rpx, sx + rpx, sy + rpx,
+                        outline=zone_style['outline'],
+                        fill=zone_style['fill'],
+                        stipple='gray25',
+                        tags=('obj', name)
+                    )
+                r = 5
+                map_canvas.create_oval(
+                    sx-r, sy-r, sx+r, sy+r,
+                    fill=zone_style['outline'], outline='',
+                    tags=('obj', name)
+                )
+                map_canvas.create_text(
+                    sx, sy-10,
+                    text=name,
+                    fill=zone_style['text'],
+                    font=('Arial', 8, 'bold'),
+                    tags=('obj', name)
+                )
+                continue
+
             # use green for jumpnode/jumppoint, white otherwise
             color = 'light green' if otype in ('jumpnode','jumppoint') else 'white'
-            sx, sy = coord_to_screen(coord[0], coord[2])
 
             # ── Jump node/point drift ring (pale blue) ─────────────────────────
             # If the object is a jumpnode/jumppoint and has a drift value,
@@ -3139,6 +4737,37 @@ def open_system_editor(filename: str) -> None:
             feat = sm.get_terrain_feature(key)
             # blackhole rendering: yellow dot with black center
             t_type = feat.get('type','').lower()
+            zone_style = get_zone_style(t_type)
+            if zone_style is not None:
+                coord = feat.get('coordinate', [0,0,0])
+                try:
+                    radius = float(feat.get('radius', 0) or 0)
+                except Exception:
+                    radius = 0.0
+                sx, sy = coord_to_screen(coord[0], coord[2])
+                if radius > 0:
+                    rpx = radius * map_scale
+                    map_canvas.create_oval(
+                        sx - rpx, sy - rpx, sx + rpx, sy + rpx,
+                        outline=zone_style['outline'],
+                        fill=zone_style['fill'],
+                        stipple='gray25',
+                        tags=('terrain', key)
+                    )
+                rr = 4
+                map_canvas.create_oval(
+                    sx - rr, sy - rr, sx + rr, sy + rr,
+                    fill='blue',
+                    tags=('terrain_pt', key, 'coord')
+                )
+                map_canvas.create_text(
+                    sx, sy - 10,
+                    text=key,
+                    fill=zone_style['text'],
+                    font=('Arial', 8, 'bold'),
+                    tags=('terrain', key)
+                )
+                continue
             if t_type == 'blackhole':
                 coord = feat.get('coordinate',[0,0,0])
                 sx, sy = coord_to_screen(coord[0], coord[2])
@@ -3201,7 +4830,7 @@ def open_system_editor(filename: str) -> None:
                     tags=('terrain', key)
                 )
                 continue
-            if t_type == 'hidden_minefield':
+            if t_type in ('hidden_minefield', 'minefield'):
                 coord = feat.get('coordinate', [0,0,0])
                 width = float(feat.get('width', 15000) or 0)
                 height = float(feat.get('height', 15000) or 0)
@@ -3212,9 +4841,11 @@ def open_system_editor(filename: str) -> None:
                 x1, z1 = coord[0] + extent_w, coord[2] + extent_h
                 sx0, sy0 = coord_to_screen(x0, z0)
                 sx1, sy1 = coord_to_screen(x1, z1)
+                outline = '#cc0000' if t_type == 'hidden_minefield' else '#ff9900'
+                fill = '#552222' if t_type == 'hidden_minefield' else '#7a3d00'
                 map_canvas.create_rectangle(
                     sx0, sy0, sx1, sy1,
-                    outline='#cc0000', fill='#552222',
+                    outline=outline, fill=fill,
                     tags=('terrain', key)
                 )
                 # draggable/selectable center handle (blue)
@@ -3265,11 +4896,11 @@ def open_system_editor(filename: str) -> None:
             if t_type in ('nebulas', 'asteroids'):
                 density = int(feat.get('density', 125) or 0)
                 density = max(0, min(density, 10000))
-                seed = feat.get('seed', 2010)
+                seed = feat.get('seed')
                 scatter = float(feat.get('scatter', 0) or 0)
                 cache = ctx.setdefault('terrain_points_cache', {})
                 cache_key = (t_type, tuple(feat.get('start', [0, 0, 0])), tuple(feat.get('end', [0, 0, 0])),
-                             float(scatter), int(density), int(seed))
+                             float(scatter), int(density), seed)
                 coords = cache.get((key, cache_key))
                 if coords is None and density > 0 and scatter > 0:
                     coords = generate_line_coords(feat.get('start', [0, 0, 0]),
@@ -3348,22 +4979,77 @@ def open_system_editor(filename: str) -> None:
 
     # Adapter: show_relay via generic helper
     def show_relay(name: str):
-        relay_data = sm.data.get('sensor_relay', {}).get(name)
-        if isinstance(relay_data, dict):
-            coord = relay_data.get('coordinate',[0,0,0])
-        else:
-            coord = sm.list_sensor_relays().get(name,[0,0,0])
-            relay_data = {'coordinate': coord}
-            sm.data['sensor_relay'][name] = relay_data
+        relay_store = sm.data.setdefault('sensor_relay', {})
+        relay_data = ensure_relay_dict(relay_store.get(name))
+        relay_store[name] = relay_data
+        coord = relay_data.get('coordinate', [0, 0, 0])
         update_coord_display(coord, False)
         clear_edit_pane()
         edit_title.config(text=f"Relay: {name}")
-        fields = [
-            ("X:",           lambda: relay_data['coordinate'][0], lambda v: relay_data['coordinate'].__setitem__(0,v)),
-            ("Z:",           lambda: relay_data['coordinate'][2], lambda v: relay_data['coordinate'].__setitem__(2,v)),
-            ("Description:", lambda: relay_data.get('description',''), lambda v: relay_data.__setitem__('description',v), 'text'),
-        ]
-        show_item("Relay", name, fields, rename_relay, delete_relay)
+
+        tk.Label(edit_frame, text="X:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+        build_field(edit_frame, relay_data['coordinate'][0], lambda v: relay_data['coordinate'].__setitem__(0, v))
+        tk.Label(edit_frame, text="Z:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+        build_field(edit_frame, relay_data['coordinate'][2], lambda v: relay_data['coordinate'].__setitem__(2, v))
+
+        tk.Label(edit_frame, text="Type:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+        relay_type_var = tk.StringVar(value=normalize_relay_type(relay_data.get('type')))
+        type_cb = ttk.Combobox(
+            edit_frame,
+            textvariable=relay_type_var,
+            values=RELAY_TYPE_OPTIONS,
+            state='readonly'
+        )
+        type_cb.pack(anchor='w', pady=2)
+
+        warning_frame = tk.Frame(edit_frame)
+        warning_frame.pack(anchor='w', fill='x')
+
+        def render_warning_fields():
+            for child in warning_frame.winfo_children():
+                child.destroy()
+            if relay_data.get('type') != RELAY_TYPE_WARNING_BUOY:
+                return
+            tk.Label(warning_frame, text="Broadcast:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+            build_field(warning_frame, relay_data.get('broadcast', ''), lambda v: relay_data.__setitem__('broadcast', v))
+            tk.Label(warning_frame, text="Ping:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+            build_field(
+                warning_frame,
+                int(relay_data.get('ping', WARNING_BUOY_DEFAULT_PING)),
+                lambda v: relay_data.__setitem__('ping', int(v))
+            )
+            tk.Label(warning_frame, text="Range:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+            build_field(
+                warning_frame,
+                int(relay_data.get('range', WARNING_BUOY_DEFAULT_RANGE)),
+                lambda v: relay_data.__setitem__('range', int(v))
+            )
+
+        def apply_relay_type(*_):
+            relay_type = normalize_relay_type(relay_type_var.get())
+            relay_data['type'] = relay_type
+            if relay_type == RELAY_TYPE_WARNING_BUOY:
+                relay_data.setdefault('broadcast', '')
+                relay_data.setdefault('ping', WARNING_BUOY_DEFAULT_PING)
+                relay_data.setdefault('range', WARNING_BUOY_DEFAULT_RANGE)
+            else:
+                relay_data.pop('broadcast', None)
+                relay_data.pop('ping', None)
+                relay_data.pop('range', None)
+            render_warning_fields()
+
+        relay_type_var.trace_add('write', apply_relay_type)
+        apply_relay_type()
+
+        tk.Label(edit_frame, text="Description:", wraplength=230, justify='left').pack(anchor='w', pady=2)
+        desc_text = tk.Text(edit_frame, height=4, width=30)
+        desc_text.insert('1.0', relay_data.get('description', ''))
+        desc_text.pack(anchor='w', pady=2)
+        register_text_widget(desc_text, lambda value: relay_data.__setitem__('description', value))
+
+        tk.Button(edit_frame, text="Rename", command=lambda: rename_relay(name)).pack(pady=5)
+        tk.Button(edit_frame, text="Delete", fg="red", command=lambda: delete_relay(name)).pack(pady=5)
+
         # Hide on map checkbox for relays
         hide_var = tk.BooleanVar(value=relay_data.get('hideonmap', False))
         hide_chk = tk.Checkbutton(edit_frame,
@@ -3466,6 +5152,7 @@ def open_system_editor(filename: str) -> None:
     # Run validation once the editor window is up
     validate_and_report()
     refresh_objects_list()
+    return win
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()

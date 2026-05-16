@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import SystemEditor
+import Toolbar
 import random
 import re
 import copy
@@ -225,6 +226,16 @@ def on_canvas_press(event, ctx):
         near = "pointer" if near_pointer else "toolbar"
         return toolbar.make_dialog(title, near=near)
 
+    def _build_relay_entry_from_config(x, z, config):
+        relay_type = str(config.get('relay_type') or Toolbar.RELAY_TYPE_SENSOR).strip()
+        return toolbar.build_relay_payload(
+            [x, 0, z],
+            relay_type=relay_type,
+            broadcast=config.get('broadcast', Toolbar.WARNING_BUOY_DEFAULT_BROADCAST),
+            ping=config.get('ping', Toolbar.WARNING_BUOY_DEFAULT_PING),
+            range_value=config.get('range', Toolbar.WARNING_BUOY_DEFAULT_RANGE),
+        )
+
 
     # ── Measurement tool: right‐click to place two points, draw line & show distance ──
     if event.num == 3:
@@ -338,7 +349,7 @@ def on_canvas_press(event, ctx):
         ctx['push_undo']()
         # get map coords
         bx, bz = screen_to_coord(event.x, event.y)
-        # popup to name & size the new black hole
+        # popup to define the new black hole using the current terrain schema
         dlg = tk.Toplevel(win)
         dlg.title("New Blackhole")
         def _cancel_blackhole():
@@ -350,11 +361,17 @@ def on_canvas_press(event, ctx):
         name_var = tk.StringVar(value=f"Blackhole{random.randint(1,99)}")
         tk.Entry(dlg, textvariable=name_var).pack(fill=tk.X)
         tk.Label(dlg, text="Size:").pack(anchor='w')
-        size_var = tk.IntVar(value=1000)
+        size_var = tk.IntVar(value=500)
         tk.Spinbox(dlg, from_=1, to=1000000, textvariable=size_var).pack(fill=tk.X)
+        tk.Label(dlg, text="Gravity Radius:").pack(anchor='w')
+        gravity_radius_var = tk.IntVar(value=5000)
+        tk.Spinbox(dlg, from_=1, to=1000000, textvariable=gravity_radius_var).pack(fill=tk.X)
         tk.Label(dlg, text="Strength:").pack(anchor='w')
-        str_var = tk.IntVar(value=500)
+        str_var = tk.IntVar(value=10)
         tk.Spinbox(dlg, from_=1, to=1000000, textvariable=str_var).pack(fill=tk.X)
+        tk.Label(dlg, text="Turbulence Strength:").pack(anchor='w')
+        turbulence_var = tk.IntVar(value=2)
+        tk.Spinbox(dlg, from_=0, to=1000000, textvariable=turbulence_var).pack(fill=tk.X)
         def create_bh():
 
             # enforce integer‐only key (timestamp fallback)
@@ -364,12 +381,15 @@ def on_canvas_press(event, ctx):
             else:
                 dlg.bell()
                 key = str(int(time.time() * 1000))
+            display_name = raw or key
             sm.data.setdefault('terrain', {})[key] = {
                 'type': 'blackhole',
-                'name': key,
+                'name': display_name,
                 'coordinate': [bx, 0, bz],
                 'size': size_var.get(),
-                'strength': str_var.get()
+                'GravityRadius': gravity_radius_var.get(),
+                'strength': str_var.get(),
+                'turbulence_strength': turbulence_var.get()
             }
             terrain_keys.append(key)
             ter_lb.insert(tk.END, key)
@@ -438,7 +458,7 @@ def on_canvas_press(event, ctx):
             }
             terrain_keys.append(key)
             ter_lb.insert(tk.END, key)
-    # ── Hidden minefield placement mode (ARMED via toolbar dialog) ─────────
+    # ── Minefield placement mode (armed via toolbar dialog) ────────────────
     if getattr(toolbar, 'minefield_mode', False):
         cfg = getattr(toolbar, 'minefield_pending', None)
         if cfg:
@@ -459,13 +479,16 @@ def on_canvas_press(event, ctx):
                 while f"{base} {suffix}" in existing:
                     suffix += 1
                 name = f"{base} {suffix}"
+            minefield_type = (cfg.get('type') or 'hidden_minefield').strip().lower()
+            if minefield_type not in ('hidden_minefield', 'minefield'):
+                minefield_type = 'hidden_minefield'
             existing[name] = {
-                'type': 'hidden_minefield',
+                'type': minefield_type,
                 'coordinate': [cx, 0, cz],
                 'height': int(cfg.get('height', 15000)),
                 'width': int(cfg.get('width', 15000)),
                 'density': int(cfg.get('density', 70)),
-                'hideonmap': True
+                'hideonmap': minefield_type == 'hidden_minefield'
             }
             terrain_keys.append(name)
             ter_lb.insert(tk.END, name)
@@ -476,6 +499,49 @@ def on_canvas_press(event, ctx):
             toolbar.minefield_mode = False
             if getattr(toolbar, 'minefield_btn', None):
                 toolbar.minefield_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
+            return
+        else:
+            return
+
+    # ── Zone placement mode (armed via toolbar dialog) ─────────────────────
+    if getattr(toolbar, 'zone_mode', False):
+        cfg = getattr(toolbar, 'zone_pending', None)
+        if cfg:
+            ctx['push_undo']()
+            pan_x, pan_y, scale = ctx['pan_x'], ctx['pan_y'], ctx['map_scale']
+            cx = (event.x - pan_x) / scale
+            cz = -(event.y - pan_y) / scale
+            sm = ctx['sm']
+            objs = ctx['objs']
+            obj_lb = ctx['obj_lb']
+
+            zone_type = str(cfg.get('type') or Toolbar.ZONE_TYPE_OPTIONS[0]).strip().lower()
+            if zone_type not in Toolbar.ZONE_TYPE_OPTIONS:
+                zone_type = Toolbar.ZONE_TYPE_OPTIONS[0]
+
+            name = (cfg.get('name') or '').strip() or toolbar.gen_zone_name(zone_type)
+            existing = sm.data.setdefault('objects', {})
+            if name in existing:
+                base = name
+                suffix = 2
+                while f"{base} {suffix}" in existing:
+                    suffix += 1
+                name = f"{base} {suffix}"
+
+            existing[name] = {
+                'type': zone_type,
+                'coordinate': [cx, 0, cz],
+                'radius': int(cfg.get('radius', 5000)),
+                'description': '',
+            }
+            objs.append(name)
+            obj_lb.insert(tk.END, name)
+            ctx['draw_map'](ctx)
+
+            toolbar.zone_pending = None
+            toolbar.zone_mode = False
+            if getattr(toolbar, 'zone_btn', None):
+                toolbar.zone_btn.config(relief=tk.RAISED, bg='#333333', activebackground='#333333')
             return
         else:
             return
@@ -635,8 +701,11 @@ def on_canvas_press(event, ctx):
                     t = i / count
                     ix = x0 + dx * t
                     iz = z0 + dz * t
-                    name = toolbar.gen_relay_name()
-                    sm.data.setdefault('sensor_relay', {})[name] = {'coordinate': [ix,0,iz]}
+                    name = toolbar.build_unique_relay_name(
+                        cfg.get('prefix', toolbar.default_relay_prefix(cfg.get('relay_type'))),
+                        cfg.get('numbering', Toolbar.RELAY_NUMBERING_ORDERED)
+                    )
+                    sm.data.setdefault('sensor_relay', {})[name] = _build_relay_entry_from_config(ix, iz, cfg)
                     relay_order.append(name)
                     relay_lb.insert(tk.END, name)
                 draw_map(ctx)
@@ -653,8 +722,11 @@ def on_canvas_press(event, ctx):
             radius = cfg.get('radius', 0)
             repeat = cfg.get('repeat')
             # center point
-            name_center = toolbar.gen_relay_name()
-            sm.data.setdefault('sensor_relay', {})[name_center] = {'coordinate': [mx,0,mz]}
+            name_center = toolbar.build_unique_relay_name(
+                cfg.get('prefix', toolbar.default_relay_prefix(cfg.get('relay_type'))),
+                cfg.get('numbering', Toolbar.RELAY_NUMBERING_ORDERED)
+            )
+            sm.data.setdefault('sensor_relay', {})[name_center] = _build_relay_entry_from_config(mx, mz, cfg)
             relay_order.append(name_center)
             relay_lb.insert(tk.END, name_center)
             # perimeter relays
@@ -664,8 +736,11 @@ def on_canvas_press(event, ctx):
                 angle = 2 * math.pi * i / count
                 ix = mx + radius * math.cos(angle)
                 iz = mz + radius * math.sin(angle)
-                name = toolbar.gen_relay_name()
-                sm.data.setdefault('sensor_relay', {})[name] = {'coordinate': [ix,0,iz]}
+                name = toolbar.build_unique_relay_name(
+                    cfg.get('prefix', toolbar.default_relay_prefix(cfg.get('relay_type'))),
+                    cfg.get('numbering', Toolbar.RELAY_NUMBERING_ORDERED)
+                )
+                sm.data.setdefault('sensor_relay', {})[name] = _build_relay_entry_from_config(ix, iz, cfg)
                 relay_order.append(name)
                 relay_lb.insert(tk.END, name)
             draw_map(ctx)
@@ -685,15 +760,77 @@ def on_canvas_press(event, ctx):
         map_scale = ctx['map_scale']
         mx = (event.x - pan_x) / map_scale
         mz = -(event.y - pan_y) / map_scale
-        default_name = toolbar.gen_relay_name()
         dlg, body, footer = _dlg('New Sensor Relay', near_pointer=True)
-        name_var = tk.StringVar(value=default_name)
-        toolbar.labeled_entry(body, "Name:", name_var, width=22, row=0, col=0)
+        relay_type_var = tk.StringVar(value=Toolbar.RELAY_TYPE_SENSOR)
+        prefix_var = tk.StringVar(value=toolbar.default_relay_prefix(relay_type_var.get()))
+        numbering_var = tk.StringVar(value=Toolbar.RELAY_NUMBERING_ORDERED)
+        name_preview_var = tk.StringVar()
+        broadcast_var = tk.StringVar(value=Toolbar.WARNING_BUOY_DEFAULT_BROADCAST)
+        ping_var = tk.IntVar(value=Toolbar.WARNING_BUOY_DEFAULT_PING)
+        range_var = tk.IntVar(value=Toolbar.WARNING_BUOY_DEFAULT_RANGE)
+
+        tk.Label(body, text="Relay Type:").grid(row=0, column=0, padx=6, pady=4, sticky='e')
+        ttk.Combobox(
+            body,
+            textvariable=relay_type_var,
+            values=Toolbar.RELAY_TYPE_OPTIONS,
+            state='readonly',
+            width=18
+        ).grid(row=0, column=1, padx=6, pady=4, sticky='w')
+        toolbar.labeled_entry(body, "Name Prefix:", prefix_var, width=22, row=1, col=0)
+        tk.Label(body, text="Numbering:").grid(row=2, column=0, padx=6, pady=4, sticky='e')
+        ttk.Combobox(
+            body,
+            textvariable=numbering_var,
+            values=Toolbar.RELAY_NUMBERING_OPTIONS,
+            state='readonly',
+            width=18
+        ).grid(row=2, column=1, padx=6, pady=4, sticky='w')
+        name_preview_entry = toolbar.labeled_entry(body, "Name Preview:", name_preview_var, width=22, row=3, col=0)
+        name_preview_entry.config(state='readonly')
+
+        warning_frame = tk.Frame(body)
+        warning_frame.grid(row=4, column=0, columnspan=2, sticky='w')
+
+        def render_warning_fields():
+            for child in warning_frame.winfo_children():
+                child.destroy()
+            if relay_type_var.get() != Toolbar.RELAY_TYPE_WARNING_BUOY:
+                return
+            toolbar.labeled_entry(warning_frame, "Broadcast:", broadcast_var, width=22, row=0, col=0)
+            toolbar.labeled_spinbox(warning_frame, "Ping:", ping_var, frm=0, to=99, width=10, row=1, col=0)
+            toolbar.labeled_spinbox(warning_frame, "Range:", range_var, frm=1000, to=1000000, width=10, row=2, col=0)
+
+        def sync_prefix(*_):
+            current = prefix_var.get().strip()
+            sensor_default = toolbar.default_relay_prefix(Toolbar.RELAY_TYPE_SENSOR)
+            warning_default = toolbar.default_relay_prefix(Toolbar.RELAY_TYPE_WARNING_BUOY)
+            if current in ("", sensor_default, warning_default):
+                prefix_var.set(toolbar.default_relay_prefix(relay_type_var.get()))
+
+        def update_name_preview(*_):
+            prefix = prefix_var.get().strip() or toolbar.default_relay_prefix(relay_type_var.get())
+            preview = toolbar.build_unique_relay_name(prefix, numbering_var.get())
+            name_preview_var.set(preview)
+
+        relay_type_var.trace_add('write', lambda *_: (sync_prefix(), render_warning_fields(), update_name_preview()))
+        prefix_var.trace_add('write', update_name_preview)
+        numbering_var.trace_add('write', update_name_preview)
+        render_warning_fields()
+        update_name_preview()
+
         def add_relay():
-            name = name_var.get().strip()
+            prefix = prefix_var.get().strip() or toolbar.default_relay_prefix(relay_type_var.get())
+            name = toolbar.build_unique_relay_name(prefix, numbering_var.get())
             if not name:
                 return
-            sm.data.setdefault('sensor_relay', {})[name] = {'coordinate': [mx, 0, mz]}
+            relay_config = {
+                'relay_type': relay_type_var.get(),
+                'broadcast': broadcast_var.get().strip(),
+                'ping': ping_var.get(),
+                'range': range_var.get(),
+            }
+            sm.data.setdefault('sensor_relay', {})[name] = _build_relay_entry_from_config(mx, mz, relay_config)
             relay_order.append(name)
             relay_lb.insert(tk.END, name)
             draw_map(ctx)
@@ -704,7 +841,13 @@ def on_canvas_press(event, ctx):
             if toolbar.sensor_mode:
                 toolbar.toggle_sensor_mode()
         dlg.protocol("WM_DELETE_WINDOW", _cancel)
-        toolbar.footer_buttons(footer, [("Add", add_relay, {"width": 12})])
+        toolbar.footer_buttons(
+            footer,
+            [
+                ("Add", add_relay, {"width": 12}),
+                ("Cancel", _cancel, {"width": 12}),
+            ]
+        )
         return
         
     # ── Gate placement mode: create new jump_point ────────────────────────
@@ -968,7 +1111,7 @@ def on_canvas_press(event, ctx):
             key = map_canvas.gettags(tag)[1]  # the terrain key
             feat = sm.get_terrain_feature(key)
             ttype = feat.get('type','').lower()
-            if ttype in ('blackhole', 'debris_field', 'planet', 'hidden_minefield'):
+            if ttype in ('blackhole', 'debris_field', 'planet', 'hidden_minefield', 'minefield') or SystemEditor.is_zone_type(ttype):
                 # capture before blackhole center move
                 ctx['push_undo']()
                 show_terrain(key)
@@ -1056,7 +1199,9 @@ def on_canvas_drag(event, ctx):
         # convert using current pan/zoom
         x = (sx - pan_x) / map_scale
         z = -(sy - pan_y) / map_scale
-        sm.data['sensor_relay'][relay] = [x, 0, z]
+        relay_entry = SystemEditor.ensure_relay_dict(sm.data['sensor_relay'].get(relay))
+        relay_entry['coordinate'] = [x, 0, z]
+        sm.data['sensor_relay'][relay] = relay_entry
         drag_data['x'], drag_data['y'] = event.x, event.y
         # do not redraw map here to allow smooth dragging
         # draw_map(ctx)

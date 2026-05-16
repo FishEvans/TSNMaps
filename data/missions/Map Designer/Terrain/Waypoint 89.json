@@ -1,6 +1,6 @@
 {
     "systemMapCoord": [
-        -11459.858216848741,
+        -11459.85821684873,
         0,
         3879.1413659642303
     ],
@@ -19,8 +19,8 @@
         "development": "Uninhabited",
         "visible": true,
         "original_author": "Draeco",
-        "revision_date": "2026-02-06",
-        "revision_number": 16,
+        "revision_date": "2026-04-12",
+        "revision_number": 18,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -56,43 +56,6 @@
             "state": "Tethered",
             "drift": 0
         },
-        "SR-89 Gullwatch": {
-            "coordinate": [
-                72500.0,
-                0,
-                51666.66666666667
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_civil",
-            "type": "station",
-            "facilities": [
-                "Docking",
-                "Refuel",
-                "Repair"
-            ],
-            "cargo": {
-                "Homing": 24,
-                "Nuke": 1,
-                "EMP": 3,
-                "Mine": 6,
-                "High Yield Warhead": 15,
-                "Warhead": 24,
-                "Torpedo Casing": 20,
-                "Casing": 60,
-                "Navigational Array": 1,
-                "Tactical Array": 2,
-                "Guidance System": 26
-            },
-            "teams": {
-                "DamCon": 2,
-                "Medics": 2,
-                "Combat Engineers": 2
-            },
-            "description": "",
-            "hideonmap": true
-        },
         "Strongjaw": {
             "coordinate": [
                 -110833.33333333334,
@@ -105,7 +68,10 @@
             "hull": "pirate_military_base",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "Data Chip": 1,
+                "Data Core": 1
+            },
             "teams": {},
             "description": "",
             "hideonmap": true
@@ -139,6 +105,171 @@
             "state": "Tethered",
             "drift": 45000,
             "hideonmap": true
+        },
+        "SR 89 Gullwatch": {
+            "coordinate": [
+                72500.0,
+                0,
+                51666.66666666667
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Repair"
+            ],
+            "cargo": {
+                "Comms Relay": 5,
+                "Coolant": 5,
+                "Fuel Cell 100": 6,
+                "Fuel Cell 200": 3,
+                "Sensor Relay": 1,
+                "Warning Buoy": 5,
+                "Disruptor": 4,
+                "EMP": 3,
+                "Homing": 10,
+                "Mine": 4,
+                "Nuke": 2,
+                "Penetration": 4,
+                "Scorch": 8,
+                "Aid Package": 6,
+                "Alcohol": 2,
+                "Analysis Suite": 2,
+                "Casing": 5,
+                "Coffee": 10,
+                "Guidance System": 25,
+                "Meals": 5,
+                "Pets": 1,
+                "Power Relay": 10,
+                "Rations": 15,
+                "Repair Materials": 10,
+                "Sensor Suite": 11,
+                "Tea": 5,
+                "Tharium Plating": 10,
+                "Torpedo Casing": 25,
+                "Warhead": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Diplomats": 1,
+                "Marines": 1,
+                "Medics": 1
+            },
+            "description": "Search And Rescue Post 89 aka Gullwatch",
+            "hideonmap": true
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -122011.1705118964,
+                0,
+                7125.702849510948
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                182468.08529009132,
+                0,
+                -67098.19393836701
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -31305.779762492977,
+                0,
+                86730.17817728283
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                136707.0139358186,
+                0,
+                7436.888561689649
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -42005.57654334605,
+                0,
+                159661.91192473655
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -100471.96457336374,
+                0,
+                102886.96342692734
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -10953.603260861348,
+                0,
+                -116287.49724010813
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS8": {
+            "type": "fcs_zone",
+            "coordinate": [
+                148558.273266014,
+                0,
+                -15824.502026553759
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS9": {
+            "type": "fcs_zone",
+            "coordinate": [
+                169644.41684840416,
+                0,
+                -42309.708879406375
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS10": {
+            "type": "fcs_zone",
+            "coordinate": [
+                117023.29507312037,
+                0,
+                43173.845424834035
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -147,42 +278,48 @@
                 -50659.37103433181,
                 0,
                 117294.75628715147
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 92": {
             "coordinate": [
                 -18992.70436766514,
                 0,
                 88128.0896204848
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 99": {
             "coordinate": [
                 12673.962299001527,
                 0,
                 58961.42295381813
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 96": {
             "coordinate": [
                 107673.96229900153,
                 0,
                 -28538.577046181876
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 38": {
             "coordinate": [
                 139340.6289656682,
                 0,
                 -57705.24371284853
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 39": {
             "coordinate": [
                 171007.2956323349,
                 0,
                 -86871.91037951522
-            ]
+            ],
+            "type": "Sensor Relay"
         }
     },
     "terrain": {

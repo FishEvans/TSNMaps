@@ -97,6 +97,7 @@ HTML_TEMPLATE = '''
             flex: 3;
             min-width: 0;
             position: relative;
+            touch-action: none;
             background:
                 radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
                 radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
@@ -192,16 +193,31 @@ HTML_TEMPLATE = '''
             display: block;
             width: 100%;
             margin-bottom: 5px;
-            background: #555;
+            background: rgba(54, 54, 54, 0.94);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 8px 10px;
             text-align: left;
             cursor: pointer;
             font-size: 20px;
-            border-radius: 10px;
+            border-radius: 999px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
         }}
-        button.header {{ background: #444; cursor: default; font-size: 24px; }}
+        button:hover,
+        button:focus-visible {{
+            transform: translateY(-1px);
+            filter: brightness(1.06);
+            outline: none;
+        }}
+        button.header {{
+            background: #444;
+            cursor: default;
+            font-size: 24px;
+            border-radius: 10px;
+            transform: none;
+            filter: none;
+        }}
         #search-box {{
             width: 100%;
             padding: 10px 12px;
@@ -469,7 +485,22 @@ HTML_TEMPLATE = '''
         else if (obj.type === 'sensor_relay') {{
             // Generate a random 5-character alphanumeric serial
             const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
-            infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+            const relayType = obj.relayType || 'Sensor Relay';
+            infoHtml += '<b>Subtype:</b> ' + relayType + '<br>';
+            if (relayType === 'Warning Buoy') {{
+                infoHtml += 'Warning buoy and hazard marker, Serial: ' + serial;
+                if (obj.broadcast) {{
+                    infoHtml += '<br><b>Broadcast:</b> ' + obj.broadcast;
+                }}
+                if (obj.ping !== undefined) {{
+                    infoHtml += '<br><b>Ping:</b> ' + obj.ping;
+                }}
+                if (obj.range !== undefined) {{
+                    infoHtml += '<br><b>Range:</b> ' + obj.range;
+                }}
+            }} else {{
+                infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+            }}
         }}
         else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {{
             // Generate a random 5-character alphanumeric serial
@@ -479,6 +510,12 @@ HTML_TEMPLATE = '''
         else if (obj.type === 'planet') {{
             if (obj['class']) {{
                 infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }}
+        }}
+        else if (obj.zoneLabel) {{
+            infoHtml += '<b>Type:</b> ' + obj.zoneLabel + '<br>';
+            if (obj.radius !== undefined) {{
+                infoHtml += '<b>Radius:</b> ' + obj.radius + '<br>';
             }}
         }}
         else {{
@@ -649,8 +686,9 @@ HTML_TEMPLATE = '''
     // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
     (function() {{
         var refSpan = null;
-        var planetIdx = {planet_trace_indices};
-        var bhIdx = {blackhole_trace_indices};
+        var scalableIdx = fig.data
+            .map(function(t, i) {{ return t && t.meta && t.meta.scale_on_zoom ? i : null; }})
+            .filter(function(i) {{ return i !== null; }});
         function rescaleMarkers() {{
             try {{
                 var full = plotDiv._fullLayout || {{}};
@@ -674,10 +712,9 @@ HTML_TEMPLATE = '''
                     markerSizes.push(newMarker);
                     textSizes.push(newText);
                 }}
-                planetIdx.forEach(pushForIndex);
-                bhIdx.forEach(pushForIndex);
+                scalableIdx.forEach(pushForIndex);
                 if (indices.length) {{
-                    Plotly.restyle(plotDiv, {{'marker.size': [markerSizes], 'textfont.size': [textSizes]}}, indices);
+                    Plotly.restyle(plotDiv, {{'marker.size': markerSizes, 'textfont.size': textSizes}}, indices);
                 }}
             }} catch (e) {{ console.error(e); }}
         }}
@@ -762,6 +799,9 @@ function addButton(label, fn, header, color, isHidden) {{
 
   addButton('--- Nav Points/POI ---', null, true, null);
   {relay_buttons}
+
+    addButton('--- Zones ---', null, true, null);
+    {zone_buttons}
 
     addButton('--- Planets ---', null, true, null);
     {planet_buttons}

@@ -5,7 +5,7 @@ from tkinter import ttk, messagebox, filedialog
 import importlib.util
 from PIL import Image, ImageTk
 import math
-import LocMapGen, GalMapGen
+import LocMapGen, GalMapGen, LibraryGen, ProductionFlowGen
 import SystemEditor  # New module for dedicated system editing
 import sys
 import SystemTemplates
@@ -37,6 +37,8 @@ class SystemMapEditor:
     def _run_generators(self):
         LocMapGen.main()
         GalMapGen.main()
+        LibraryGen.main()
+        ProductionFlowGen.main()
 
     def _open_index_html(self):
         index_path = self._get_index_html_path()
@@ -165,6 +167,25 @@ class SystemMapEditor:
     def _write_system_json(self, filename, data):
         with open(self._get_system_file_path(filename), "w") as f:
             json.dump(data, f, indent=4)
+
+    def _refresh_system_record_from_disk(self, filename):
+        previous = self.systems.get(filename, {})
+        try:
+            data = self._load_system_json(filename)
+        except (OSError, json.JSONDecodeError):
+            return False
+
+        fallback_author_meta = previous.get("author_meta", {}) if isinstance(previous, dict) else {}
+        refreshed = self._normalize_system_record(data, fallback_author_meta=fallback_author_meta)
+        if refreshed is None:
+            return False
+
+        if isinstance(previous, dict):
+            for key in ("canvas_items", "link_lines", "incoming_lines"):
+                refreshed[key] = previous.get(key, [])
+
+        self.systems[filename] = refreshed
+        return True
 
     def _build_author_meta(self, meta, fallback=None):
         if not isinstance(meta, dict):
@@ -463,6 +484,7 @@ class SystemMapEditor:
             try:
                 os.chdir(get_base_path())
                 module.main(executable_path)
+                LibraryGen.main()
             finally:
                 os.chdir(prev_cwd)
         except Exception as exc:
@@ -1285,7 +1307,10 @@ class SystemMapEditor:
         # Save borders and texts
         self.save_galmapinfo()
 
-        for fn, sys_data in self.systems.items():
+        for fn in list(self.systems.keys()):
+            if not self._refresh_system_record_from_disk(fn):
+                print(f"Failed to reload {fn}; using cached data.")
+            sys_data = self.systems.get(fn, {})
             coords = self.canvas.coords(sys_data["canvas_items"][0])
             coord_override = None
             if coords:
@@ -1331,7 +1356,15 @@ class SystemMapEditor:
         fname = self.get_clicked_system(event, radius=100)
         if fname:
             file_path = self._get_system_file_path(fname)
-            SystemEditor.open_system_editor(file_path)
+            editor_window = SystemEditor.open_system_editor(file_path)
+            if editor_window is not None:
+                def _refresh_after_editor_close(close_event, target=fname, window=editor_window):
+                    if close_event.widget is not window:
+                        return
+                    if self._refresh_system_record_from_disk(target):
+                        self.redraw_map()
+
+                editor_window.bind("<Destroy>", _refresh_after_editor_close, add="+")
             return
         # Fallback: original behavior
         """Removes nearest point from selected border, or creates a new text node if nothing is selected"""

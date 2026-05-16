@@ -10,6 +10,8 @@ from pathlib import Path
 from urllib.parse import quote
 
 from ShipDescriptionResolver import (
+    clean_description,
+    load_authoritative_description_index,
     load_authoritative_ship_stats_index,
     load_shipdata_index,
     normalize_roles,
@@ -21,6 +23,19 @@ from ShipDescriptionResolver import (
 OUTPUT_NAME = "Library.html"
 DEFAULT_FACTION = "Unaligned"
 BROKEN_BEAM_CATEGORY = "BrokenBeam"
+MISSING_DATABASE_DESC_CATEGORY = "Missing Database Desc"
+MISSING_SHIPDATA_DESC_CATEGORY = "Missing ShipData Description"
+MISSING_SYSTEM_HEALTH_CATEGORY = "Missing System Health Data"
+MISSING_DESIGN_ORIGIN_ICON_CATEGORY = "Missing Design Origin Icon"
+MISSING_SHIP_IMAGE_CATEGORY = "Missing Ship Image"
+ONI_CATEGORIES = [
+    BROKEN_BEAM_CATEGORY,
+    MISSING_DATABASE_DESC_CATEGORY,
+    MISSING_SHIPDATA_DESC_CATEGORY,
+    MISSING_SYSTEM_HEALTH_CATEGORY,
+    MISSING_DESIGN_ORIGIN_ICON_CATEGORY,
+    MISSING_SHIP_IMAGE_CATEGORY,
+]
 COMMENTED_BEAM_ANGLE_ARCS_ENABLED = False
 
 
@@ -130,6 +145,11 @@ def resolve_image_src(artfileroot):
     return fallback_rel if fallback.exists() else ""
 
 
+def is_missing_ship_image(image_src):
+    clean = str(image_src or "").strip().replace("\\", "/").casefold()
+    return not clean or clean.endswith("/unknown256.png") or clean == "images/ships/unknown256.png"
+
+
 def resolve_faction_icon_src(*labels):
     fallback_name = "Unknown.png"
     fallback = FACTIONS_DIR / fallback_name
@@ -157,6 +177,11 @@ def resolve_faction_icon_src(*labels):
     if fallback.exists():
         return "Images/Factions/" + quote(fallback_name)
     return ""
+
+
+def is_missing_faction_icon(icon_src):
+    clean = str(icon_src or "").strip().replace("\\", "/").casefold()
+    return not clean or clean.endswith("/unknown.png") or clean == "images/factions/unknown.png"
 
 
 def description_html(long_desc):
@@ -191,6 +216,32 @@ def faction_options_html(factions):
     for faction in factions:
         options.append(
             f'<option value="{html.escape(faction.casefold())}">{html.escape(faction)}</option>'
+        )
+    return "".join(options)
+
+
+def category_key(label):
+    key = re.sub(r"[^a-z0-9]+", "-", str(label or "").casefold()).strip("-")
+    return key or "uncategorized"
+
+
+def category_options_html(categories, entries=None):
+    counts = {}
+    if entries is not None:
+        counts = {category_key(category): 0 for category in categories}
+        for entry in entries:
+            for category in entry.get("categories", []):
+                key = category_key(category)
+                counts[key] = counts.get(key, 0) + 1
+
+    options = ['<option value="all">All categories</option>']
+    for category in categories:
+        key = category_key(category)
+        count = counts.get(key)
+        disabled = ' disabled' if count == 0 else ''
+        label = category if count is None else f"{category} ({count})"
+        options.append(
+            f'<option value="{html.escape(key)}"{disabled}>{html.escape(label)}</option>'
         )
     return "".join(options)
 
@@ -758,6 +809,7 @@ def faction_icon_html(entry):
         '<div class="health-faction-icon">'
         '<span>Design Origin</span>'
         f'<img src="{html.escape(icon_src)}" alt="{html.escape(label)} icon" loading="lazy" />'
+        f'<strong>{html.escape(label)}</strong>'
         '</div>'
     )
 
@@ -812,13 +864,12 @@ def render_cards(entries):
             )
 
         categories = list(entry.get("categories", []))
-        category_keys = " ".join(category.casefold() for category in categories)
+        category_keys = " ".join(category_key(category) for category in categories)
         broken_beam_attr = "true" if entry.get("broken_beam") else "false"
-        category_markup = ""
-        if entry.get("broken_beam"):
-            category_markup = (
-                f'<span class="meta-chip oni-only broken-beam-chip">{BROKEN_BEAM_CATEGORY}</span>'
-            )
+        category_markup = "".join(
+            f'<span class="meta-chip oni-only oni-category-chip">{html.escape(category)}</span>'
+            for category in categories
+        )
 
         cards.append(
             f"""
@@ -885,6 +936,7 @@ def format_version_tag(date_str, revision_number):
 def build_page(entries, faction_labels):
     cards = render_cards(entries)
     faction_options = faction_options_html(faction_labels)
+    category_options = category_options_html(ONI_CATEGORIES, entries)
     total_entries = len(entries)
     build_version = format_version_tag(datetime.now().strftime("%Y-%m-%d"), 0)
 
@@ -1279,7 +1331,7 @@ def build_page(entries, faction_labels):
       display: flex;
     }}
 
-    .broken-beam-chip {{
+    .oni-category-chip {{
       color: #ffe7a7;
       border-color: rgba(255, 213, 106, 0.38);
       background: rgba(77, 56, 21, 0.88);
@@ -1287,7 +1339,7 @@ def build_page(entries, faction_labels):
 
     .health-summary {{
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 68px;
+      grid-template-columns: minmax(0, 1fr) 136px;
       gap: 0;
       align-items: stretch;
       margin-top: 12px;
@@ -1299,7 +1351,7 @@ def build_page(entries, faction_labels):
       table-layout: fixed;
       overflow: hidden;
       border: 1px solid rgba(129, 176, 255, 0.14);
-      border-radius: 8px;
+      border-radius: 8px 0 0 8px;
       background: rgba(8, 17, 30, 0.42);
     }}
 
@@ -1332,10 +1384,11 @@ def build_page(entries, faction_labels):
       gap: 5px;
       align-items: center;
       justify-content: center;
-      min-height: 68px;
-      padding: 8px;
+      min-height: 84px;
+      padding: 9px 10px;
       border: 1px solid rgba(129, 176, 255, 0.14);
-      border-radius: 8px;
+      border-left: 0;
+      border-radius: 0 8px 8px 0;
       background: rgba(8, 17, 30, 0.42);
     }}
 
@@ -1350,10 +1403,19 @@ def build_page(entries, faction_labels):
 
     .health-faction-icon img {{
       width: 100%;
-      max-width: 44px;
+      max-width: 72px;
       height: auto;
       object-fit: contain;
       filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+    }}
+
+    .health-faction-icon strong {{
+      max-width: 100%;
+      color: var(--text);
+      font-size: 0.82rem;
+      line-height: 1.1;
+      text-align: center;
+      overflow-wrap: anywhere;
     }}
 
     .description-block {{
@@ -1472,12 +1534,16 @@ def build_page(entries, faction_labels):
       }}
 
       .health-summary {{
-        grid-template-columns: minmax(0, 1fr) 58px;
+        grid-template-columns: minmax(0, 1fr) 104px;
       }}
 
       .health-faction-icon {{
-        min-height: 58px;
+        min-height: 76px;
         padding: 6px;
+      }}
+
+      .health-faction-icon img {{
+        max-width: 56px;
       }}
     }}
   </style>
@@ -1523,8 +1589,7 @@ def build_page(entries, faction_labels):
         <div class="filter-group oni-only-block">
           <label for="category-filter">Category</label>
           <select id="category-filter">
-            <option value="all">All categories</option>
-            <option value="{BROKEN_BEAM_CATEGORY.casefold()}">{BROKEN_BEAM_CATEGORY}</option>
+            {category_options}
           </select>
         </div>
       </div>
@@ -1700,6 +1765,7 @@ def main():
         raise ValueError(f"{SHIPMAP_PATH} does not contain a ship list.")
     shipdata_index = load_shipdata_index()
     broken_beam_ship_keys = load_commented_beam_angle_ships()
+    authoritative_descriptions = load_authoritative_description_index()
     authoritative_ship_stats = load_authoritative_ship_stats_index()
 
     factions_from_settings, faction_lookup, side_lookup, race_to_faction = build_side_catalog(settings)
@@ -1747,6 +1813,9 @@ def main():
         ).casefold()
         shipdata_entry = shipdata_index.get(key, {})
         beam_arcs = _beam_arc_entries(key, shipdata_entry)
+        image_src = resolve_image_src(raw_entry.get("artfileroot", ""))
+        faction_icon_src = resolve_faction_icon_src(side_label, faction_label)
+        authoritative_description = authoritative_descriptions.get(key, {})
         stat_entry = authoritative_ship_stats.get(key, {})
         shield_forward, shield_aft = _shield_stat_values(
             shipdata_entry.get("shields") if isinstance(shipdata_entry, dict) else None
@@ -1759,7 +1828,22 @@ def main():
         system_health_total = _system_health_total(stat_entry.get("systemhealth"))
         abilities = _normalize_abilities(stat_entry.get("abilities"))
         broken_beam = key in broken_beam_ship_keys
-        categories = [BROKEN_BEAM_CATEGORY] if broken_beam else []
+        categories = []
+        if broken_beam:
+            categories.append(BROKEN_BEAM_CATEGORY)
+        if not clean_description(authoritative_description.get("description", "")):
+            categories.append(MISSING_DATABASE_DESC_CATEGORY)
+        if not (
+            isinstance(shipdata_entry, dict)
+            and clean_description(shipdata_entry.get("long_desc", ""))
+        ):
+            categories.append(MISSING_SHIPDATA_DESC_CATEGORY)
+        if system_health_total is None:
+            categories.append(MISSING_SYSTEM_HEALTH_CATEGORY)
+        if is_missing_faction_icon(faction_icon_src):
+            categories.append(MISSING_DESIGN_ORIGIN_ICON_CATEGORY)
+        if is_missing_ship_image(image_src):
+            categories.append(MISSING_SHIP_IMAGE_CATEGORY)
         beam_range = raw_entry.get("BRange")
         if beam_range is None:
             beam_range = _max_beam_range(shipdata_entry)
@@ -1788,8 +1872,8 @@ def main():
                 "broken_beam": broken_beam,
                 "beam_arcs": beam_arcs,
                 "dpm_summary": _beam_dpm_summary(beam_arcs),
-                "image_src": resolve_image_src(raw_entry.get("artfileroot", "")),
-                "faction_icon_src": resolve_faction_icon_src(side_label, faction_label),
+                "image_src": image_src,
+                "faction_icon_src": faction_icon_src,
                 "search_blob": search_blob,
             }
         )

@@ -19,10 +19,12 @@
 <span class="moduletype">Script</span>  <div class="import">
 imports:
     <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#SystemMetaOptions">SystemMetaOptions</a>
  &#8226;   <a href="#SystemTemplates">SystemTemplates</a>
@@ -399,17 +401,45 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="LibraryGen"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/LibraryGen.py" type="text/plain"><tt>LibraryGen</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#functools">functools</a>
+ &#8226;   <a href="#html">html</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#urllib.parse">urllib.parse</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#StellarCartography.py">StellarCartography.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="LocMapGen"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/LocMapGen.py" type="text/plain"><tt>LocMapGen</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#LocMapTemplate">LocMapTemplate</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#glob">glob</a>
  &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#sys">sys</a>
 
@@ -2669,6 +2699,26 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="ProductionFlowGen"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/ProductionFlowGen.py" type="text/plain"><tt>ProductionFlowGen</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#ast">ast</a>
+ &#8226;   <a href="#html">html</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#StellarCartography.py">StellarCartography.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="ResizeTool"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/ResizeTool.py" type="text/plain"><tt>ResizeTool</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -2686,11 +2736,36 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="ShipDescriptionResolver"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/ShipDescriptionResolver.py" type="text/plain"><tt>ShipDescriptionResolver</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#ast">ast</a>
+ &#8226;   <a href="#functools">functools</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#LocMapGen">LocMapGen</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="SysMapCanvas"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SysMapCanvas.py" type="text/plain"><tt>SysMapCanvas</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#copy">copy</a>
  &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#math">math</a>
@@ -2723,12 +2798,14 @@ imports:
  &#8226;   <a href="#SystemMetaOptions">SystemMetaOptions</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#copy">copy</a>
  &#8226;   <a href="#datetime">datetime</a>
  &#8226;   <a href="#generate_system_terrain">generate_system_terrain</a>
  &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#sys">sys</a>
@@ -2785,6 +2862,7 @@ imports:
  &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#tkinter.messagebox">tkinter.messagebox</a>
  &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
@@ -2792,7 +2870,19 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#SystemEditor">SystemEditor</a>
+    <a href="#SysMapCanvas">SysMapCanvas</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="UserDict"></a>
+  <a target="code" href="" type="text/plain"><tt>UserDict</tt></a>
+<span class="moduletype">MissingModule</span>  <div class="import">
+imported by:
+    <a href="#hjson.ordered_dict">hjson.ordered_dict</a>
 
   </div>
 
@@ -2882,6 +2972,10 @@ imported by:
  &#8226;   <a href="#_pyrepl.pager">_pyrepl.pager</a>
  &#8226;   <a href="#codeop">codeop</a>
  &#8226;   <a href="#doctest">doctest</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.metadata._meta">importlib.metadata._meta</a>
  &#8226;   <a href="#importlib.resources.readers">importlib.resources.readers</a>
@@ -4112,7 +4206,10 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#inspect">inspect</a>
+    <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#numpy._core._internal">numpy._core._internal</a>
  &#8226;   <a href="#numpy.lib._format_impl">numpy.lib._format_impl</a>
  &#8226;   <a href="#numpy.lib._utils_impl">numpy.lib._utils_impl</a>
@@ -5237,6 +5334,17 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="cStringIO"></a>
+  <a target="code" href="" type="text/plain"><tt>cStringIO</tt></a>
+<span class="moduletype">MissingModule</span>  <div class="import">
+imported by:
+    <a href="#hjson.compat">hjson.compat</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="calendar"></a>
   <a target="code" href="///C:/Program%20Files/Python313/Lib/calendar.py" type="text/plain"><tt>calendar</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -5450,6 +5558,7 @@ imported by:
  &#8226;   <a href="#encodings.utf_8_sig">encodings.utf_8_sig</a>
  &#8226;   <a href="#encodings.uu_codec">encodings.uu_codec</a>
  &#8226;   <a href="#encodings.zlib_codec">encodings.zlib_codec</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
  &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#numpy.f2py.crackfortran">numpy.f2py.crackfortran</a>
  &#8226;   <a href="#pickle">pickle</a>
@@ -5518,6 +5627,7 @@ imported by:
  &#8226;   <a href="#doctest">doctest</a>
  &#8226;   <a href="#email.feedparser">email.feedparser</a>
  &#8226;   <a href="#functools">functools</a>
+ &#8226;   <a href="#hjson">hjson</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.metadata._collections">importlib.metadata._collections</a>
  &#8226;   <a href="#importlib.resources.readers">importlib.resources.readers</a>
@@ -6038,7 +6148,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PIL._imagingcms">PIL._imagingcms</a>
+    <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#PIL._imagingcms">PIL._imagingcms</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#_strptime">_strptime</a>
@@ -6067,6 +6178,9 @@ imports:
   <div class="import">
 imported by:
     <a href="#fractions">fractions</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
  &#8226;   <a href="#statistics">statistics</a>
  &#8226;   <a href="#xmlrpc.client">xmlrpc.client</a>
 
@@ -9335,13 +9449,15 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
+    <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
  &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.PsdImagePlugin">PIL.PsdImagePlugin</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#asyncio.format_helpers">asyncio.format_helpers</a>
  &#8226;   <a href="#asyncio.runners">asyncio.runners</a>
@@ -9657,6 +9773,164 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="hjson"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/__init__.py" type="text/plain"><tt>hjson</tt></a>
+<span class="moduletype">Package</span>  <div class="import">
+imports:
+    <a href="#__future__">__future__</a>
+ &#8226;   <a href="#collections">collections</a>
+ &#8226;   <a href="#decimal">decimal</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
+ &#8226;   <a href="#hjson.ordered_dict">hjson.ordered_dict</a>
+ &#8226;   <a href="#hjson.scanner">hjson.scanner</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
+ &#8226;   <a href="#hjson.ordered_dict">hjson.ordered_dict</a>
+ &#8226;   <a href="#hjson.scanner">hjson.scanner</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="hjson.compat"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/compat.py" type="text/plain"><tt>hjson.compat</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#cStringIO">cStringIO</a>
+ &#8226;   <a href="#codecs">codecs</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#imp">imp</a>
+ &#8226;   <a href="#importlib">importlib</a>
+ &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="hjson.decoder"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/decoder.py" type="text/plain"><tt>hjson.decoder</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#__future__">__future__</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
+ &#8226;   <a href="#hjson.scanner">hjson.scanner</a>
+ &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#struct">struct</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="hjson.encoder"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/encoder.py" type="text/plain"><tt>hjson.encoder</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#__future__">__future__</a>
+ &#8226;   <a href="#decimal">decimal</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#operator">operator</a>
+ &#8226;   <a href="#re">re</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#hjson">hjson</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="hjson.encoderH"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/encoderH.py" type="text/plain"><tt>hjson.encoderH</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#__future__">__future__</a>
+ &#8226;   <a href="#decimal">decimal</a>
+ &#8226;   <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#operator">operator</a>
+ &#8226;   <a href="#re">re</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#hjson">hjson</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="hjson.ordered_dict"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/ordered_dict.py" type="text/plain"><tt>hjson.ordered_dict</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#UserDict">UserDict</a>
+ &#8226;   <a href="#hjson">hjson</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#hjson">hjson</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="hjson.scanner"></a>
+  <a target="code" href="///C:/Users/Fish_/AppData/Roaming/Python/Python313/site-packages/hjson/scanner.py" type="text/plain"><tt>hjson.scanner</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#hjson">hjson</a>
+ &#8226;   <a href="#re">re</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#hjson">hjson</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="hmac"></a>
   <a target="code" href="///C:/Program%20Files/Python313/Lib/hmac.py" type="text/plain"><tt>hmac</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -9687,7 +9961,9 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#html.entities">html.entities</a>
+    <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#html.entities">html.entities</a>
  &#8226;   <a href="#http.server">http.server</a>
 
   </div>
@@ -9828,6 +10104,17 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="imp"></a>
+  <a target="code" href="" type="text/plain"><tt>imp</tt></a>
+<span class="moduletype">MissingModule</span>  <div class="import">
+imported by:
+    <a href="#hjson.compat">hjson.compat</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="importlib"></a>
   <a target="code" href="///C:/Program%20Files/Python313/Lib/importlib/__init__.py" type="text/plain"><tt>importlib</tt></a>
 <span class="moduletype">Package</span>  <div class="import">
@@ -9843,7 +10130,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#importlib">importlib</a>
+    <a href="#hjson.compat">hjson.compat</a>
+ &#8226;   <a href="#importlib">importlib</a>
  &#8226;   <a href="#importlib._abc">importlib._abc</a>
  &#8226;   <a href="#importlib._bootstrap">importlib._bootstrap</a>
  &#8226;   <a href="#importlib._bootstrap_external">importlib._bootstrap_external</a>
@@ -10469,6 +10757,7 @@ imported by:
  &#8226;   <a href="#fileinput">fileinput</a>
  &#8226;   <a href="#getpass">getpass</a>
  &#8226;   <a href="#gzip">gzip</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
  &#8226;   <a href="#http.client">http.client</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
  &#8226;   <a href="#http.server">http.server</a>
@@ -10615,8 +10904,10 @@ imports:
 imported by:
     <a href="#CenteringTool">CenteringTool</a>
  &#8226;   <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#ResizeTool">ResizeTool</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
@@ -10839,7 +11130,8 @@ imported by:
   <a name="math"></a>
   <tt>math</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
-    <a href="#LocMapGen">LocMapGen</a>
+    <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#PIL.FitsImagePlugin">PIL.FitsImagePlugin</a>
  &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.GimpGradientFile">PIL.GimpGradientFile</a>
@@ -18555,6 +18847,8 @@ imported by:
  &#8226;   <a href="#fractions">fractions</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#glob">glob</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.resources.readers">importlib.resources.readers</a>
  &#8226;   <a href="#inspect">inspect</a>
@@ -18604,6 +18898,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#PIL.BlpImagePlugin">PIL.BlpImagePlugin</a>
  &#8226;   <a href="#PIL.BmpImagePlugin">PIL.BmpImagePlugin</a>
@@ -18627,6 +18922,8 @@ imported by:
  &#8226;   <a href="#PIL._typing">PIL._typing</a>
  &#8226;   <a href="#PIL._util">PIL._util</a>
  &#8226;   <a href="#PIL.features">PIL.features</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
@@ -18789,8 +19086,12 @@ imports:
   <div class="import">
 imported by:
     <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.resources._common">importlib.resources._common</a>
  &#8226;   <a href="#importlib.resources.abc">importlib.resources.abc</a>
@@ -19299,7 +19600,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
+    <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
@@ -19331,7 +19633,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#LocMapGen">LocMapGen</a>
+    <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
  &#8226;   <a href="#PIL.GimpPaletteFile">PIL.GimpPaletteFile</a>
  &#8226;   <a href="#PIL.ImImagePlugin">PIL.ImImagePlugin</a>
@@ -19343,9 +19646,11 @@ imported by:
  &#8226;   <a href="#PIL.PngImagePlugin">PIL.PngImagePlugin</a>
  &#8226;   <a href="#PIL.XbmImagePlugin">PIL.XbmImagePlugin</a>
  &#8226;   <a href="#PIL.XpmImagePlugin">PIL.XpmImagePlugin</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
  &#8226;   <a href="#_pyrepl.pager">_pyrepl.pager</a>
  &#8226;   <a href="#_sre">_sre</a>
@@ -19376,6 +19681,10 @@ imported by:
  &#8226;   <a href="#ftplib">ftplib</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#glob">glob</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
+ &#8226;   <a href="#hjson.encoder">hjson.encoder</a>
+ &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
+ &#8226;   <a href="#hjson.scanner">hjson.scanner</a>
  &#8226;   <a href="#html">html</a>
  &#8226;   <a href="#http.client">http.client</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
@@ -20062,6 +20371,7 @@ imported by:
  &#8226;   <a href="#ctypes.util">ctypes.util</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#gzip">gzip</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
  &#8226;   <a href="#multiprocessing.connection">multiprocessing.connection</a>
  &#8226;   <a href="#multiprocessing.forkserver">multiprocessing.forkserver</a>
  &#8226;   <a href="#multiprocessing.shared_memory">multiprocessing.shared_memory</a>
@@ -20141,6 +20451,7 @@ imported by:
   <tt>sys</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
     <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#PIL.DdsImagePlugin">PIL.DdsImagePlugin</a>
  &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
@@ -20156,7 +20467,9 @@ imported by:
  &#8226;   <a href="#PIL._imagingcms">PIL._imagingcms</a>
  &#8226;   <a href="#PIL._typing">PIL._typing</a>
  &#8226;   <a href="#PIL.features">PIL.features</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
  &#8226;   <a href="#ResizeTool">ResizeTool</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#_aix_support">_aix_support</a>
@@ -20214,6 +20527,8 @@ imported by:
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#glob">glob</a>
  &#8226;   <a href="#gzip">gzip</a>
+ &#8226;   <a href="#hjson.compat">hjson.compat</a>
+ &#8226;   <a href="#hjson.decoder">hjson.decoder</a>
  &#8226;   <a href="#http.client">http.client</a>
  &#8226;   <a href="#http.server">http.server</a>
  &#8226;   <a href="#importlib">importlib</a>
@@ -21455,6 +21770,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#email.utils">email.utils</a>
  &#8226;   <a href="#http.client">http.client</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>

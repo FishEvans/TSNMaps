@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        14095.123993147823,
+        14095.123993147834,
         0,
-        11984.852198883353
+        11984.852198883367
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -10,8 +10,8 @@
         "security": "Neutral",
         "exports": [
             "Agriculture",
-            "Industry",
-            "Research"
+            "Research",
+            "Industry"
         ],
         "focus": "Research",
         "intel": {
@@ -23,12 +23,12 @@
         "visible": true,
         "skybox": "sky1-blue.png",
         "original_author": "Fish Evans",
-        "revision_date": "2026-01-29",
-        "revision_number": 15,
+        "revision_date": "2026-04-12",
+        "revision_number": 16,
         "all_authors": [
             "Fish Evans"
         ],
-        "last_revision_author": ""
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Leopard": {
@@ -244,24 +244,36 @@
             "type": "station",
             "facilities": [],
             "cargo": {
+                "Coolant": 8,
+                "Fuel Cell 400": 1,
+                "Data Chip": 5,
+                "Data Core": 2,
+                "Computer Core": 2,
+                "Life Support": 2,
+                "EMP": 10,
+                "Homing": 35,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Denebite Crystals": 2,
+                "Guidance System": 15,
                 "High Yield Warhead": 10,
-                "Life Support": 3,
+                "Iso B Circuit": 2,
+                "Meals": 15,
                 "Medical Supplies": 16,
                 "Micro Controller": 25,
                 "Power Relay": 16,
-                "Transmitter": 8,
+                "Rations": 8,
                 "Receiver": 6,
-                "Analysis Suite": 8,
+                "Repair Materials": 6,
                 "Sensor Suite": 8,
-                "Guidance System": 15,
+                "Transmitter": 8,
                 "Wild Animals": 15,
-                "Casing": 15,
-                "EMP": 10,
-                "Homing": 35
+                "Ice": 40,
+                "Mexalon": 9
             },
             "teams": {
-                "DamCon": 2,
-                "Medics": 2
+                "DamCon": 1,
+                "Medics": 5
             },
             "description": ""
         },
@@ -742,6 +754,105 @@
                 "Medics": 0
             },
             "description": ""
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                180365.6703732013,
+                0,
+                82588.416826328
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                191902.834687169,
+                0,
+                111376.60647535403
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -56524.70546848068,
+                0,
+                9076.8416487142
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -227658.07707586212,
+                0,
+                -174551.02982958706
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                69091.16234688817,
+                0,
+                -41819.312422564304
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -227677.6378003637,
+                0,
+                9136.290012019648
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -247239.6222563992,
+                0,
+                -30874.33687326979
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS8": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -216550.93340259927,
+                0,
+                52416.073521113874
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS9": {
+            "type": "fcs_zone",
+            "coordinate": [
+                301102.9357233149,
+                0,
+                -123183.71360607125
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -750,315 +861,360 @@
                 -40896.18403481218,
                 0.0,
                 211429.24847634468
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 92": {
             "coordinate": [
                 4103.815965187823,
                 0.0,
                 211429.24847634468
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 53": {
             "coordinate": [
                 -12839.142951169168,
                 0.0,
                 246611.665187406
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 84": {
             "coordinate": [
                 -50909.62606284632,
                 0.0,
                 255301.00452452677
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 81": {
             "coordinate": [
                 -81439.78309042103,
                 0.0,
                 230954.01673663483
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 70": {
             "coordinate": [
                 -81439.78309042103,
                 0.0,
                 191904.4802160546
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 21": {
             "coordinate": [
                 -50909.626062846335,
                 0.0,
                 167557.4924281626
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 61": {
             "coordinate": [
                 -12839.142951169175,
                 0.0,
                 176246.8317652833
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 49": {
             "coordinate": [
                 -16995.793634812,
                 0.0,
                 188719.7188763448
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 79": {
             "coordinate": [
                 8684.206365188002,
                 0.0,
                 153919.7188763448
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 42": {
             "coordinate": [
                 34364.206365188,
                 0.0,
                 119119.71887634479
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 76": {
             "coordinate": [
                 60044.206365188,
                 0.0,
                 84319.71887634482
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 98": {
             "coordinate": [
                 85724.206365188,
                 0.0,
                 49519.71887634482
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 13": {
             "coordinate": [
                 111404.206365188,
                 0.0,
                 14719.718876344821
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 56": {
             "coordinate": [
                 137084.206365188,
                 0.0,
                 -20080.28112365518
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 31": {
             "coordinate": [
                 162764.206365188,
                 0.0,
                 -54880.28112365515
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 18": {
             "coordinate": [
                 188444.206365188,
                 0.0,
                 -89680.28112365515
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 85": {
             "coordinate": [
                 214124.206365188,
                 0.0,
                 -124480.28112365515
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 54": {
             "coordinate": [
                 239804.206365188,
                 0.0,
                 -159280.28112365515
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 64": {
             "coordinate": [
                 265484.206365188,
                 0.0,
                 -194080.28112365515
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 46": {
             "coordinate": [
                 304724.206365188,
                 0.0,
                 -179680.28112365518
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 52": {
             "coordinate": [
                 287781.247448831,
                 0.0,
                 -144497.86441259383
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 14": {
             "coordinate": [
                 249710.7643371538,
                 0.0,
                 -135808.5250754731
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 80": {
             "coordinate": [
                 219180.60730957912,
                 0.0,
                 -160155.51286336506
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 58": {
             "coordinate": [
                 219180.60730957912,
                 0.0,
                 -199205.04938394527
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 75": {
             "coordinate": [
                 249710.7643371538,
                 0.0,
                 -223552.03717183723
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 15": {
             "coordinate": [
                 287781.247448831,
                 0.0,
                 -214862.69783471653
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 99": {
             "coordinate": [
                 -100757.55790147898,
                 0.0,
                 -185191.18672365506
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 77": {
             "coordinate": [
                 -55757.557901478984,
                 0.0,
                 -185191.18672365506
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 87": {
             "coordinate": [
                 -72700.51681783597,
                 0.0,
                 -150008.77001259374
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 26": {
             "coordinate": [
                 -110770.99992951314,
                 0.0,
                 -141319.430675473
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 23": {
             "coordinate": [
                 -141301.15695708783,
                 0.0,
                 -165666.41846336494
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 17": {
             "coordinate": [
                 -141301.15695708783,
                 0.0,
                 -204715.95498394518
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 82": {
             "coordinate": [
                 -110770.99992951314,
                 0.0,
                 -229062.94277183712
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 40": {
             "coordinate": [
                 -72700.51681783597,
                 0.0,
                 -220373.6034347164
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 93": {
             "coordinate": [
                 -238632.78645282742,
                 0.0,
                 64269.6797003517
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 38": {
             "coordinate": [
                 -193632.78645282742,
                 0.0,
                 64269.6797003517
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 66": {
             "coordinate": [
                 -210575.7453691844,
                 0.0,
                 99452.09641141305
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 19": {
             "coordinate": [
                 -248646.22848086155,
                 0.0,
                 108141.43574853375
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 90": {
             "coordinate": [
                 -279176.38550843624,
                 0.0,
                 83794.44796064182
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 25": {
             "coordinate": [
                 -279176.38550843624,
                 0.0,
                 44744.91144006158
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 59": {
             "coordinate": [
                 -248646.22848086155,
                 0.0,
                 20397.923652169644
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 67": {
             "coordinate": [
                 -210575.7453691844,
                 0.0,
                 29087.26298929035
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 24": {
             "coordinate": [
                 -54660.15928568828,
                 0.0,
                 25575.33833112064
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 71": {
             "coordinate": [
                 -34920.58804359601,
                 0.0,
                 12453.009721320675
-            ]
+            ],
+            "type": "Sensor Relay"
         }
     },
     "terrain": {

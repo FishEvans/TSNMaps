@@ -23,12 +23,12 @@
         "visible": true,
         "skybox": "sky1-rainbow.png",
         "original_author": "Fish Evans",
-        "revision_date": "2026-01-29",
-        "revision_number": 15,
+        "revision_date": "2026-05-06",
+        "revision_number": 17,
         "all_authors": [
             "Fish Evans"
         ],
-        "last_revision_author": ""
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Arcturus Gate": {
@@ -53,7 +53,9 @@
             ],
             "type": "jumpnode",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Echo Gate": "Waypoint 78"
+            },
             "state": "Tethered",
             "drift": 0
         },
@@ -66,7 +68,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -98,7 +100,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -114,7 +116,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -146,7 +148,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -178,7 +180,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -226,7 +228,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -274,7 +276,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -354,7 +356,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -370,7 +372,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -386,7 +388,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -418,7 +420,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -450,7 +452,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -513,7 +515,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -545,12 +547,298 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
             "teams": {},
             "description": ""
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -114656.2295114567,
+                0,
+                -125467.1571271413
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -194619.2890313988,
+                0,
+                -105993.88497755628
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                54485.56315473287,
+                0,
+                -27560.89236989617
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                8974.279101325857,
+                0,
+                96184.50768412223
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                156280.43787421368,
+                0,
+                -93111.83143176208
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                165788.84215993754,
+                0,
+                12259.137125741325
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -58864.413568506614,
+                0,
+                -209076.91570570125
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS8": {
+            "type": "fcs_zone",
+            "coordinate": [
+                119011.15141040759,
+                0,
+                119324.7150772717
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS9": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -173422.9090189736,
+                0,
+                40584.993476739706
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS10": {
+            "type": "fcs_zone",
+            "coordinate": [
+                90439.29070597289,
+                0,
+                -227403.3260854186
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS11": {
+            "type": "fcs_zone",
+            "coordinate": [
+                35419.91975894119,
+                0,
+                -112163.88983994388
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS12": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -137612.49129760286,
+                0,
+                133250.50705533422
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS13": {
+            "type": "fcs_zone",
+            "coordinate": [
+                71469.18913236023,
+                0,
+                -78756.55978197587
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS14": {
+            "type": "fcs_zone",
+            "coordinate": [
+                24278.237939746123,
+                0,
+                42196.36909593129
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS15": {
+            "type": "fcs_zone",
+            "coordinate": [
+                134615.5921426759,
+                0,
+                -125243.36311803153
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS16": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -154238.28033286566,
+                0,
+                -116025.47246150875
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS17": {
+            "type": "fcs_zone",
+            "coordinate": [
+                127137.89379048024,
+                0,
+                -27886.10056740899
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS18": {
+            "type": "fcs_zone",
+            "coordinate": [
+                15737.65348507387,
+                0,
+                67132.82882921143
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS19": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -140577.11279743517,
+                0,
+                -197431.95037953157
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS20": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -89172.460185046,
+                0,
+                911.3089919986334
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS21": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -97152.3747466974,
+                0,
+                -146354.93524111924
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS22": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -75876.83126134869,
+                0,
+                -167681.99064413385
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS23": {
+            "type": "fcs_zone",
+            "coordinate": [
+                143607.18732565414,
+                0,
+                -5447.704336454499
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS24": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -126535.02866345379,
+                0,
+                15359.41464684298
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS25": {
+            "type": "fcs_zone",
+            "coordinate": [
+                58443.44981156798,
+                0,
+                -54225.322264867566
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS26": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -108689.97856879153,
+                0,
+                -201889.10687779382
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {},

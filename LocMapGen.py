@@ -5,8 +5,10 @@ import glob
 import argparse
 from pathlib import Path
 import math
+import random
 import re
 from LocMapTemplate import build_object_button, render_locmap_html
+from ShipDescriptionResolver import resolve_ship_description
 
 # Helper to locate resources when running as a module or frozen executable
 def get_base_path():
@@ -42,6 +44,27 @@ PLANET_CLASS_COLORS = {
 }
 PLANET_CLASS_FALLBACK = '#98FB98'  # pale green
 
+ZONE_STYLE_MAP = {
+    'fcs_zone': {
+        'label': 'Fuel Collection Zone',
+        'fill_rgba': '54,191,214',
+        'line_color': '#7fe7ff',
+        'marker_color': '#7fe7ff',
+        'text_color': '#bff7ff',
+        'button_color': '#2d7f8e',
+        'show_plot_label': False,
+    }
+}
+DEFAULT_ZONE_STYLE = {
+    'label': 'Zone',
+    'fill_rgba': '214,149,54',
+    'line_color': '#ffd37f',
+    'marker_color': '#ffd37f',
+    'text_color': '#fff0bf',
+    'button_color': '#8e622d',
+    'show_plot_label': True,
+}
+
 # Grid reference generator
 def get_grid_reference(x, z):
     grid_size = 20000
@@ -60,6 +83,79 @@ def get_grid_reference(x, z):
 
 def is_hidden(obj):
     return str(obj.get('hideonmap')).lower() == 'true'
+
+def get_zone_style(zone_type):
+    zone_key = str(zone_type or '').strip().lower()
+    if not zone_key:
+        return None
+    if zone_key in ZONE_STYLE_MAP:
+        return ZONE_STYLE_MAP[zone_key]
+    if zone_key.endswith('_zone'):
+        return {
+            **DEFAULT_ZONE_STYLE,
+            'label': zone_key.replace('_', ' ').title(),
+        }
+    return None
+
+def is_zone_type(zone_type):
+    return get_zone_style(zone_type) is not None
+
+def build_circle_points(x0, y0, radius, segments=48):
+    angles = [2 * math.pi * i / segments for i in range(segments)]
+    xs = [x0 + radius * math.cos(a) for a in angles]
+    ys = [y0 + radius * math.sin(a) for a in angles]
+    return xs, ys
+
+def generate_line_coords(start, end, count, radius, seed=None, y_range=(-600, 600),
+                         clumps=(), voids=()):
+    # Keep LocMapGen in sync with the deterministic asteroid/nebula placement
+    # used by the editor and runtime terrain generator.
+    rng = random.Random(seed)
+    coords = []
+
+    dx = end[0] - start[0]
+    dz = end[2] - start[2]
+    length = math.hypot(dx, dz)
+
+    if length == 0:
+        return []
+
+    for _ in range(count):
+        t = rng.random()
+        cx = start[0] + t * dx
+        cz = start[2] + t * dz
+
+        u = max(1e-6, rng.random())
+        d = radius * math.sqrt(-math.log(u))
+
+        angle = rng.uniform(0, 2 * math.pi)
+        ox = math.cos(angle) * d
+        oz = math.sin(angle) * d
+
+        x = cx + ox
+        z = cz + oz
+        y = rng.uniform(*y_range)
+
+        density_bias = 0.0
+
+        for cx_, cz_, r, s in clumps:
+            dist = math.hypot(x - cx_, z - cz_)
+            if dist < r:
+                density_bias += (1 - dist / r) ** 2 * s
+
+        for vx_, vz_, r, s in voids:
+            dist = math.hypot(x - vx_, z - vz_)
+            if dist < r:
+                density_bias -= (1 - dist / r) ** 2 * s
+
+        if density_bias != 0:
+            push = density_bias * radius * 0.15
+            x += rng.uniform(-push, push)
+            z += rng.uniform(-push, push)
+
+        coords.append((x, y, z))
+
+    return coords
 
 # Load external ship map once
 shipmap_path = Path('HTML') / 'Images' / 'Ships' / 'ShipMap.json'
@@ -96,7 +192,10 @@ class MapViewer:
                 if isinstance(coord, dict) and 'coordinate' in coord:
                     entry['coordinate'] = coord['coordinate']
                     # …but also carry over any hideonmap/description flags
-                    for fld in ('hideonmap', 'HideOnSCMap', 'description'):
+                    relay_type = str(coord.get('type', '')).strip()
+                    if relay_type:
+                        entry['relayType'] = relay_type
+                    for fld in ('hideonmap', 'HideOnSCMap', 'description', 'broadcast', 'ping', 'range'):
                         if fld in coord:
                             entry[fld] = coord[fld]
                 else:
@@ -138,6 +237,8 @@ class MapViewer:
         relays,
         planets,
         gates,
+        zones,
+        zone_button_color_map,
         planet_trace_indices,
         blackhole_trace_indices,
     ):
@@ -156,10 +257,100 @@ class MapViewer:
                 color_lookup=station_color_map,
             ),
             'relay_buttons': self._build_button_markup(relays, obj_data),
+            'zone_buttons': self._build_button_markup(
+                zones,
+                obj_data,
+                color_lookup=zone_button_color_map,
+            ),
             'planet_buttons': self._build_button_markup(planets, obj_data),
             'planet_trace_indices': json.dumps(planet_trace_indices),
             'blackhole_trace_indices': json.dumps(blackhole_trace_indices),
         }
+
+    def _render_zone_feature(self, name, zone, trace_target, data_target, obj_data, zones, zone_button_color_map):
+        zone_type = str(zone.get('type', '')).strip().lower()
+        style = get_zone_style(zone_type)
+        if style is None:
+            return False
+
+        coord = zone.get('coordinate')
+        try:
+            radius = float(zone.get('radius', 0) or 0)
+        except Exception:
+            radius = 0.0
+        if not (isinstance(coord, (list, tuple)) and len(coord) >= 2 and radius > 0):
+            return True
+
+        x0, y0 = self.project(coord)
+        hidden = is_hidden(zone)
+        grid_ref = get_grid_reference(x0, y0)
+        display_name = f"**{name}**" if hidden else name
+        xs, ys = build_circle_points(x0, y0, radius)
+
+        if hidden:
+            fill = 'rgba(255,255,0,0.35)'
+            line_color = 'yellow'
+            line_width = 2
+            marker_color = 'yellow'
+            text_color = 'yellow'
+        else:
+            fill = f"rgba({style['fill_rgba']},0.30)"
+            line_color = style['line_color']
+            line_width = 2
+            marker_color = style['marker_color']
+            text_color = style['text_color']
+        show_plot_label = bool(style.get('show_plot_label', True))
+
+        area_trace = {
+            'type': 'scatter',
+            'x': xs + [xs[0]],
+            'y': ys + [ys[0]],
+            'fill': 'toself',
+            'fillcolor': fill,
+            'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
+            'hoverinfo': 'none',
+        }
+        center_trace = {
+            'type': 'scatter',
+            'x': [x0],
+            'y': [y0],
+            'mode': 'markers+text' if show_plot_label else 'markers',
+            'marker': {
+                'symbol': 'circle-open',
+                'size': 10,
+                'color': marker_color,
+                'line': {'color': marker_color, 'width': 2},
+            },
+            'hovertext': [f"{name} [{grid_ref}]"],
+            'hoverinfo': 'text',
+        }
+        if show_plot_label:
+            center_trace['text'] = [display_name]
+            center_trace['textposition'] = 'top center'
+            center_trace['textfont'] = {'color': text_color, 'size': 12}
+        if hidden:
+            area_trace['gmOnly'] = True
+            center_trace['gmOnly'] = True
+
+        trace_target.append(area_trace)
+        data_target.append(center_trace)
+
+        entry = {
+            'type': zone_type,
+            'zoneLabel': style['label'],
+            'x': x0,
+            'y': y0,
+            'grid': grid_ref,
+            'hidden': hidden,
+            'label': display_name,
+            'radius': int(radius) if radius.is_integer() else radius,
+        }
+        if zone.get('description'):
+            entry['description'] = zone['description']
+        obj_data[name] = entry
+        zones.append(name)
+        zone_button_color_map[name] = style['button_color']
+        return True
 
     def generate(self, output_html=None):
         if output_html:
@@ -243,8 +434,10 @@ class MapViewer:
         }
         terrain_traces = []
            # data = terrain_traces[:]
+        data = []
         obj_data = {}
-        gates, stations, relays, planets = [], [], [], []
+        gates, stations, relays, planets, zones = [], [], [], [], []
+        zone_button_color_map = {}
 
         # --- Terrain rendering ---
         # Support:
@@ -254,11 +447,24 @@ class MapViewer:
             ttype = r.get('type', '')
             hidden = is_hidden(r)
 
+            if self._render_zone_feature(
+                key,
+                r,
+                terrain_traces,
+                terrain_traces,
+                obj_data,
+                zones,
+                zone_button_color_map,
+            ):
+                continue
+
             # ---------- Rectangular "lane" style (asteroids / nebulas) ----------
             if ttype in ('asteroids', 'nebulas'):
                 if 'start' not in r or 'end' not in r:
                     continue
 
+                start = r.get('start')
+                end = r.get('end')
                 x1, y1 = self.project(r['start'])
                 x2, y2 = self.project(r['end'])
                 length = math.hypot(x2 - x1, y2 - y1)
@@ -307,6 +513,49 @@ class MapViewer:
                 if hidden:
                     terrain_trace['gmOnly'] = True
                 terrain_traces.append(terrain_trace)
+
+                try:
+                    density = max(0, min(int(r.get('density', 0) or 0), 10000))
+                except Exception:
+                    density = 0
+                try:
+                    scatter = float(r.get('scatter', 0) or 0)
+                except Exception:
+                    scatter = 0.0
+                seed = r.get('seed')
+
+                if (
+                    density > 0
+                    and scatter > 0
+                    and isinstance(start, (list, tuple))
+                    and isinstance(end, (list, tuple))
+                    and len(start) >= 3
+                    and len(end) >= 3
+                ):
+                    coords = generate_line_coords(start, end, density, scatter, seed=seed)
+                    if coords:
+                        if hidden:
+                            dot_color = 'yellow'
+                        elif ttype == 'nebulas':
+                            dot_color = '#C24BFF'
+                        else:
+                            dot_color = '#D8A25A'
+
+                        dot_trace = {
+                            'type': 'scatter',
+                            'x': [gx for gx, _, _ in coords],
+                            'y': [gz for _, _, gz in coords],
+                            'mode': 'markers',
+                            'marker': {
+                                'size': 4 if ttype == 'nebulas' else 2,
+                                'color': dot_color,
+                                'opacity': 0.8,
+                            },
+                            'hoverinfo': 'none',
+                        }
+                        if hidden:
+                            dot_trace['gmOnly'] = True
+                        terrain_traces.append(dot_trace)
                 continue
 
             # ---------- Circular debris field (center + radius) ----------
@@ -354,8 +603,8 @@ class MapViewer:
                 terrain_traces.append(terrain_trace)
                 continue
 
-            # ---------- Hidden minefield (axis-aligned rectangle) ----------
-            if ttype == 'hidden_minefield':
+            # ---------- Minefield (axis-aligned rectangle) ----------
+            if ttype in ('hidden_minefield', 'minefield'):
                 coord = r.get('coordinate')
                 width = float(r.get('width', 15000) or 0)
                 height = float(r.get('height', 15000) or 0)
@@ -373,12 +622,13 @@ class MapViewer:
                 eff_den = density * 1e8 / area if area else density
                 alpha = max(0.4, min(1, eff_den / 200))
 
+                is_hidden_minefield = (ttype == 'hidden_minefield')
                 if hidden:
                     fill = 'rgba(255,255,0,0.6)'  # GM-only highlight
                     line_color = 'yellow'
                     line_width = 2
                 else:
-                    fill = f'rgba(204,0,0,{alpha})'
+                    fill = f'rgba({204 if is_hidden_minefield else 255},{0 if is_hidden_minefield else 153},0,{alpha})'
                     line_color = fill
                     line_width = 0
 
@@ -459,8 +709,13 @@ class MapViewer:
                 if hidden:
                     trace['gmOnly'] = True
 
+                trace['meta'] = {
+                    'base_marker_size': size,
+                    'base_text_size': text_size,
+                    'scale_on_zoom': True,
+                    'map_object_type': 'planet',
+                }
                 terrain_traces.append(trace)
-                terrain_traces[-1]['meta'] = {'base_marker_size': size, 'base_text_size': text_size}
                 # We'll expose planets into obj_data later (alongside blackholes)
                 # store a lightweight marker in a temp list for later processing
                 # use the display name as the key
@@ -468,9 +723,7 @@ class MapViewer:
                 planets.append(display)
                 continue
 
-        data = []
         data.extend(terrain_traces)
-        obj_data = {}
 
         # ——— Add black holes as their own markers ———
         # ——— Prep a helper so we treat hideonmap exactly the same everywhere ———
@@ -484,8 +737,8 @@ class MapViewer:
                 display = key
                 grid_ref = get_grid_reference(x, y)
                 # add scatter marker+label for the black hole
-                bh_size = 40
-                text_size = 14
+                bh_size = 20
+                text_size = 12
                 bh_trace = {
                     'type': 'scatter',
                     'x': [x], 'y': [y],
@@ -493,10 +746,16 @@ class MapViewer:
                     'marker': {'symbol': 'star', 'size': bh_size, 'color': 'yellow'},
                     'text': [display],
                     'textposition': 'top center',
+                    'textfont': {'color': 'white', 'size': text_size},
                     'hovertext': [f"{display} [{grid_ref}]"],
                     'hoverinfo': 'text'
                 }
-                bh_trace['meta'] = {'base_marker_size': bh_size, 'base_text_size': text_size}
+                bh_trace['meta'] = {
+                    'base_marker_size': bh_size,
+                    'base_text_size': text_size,
+                    'scale_on_zoom': True,
+                    'map_object_type': 'blackhole',
+                }
                 data.append(bh_trace)
                 # expose it to the JS highlight/info panel
                 obj_data[display] = {'type': 'blackhole', 'x': x, 'y': y, 'grid': grid_ref}
@@ -526,6 +785,17 @@ class MapViewer:
             # now skip solely based on hideonmap
             hidden = is_hidden(obj)
 
+            if self._render_zone_feature(
+                name,
+                obj,
+                data,
+                data,
+                obj_data,
+                zones,
+                zone_button_color_map,
+            ):
+                continue
+
             x, y = self.project(obj.get('coordinate', [0, 0, 0]))
             typ = obj.get('type', '')
             grid_ref = get_grid_reference(x, y)
@@ -550,16 +820,28 @@ class MapViewer:
                 color = self.get_station_color(obj)
                 stations.append((name, color))
             elif typ == 'sensor_relay':
-                symbol = 'circle'
-                
-                if re.match(r'^(?:SR[- ]?\d+|Sensor Relay \d+|WB[- ]?\d+)$', name):
-                    size = 3
-                    mode = 'markers'
+                relay_type = str(obj.get('relayType', 'Sensor Relay')).strip().casefold()
+                if relay_type == 'warning buoy':
+                    symbol = 'triangle-up'
+                    size = 8
+                    color = 'orange'
+                    text_color = 'orange'
+                    if re.match(r'^(?:WB[- ]?\d+|Warning Buoy \d+)$', name):
+                        size = 5
+                        mode = 'markers'
+                    else:
+                        mode = 'markers+text'
+                        relays.append(name)
                 else:
-                    size = 6
-                    color = '#FF13F0'
-                    mode = 'markers+text'
-                    relays.append(name)
+                    symbol = 'circle'
+                    if re.match(r'^(?:SR[- ]?\d+|Sensor Relay \d+)$', name):
+                        size = 3
+                        mode = 'markers'
+                    else:
+                        size = 6
+                        color = '#FF13F0'
+                        mode = 'markers+text'
+                        relays.append(name)
             
             elif typ == 'platform':
                 symbol = 'pentagon-open'
@@ -609,6 +891,13 @@ class MapViewer:
             # ——— carry over description if present ———
             if obj.get('description'):
                 entry['description'] = obj['description']            
+            if typ == 'sensor_relay':
+                relay_type = obj.get('relayType')
+                if relay_type:
+                    entry['relayType'] = relay_type
+                for relay_field in ('broadcast', 'ping', 'range'):
+                    if relay_field in obj and obj.get(relay_field) not in (None, ''):
+                        entry[relay_field] = obj.get(relay_field)
             
             if typ in ('jump_point', 'jumppoint', 'jumpnode'):
                 raw_dest = obj.get('destinations', {})
@@ -627,13 +916,20 @@ class MapViewer:
                 if hull_data:
                     entry['hullName'] = hull_data.get('name')
                     entry['hullImage'] = f"Images/Ships/{hull_data.get('artfileroot')}256.png"
-                    entry['hullDescription'] = hull_data.get('long_desc', '')
+                    entry['hullDescription'] = resolve_ship_description(
+                        hull_key,
+                        name=hull_data.get('name', ''),
+                        side=hull_data.get('side', ''),
+                        roles=hull_data.get('roles', []),
+                        shipmap_entry=hull_data,
+                    )['description']
             obj_data[name] = entry
 
         gates.sort()
         stations.sort(key=lambda x: x[0])
         relays.sort()
         blackholes.sort()
+        zones.sort()
 
         layout = {
     'title': sys_name,
@@ -667,17 +963,17 @@ class MapViewer:
         # compute trace indices for planets and blackholes so JS can efficiently rescale only them
         planet_trace_indices = []
         blackhole_trace_indices = []
-        # data is terrain_traces followed by object traces; find traces by matching text label or star symbol
+        # data is terrain_traces followed by object traces; only traces explicitly
+        # tagged as scalable should resize during Plotly zoom.
         for i, t in enumerate(data):
             try:
-                txt = None
-                if isinstance(t.get('text'), (list, tuple)) and t.get('text'):
-                    txt = t.get('text')[0]
-                if txt and txt in planets:
+                meta = t.get('meta', {})
+                if not meta.get('scale_on_zoom'):
+                    continue
+                if meta.get('map_object_type') == 'planet':
                     planet_trace_indices.append(i)
                     continue
-                # blackholes use 'star' symbol
-                if t.get('marker', {}).get('symbol') == 'star':
+                if meta.get('map_object_type') == 'blackhole':
                     blackhole_trace_indices.append(i)
             except Exception:
                 continue
@@ -692,6 +988,8 @@ class MapViewer:
             relays=relays,
             planets=planets,
             gates=gates,
+            zones=zones,
+            zone_button_color_map=zone_button_color_map,
             planet_trace_indices=planet_trace_indices,
             blackhole_trace_indices=blackhole_trace_indices,
         )
@@ -749,4 +1047,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

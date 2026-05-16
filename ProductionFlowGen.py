@@ -61,6 +61,14 @@ DATABASE_PATH = BASE / DATABASE_SOURCE
 SPRITE_PATH = BASE / SPRITE_SOURCE
 
 
+def build_sprite_href():
+    href = os.path.relpath(SPRITE_PATH, HTML_DIR).replace("\\", "/")
+    if SPRITE_PATH.exists():
+        stat = SPRITE_PATH.stat()
+        href = f"{href}?v={stat.st_mtime_ns}-{stat.st_size}"
+    return html.escape(href)
+
+
 def parse_database_snapshot(path):
     source = path.read_text(encoding="utf-8")
     module = ast.parse(source, filename=str(path))
@@ -892,7 +900,7 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
         industrial_items,
         item_meta,
     )
-    sprite_href = html.escape(os.path.relpath(SPRITE_PATH, HTML_DIR).replace("\\", "/"))
+    sprite_href = build_sprite_href()
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -1224,7 +1232,7 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
     all_roots = sorted({item for tier_code in ("C", "1", "2", "3", "I", "M") for item in tier_roots.get(tier_code, set())})
     all_items = sorted({item for root in all_roots for item in collect_subtree_items(root, recipes)})
     raw_items, external_items = collect_external_and_raw_items(all_roots, recipes, minimum_tier, raw_materials)
-    sprite_href = html.escape(os.path.relpath(SPRITE_PATH, HTML_DIR).replace("\\", "/"))
+    sprite_href = build_sprite_href()
     tab_buttons = build_tier_buttons(tier_codes)
     signature_explorer = build_signature_explorer(
         tier_roots,

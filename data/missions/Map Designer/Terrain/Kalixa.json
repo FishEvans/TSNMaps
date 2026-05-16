@@ -1,6 +1,6 @@
 {
     "systemMapCoord": [
-        -25454.50874192626,
+        -25454.508741926253,
         0,
         -17411.390733016167
     ],
@@ -19,13 +19,13 @@
         "development": "Unclaimed",
         "visible": true,
         "original_author": "Draeco",
-        "revision_date": "2005-12-23",
-        "revision_number": 15,
+        "revision_date": "2026-05-06",
+        "revision_number": 16,
         "all_authors": [
             "Fish Evans",
             "Draeco"
         ],
-        "last_revision_author": ""
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Cronus Gate": {
@@ -64,7 +64,9 @@
             ],
             "type": "jumpnode",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Ropely Point Gate": "Waypoint 78"
+            },
             "state": "Tethered",
             "drift": 0
         },
@@ -111,7 +113,7 @@
             "sides": [
                 "Hegemony"
             ],
-            "hull": "starbase_Kralien",
+            "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -135,6 +137,105 @@
             "teams": {},
             "description": "",
             "hideonmap": true
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                38734.23062690689,
+                0,
+                146965.55815894113
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                5447.758269216423,
+                0,
+                125226.09479483405
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -29555.215036354995,
+                0,
+                130032.52993245993
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                7365.379060066696,
+                0,
+                -24943.63763153012
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                40637.89513745916,
+                0,
+                -8167.762095776434
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS6": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -62985.18224840901,
+                0,
+                103545.53572708044
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS7": {
+            "type": "fcs_zone",
+            "coordinate": [
+                73863.48252989254,
+                0,
+                -17223.704016709507
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS8": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -36629.812445075004,
+                0,
+                -16309.911619908813
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS9": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -71185.60245408531,
+                0,
+                -37834.187918674616
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {},
@@ -146,7 +247,8 @@
                 -833.3333333333334,
                 0,
                 50000.00000000001
-            ]
+            ],
+            "class": "EarthLike"
         },
         "1766409694887": {
             "type": "nebulas",

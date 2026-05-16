@@ -1,6 +1,6 @@
 {
     "systemMapCoord": [
-        52262.38759612874,
+        52262.387596128734,
         0,
         4893.905768282473
     ],
@@ -22,8 +22,8 @@
         "visible": true,
         "skybox": "sky-neb2-rvb.png",
         "original_author": "Draeco",
-        "revision_date": "2026-02-06",
-        "revision_number": 17,
+        "revision_date": "2026-04-15",
+        "revision_number": 23,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -76,22 +76,32 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 46,
-                "Nuke": 3,
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Disruptor": 5,
                 "EMP": 6,
-                "Mine": 5,
+                "Homing": 50,
+                "Mine": 6,
+                "Nuke": 2,
+                "Penetration": 2,
+                "Scorch": 8,
+                "Casing": 20,
+                "Guidance System": 25,
                 "High Yield Warhead": 15,
-                "Warhead": 62,
-                "Torpedo Casing": 52,
-                "Casing": 54,
-                "Navigational Array": 3,
-                "Tactical Array": 9,
-                "Guidance System": 6
+                "Power Relay": 5,
+                "Sensor Suite": 8,
+                "Tharium Plating": 9,
+                "Torpedo Casing": 27,
+                "Warhead": 26,
+                "Mexalon": 3
             },
             "teams": {
-                "DamCon": 4,
-                "Medics": 2,
-                "Combat Engineers": 2
+                "Combat Engineers": 2,
+                "DamCon": 3,
+                "Marines": 1,
+                "Medics": 2
             },
             "description": "Gate Control is hyper-vigilant because of the damage suffered during the last war."
         },
@@ -139,27 +149,45 @@
                 "Repair"
             ],
             "cargo": {
-                "Repair Materials": 16,
-                "Medical Supplies": 10,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
-                "Micro Controller": 8,
-                "Power Relay": 16,
-                "Aid Package": 16,
+                "Coolant": 15,
+                "Fuel Cell 100": 7,
+                "Fuel Cell 200": 1,
+                "Fuel Cell 400": 1,
+                "Life Support": 3,
+                "EMP": 10,
+                "Homing": 35,
+                "Alcohol": 16,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Coffee": 15,
+                "Container": 18,
+                "Denebite Crystals": 5,
+                "Guidance System": 15,
+                "High Yield Warhead": 6,
+                "Iso B Circuit": 7,
+                "Meals": 14,
+                "Medical Supplies": 25,
+                "Micro Controller": 25,
+                "Packaging": 8,
                 "Pets": 4,
-                "Transmitter": 5,
-                "Comms Relay": 6,
-                "Coffee": 5,
-                "Tea": 5,
-                "Alcohol": 5,
-                "Sensor Relay": 3,
-                "Analysis Suite": 2,
-                "Warhead": 15,
-                "Guidance System": 19,
-                "Torpedo Casing": 29
+                "Power Relay": 16,
+                "Produce": 15,
+                "Rations": 25,
+                "Receiver": 6,
+                "Repair Materials": 8,
+                "Sensor Suite": 8,
+                "Tea": 12,
+                "Tharium Plating": 16,
+                "Torpedo Casing": 21,
+                "Transmitter": 8,
+                "Warhead": 13,
+                "Wild Animals": 15,
+                "Mine": 3
             },
-            "teams": {},
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
             "description": "Tias Emporium has a reputation as beeing rather shady, Stolen or pirated goods appear frequently."
         },
         "Elias Resorts": {
@@ -209,9 +237,29 @@
             ],
             "hull": "starbase_command",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Disruptor": 5,
+                "EMP": 6,
+                "Homing": 50,
+                "Mine": 6,
+                "Nuke": 2,
+                "Penetration": 5,
+                "Casing": 60,
+                "Guidance System": 60,
+                "High Yield Warhead": 15,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Torpedo Casing": 60,
+                "Warhead": 60
+            },
+            "teams": {
+                "Combat Engineers": 2,
+                "DamCon": 3,
+                "Medics": 2
+            },
             "description": ""
         },
         "WP 15": {
@@ -395,6 +443,61 @@
             "type": "platform",
             "cargo": {},
             "teams": {}
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -25812.37222317371,
+                0,
+                -44352.54432186914
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -19158.733846755982,
+                0,
+                -69778.75772216685
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -26933.67760122835,
+                0,
+                -95504.42270881355
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -56774.58536553491,
+                0,
+                -703.2181631173465
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -44571.87458451176,
+                0,
+                -27009.183180237906
+            ],
+            "radius": 5000,
+            "description": "Auto-generated from nebula density.",
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -403,42 +506,135 @@
                 59166.66666666667,
                 0,
                 146666.6666666667
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 42": {
             "coordinate": [
                 40416.66666666667,
                 0,
                 112361.11111111112
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 54": {
             "coordinate": [
                 21666.66666666667,
                 0,
                 78055.55555555556
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 97": {
             "coordinate": [
                 -15833.333333333328,
                 0,
                 9444.444444444438
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 67": {
             "coordinate": [
                 -34583.33333333333,
                 0,
                 -24861.111111111124
-            ]
+            ],
+            "type": "Sensor Relay"
         },
         "SR 84": {
             "coordinate": [
                 -53333.33333333333,
                 0,
                 -59166.666666666686
-            ]
+            ],
+            "type": "Sensor Relay"
+        },
+        "The Chalk Line": {
+            "coordinate": [
+                -36106.14569044352,
+                0,
+                -48201.30315500683
+            ],
+            "type": "Sensor Relay"
+        },
+        "NAV HAZ 002": {
+            "coordinate": [
+                58245.18119451638,
+                0,
+                140738.7082767914
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000
+        },
+        "NAV HAZ 003": {
+            "coordinate": [
+                50714.97723169105,
+                0,
+                156375.33792615202
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000,
+            "description": ""
+        },
+        "NAV HAZ 004": {
+            "coordinate": [
+                33794.762515390095,
+                0,
+                160237.2665204279
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000,
+            "description": ""
+        },
+        "NAV HAZ 005": {
+            "coordinate": [
+                20225.803836468,
+                0,
+                149416.38305914256
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000
+        },
+        "NAV HAZ 006": {
+            "coordinate": [
+                20225.803836467996,
+                0,
+                132061.03349444026
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000
+        },
+        "NAV HAZ 007": {
+            "coordinate": [
+                33794.76251539009,
+                0,
+                121240.15003315493
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000
+        },
+        "NAV HAZ 008": {
+            "coordinate": [
+                50714.977231691046,
+                0,
+                125102.0786274308
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 15000
         }
     },
     "terrain": {
