@@ -23,6 +23,77 @@ def get_base_path():
     return os.path.dirname(os.path.abspath(__file__))
 
 
+STATION_OR_PLATFORM_TYPES = {"station", "platform"}
+INCOMING_ONLY_GATES_KEY = "incomingOnlyGates"
+INCOMING_ONLY_GATES_ALIASES = (INCOMING_ONLY_GATES_KEY, "incoming_only_gates")
+
+
+def load_valid_hull_keys():
+    shipmap_path = os.path.join(get_base_path(), "HTML", "Images", "Ships", "ShipMap.json")
+    try:
+        with open(shipmap_path, "r") as sf:
+            ship_entries = json.load(sf)
+    except (OSError, json.JSONDecodeError):
+        return set()
+    if not isinstance(ship_entries, list):
+        return set()
+    return {
+        str(entry.get("key", "")).strip().casefold()
+        for entry in ship_entries
+        if isinstance(entry, dict) and str(entry.get("key", "")).strip()
+    }
+
+
+def object_has_blank_or_invalid_hull(obj, valid_hull_keys):
+    if not isinstance(obj, dict):
+        return False
+    if str(obj.get("type", "")).strip().lower() not in STATION_OR_PLATFORM_TYPES:
+        return False
+    hull = str(obj.get("hull", "") or "").strip()
+    if not hull:
+        return True
+    return bool(valid_hull_keys) and hull.casefold() not in valid_hull_keys
+
+
+def system_has_blank_or_invalid_station_hull(data, valid_hull_keys):
+    objects = data.get("objects", {}) if isinstance(data, dict) else {}
+    if not isinstance(objects, dict):
+        return False
+    return any(object_has_blank_or_invalid_hull(obj, valid_hull_keys) for obj in objects.values())
+
+
+def get_incoming_only_gate_names(data):
+    meta = data.get("metadata", {}) if isinstance(data, dict) else {}
+    if not isinstance(meta, dict):
+        return set()
+
+    names = set()
+    for key in INCOMING_ONLY_GATES_ALIASES:
+        raw_names = meta.get(key, [])
+        if isinstance(raw_names, str):
+            raw_names = [raw_names]
+        if not isinstance(raw_names, (list, tuple, set)):
+            continue
+        for name in raw_names:
+            cleaned = str(name or "").strip()
+            if cleaned:
+                names.add(cleaned.casefold())
+    return names
+
+
+def draw_red_cross(canvas, sx, sy, radius, width, tags):
+    return [
+        canvas.create_line(
+            sx - radius, sy - radius, sx + radius, sy + radius,
+            fill="red", width=width, tags=tags
+        ),
+        canvas.create_line(
+            sx - radius, sy + radius, sx + radius, sy - radius,
+            fill="red", width=width, tags=tags
+        ),
+    ]
+
+
 
 class SystemMapEditor:
     INITIAL_SCALE = 10000
@@ -92,6 +163,7 @@ class SystemMapEditor:
     • Save Changes – Writes all system edits and regenerates maps
     • Zoom In / Out – Adjust zoom level
     • New System – Create a new system at the current view center
+    • Rename System – Edit the system name in System Properties
     • Help – Show this dialog
 
     System Editor:
@@ -167,6 +239,129 @@ class SystemMapEditor:
     def _write_system_json(self, filename, data):
         with open(self._get_system_file_path(filename), "w") as f:
             json.dump(data, f, indent=4)
+
+    def _system_name_from_filename(self, filename):
+        return os.path.splitext(os.path.basename(filename))[0]
+
+    def _normalize_system_filename_from_input(self, system_name):
+        cleaned = str(system_name or "").strip()
+        if cleaned.lower().endswith(".json"):
+            cleaned = cleaned[:-5].strip()
+        if not cleaned:
+            raise ValueError("System name cannot be empty.")
+        if cleaned in (".", ".."):
+            raise ValueError("System name cannot be '.' or '..'.")
+        if cleaned.endswith(".") or cleaned.endswith(" "):
+            raise ValueError("System name cannot end with a dot or space.")
+        if any(ch in '<>:"/\\|?*' for ch in cleaned) or any(ord(ch) < 32 for ch in cleaned):
+            raise ValueError('System name contains invalid filename characters: <>:"/\\|?*')
+        reserved_names = {
+            "CON", "PRN", "AUX", "NUL",
+            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+        }
+        if cleaned.split(".")[0].upper() in reserved_names:
+            raise ValueError("System name is reserved by Windows.")
+        return f"{cleaned}.json"
+
+    def _system_destination_key(self, value):
+        key = str(value or "").strip().casefold()
+        if key.endswith(".json"):
+            key = key[:-5]
+        return key
+
+    def _renamed_destination_value(self, original_value, new_system_name):
+        original = str(original_value or "").strip()
+        if original.casefold().endswith(".json"):
+            return f"{new_system_name}.json"
+        return new_system_name
+
+    def _rewrite_destination_system_names(self, data, old_system_name, new_system_name):
+        objects = data.get("objects", {}) if isinstance(data, dict) else {}
+        if not isinstance(objects, dict):
+            return False
+
+        old_key = old_system_name.casefold()
+        changed = False
+        for obj in objects.values():
+            if not isinstance(obj, dict):
+                continue
+            if str(obj.get("type", "")).strip().lower() not in ("jumpnode", "jumppoint", "jump_point"):
+                continue
+            destinations = obj.get("destinations")
+            if not isinstance(destinations, dict):
+                continue
+            for dest_gate_name, dest_system_name in list(destinations.items()):
+                if self._system_destination_key(dest_system_name) != old_key:
+                    continue
+                destinations[dest_gate_name] = self._renamed_destination_value(dest_system_name, new_system_name)
+                changed = True
+        return changed
+
+    def _rename_system_file(self, old_filename, new_filename):
+        if old_filename == new_filename:
+            return
+
+        old_path = self._get_system_file_path(old_filename)
+        new_path = self._get_system_file_path(new_filename)
+        old_abs = os.path.abspath(old_path)
+        new_abs = os.path.abspath(new_path)
+        same_file = os.path.normcase(old_abs) == os.path.normcase(new_abs)
+
+        if os.path.exists(new_path) and not same_file:
+            raise FileExistsError(f"{new_filename} already exists.")
+        if not os.path.exists(old_path):
+            raise FileNotFoundError(old_path)
+
+        if same_file:
+            temp_filename = f".__rename_tmp__{os.getpid()}.json"
+            temp_path = self._get_system_file_path(temp_filename)
+            suffix = 1
+            while os.path.exists(temp_path):
+                temp_filename = f".__rename_tmp__{os.getpid()}_{suffix}.json"
+                temp_path = self._get_system_file_path(temp_filename)
+                suffix += 1
+            os.replace(old_path, temp_path)
+            os.replace(temp_path, new_path)
+        else:
+            os.replace(old_path, new_path)
+
+    def rename_system(self, old_filename, new_system_name):
+        new_filename = self._normalize_system_filename_from_input(new_system_name)
+        old_system_name = self._system_name_from_filename(old_filename)
+        new_system_name = self._system_name_from_filename(new_filename)
+        if old_filename == new_filename:
+            return old_filename
+
+        self._rename_system_file(old_filename, new_filename)
+
+        for filename in list(self._iter_system_filenames()):
+            try:
+                data = self._load_system_json(filename)
+            except (OSError, json.JSONDecodeError):
+                print(f"Warning: Could not parse {filename}, skipping destination rename.")
+                continue
+            if self._rewrite_destination_system_names(data, old_system_name, new_system_name):
+                try:
+                    self._write_system_json(filename, data)
+                except OSError:
+                    print(f"Failed to update destinations in {filename}")
+
+        if old_filename in self.systems:
+            self.systems[new_filename] = self.systems.pop(old_filename)
+
+        for system in self.systems.values():
+            cached_data = {"objects": {}}
+            for jp in system.get("jump_points", []):
+                if not isinstance(jp, dict):
+                    continue
+                jp_name = jp.get("name", "")
+                cached_data["objects"][jp_name] = jp
+            self._rewrite_destination_system_names(cached_data, old_system_name, new_system_name)
+
+        self.clear_selection()
+        self.redraw_map()
+        return new_filename
 
     def _refresh_system_record_from_disk(self, filename):
         previous = self.systems.get(filename, {})
@@ -254,6 +449,10 @@ class SystemMapEditor:
             "traffic": dict(traffic),
             "author_meta": self._build_author_meta(meta, fallback_author_meta),
             "jump_points": jump_points,
+            "incoming_only_gates": get_incoming_only_gate_names(data),
+            "has_invalid_station_hull": system_has_blank_or_invalid_station_hull(
+                data, getattr(self, "valid_hull_keys", set())
+            ),
             "canvas_items": [],
             "link_lines": [],
             "incoming_lines": [],
@@ -354,12 +553,15 @@ class SystemMapEditor:
             objects = data.get("objects", {})
             if not isinstance(objects, dict):
                 continue
+            incoming_only_gates = get_incoming_only_gate_names(data)
             current_system = filename[:-5]
             current_system_lower = current_system.lower()
             for gate_name, gate_data in objects.items():
                 if not isinstance(gate_data, dict):
                     continue
                 if gate_data.get("type") not in ("jumpnode", "jumppoint"):
+                    continue
+                if str(gate_name).strip().casefold() in incoming_only_gates:
                     continue
                 destinations = gate_data.get("destinations")
                 if isinstance(destinations, dict) and destinations:
@@ -435,6 +637,7 @@ class SystemMapEditor:
 
     def reload_systems_data(self):
         self.systems = {}
+        self.valid_hull_keys = load_valid_hull_keys()
         self.load_systems()
         self.clear_selection()
         self.redraw_map()
@@ -504,6 +707,8 @@ class SystemMapEditor:
             "Re-generate Ship Data",
             "Ship data re-generation completed.",
         )
+        self.valid_hull_keys = load_valid_hull_keys()
+        self.reload_systems_data()
 
     def create_new_system(self):
         top = tk.Toplevel(self.root)
@@ -551,7 +756,15 @@ class SystemMapEditor:
             self.systems[filename] = self._normalize_system_record(template)
 
             self.redraw_map()
-            SystemEditor.open_system_editor(file_path)
+            editor_window = SystemEditor.open_system_editor(file_path)
+            if editor_window is not None:
+                def _refresh_after_editor_close(close_event, target=filename, window=editor_window):
+                    if close_event.widget is not window:
+                        return
+                    if self._refresh_system_record_from_disk(target):
+                        self.redraw_map()
+
+                editor_window.bind("<Destroy>", _refresh_after_editor_close, add="+")
             top.destroy()
 
         tk.Button(top, text="Add", command=add_system).pack(pady=10)
@@ -625,6 +838,7 @@ class SystemMapEditor:
         self.systems = {}
         self.borders = []
         self.texts = []
+        self.valid_hull_keys = load_valid_hull_keys()
         self.pan_offset_x = 600
         self.pan_offset_y = 400
         # Initialize SCALE to sweet spot selected by user
@@ -744,8 +958,11 @@ class SystemMapEditor:
 
     def system_has_invalid_destination(self, filename, gate_index, system_name_map):
         system = self.systems.get(filename, {})
+        incoming_only_gates = system.get("incoming_only_gates", set())
         for jp in system.get("jump_points", []):
             if jp.get("type") not in ("jumpnode", "jumppoint"):
+                continue
+            if str(jp.get("name", "")).strip().casefold() in incoming_only_gates:
                 continue
             destinations = jp.get("destinations")
             if not isinstance(destinations, dict) or not destinations:
@@ -784,11 +1001,20 @@ class SystemMapEditor:
             else:
                 img_id = self.canvas.create_oval(sx-half, sy-half, sx+half, sy+half, fill="grey", tags=("map",))
 
+            indicator_items = []
             if self.system_has_invalid_destination(filename, gate_index, system_name_map):
                 ring_r = half + 6
-                self.canvas.create_oval(
+                ring_id = self.canvas.create_oval(
                     sx - ring_r, sy - ring_r, sx + ring_r, sy + ring_r,
                     outline="yellow", width=3, tags=("map",)
+                )
+                indicator_items.append(ring_id)
+
+            if system.get("has_invalid_station_hull"):
+                cross_r = max(18, int(half * 0.72))
+                cross_w = max(3, int(size / 28))
+                indicator_items.extend(
+                    draw_red_cross(self.canvas, sx, sy, cross_r, cross_w, ("map",))
                 )
 
             # Position label below icon
@@ -796,7 +1022,7 @@ class SystemMapEditor:
             text_id = self.canvas.create_text(sx, text_y, text=filename.replace(".json", ""), fill="white", tags=("map",))
 
             # Store canvas items for dragging
-            system["canvas_items"] = [img_id, text_id]
+            system["canvas_items"] = [img_id, *indicator_items, text_id]
 
     def draw_jump_links(self):
         system_names = {filename.replace(".json", "").lower(): filename for filename in self.systems.keys()}
@@ -807,8 +1033,11 @@ class SystemMapEditor:
         links = []
 
         for src_filename, system in self.systems.items():
+            incoming_only_gates = system.get("incoming_only_gates", set())
             for jp in system["jump_points"]:
                 if jp.get("type") not in ["jumppoint", "jumpnode"]:
+                    continue
+                if str(jp.get("name", "")).strip().casefold() in incoming_only_gates:
                     continue
                 destinations = jp.get("destinations", {})
                 for dest_system in destinations.values():
@@ -1125,7 +1354,17 @@ class SystemMapEditor:
         system_hit = self._find_system_hit(event.x, event.y, radius=30)
         if system_hit:
             file_path = self._get_system_file_path(system_hit["filename"])
-            SystemEditor.open_system_editor(file_path)
+            editor_window = SystemEditor.open_system_editor(file_path)
+            if editor_window is not None:
+                target = system_hit["filename"]
+
+                def _refresh_after_editor_close(close_event, filename=target, window=editor_window):
+                    if close_event.widget is not window:
+                        return
+                    if self._refresh_system_record_from_disk(filename):
+                        self.redraw_map()
+
+                editor_window.bind("<Destroy>", _refresh_after_editor_close, add="+")
             return
         # Select text node
         text_hit = self._find_text_node_hit(event.x, event.y, radius=60)
@@ -1463,6 +1702,36 @@ class SystemMapEditor:
         top = tk.Toplevel(self.root)
         top.title(f"Edit System: {filename}")
 
+        # System name / file rename
+        tk.Label(top, text="System Name:").pack(anchor="w")
+        name_frame = tk.Frame(top)
+        name_frame.pack(fill=tk.X)
+        system_name_var = tk.StringVar(value=self._system_name_from_filename(filename))
+        tk.Entry(name_frame, textvariable=system_name_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+
+        def rename_current_system(show_message=True):
+            nonlocal filename, system
+            old_filename = filename
+            try:
+                new_filename = self.rename_system(filename, system_name_var.get())
+            except (ValueError, FileExistsError, FileNotFoundError, OSError) as exc:
+                messagebox.showerror("Rename System", str(exc), parent=top)
+                system_name_var.set(self._system_name_from_filename(filename))
+                return False
+
+            filename = new_filename
+            system = self.systems[filename]
+            system_name_var.set(self._system_name_from_filename(filename))
+            top.title(f"Edit System: {filename}")
+            if show_message and new_filename != old_filename:
+                try:
+                    top.bell()
+                except tk.TclError:
+                    pass
+            return True
+
+        tk.Button(name_frame, text="Rename", command=rename_current_system).pack(side=tk.LEFT)
+
         # Coordinates
         tk.Label(top, text="Coordinates (X,Y,Z):").pack(anchor="w")
         coord_frame = tk.Frame(top)
@@ -1632,6 +1901,9 @@ class SystemMapEditor:
         ttk.Entry(meta_frame, textvariable=all_authors_var, state="readonly", width=60).grid(row=2, column=1, columnspan=3, sticky="w", padx=5)
 
         def save_system_changes():
+            if not rename_current_system(show_message=False):
+                return
+
             def _merge_with_extras(selected, existing, known):
                 extras = [x for x in (existing or []) if x not in known]
                 for x in extras:

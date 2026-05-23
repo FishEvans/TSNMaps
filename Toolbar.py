@@ -316,7 +316,8 @@ class Toolbar:
         return "ZONE"
 
     def gen_zone_name(self, zone_type: str = ZONE_TYPE_FCS) -> str:
-        existing = {str(name) for name in self.sm.list_objects()}
+        existing = {str(name) for name in self.sm.list_terrain()}
+        existing.update(str(name) for name in self.sm.list_objects())
         prefix = self.default_zone_prefix(zone_type)
         pattern = re.compile(rf'^{re.escape(prefix)}\s*(\d+)$', re.IGNORECASE)
         used_numbers = []

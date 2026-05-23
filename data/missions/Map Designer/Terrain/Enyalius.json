@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        34826.26861792772,
+        34826.26861792774,
         0,
-        14874.997685367196
+        14874.997685367189
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -335,39 +335,6 @@
                 "Medics": 2
             },
             "description": ""
-        },
-        "FCS1": {
-            "type": "fcs_zone",
-            "coordinate": [
-                131701.6850036641,
-                0,
-                -40781.935726190066
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS2": {
-            "type": "fcs_zone",
-            "coordinate": [
-                2079.0069196272325,
-                0,
-                -89570.07923423882
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS3": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -44450.14863434874,
-                0,
-                -96840.60145812866
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -601,6 +568,28 @@
             "composition": [
                 "Ast. Std Rand"
             ]
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                131701.6850036641,
+                0,
+                -40781.935726190066
+            ],
+            "radius": 6155,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,155 units. Local nebular density index: 10.8. Source field: 1766359058018. Survey profile: hydrogen-rich vapor with low metallic dust; field stability stable; collector saturation estimate 52%. Telemetry confidence: limited. Hold station near the inner third for the cleanest skim.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                2079.0069196272325,
+                0,
+                -89570.07923423882
+            ],
+            "radius": 6408,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,408 units. Local nebular density index: 9.7. Source field: 1766359058018. Survey profile: hydrogen-rich vapor with low metallic dust; field stability lightly turbulent; collector saturation estimate 36%. Telemetry confidence: limited. Cycle filters often; particulate load may spike without warning.",
+            "hideonmap": false
         }
     },
     "traffic": {}

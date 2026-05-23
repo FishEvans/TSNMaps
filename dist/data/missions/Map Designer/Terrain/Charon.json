@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -5412.440318274784,
+        -5412.440318274773,
         0,
-        5217.143807263157
+        5217.1438072631545
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -701,39 +701,6 @@
             "teams": {},
             "description": "",
             "hideonmap": true
-        },
-        "FCS1": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -77550.30155032691,
-                0,
-                -47207.22874548868
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS2": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -118901.94261658013,
-                0,
-                56660.862276335465
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS3": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -40709.332552880864,
-                0,
-                -75465.69308723991
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -1103,6 +1070,28 @@
             "density": 125,
             "scatter": 10000,
             "composition": []
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -77550.30155032691,
+                0,
+                -47207.22874548868
+            ],
+            "radius": 7407,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 7,407 units. Local nebular density index: 22.6. Source field: 1766340487534. Survey profile: cool deuterium traces threaded through ionized gas; field stability lightly turbulent; collector saturation estimate 62%. Telemetry confidence: moderate. Cycle filters often; particulate load may spike without warning.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -118901.94261658013,
+                0,
+                56660.862276335465
+            ],
+            "radius": 6004,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,004 units. Local nebular density index: 5.1. Source field: 1766339055111. Survey profile: volatile ice fines suspended in a quiet plasma band; field stability uneven but workable; collector saturation estimate 71%. Telemetry confidence: limited. Cycle filters often; particulate load may spike without warning.",
+            "hideonmap": false
         }
     },
     "traffic": {}

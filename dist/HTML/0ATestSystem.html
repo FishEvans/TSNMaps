@@ -1,0 +1,830 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0ATestSystem.html</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        html, body { margin: 0; height: 100%; background: black; color: white; }
+        /* === Description typography controls ===
+           Tweak these two variables to change description sizes globally */
+        :root {
+            --desc-font-size: 130%;
+            --hull-desc-font-size: 130%;
+            --panel-bg: #24272d;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --toolbar-bg: rgba(12, 14, 18, 0.92);
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --mobile-toolbar-height: 58px;
+        }
+        body { display: flex; height: 100vh; overflow: hidden; position: relative; }
+        .desc-text { font-size: var(--desc-font-size); margin-top: 8px; }
+        .hull-desc { font-size: var(--hull-desc-font-size); margin-top: 5px; color: #ccc; }
+        .info-title { font-size: 26px; font-weight: bold; text-align: center; margin: 2px 0 6px; }
+        .info-desc { font-size: 16px; color: #fff; }
+        .info-meta { font-size: 12px; color: #ccc; }
+        .info-meta-block { margin-bottom: 6px; }
+        .info-section { margin-top: 6px; }
+        #controls, #info {
+            background: linear-gradient(180deg, rgba(43, 47, 56, 0.98), rgba(28, 31, 38, 0.98));
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            scrollbar-gutter: stable;
+        }
+        #controls { flex: 1; min-width: 220px; max-width: 350px; }
+        #plot {
+            flex: 3;
+            min-width: 0;
+            position: relative;
+            touch-action: none;
+            background:
+                radial-gradient(circle at top, rgba(0, 188, 212, 0.12), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 196, 0, 0.08), transparent 34%),
+                #050608;
+        }
+        #info {
+            flex: 1;
+            min-width: 240px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+        #mobile-toolbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            height: var(--mobile-toolbar-height);
+            padding: env(safe-area-inset-top, 0) 12px 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--toolbar-border);
+            box-sizing: border-box;
+            align-items: center;
+            gap: 10px;
+        }
+        #mobile-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mobile-toggle {
+            width: auto;
+            min-width: 86px;
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+        #panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(3, 5, 9, 0.58);
+            backdrop-filter: blur(3px);
+        }
+        #grid-readout {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        #author-tooltip {
+            position: absolute;
+            display: none;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+        }
+        h2.header { margin-top: 0; margin-bottom: 5px; text-align: center; }
+        h3.subheader { margin-top: 0; margin-bottom: 15px; text-align: center; color: #ccc; }
+        .alignment-image { display: block; max-width: 100%; height: auto; margin: 10px auto; }
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: rgba(54, 54, 54, 0.94);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 8px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 999px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+        button:hover,
+        button:focus-visible {
+            transform: translateY(-1px);
+            filter: brightness(1.06);
+            outline: none;
+        }
+        button.header {
+            background: #444;
+            cursor: default;
+            font-size: 24px;
+            border-radius: 10px;
+            transform: none;
+            filter: none;
+        }
+        #search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+        #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        @media (max-width: 900px) {
+            body { display: block; }
+            #mobile-toolbar { display: flex; }
+            #controls, #info {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                width: min(86vw, 360px);
+                max-width: none;
+                min-width: 0;
+                padding:
+                    calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0) + 12px)
+                    14px
+                    calc(18px + env(safe-area-inset-bottom, 0));
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+                transition: transform 0.24s ease;
+            }
+            #controls {
+                left: 0;
+                border-right: 1px solid var(--panel-border);
+                transform: translateX(-104%);
+            }
+            #info {
+                right: 0;
+                border-left: 1px solid var(--panel-border);
+                transform: translateX(104%);
+            }
+            body.drawer-left-open #controls { transform: translateX(0); }
+            body.drawer-right-open #info { transform: translateX(0); }
+            body.drawer-left-open #panel-overlay,
+            body.drawer-right-open #panel-overlay { display: block; }
+            #plot {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            .info-title { font-size: 22px; }
+            .info-desc, .desc-text, .hull-desc { font-size: 15px; }
+            button { font-size: 17px; }
+            button.header { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mobile-toolbar">
+        <button id="mobile-controls-btn" class="mobile-toggle" type="button">Objects</button>
+        <div id="mobile-title">0ATestSystem</div>
+        <button id="mobile-info-btn" class="mobile-toggle" type="button">Info</button>
+    </div>
+    <div id="panel-overlay"></div>
+    <div id="controls">
+        <div id="gm-controls" style="margin-bottom:10px;"></div>
+        <h2 class="header">0ATestSystem</h2>
+        <h3 class="subheader">Alignment: USFP</h3>
+        <img src="Images/Factions/USFP.png" alt="Alignment Logo" class="alignment-image" onerror="this.style.display='none';">
+
+        <input type="text" id="search-box" placeholder="Search objects...">
+        <div id="object-buttons">
+    </div>
+    </div>
+    <div id="plot"></div>
+    <div id="info">
+        <img src="Images/Compass.png" alt="Compass" style="display:block; max-width:100%; height:auto; margin-bottom:10px;">
+        <button id="galactic-map-btn" title="Back to Galactic Map">Show Galactic Map</button>
+        Loading system info...
+    </div>
+<script>
+    var objData = {"Test Black Hole": {"type": "blackhole", "x": -60000.0, "y": -10000.0, "grid": "L09"}, "starbase_command": {"type": "station", "x": 0.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_command", "hull": "starbase_command", "facilities": [], "sides": ["USFP"], "hullName": "Command Starbase", "hullImage": "Images/Ships/tsn-big-base256.png", "hullDescription": "Command Starbase is catalogued as a station aligned with TSN. No formal database description is currently available."}, "starbase_civil": {"type": "station", "x": 1000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_civil", "hull": "starbase_civil", "facilities": [], "sides": ["USFP"], "hullName": "Civilian Starbase", "hullImage": "Images/Ships/civil_station256.png", "hullDescription": "Civilian Starbase is catalogued as a station aligned with USFP. No formal database description is currently available."}, "starbase_industry": {"type": "station", "x": 2000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_industry", "hull": "starbase_industry", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Starbase", "hullImage": "Images/Ships/industry_station256.png", "hullDescription": "Industrial Starbase is catalogued as a station aligned with USFP. No formal database description is currently available."}, "starbase_science": {"type": "station", "x": 3000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_science", "hull": "starbase_science", "facilities": [], "sides": ["USFP"], "hullName": "Science Starbase", "hullImage": "Images/Ships/science_station256.png", "hullDescription": "Science Starbase is catalogued as a station aligned with USFP. No formal database description is currently available."}, "starbase_arvonian": {"type": "station", "x": 4000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_arvonian", "hull": "starbase_arvonian", "facilities": [], "sides": ["USFP"], "hullName": "Arvonian Base", "hullImage": "Images/Ships/arvonian_station256.png", "hullDescription": "Duchess Class Mixed-Use Space Station. Depending on configuration, it can support both civilian and military power. In either case, it can house up to several wings of defence fighters and has a single modest defensive beam turret."}, "starbase_skaraan": {"type": "station", "x": 5000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_skaraan", "hull": "starbase_skaraan", "facilities": [], "sides": ["USFP"], "hullName": "Skaraan Base", "hullImage": "Images/Ships/skaraan_station256.png", "hullDescription": "Standard Model Skarran Military Post. This modular design is mass-produced with several configurations for widely separate uses. Designed for use by various Skarran war mercenary groups. The base model is unremarkable, but it has an extensive module bay that may hold additional abilities depending on the owner's purse."}, "starbase_torgoth": {"type": "station", "x": 6000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_torgoth", "hull": "starbase_torgoth", "facilities": [], "sides": ["USFP"], "hullName": "Torgoth Base", "hullImage": "Images/Ships/torgoth_station256.png", "hullDescription": "Chieftain Class Torgoth Base. As per Torgoth doctrine, it has some of the heaviest shields known and an armored hull to boot. It has a relatively wimpy single beam, however, but comes equipped with a drone launcher."}, "starbase_kralien": {"type": "station", "x": 7000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "starbase_kralien", "hull": "starbase_kralien", "facilities": [], "sides": ["USFP"], "hullName": "Kralien Base", "hullImage": "Images/Ships/kralien_station256.png", "hullDescription": "Collection Class Space Station. This mass-produced design is made for cheap manufacture and even quicker assembly on site. This station can be found throughout Hegemony space as a cost-effective station for all but the most specialist requirements."}, "defense_platform_beam": {"type": "platform", "x": 8000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "defense_platform_beam"}, "defense_platform_torp": {"type": "platform", "x": 9000.0, "y": 0.0, "grid": "M12", "hidden": false, "label": "defense_platform_torp"}, "defense_platform_fighter": {"type": "platform", "x": 0.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "defense_platform_fighter"}, "usfp_industrial_unit": {"type": "platform", "x": 1000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_unit"}, "usfp_industrial_refinary": {"type": "platform", "x": 2000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_refinary"}, "usfp_industrial_processor": {"type": "platform", "x": 3000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_processor"}, "usfp_industrial_assembly": {"type": "platform", "x": 4000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_assembly"}, "hegemony_fighter_platform": {"type": "platform", "x": 5000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "hegemony_fighter_platform"}, "hegemony_beam_platform": {"type": "platform", "x": 6000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "hegemony_beam_platform"}, "defense_platform_beam (station)": {"type": "station", "x": 7000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "defense_platform_beam (station)", "hull": "defense_platform_beam", "facilities": [], "sides": ["USFP"], "hullName": "LR Beam Platform", "hullImage": "Images/Ships/TSN Mod/USFP/DefensePlatBeam256.png", "hullDescription": "The Vorkosican Class Beam Platform offers a stable power supply for some of the longest-range beams the USFP knows how to construct. Often found at sites of particular importance to the USFP, its design was stolen a number of years ago."}, "defense_platform_torp (station)": {"type": "station", "x": 8000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "defense_platform_torp (station)", "hull": "defense_platform_torp", "facilities": [], "sides": ["USFP"], "hullName": "Torpedo Platform", "hullImage": "Images/Ships/TSN Mod/USFP/DefensePlatTorp256.png", "hullDescription": "Defensive torpedo battery. Has a large supply of standardised torpedoes. Not especially threatening to a military ship, but very persistent and has a wide area of influence."}, "defense_platform_fighter (station)": {"type": "station", "x": 9000.0, "y": 1000.0, "grid": "M12", "hidden": false, "label": "defense_platform_fighter (station)", "hull": "defense_platform_fighter", "facilities": [], "sides": ["USFP"], "hullName": "Fighter Platform", "hullImage": "Images/Ships/TSN Mod/USFP/DefensePlatFighter256.png", "hullDescription": "The Allard Industries Fighter Platform is a high-tech mini station designed exclusively as a defensive or patrol point base for light in-system shuttles and combat craft. Often used by the USFP Customs Agency at borders to house inspection craft or at military facilities to provide a greater patrol and defence installation than torpedo or beam batteries."}, "usfp_industrial_unit (station)": {"type": "station", "x": 0.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_unit (station)", "hull": "usfp_industrial_unit", "facilities": [], "sides": ["USFP"], "hullName": "Industrial Unit", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialUnit256.png", "hullDescription": "Unity Class Industrial Unit. This is basically a large box where all sorts of additive and reductive processing occurs to produce components or finished items. Typically has a large wing for design."}, "usfp_industrial_storage": {"type": "station", "x": 1000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_storage", "hull": "usfp_industrial_storage", "facilities": [], "sides": ["USFP"], "hullName": "Storage Module", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialStorage256.png", "hullDescription": "This is a storage area for nearby stations and industrial facilities. Rarely has anything more than a basic docking system and is typically private."}, "usfp_industrial_refinary (station)": {"type": "station", "x": 2000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_refinary (station)", "hull": "usfp_industrial_refinary", "facilities": [], "sides": ["USFP"], "hullName": "Refinary Unit", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialRefinary256.png", "hullDescription": "This large unit is designed to break down raw asteroids into useful materials; half of the USFP is built from outputs of units like this."}, "usfp_industrial_processor (station)": {"type": "station", "x": 3000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_processor (station)", "hull": "usfp_industrial_processor", "facilities": [], "sides": ["USFP"], "hullName": "Processor Unit", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialProcessor256.png", "hullDescription": "The Theros Type Industrial Processor, useful for creating many types of components out of refined bar stock, or simply the industrial-scale manufacturing of simple items."}, "usfp_industrial_assembly (station)": {"type": "station", "x": 4000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "usfp_industrial_assembly (station)", "hull": "usfp_industrial_assembly", "facilities": [], "sides": ["USFP"], "hullName": "Assembly Yard", "hullImage": "Images/Ships/TSN Mod/USFP/IndustrialAssembler256.png", "hullDescription": "This is a Bidilin Class modular Industrial Assembly Unit. It specialises in final assembly of goods from components, from home appliances to lab equipment to even small spacecraft. This unit can be configured for a wide range of applications."}, "usfp_shipyard": {"type": "station", "x": 5000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "usfp_shipyard", "hull": "usfp_shipyard", "facilities": [], "sides": ["USFP"], "hullName": "Ship Yard", "hullImage": "Images/Ships/TSN Mod/USFP/ShipYard256.png", "hullDescription": "ARC-class shipyard \u2014 Auxiliary Refit and Construction \u2014 A modular support platform designed for the assembly, repair, and modernization of military and commercial spacecraft. The class features expandable drydock frames, heavy fabrication gantries, stores modules, and reactor service booms."}, "pirate_military_base": {"type": "station", "x": 6000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "pirate_military_base", "hull": "pirate_military_base", "facilities": [], "sides": ["USFP"], "hullName": "Pirate Base", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateBaseAst256.png", "hullDescription": "Built into an asteroid, this base has a lot of the features of a normal commercial space station, without the safety regs. It appears to have a small fighter bay and a modular mount for other defences."}, "pirate_cache_1": {"type": "station", "x": 7000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "pirate_cache_1", "hull": "pirate_cache_1", "facilities": [], "sides": ["USFP"], "hullName": "Cache", "hullImage": "Images/Ships/TSN Mod/Pirate/PirateCache256.png", "hullDescription": "This is a small storage location often used for storing loot and supplies. Has minimal life support capacity and limited defences."}, "hegemony_generator": {"type": "station", "x": 8000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "hegemony_generator", "hull": "hegemony_generator", "facilities": [], "sides": ["USFP"], "hullName": "Generator", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegGen256.png", "hullDescription": "A high-powered generator. This unit can be modified in a number of ways for various purposes, all of them requiring high amounts of energy. It can remotely beam power to nearby ships or structures, or in some instances be used by onboard equipment."}, "arvonian_platform": {"type": "station", "x": 9000.0, "y": 2000.0, "grid": "M12", "hidden": false, "label": "arvonian_platform", "hull": "arvonian_platform", "facilities": [], "sides": ["USFP"], "hullName": "Platform", "hullImage": "Images/Ships/TSN Mod/Hegemony/ArvonianPlatform256.png", "hullDescription": "Arvonian Fighter Platform. Contains maintenance, barracks, and command facilities for a large wing of small fighters or bombers. This variant is optimised for Arvonian use."}, "hegemony_gasextractor": {"type": "station", "x": 0.0, "y": 3000.0, "grid": "M12", "hidden": false, "label": "hegemony_gasextractor", "hull": "hegemony_gasextractor", "facilities": [], "sides": ["USFP"], "hullName": "Gas Extractor", "hullImage": "Images/Ships/TSN Mod/Hegemony/GasExtractor256.png", "hullDescription": "This Industrial Facility is Torgoth in origin; however, it has been co-opted by the Hegemony factions at large. It is designed to extract materials from nebulae for use in many industrial processes."}, "hegemony_drydock": {"type": "station", "x": 1000.0, "y": 3000.0, "grid": "M12", "hidden": false, "label": "hegemony_drydock", "hull": "hegemony_drydock", "facilities": [], "sides": ["USFP"], "hullName": "Dry Dock", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegDryDock256.png", "hullDescription": "A Hegemony-designed docking facility for the construction, overhaul, and repair of Hegemony spaceships."}, "hegemony_fighter_platform (station)": {"type": "station", "x": 2000.0, "y": 3000.0, "grid": "M12", "hidden": false, "label": "hegemony_fighter_platform (station)", "hull": "hegemony_fighter_platform", "facilities": [], "sides": ["USFP"], "hullName": "Light Craft Base", "hullImage": "Images/Ships/TSN Mod/Hegemony/ArvonianPlatform256.png", "hullDescription": "The Hive Class Light Craft Platform is of Arvonian origin; however, it has been deployed throughout Hegemony space wherever a volume of space needs to be defended or patrolled."}, "hegemony_beam_platform (station)": {"type": "station", "x": 3000.0, "y": 3000.0, "grid": "M12", "hidden": false, "label": "hegemony_beam_platform (station)", "hull": "hegemony_beam_platform", "facilities": [], "sides": ["USFP"], "hullName": "Beam Defense", "hullImage": "Images/Ships/TSN Mod/Hegemony/HegBeamPlatform256.png", "hullDescription": "Kralien in manufacture, this is a standardised beam defence platform that can be found in all territories of the Hegemony. 5 x 1.2G beams are its typical loadout, but it is designed with some upgradability in mind."}, "FCS1": {"type": "fcs_zone", "zoneLabel": "Fuel Collection Zone", "x": -39784.95886737617, "y": -10128.03648390529, "grid": "L10", "hidden": false, "label": "FCS1", "radius": 11212, "description": "Auto-surveyed fuel collection zone. Estimated radius: 11,212 units. Local nebular density index: 158.5. Source field: Test Nebula. Survey profile: thin helium wash over denser collection pockets; field stability stable; collector saturation estimate 61%. Telemetry confidence: high. Keep condenser temperature margins high during extended collection."}};
+    var systemMeta = {"system_name": "0ATestSystem", "description": "Autogenerated TestSystem. Generated 2026-04-25. Stations: 25. Platforms: 9. Statics: 17. Terrain: 4.", "exports": [], "assets": [], "focus": "", "intel": {"pirate": "Low", "enemy": "Low"}, "original_author": "", "last_author": "", "revision_number": 1, "version_tag": "16526.1", "all_authors": []};
+    var pageBody = document.body;
+        console.log("[DEBUG JS] objData keys:", Object.keys(objData));
+        console.log("[DEBUG JS] objData sample:", objData[Object.keys(objData)[0]]);
+
+    function isMobileLayout() {
+        return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function closePanels() {
+        pageBody.classList.remove('drawer-left-open', 'drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openControlsPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-left-open');
+        pageBody.classList.remove('drawer-right-open');
+        syncMobileToggles();
+    }
+
+    function openInfoPanel() {
+        if (!isMobileLayout()) return;
+        pageBody.classList.add('drawer-right-open');
+        pageBody.classList.remove('drawer-left-open');
+        syncMobileToggles();
+    }
+
+    function toggleControlsPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-left-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-left-open');
+        }
+        syncMobileToggles();
+    }
+
+    function toggleInfoPanel() {
+        if (!isMobileLayout()) return;
+        var willOpen = !pageBody.classList.contains('drawer-right-open');
+        closePanels();
+        if (willOpen) {
+            pageBody.classList.add('drawer-right-open');
+        }
+        syncMobileToggles();
+    }
+
+    function syncMobileToggles() {
+        var controlsBtn = document.getElementById('mobile-controls-btn');
+        var infoBtn = document.getElementById('mobile-info-btn');
+        if (!controlsBtn || !infoBtn) return;
+        controlsBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-left-open') ? 'true' : 'false');
+        infoBtn.setAttribute('aria-expanded', pageBody.classList.contains('drawer-right-open') ? 'true' : 'false');
+    }
+
+    function safeText(value, fallback) {
+        if (value === undefined || value === null || value === '') return fallback;
+        return value;
+    }
+
+    function listOrNone(list) {
+        return (list && list.length) ? list.join(', ') : 'None';
+    }
+
+    function getDefaultInfo() {
+        var html = '';
+        html += '<div class="info-title">' + safeText(systemMeta.system_name, 'Unknown System') + '</div>';
+        var origAuthor = safeText(systemMeta.original_author, 'Unknown');
+        var lastAuthor = safeText(systemMeta.last_author, '');
+        var authorLine = origAuthor;
+        if (lastAuthor && lastAuthor !== origAuthor) {
+            authorLine = origAuthor + ' & ' + lastAuthor;
+        }
+        var allAuthors = (systemMeta.all_authors && systemMeta.all_authors.length)
+            ? systemMeta.all_authors.join(', ')
+            : authorLine;
+        var focus = safeText(systemMeta.focus, 'None');
+        var exportsText = listOrNone(systemMeta.exports);
+        var pirate = (systemMeta.intel && systemMeta.intel.pirate) ? systemMeta.intel.pirate : 'Unknown';
+        var enemy = (systemMeta.intel && systemMeta.intel.enemy) ? systemMeta.intel.enemy : 'Unknown';
+        var assets = (systemMeta.assets && systemMeta.assets.length) ? systemMeta.assets : [];
+        html += '<div class="info-meta-block author-hover" data-authors="' + allAuthors + '">';
+        html += '<div class="info-meta">Cartographers: ' + authorLine + '</div>';
+        html += '<div class="info-meta">Version: ' + safeText(systemMeta.version_tag, 'unknown') + '</div>';
+        html += '</div>';
+        html += '<div class="info-desc">' + (systemMeta.description || 'No description available.') + '</div>';
+        html += '<div class="info-section"><strong>System Focus:</strong> ' + focus + '</div>';
+        html += '<div class="info-section"><strong>Intel:</strong></div>';
+        html += '<div>' +
+            '<img src="Images/SysBadges/' + pirate + 'Pirate.png" width="50" height="50" alt="' + pirate + ' Pirate" /> ' +
+            '<img src="Images/SysBadges/' + enemy + 'Enemy.png" width="50" height="50" alt="' + enemy + ' Enemy" />' +
+            '</div>';
+        html += '<div>Pirate Activity: ' + pirate + '</div>';
+        html += '<div>Enemy Activity: ' + enemy + '</div>';
+        html += '<div class="info-section"><strong>Important Assets:</strong></div>';
+        html += '<div class="asset-icons">' +
+            assets.map(function(a) {
+                return '<img src="Images/SysBadges/' + a + '.png" width="50" height="50" alt="' + a + '" title="' + a + '" />';
+            }).join('') +
+            '</div>';
+        html += '<div class="asset-text">' +
+            assets.map(function(a) { return '<div>' + a + '</div>'; }).join('') +
+            '</div>';
+        html += '<div class="info-section"><strong>Exports:</strong> ' + exportsText + '</div>';
+        return html;
+    }
+
+    function bindGalacticButton() {
+        var btn = document.getElementById('galactic-map-btn');
+        if (btn) {
+            btn.onclick = function() {
+                window.location.href = 'index.html';
+            };
+        }
+    }
+
+    function setDefaultInfo() {
+        document.getElementById('info').innerHTML = getInfoHeader() + getDefaultInfo();
+        bindGalacticButton();
+        attachAuthorHover();
+    }
+
+    function clearAnnotations() {
+        Plotly.relayout('plot', {annotations: []});
+        setDefaultInfo();
+    }
+    
+    function getInfoHeader() {
+    return '<img src="Images/Compass.png" alt="Compass" '
+         + 'style="display:block; max-width:100%; height:auto; margin-bottom:10px;">'
+         + '<button id="galactic-map-btn" title="Back to Galactic Map">Galactic Map</button>';
+        }
+    
+    function highlight(name) {
+        var obj = objData[name];
+        if (obj.hidden && !isGM()) {
+            alert("This object is not visible on the public map.");
+            return;
+        }
+        var annotation = {
+            x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
+            showarrow: true, arrowcolor: 'yellow', arrowwidth: 2,
+            arrowhead: 3, font: {color: 'yellow', size: 28}
+        };
+
+        Plotly.relayout('plot', {annotations: [annotation]});
+
+        var label = obj.label || name;
+        var infoHtml = '<span style="font-size:20pt;">' + label + '</span><br>';
+        infoHtml += '<b>Location:</b> ' + obj.grid + '<br>';
+
+        if (obj.type === 'station') {
+            // Station selected: display detailed station info
+            if (obj.hullImage) {
+                infoHtml += '<img src="' + obj.hullImage + '" alt="Hull Art" style="max-width:48%; height:auto;">';
+            }
+            if (obj.sides && obj.sides.length > 0) {
+                infoHtml += '<img src="Images/Factions/' + obj.sides[0] + '.png" alt="Faction Logo" style="max-width:48%; height:auto;">';
+            }
+            infoHtml += '<b>Facilities:</b> ' + (obj.facilities.length ? obj.facilities.join(', ') : 'None') + '<br>';
+            if (obj.hullName && obj.hullImage) {
+                infoHtml += '<b>General Class:</b> ' + obj.hullName + '<br>';
+            }
+            if (obj.hullDescription) {
+                infoHtml += '<p class="hull-desc">' + obj.hullDescription + '</p>';
+            }
+        } 
+        else if ((obj.type === 'jump_point' || obj.type === 'jumppoint' || obj.type === 'jumpnode') && obj.destinations && typeof obj.destinations === 'object') {
+        
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+            infoHtml += '<br><br><b>Destinations:</b><br>';
+            for (const [target, label] of Object.entries(obj.destinations)) {
+                if (typeof target === 'string' && typeof label === 'string') {
+                    let file = label + '.html';
+                    // Correctly escape single quotes for JS string
+                    infoHtml += `<button onclick="window.open('${file}', '_blank')">${label}, ${target}</button>`;
+                }
+            }
+            }
+        else if (obj.type === 'sensor_relay') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            const relayType = obj.relayType || 'Sensor Relay';
+            infoHtml += '<b>Subtype:</b> ' + relayType + '<br>';
+            if (relayType === 'Warning Buoy') {
+                infoHtml += 'Warning buoy and hazard marker, Serial: ' + serial;
+                if (obj.broadcast) {
+                    infoHtml += '<br><b>Broadcast:</b> ' + obj.broadcast;
+                }
+                if (obj.ping !== undefined) {
+                    infoHtml += '<br><b>Ping:</b> ' + obj.ping;
+                }
+                if (obj.range !== undefined) {
+                    infoHtml += '<br><b>Range:</b> ' + obj.range;
+                }
+            } else {
+                infoHtml += 'Standard sensor and info relay buoy, Serial: ' + serial;
+            }
+        }
+        else if (obj.type === 'jumpnode' || obj.type === 'jumppoint') {
+            // Generate a random 5-character alphanumeric serial
+            const serial = Math.random().toString(36).substring(2, 7).toUpperCase();
+            infoHtml += 'Oliver Class jump stabilisation node. Serial: ' + serial;
+        }
+        else if (obj.type === 'planet') {
+            if (obj['class']) {
+                infoHtml += '<b>Class:</b> ' + obj['class'] + '<br>';
+            }
+        }
+        else if (obj.zoneLabel) {
+            infoHtml += '<b>Type:</b> ' + obj.zoneLabel + '<br>';
+            if (obj.radius !== undefined) {
+                infoHtml += '<b>Radius:</b> ' + obj.radius + '<br>';
+            }
+        }
+        else {
+            infoHtml += '<b>Type:</b> ' + obj.type;
+        }
+
+            // ——— append a description paragraph if one exists ———
+            if (obj.description) {
+                infoHtml += '<p class="desc-text">'
+                          + obj.description
+                          + '</p>';
+            }
+            document.getElementById('info').innerHTML = getInfoHeader() + infoHtml;
+            bindGalacticButton();
+            attachAuthorHover();
+            openInfoPanel();
+                + infoHtml;
+         
+    }
+         bindGalacticButton();
+    
+
+    var fig = {"data": [{"type": "scatter", "x": [-30000.0, -20000.0, -20000.0, -30000.0, -30000.0], "y": [-15000.0, -15000.0, -5000.0, -5000.0, -15000.0], "fill": "toself", "fillcolor": "rgba(165,42,42,1)", "line": {"shape": "spline", "color": "rgba(165,42,42,1)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-20822.93232109008, -24503.19258632582, -22251.56235115641, -27030.183512504373, -21836.974561474737, -19174.64028241694, -20086.760837795024, -13947.077661273224, -19843.98796631475, -31969.09140235911, -18384.69592021993, -20852.627585723098, -31511.833660036133, -22735.368262435768, -21260.80613988291, -19532.590370217604, -15252.30077516819, -22169.710049536046, -19708.343889937027, -26782.329817232945, -20903.813432979736, -23169.256759765874, -25695.643232832732, -27510.973703872995, -24324.520041079948, -22678.53972787183, -24464.665934449087, -18911.366846221666, -19091.615569804188, -22295.954020493224, -28303.211173222073, -33425.464406583145, -20878.764762517443, -28633.43988862667, -31967.902986425936, -19158.336279396266, -24179.403819013136, -24116.054595205045, -26249.939226701536, -33093.53400710986, -18409.65391130757, -22574.456176999905, -22782.7961002946, -20080.10413209925, -19215.321676154017, -26045.972106219542, -21490.018537446136, -21862.785639086593, -31166.909199050766, -28364.44223827758, -24265.191941154906, -27388.699931080617, -21850.90129270906, -20148.66098820525, -15754.422645299494, -26220.731359101086, -26038.962137191065, -25420.103859087118, -26851.3006940212, -33269.26427753151, -31055.603274356945, -18969.402868048932, -15264.631566074138, -31266.758650420612, -27001.882625667557, -31651.643064445652, -28425.67072327459, -20959.209589224818, -25194.923282467338, -33295.497050014776, -26335.18158941763, -14162.157236007582, -31409.40760045117, -26553.673142328364, -29697.553533779963, -28665.083938780812, -26316.20410909836, -25031.988272095754, -28070.15584828179, -25496.98177311687, -32707.075608599775, -28754.737309082582, -23366.47141907109, -31284.01401655221, -28072.097866168646, -37669.979652637965, -22108.729668990352, -31119.214551616304, -19640.860356230794, -22298.985319933046, -24004.607390655878, -27925.963159612947, -25281.57523715326, -37283.06736111254, -18434.359633694574, -21053.634505012804, -18955.453467732197, -20596.660116354517, -25898.38920202712, -21357.366273106447, -34667.28870193007, -22027.217164597056, -26514.424610731345, -25893.397395439017, -25945.952133603598, -22006.0950354864, -29757.453201707172, -17091.753168471627, -32463.733473567107, -26681.454912570945, -27032.59209928474, -23191.762902078106, -20319.0472618698, -19383.94475893142, -25817.78618689863, -30146.708179924135, -22043.16744066304, -21890.54243018784, -29122.11067368512, -27385.420946053044, -24400.261607064494, -19515.629041500742, -31439.59916319666, -17544.53303211347, -27975.114650665815, -26138.283055170035, -26786.366002223738, -25859.675559831445, -24938.537343536245, -26829.063165999916, -27917.677423405486, -32467.501206524732, -19120.25665107312, -28395.656915576033, -32278.15398989114, -24259.597797763578, -26744.978126777598, -21722.744558119488, -23026.200279202654, -19786.14884023569, -25215.455595018448, -28405.66327906381, -20631.202029339434, -26521.110435485363, -21599.473272515294, -22791.453220232954, -22225.516781779937, -26528.62967317708, -16355.611416534564, -27627.97692878502, -30317.653081771216, -25678.752179216124, -22329.7445959723, -26403.944828566746, -22330.962011709176, -18012.490555889803, -25403.31056745587, -24535.14841077652, -22836.10729807855, -31380.481443885754, -18593.88948388677, -26353.72949772121, -28675.30981289249, -26289.010000075414, -19312.691808941916, -29206.895826663902, -26750.010263593085, -29823.587186296616, -24239.4229576173, -24087.78946736447, -22528.50791090671, -25463.719073923006, -23540.11890480107, -27087.239595003462, -16842.17504408566, -15236.490709000467, -26445.30992072983, -29313.77227310554, -27872.68679727834, -24288.97066328884, -23535.031829797732, -28922.029463601484, -28315.09725221704, -29850.39929129099, -26376.828362341654, -27810.103037766723, -23133.290372575615, -21085.250266429448, -19277.62093399471, -25049.617939136577, -29747.590624164823, -23227.111117027376, -23786.21829254851, -27935.277590993795, -25027.437330520097, -25343.067703170662, -19574.725129080223, -30293.160784238993, -22089.41187389592, -22244.255110364727], "y": [-5795.029459921731, -9179.9263526592, -7377.565734096535, -12873.583537339577, -8782.874935034768, -11595.011655463895, -14663.092833350205, -9222.744904058607, -8385.693926308737, -7231.496847762549, -8080.111722912439, -9390.31150261238, -8584.42048496052, -9173.223923498093, -11432.724163783294, -13908.610946380522, -12258.185891967707, -10238.62558268986, -7232.844321942042, -8614.45633704244, -10615.43076345577, -18660.499194070362, -12233.928385619281, -6537.874934125478, -8364.535746730451, -7630.17059584647, -13507.574630784837, -8040.070925344427, -12257.010805056045, -7983.107155834925, -7124.23814624138, -5153.398401717924, -7440.4583832680155, -9662.98257171453, -4566.257170468164, -17409.121176363307, -7746.839737185259, -8331.014475509144, -16437.23096631407, -11374.80848339788, -5744.437725524916, -6599.08838478001, -9945.930785971248, -11944.120684812544, -12167.195972449297, -12027.3286046604, -12113.194045382419, -11160.655101158012, -12040.587356040825, -9440.848615795241, -13880.250121846298, -6802.110251878621, -9489.19266287417, -14205.741861382568, -7255.719166528483, -18743.41628381236, -13432.904409470342, -3735.659639851252, -9441.704729716708, -8335.072647289762, -7884.996736828838, -11473.222244263596, -6821.204944817657, -2279.9209912640536, -8608.27941801059, -12018.219675776125, -17473.795210336077, -12082.435539547861, -8340.291118839878, -13929.304595855148, -12639.463830939694, -12289.357849037115, -9784.865669158642, -9855.211732959026, -6248.5159797851375, -8715.74459926815, -5103.602861422746, -15291.12972831543, -12208.196488557413, -10503.656464111566, -11116.081445585913, -13503.48988422595, -17317.807500214338, -9230.798667537494, -13209.255459887569, -9978.989356363356, -16530.119282068114, -6833.939687213613, -7885.35103469977, -9296.65025014187, -7499.313948376996, -7188.900432729917, -9319.301989861338, -11119.076362622238, -3050.431776124823, -5531.015805433873, -15059.005625869258, -6264.754672162328, -10584.934129924784, -14132.321325924107, -11322.819664451185, -9306.796004776632, -12424.596440161473, -3550.5406927303484, -16236.849937853138, -12988.480055025298, -7920.114562077343, -8512.626823865077, -7233.680265669448, -2923.70063143243, -6000.866744213657, -13744.430913095772, -6045.859961172601, -14329.792146623338, -10632.421149011197, -6816.827961541254, -11768.00287338851, -12542.432691200667, -4735.2145373508865, -10289.445060345395, -11873.821970592977, -9142.264062722514, -14566.865579424899, -13015.915611148948, -10948.642131055347, -3961.0260531533404, -3357.5017701317147, -8850.05677772555, -10061.447521157112, -6664.847302530696, -14965.825127159904, -10282.669770915554, -13901.641949153522, -8246.851426873307, -4053.2466059237577, -12201.757262236575, -8569.220269425914, -8422.94409834053, -12543.469252956904, -5738.801472669734, -14921.384470809662, -12098.310305929408, -17014.582605847645, -11270.423640867995, -13445.161391191212, -7265.842506441449, -14426.27776687688, -4043.727929805973, -11976.461380378862, -8631.922500370893, -15087.56371581979, -9396.499825765028, -11705.252458864394, -12170.136620941921, -13292.945499830841, -10715.461150812149, -7281.362580386458, -10521.17620088318, -16442.186417742545, -5285.565972911101, -7555.939784961176, -11422.198754267813, -8242.583387249526, -10138.880280373598, -18507.842843297884, -12996.12834107071, -16226.630221300038, -14920.076001244193, -11732.516302978522, -9707.617597809993, -9933.92726104807, -9264.815458358693, -8278.89401665412, -11213.835143437102, -8976.416611522933, -13365.127365444316, -8069.5891799084875, -10246.144267629932, -10842.229601942227, -10794.409995675494, -6455.485134383966, -11673.642724442752, -9761.811238298891, -8361.889550692102, -10166.247732744294, -13812.814826602436, -9016.650436692378, -2304.7727085221386, -11564.183848355484, -12214.343694430292, -5549.3953102876285, -17088.57548612433, -10342.896132649224, -5845.682207982167, -6278.115582425138, -12204.611435362069, -11360.173507354295, -10187.755537064735, -9331.345161219628, -6904.291319098438], "mode": "markers", "marker": {"size": 2, "color": "#D8A25A", "opacity": 0.8}, "hoverinfo": "none"}, {"type": "scatter", "x": [-45000.0, -35000.0, -35000.0, -45000.0, -45000.0], "y": [-15000.0, -15000.0, -5000.0, -5000.0, -15000.0], "fill": "toself", "fillcolor": "rgba(128,0,128,1)", "line": {"shape": "spline", "color": "rgba(128,0,128,1)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-35822.932321090084, -39503.192586325815, -37251.56235115641, -42030.183512504365, -36836.97456147474, -34174.64028241694, -35086.76083779503, -28947.077661273222, -34843.98796631475, -46969.09140235911, -33384.69592021993, -35852.627585723094, -46511.83366003613, -37735.36826243577, -36260.8061398829, -34532.5903702176, -30252.30077516819, -37169.71004953604, -34708.34388993702, -41782.329817232945, -35903.81343297974, -38169.25675976587, -40695.643232832736, -42510.973703872995, -39324.52004107995, -37678.53972787183, -39464.66593444908, -33911.36684622167, -34091.61556980419, -37295.95402049323, -43303.21117322207, -48425.464406583145, -35878.76476251745, -43633.43988862667, -46967.902986425936, -34158.336279396266, -39179.40381901313, -39116.054595205045, -41249.939226701536, -48093.534007109854, -33409.65391130757, -37574.456176999905, -37782.7961002946, -35080.10413209925, -34215.32167615402, -41045.972106219546, -36490.018537446136, -36862.7856390866, -46166.909199050766, -43364.442238277574, -39265.19194115491, -42388.69993108062, -36850.90129270906, -35148.66098820525, -30754.42264529949, -41220.73135910109, -41038.96213719106, -40420.10385908712, -41851.3006940212, -48269.26427753151, -46055.603274356945, -33969.40286804893, -30264.631566074142, -46266.75865042061, -42001.88262566755, -46651.64306444565, -43425.67072327459, -35959.20958922482, -40194.92328246734, -48295.497050014776, -41335.181589417625, -29162.15723600758, -46409.40760045117, -41553.67314232836, -44697.55353377996, -43665.08393878081, -41316.204109098355, -40031.988272095754, -43070.15584828179, -40496.98177311687, -47707.07560859977, -43754.73730908258, -38366.471419071095, -46284.01401655221, -43072.097866168646, -52669.979652637965, -37108.72966899035, -46119.2145516163, -34640.8603562308, -37298.98531993305, -39004.60739065588, -42925.963159612955, -40281.57523715326, -52283.067361112546, -33434.35963369458, -36053.63450501281, -33955.4534677322, -35596.66011635451, -40898.38920202712, -36357.36627310645, -49667.28870193007, -37027.21716459705, -41514.424610731345, -40893.39739543902, -40945.9521336036, -37006.0950354864, -44757.453201707176, -32091.75316847163, -47463.7334735671, -41681.454912570945, -42032.59209928474, -38191.76290207811, -35319.0472618698, -34383.94475893142, -40817.78618689863, -45146.708179924135, -37043.16744066304, -36890.54243018784, -44122.110673685114, -42385.42094605304, -39400.261607064494, -34515.62904150074, -46439.59916319666, -32544.53303211347, -42975.11465066581, -41138.28305517003, -41786.36600222374, -40859.67555983144, -39938.53734353625, -41829.06316599991, -42917.67742340549, -47467.501206524736, -34120.25665107312, -43395.65691557603, -47278.153989891136, -39259.59779776358, -41744.9781267776, -36722.744558119484, -38026.200279202654, -34786.14884023569, -40215.455595018444, -43405.66327906382, -35631.20202933944, -41521.11043548536, -36599.47327251529, -37791.45322023295, -37225.51678177994, -41528.629673177085, -31355.611416534564, -42627.97692878502, -45317.65308177121, -40678.75217921613, -37329.744595972305, -41403.944828566746, -37330.962011709176, -33012.4905558898, -40403.31056745586, -39535.14841077652, -37836.107298078554, -46380.48144388576, -33593.88948388676, -41353.72949772121, -43675.30981289249, -41289.01000007541, -34312.69180894192, -44206.895826663895, -41750.01026359308, -44823.587186296616, -39239.4229576173, -39087.78946736447, -37528.507910906716, -40463.71907392301, -38540.11890480107, -42087.23959500346, -31842.175044085663, -30236.490709000464, -41445.30992072983, -44313.77227310554, -42872.68679727834, -39288.97066328885, -38535.03182979773, -43922.02946360148, -43315.09725221704, -44850.39929129099, -41376.82836234165, -42810.10303776672, -38133.29037257561, -36085.25026642945, -34277.62093399471, -40049.61793913658, -44747.590624164826, -38227.11111702738, -38786.21829254851, -42935.2775909938, -40027.4373305201, -40343.06770317066, -34574.72512908022, -45293.16078423899, -37089.41187389592, -37244.25511036472], "y": [-5795.029459921731, -9179.9263526592, -7377.565734096535, -12873.583537339577, -8782.874935034768, -11595.011655463895, -14663.092833350205, -9222.744904058607, -8385.693926308737, -7231.496847762549, -8080.111722912439, -9390.31150261238, -8584.42048496052, -9173.223923498093, -11432.724163783294, -13908.610946380522, -12258.185891967707, -10238.62558268986, -7232.844321942042, -8614.45633704244, -10615.43076345577, -18660.499194070362, -12233.928385619281, -6537.874934125478, -8364.535746730451, -7630.17059584647, -13507.574630784837, -8040.070925344427, -12257.010805056045, -7983.107155834925, -7124.23814624138, -5153.398401717924, -7440.4583832680155, -9662.98257171453, -4566.257170468164, -17409.121176363307, -7746.839737185259, -8331.014475509144, -16437.23096631407, -11374.80848339788, -5744.437725524916, -6599.08838478001, -9945.930785971248, -11944.120684812544, -12167.195972449297, -12027.3286046604, -12113.194045382419, -11160.655101158012, -12040.587356040825, -9440.848615795241, -13880.250121846298, -6802.110251878621, -9489.19266287417, -14205.741861382568, -7255.719166528483, -18743.41628381236, -13432.904409470342, -3735.659639851252, -9441.704729716708, -8335.072647289762, -7884.996736828838, -11473.222244263596, -6821.204944817657, -2279.9209912640536, -8608.27941801059, -12018.219675776125, -17473.795210336077, -12082.435539547861, -8340.291118839878, -13929.304595855148, -12639.463830939694, -12289.357849037115, -9784.865669158642, -9855.211732959026, -6248.5159797851375, -8715.74459926815, -5103.602861422746, -15291.12972831543, -12208.196488557413, -10503.656464111566, -11116.081445585913, -13503.48988422595, -17317.807500214338, -9230.798667537494, -13209.255459887569, -9978.989356363356, -16530.119282068114, -6833.939687213613, -7885.35103469977, -9296.65025014187, -7499.313948376996, -7188.900432729917, -9319.301989861338, -11119.076362622238, -3050.431776124823, -5531.015805433873, -15059.005625869258, -6264.754672162328, -10584.934129924784, -14132.321325924107, -11322.819664451185, -9306.796004776632, -12424.596440161473, -3550.5406927303484, -16236.849937853138, -12988.480055025298, -7920.114562077343, -8512.626823865077, -7233.680265669448, -2923.70063143243, -6000.866744213657, -13744.430913095772, -6045.859961172601, -14329.792146623338, -10632.421149011197, -6816.827961541254, -11768.00287338851, -12542.432691200667, -4735.2145373508865, -10289.445060345395, -11873.821970592977, -9142.264062722514, -14566.865579424899, -13015.915611148948, -10948.642131055347, -3961.0260531533404, -3357.5017701317147, -8850.05677772555, -10061.447521157112, -6664.847302530696, -14965.825127159904, -10282.669770915554, -13901.641949153522, -8246.851426873307, -4053.2466059237577, -12201.757262236575, -8569.220269425914, -8422.94409834053, -12543.469252956904, -5738.801472669734, -14921.384470809662, -12098.310305929408, -17014.582605847645, -11270.423640867995, -13445.161391191212, -7265.842506441449, -14426.27776687688, -4043.727929805973, -11976.461380378862, -8631.922500370893, -15087.56371581979, -9396.499825765028, -11705.252458864394, -12170.136620941921, -13292.945499830841, -10715.461150812149, -7281.362580386458, -10521.17620088318, -16442.186417742545, -5285.565972911101, -7555.939784961176, -11422.198754267813, -8242.583387249526, -10138.880280373598, -18507.842843297884, -12996.12834107071, -16226.630221300038, -14920.076001244193, -11732.516302978522, -9707.617597809993, -9933.92726104807, -9264.815458358693, -8278.89401665412, -11213.835143437102, -8976.416611522933, -13365.127365444316, -8069.5891799084875, -10246.144267629932, -10842.229601942227, -10794.409995675494, -6455.485134383966, -11673.642724442752, -9761.811238298891, -8361.889550692102, -10166.247732744294, -13812.814826602436, -9016.650436692378, -2304.7727085221386, -11564.183848355484, -12214.343694430292, -5549.3953102876285, -17088.57548612433, -10342.896132649224, -5845.682207982167, -6278.115582425138, -12204.611435362069, -11360.173507354295, -10187.755537064735, -9331.345161219628, -6904.291319098438], "mode": "markers", "marker": {"size": 4, "color": "#C24BFF", "opacity": 0.8}, "hoverinfo": "none"}, {"type": "scatter", "x": [-45000.0, -45042.77569313095, -45170.37086855466, -45380.60233744357, -45669.87298107781, -46033.233298543826, -46464.46609406726, -46956.192854956396, -47500.0, -48086.58283817455, -48705.9047744874, -49347.36903889974, -50000.0, -50652.63096110026, -51294.0952255126, -51913.41716182545, -52500.0, -53043.807145043604, -53535.53390593274, -53966.766701456174, -54330.12701892219, -54619.39766255643, -54829.62913144534, -54957.22430686905, -55000.0, -54957.22430686905, -54829.62913144534, -54619.39766255643, -54330.1270189222, -53966.766701456174, -53535.53390593274, -53043.807145043604, -52500.0, -51913.41716182545, -51294.0952255126, -50652.63096110026, -50000.0, -49347.36903889974, -48705.9047744874, -48086.58283817455, -47500.0, -46956.1928549564, -46464.46609406726, -46033.233298543826, -45669.87298107781, -45380.60233744357, -45170.37086855466, -45042.77569313095, -45000.0], "y": [-10000.0, -9347.369038899742, -8705.904774487397, -8086.582838174551, -7500.0, -6956.192854956396, -6464.466094067262, -6033.233298543824, -5669.872981077807, -5380.602337443566, -5170.370868554658, -5042.775693130948, -5000.0, -5042.775693130948, -5170.370868554658, -5380.602337443565, -5669.872981077807, -6033.233298543824, -6464.466094067262, -6956.192854956395, -7500.0, -8086.5828381745505, -8705.904774487395, -9347.36903889974, -10000.0, -10652.630961100258, -11294.095225512603, -11913.417161825448, -12499.999999999998, -13043.807145043604, -13535.533905932736, -13966.766701456174, -14330.127018922192, -14619.397662556436, -14829.629131445341, -14957.224306869051, -15000.0, -14957.224306869051, -14829.629131445341, -14619.397662556436, -14330.127018922194, -13966.766701456178, -13535.533905932738, -13043.807145043605, -12500.000000000002, -11913.417161825448, -11294.095225512609, -10652.630961100258, -10000.0], "fill": "toself", "fillcolor": "rgba(64,64,64,0.4)", "line": {"shape": "spline", "color": "rgba(64,64,64,0.4)", "width": 0}, "hoverinfo": "none"}, {"type": "scatter", "x": [-60000.0], "y": [-10000.0], "mode": "markers+text", "marker": {"symbol": "star", "size": 20, "color": "yellow"}, "text": ["Test Black Hole"], "textposition": "top center", "textfont": {"color": "white", "size": 12}, "hovertext": ["Test Black Hole [L09]"], "hoverinfo": "text", "meta": {"base_marker_size": 20, "base_text_size": 12, "scale_on_zoom": true, "map_object_type": "blackhole"}}, {"type": "scatter", "x": [0.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_command [M12]"], "hoverinfo": "text", "text": ["starbase_command"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [1000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_civil [M12]"], "hoverinfo": "text", "text": ["starbase_civil"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [2000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_industry [M12]"], "hoverinfo": "text", "text": ["starbase_industry"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [3000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_science [M12]"], "hoverinfo": "text", "text": ["starbase_science"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [4000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_arvonian [M12]"], "hoverinfo": "text", "text": ["starbase_arvonian"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [5000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_skaraan [M12]"], "hoverinfo": "text", "text": ["starbase_skaraan"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [6000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_torgoth [M12]"], "hoverinfo": "text", "text": ["starbase_torgoth"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [7000.0], "y": [0.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["starbase_kralien [M12]"], "hoverinfo": "text", "text": ["starbase_kralien"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [8000.0], "y": [0.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["defense_platform_beam [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [9000.0], "y": [0.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["defense_platform_torp [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [0.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["defense_platform_fighter [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [1000.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["usfp_industrial_unit [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [2000.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["usfp_industrial_refinary [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [3000.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["usfp_industrial_processor [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [4000.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["usfp_industrial_assembly [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [5000.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["hegemony_fighter_platform [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [6000.0], "y": [1000.0], "mode": "markers", "marker": {"symbol": "pentagon-open", "size": 3, "color": "orange"}, "hovertext": ["hegemony_beam_platform [M12]"], "hoverinfo": "text", "meta": {"base_marker_size": 3, "base_text_size": 14}}, {"type": "scatter", "x": [7000.0], "y": [1000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["defense_platform_beam (station) [M12]"], "hoverinfo": "text", "text": ["defense_platform_beam (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [8000.0], "y": [1000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["defense_platform_torp (station) [M12]"], "hoverinfo": "text", "text": ["defense_platform_torp (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [9000.0], "y": [1000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["defense_platform_fighter (station) [M12]"], "hoverinfo": "text", "text": ["defense_platform_fighter (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [0.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["usfp_industrial_unit (station) [M12]"], "hoverinfo": "text", "text": ["usfp_industrial_unit (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [1000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["usfp_industrial_storage [M12]"], "hoverinfo": "text", "text": ["usfp_industrial_storage"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [2000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["usfp_industrial_refinary (station) [M12]"], "hoverinfo": "text", "text": ["usfp_industrial_refinary (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [3000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["usfp_industrial_processor (station) [M12]"], "hoverinfo": "text", "text": ["usfp_industrial_processor (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [4000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["usfp_industrial_assembly (station) [M12]"], "hoverinfo": "text", "text": ["usfp_industrial_assembly (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [5000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["usfp_shipyard [M12]"], "hoverinfo": "text", "text": ["usfp_shipyard"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [6000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["pirate_military_base [M12]"], "hoverinfo": "text", "text": ["pirate_military_base"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [7000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["pirate_cache_1 [M12]"], "hoverinfo": "text", "text": ["pirate_cache_1"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [8000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["hegemony_generator [M12]"], "hoverinfo": "text", "text": ["hegemony_generator"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [9000.0], "y": [2000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["arvonian_platform [M12]"], "hoverinfo": "text", "text": ["arvonian_platform"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [0.0], "y": [3000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["hegemony_gasextractor [M12]"], "hoverinfo": "text", "text": ["hegemony_gasextractor"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [1000.0], "y": [3000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["hegemony_drydock [M12]"], "hoverinfo": "text", "text": ["hegemony_drydock"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [2000.0], "y": [3000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["hegemony_fighter_platform (station) [M12]"], "hoverinfo": "text", "text": ["hegemony_fighter_platform (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [3000.0], "y": [3000.0], "mode": "markers+text", "marker": {"symbol": "square", "size": 12, "color": "blue"}, "hovertext": ["hegemony_beam_platform (station) [M12]"], "hoverinfo": "text", "text": ["hegemony_beam_platform (station)"], "textposition": "top center", "textfont": {"color": "white", "size": 14}, "meta": {"base_marker_size": 12, "base_text_size": 14}}, {"type": "scatter", "x": [-28572.95886737617, -28668.879081653005, -28954.998503023133, -29426.421548859624, -30075.08204014504, -30889.881216030837, -31856.877636712597, -32959.52572533039, -34178.95886737617, -35494.312223698784, -36883.0797336867, -38321.49920020495, -39784.95886737617, -41248.41853454739, -42686.83800106563, -44075.60551105355, -45390.95886737617, -46610.39200942194, -47713.04009803974, -48680.03651872149, -49494.835694607296, -50143.49618589271, -50614.9192317292, -50901.03865309933, -50996.95886737617, -50901.03865309933, -50614.9192317292, -50143.49618589271, -49494.835694607296, -48680.0365187215, -47713.040098039746, -46610.39200942195, -45390.958867376175, -44075.60551105355, -42686.83800106563, -41248.41853454739, -39784.95886737617, -38321.499200204955, -36883.07973368671, -35494.31222369879, -34178.95886737617, -32959.5257253304, -31856.877636712597, -30889.881216030844, -30075.082040145047, -29426.42154885962, -28954.998503023136, -28668.879081653005, -28572.95886737617], "y": [-10128.03648390529, -8664.576816734072, -7226.157350215828, -5837.389840227905, -4522.036483905292, -3302.6033418595152, -2199.955253241719, -1232.9588325599616, -418.1596566741646, 230.5008346112554, 701.9238804477427, 988.0433018178719, 1083.9635160947091, 988.0433018178719, 701.9238804477427, 230.50083461125723, -418.1596566741646, -1232.9588325599616, -2199.955253241719, -3302.6033418595125, -4522.036483905292, -5837.389840227903, -7226.157350215825, -8664.576816734068, -10128.036483905289, -11591.496151076512, -13029.915617594754, -14418.683127582677, -15734.036483905289, -16953.469625951067, -18056.117714568856, -19023.114135250617, -19837.913311136414, -20486.573802421837, -20957.996848258324, -21244.116269628452, -21340.036483905293, -21244.116269628452, -20957.996848258328, -20486.57380242184, -19837.913311136417, -19023.114135250624, -18056.117714568863, -16953.46962595107, -15734.036483905296, -14418.683127582675, -13029.915617594763, -11591.49615107651, -10128.03648390529], "fill": "toself", "fillcolor": "rgba(54,191,214,0.30)", "line": {"shape": "spline", "color": "#7fe7ff", "width": 2}, "hoverinfo": "none"}, {"type": "scatter", "x": [-39784.95886737617], "y": [-10128.03648390529], "mode": "markers", "marker": {"symbol": "circle-open", "size": 10, "color": "#7fe7ff", "line": {"color": "#7fe7ff", "width": 2}}, "hovertext": ["FCS1 [L10]"], "hoverinfo": "text"}], "layout": {"title": "0ATestSystem", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    fig.layout.showlegend = false;
+    fig.layout.dragmode = 'pan';
+    fig.layout.title = '0ATestSystem';
+    if (!isGM()) {
+        fig.data = fig.data.filter(t => !t.gmOnly);
+        }
+    setDefaultInfo();
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+        console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
+        console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
+
+    var plotDiv = document.getElementById('plot');
+    // Use Plotly's built-in nearest-point selection for accurate clicks
+    plotDiv.on('plotly_click', function(ev) {
+        if (!ev || !ev.points || !ev.points.length) return;
+        var p = ev.points[0];
+        var picked = null;
+        // Prefer original name from hovertext: "Name [Grid]"
+        if (p.hovertext && typeof p.hovertext === 'string') {
+            picked = p.hovertext.split(' [')[0];
+        } else if (p.text && typeof p.text === 'string') {
+            // Fallback to text label (strip any ** used for GM marking)
+            picked = p.text.replace(/\*/g, '');
+        }
+        if (picked && objData[picked]) {
+            highlight(picked);
+            lastPlotlyClickTs = Date.now();
+        }
+    });
+
+    plotDiv.on('plotly_clickmiss', function() {
+        clearAnnotations();
+    });
+
+    function isPlotPointTarget(target) {
+        if (!target || !target.closest) return false;
+        return !!target.closest('.point, .textpoint, .text, .hovertext, .hoverlayer');
+    }
+
+    var clickStart = null;
+    var dragged = false;
+    var lastPlotlyClickTs = 0;
+    plotDiv.addEventListener('mousedown', function(ev) {
+        clickStart = {x: ev.clientX, y: ev.clientY};
+        dragged = false;
+    });
+    plotDiv.addEventListener('mousemove', function(ev) {
+        if (!clickStart) return;
+        var dx = ev.clientX - clickStart.x;
+        var dy = ev.clientY - clickStart.y;
+        if ((dx * dx + dy * dy) > 25) dragged = true;
+    });
+    plotDiv.addEventListener('click', function(ev) {
+        if (Date.now() - lastPlotlyClickTs < 250) return;
+        if (dragged) return;
+        if (isPlotPointTarget(ev.target)) return;
+        closePanels();
+        clearAnnotations();
+    }, true);
+
+    function gridRefFromXY(x, y) {
+        var gridSize = 20000;
+        var originX = -240000;
+        var originZ = 280000;
+        var dx = Math.floor((x - originX) / gridSize);
+        var dz = Math.floor((y - originZ) / gridSize);
+        function posMod(n, mod) {
+            return ((n % mod) + mod) % mod;
+        }
+        var col = posMod(dx, 100);
+        var row = posMod(dz, 26);
+        var letter = String.fromCharCode(65 + row);
+        var number = String(col).padStart(2, '0');
+        return letter + number;
+    }
+
+    function axisPixelToData(axis, px) {
+        if (axis && typeof axis.p2d === 'function') return axis.p2d(px);
+        if (axis && typeof axis.p2c === 'function') return axis.p2c(px);
+        if (axis && typeof axis.p2l === 'function') return axis.p2l(px);
+        return null;
+    }
+
+    var gridReadout = document.createElement('div');
+    gridReadout.id = 'grid-readout';
+    plotDiv.appendChild(gridReadout);
+    var authorTooltip = document.createElement('div');
+    authorTooltip.id = 'author-tooltip';
+    document.body.appendChild(authorTooltip);
+
+    function updateGridReadout(evt) {
+        try {
+            var full = plotDiv._fullLayout;
+            if (!full || !full._size || !full.xaxis || !full.yaxis) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
+            var xpx = mouseX - full._size.l;
+            var ypx = mouseY - full._size.t;
+            if (xpx < 0 || ypx < 0 || xpx > full._size.w || ypx > full._size.h) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            var x = axisPixelToData(full.xaxis, xpx);
+            var y = axisPixelToData(full.yaxis, ypx);
+            if (!isFinite(x) || !isFinite(y)) {
+                gridReadout.style.display = 'none';
+                return;
+            }
+            gridReadout.textContent = gridRefFromXY(x, y);
+            gridReadout.style.left = (mouseX + 12) + 'px';
+            gridReadout.style.top = (mouseY + 12) + 'px';
+            gridReadout.style.display = 'block';
+        } catch (e) {
+            gridReadout.style.display = 'none';
+        }
+    }
+
+    plotDiv.addEventListener('mousemove', updateGridReadout);
+    plotDiv.addEventListener('mouseleave', function() {
+        gridReadout.style.display = 'none';
+    });
+
+    function attachAuthorHover() {
+        var info = document.getElementById('info');
+        if (!info) return;
+        var target = info.querySelector('.author-hover');
+        if (!target) return;
+        target.addEventListener('mousemove', function(ev) {
+            var authors = target.getAttribute('data-authors') || '';
+            if (!authors) {
+                authorTooltip.style.display = 'none';
+                return;
+            }
+            authorTooltip.textContent = authors;
+            authorTooltip.style.left = (ev.clientX + 12) + 'px';
+            authorTooltip.style.top = (ev.clientY + 12) + 'px';
+            authorTooltip.style.display = 'block';
+        });
+        target.addEventListener('mouseleave', function() {
+            authorTooltip.style.display = 'none';
+        });
+    }
+
+    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    (function() {
+        var refSpan = null;
+        var scalableIdx = fig.data
+            .map(function(t, i) { return t && t.meta && t.meta.scale_on_zoom ? i : null; })
+            .filter(function(i) { return i !== null; });
+        function rescaleMarkers() {
+            try {
+                var full = plotDiv._fullLayout || {};
+                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
+                if (!xaxis || !xaxis.range) return;
+                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
+                if (!curr) return;
+                if (!refSpan) refSpan = curr;
+                var scale = refSpan / curr;
+                var indices = [];
+                var markerSizes = [];
+                var textSizes = [];
+                function pushForIndex(i) {
+                    var t = fig.data[i];
+                    if (!t || !t.meta || !t.meta.base_marker_size) return;
+                    var base = t.meta.base_marker_size;
+                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
+                    var newMarker = Math.max(2, Math.round(base * scale));
+                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
+                    indices.push(i);
+                    markerSizes.push(newMarker);
+                    textSizes.push(newText);
+                }
+                scalableIdx.forEach(pushForIndex);
+                if (indices.length) {
+                    Plotly.restyle(plotDiv, {'marker.size': markerSizes, 'textfont.size': textSizes}, indices);
+                }
+            } catch (e) { console.error(e); }
+        }
+        // initial scale after plot settles
+        setTimeout(rescaleMarkers, 250);
+        plotDiv.on('plotly_relayout', rescaleMarkers);
+    })();
+
+  var ctrl = document.getElementById('object-buttons');
+  var activeSection = null;
+
+  // Helper: create and append a single button
+function addButton(label, fn, header, color, isHidden) {
+    if (isHidden && !isGM()) return;
+    var btn = document.createElement('button');
+    btn.textContent = label;
+    if (header) {
+      btn.className = 'header';     // section header style
+      btn.dataset.section = label;
+      btn.onclick = null;           // no click action
+    } else {
+      btn.onclick = fn;             // bind the handler
+      if (color) btn.style.backgroundColor = color;
+      if (activeSection) btn.dataset.section = activeSection;
+    }
+    ctrl.appendChild(btn);
+  }
+
+  function addSection(label, populate) {
+    var before = ctrl.children.length;
+    addButton(label, null, true, null);
+    var header = ctrl.children[ctrl.children.length - 1];
+    var previousSection = activeSection;
+    activeSection = label;
+    if (typeof populate === 'function') {
+      populate();
+    }
+    activeSection = previousSection;
+    var added = ctrl.children.length - before - 1;
+    if (added <= 0 && header && header.parentNode === ctrl) {
+      ctrl.removeChild(header);
+    }
+  }
+  
+  function enterGMMode() {
+    const pw = prompt("Enter ONI Auth Code: --We will store a cookie for the purpose of tracking if you have authenticated or not--");
+    if (pw === "oni1") {
+      document.cookie = "gmMode=1; path=/; max-age=31536000";
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  function isGM() {
+    return document.cookie.split(';').some(c => c.trim() === 'gmMode=1');
+  }
+
+  function exitGMMode() {
+    document.cookie = "gmMode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    location.reload();
+  }
+
+  function renderGMControls() {
+    const div = document.getElementById('gm-controls');
+    div.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    if (isGM()) {
+      btn.textContent = 'ONI Logout';
+      btn.onclick = exitGMMode;
+    } else {
+      btn.textContent = 'ONI Login';
+      btn.onclick = enterGMMode;
+    }
+    div.appendChild(btn);
+  }
+
+  renderGMControls();
+
+  document.getElementById('mobile-controls-btn').addEventListener('click', toggleControlsPanel);
+  document.getElementById('mobile-info-btn').addEventListener('click', toggleInfoPanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanels);
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') closePanels();
+  });
+  window.addEventListener('resize', function() {
+    if (!isMobileLayout()) {
+      closePanels();
+    } else {
+      syncMobileToggles();
+    }
+  });
+  syncMobileToggles();
+
+  // ——— Populate the sidebar ———
+  addButton('None', clearAnnotations, false, null);
+
+  addSection('--- Gates ---', function() {
+    
+  });
+
+  addSection('--- Nav Points/POI ---', function() {
+    
+  });
+
+  addSection('--- Zones ---', function() {
+    
+  });
+
+  addSection('--- Planets ---', function() {
+    
+  });
+
+  addSection('--- Stations ---', function() {
+    addButton('arvonian_platform',function(){highlight('arvonian_platform');},false,'blue',false)
+    addButton('defense_platform_beam (station)',function(){highlight('defense_platform_beam (station)');},false,'blue',false)
+    addButton('defense_platform_fighter (station)',function(){highlight('defense_platform_fighter (station)');},false,'blue',false)
+    addButton('defense_platform_torp (station)',function(){highlight('defense_platform_torp (station)');},false,'blue',false)
+    addButton('hegemony_beam_platform (station)',function(){highlight('hegemony_beam_platform (station)');},false,'blue',false)
+    addButton('hegemony_drydock',function(){highlight('hegemony_drydock');},false,'blue',false)
+    addButton('hegemony_fighter_platform (station)',function(){highlight('hegemony_fighter_platform (station)');},false,'blue',false)
+    addButton('hegemony_gasextractor',function(){highlight('hegemony_gasextractor');},false,'blue',false)
+    addButton('hegemony_generator',function(){highlight('hegemony_generator');},false,'blue',false)
+    addButton('pirate_cache_1',function(){highlight('pirate_cache_1');},false,'blue',false)
+    addButton('pirate_military_base',function(){highlight('pirate_military_base');},false,'blue',false)
+    addButton('starbase_arvonian',function(){highlight('starbase_arvonian');},false,'blue',false)
+    addButton('starbase_civil',function(){highlight('starbase_civil');},false,'blue',false)
+    addButton('starbase_command',function(){highlight('starbase_command');},false,'blue',false)
+    addButton('starbase_industry',function(){highlight('starbase_industry');},false,'blue',false)
+    addButton('starbase_kralien',function(){highlight('starbase_kralien');},false,'blue',false)
+    addButton('starbase_science',function(){highlight('starbase_science');},false,'blue',false)
+    addButton('starbase_skaraan',function(){highlight('starbase_skaraan');},false,'blue',false)
+    addButton('starbase_torgoth',function(){highlight('starbase_torgoth');},false,'blue',false)
+    addButton('usfp_industrial_assembly (station)',function(){highlight('usfp_industrial_assembly (station)');},false,'blue',false)
+    addButton('usfp_industrial_processor (station)',function(){highlight('usfp_industrial_processor (station)');},false,'blue',false)
+    addButton('usfp_industrial_refinary (station)',function(){highlight('usfp_industrial_refinary (station)');},false,'blue',false)
+    addButton('usfp_industrial_storage',function(){highlight('usfp_industrial_storage');},false,'blue',false)
+    addButton('usfp_industrial_unit (station)',function(){highlight('usfp_industrial_unit (station)');},false,'blue',false)
+    addButton('usfp_shipyard',function(){highlight('usfp_shipyard');},false,'blue',false)
+  });
+    
+  // Search filter
+  document.getElementById('search-box').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const buttons = Array.from(document.querySelectorAll('#object-buttons button'));
+    buttons.forEach(btn => {
+      const label = btn.textContent.toLowerCase();
+      const isHeader = btn.classList.contains('header');
+      if (isHeader) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = label.includes(query) ? '' : 'none';
+      }
+    });
+    buttons
+      .filter(btn => btn.classList.contains('header'))
+      .forEach(header => {
+        const section = header.dataset.section;
+        const hasVisibleEntry = buttons.some(btn =>
+          !btn.classList.contains('header') &&
+          btn.dataset.section === section &&
+          btn.style.display !== 'none'
+        );
+        header.style.display = hasVisibleEntry ? '' : 'none';
+      });
+  });
+</script>
+</body>
+</html>

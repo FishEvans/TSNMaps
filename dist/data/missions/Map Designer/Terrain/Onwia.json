@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        1035.6406700758619,
+        1035.6406700758696,
         0,
-        -30956.696906489367
+        -30956.696906489364
     ],
     "systemalignment": "Kralien",
     "metadata": {
@@ -198,39 +198,6 @@
             "cargo": {},
             "teams": {},
             "description": ""
-        },
-        "FCS1": {
-            "type": "fcs_zone",
-            "coordinate": [
-                76983.22620933132,
-                0,
-                100510.19631958612
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS2": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -4579.919966291861,
-                0,
-                -163346.5654679843
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS3": {
-            "type": "fcs_zone",
-            "coordinate": [
-                163139.3329809192,
-                0,
-                142296.25604793272
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
         }
     },
     "sensor_relay": {},
@@ -351,6 +318,39 @@
             "composition": [
                 "Ast. Std Rand"
             ]
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                76983.22620933132,
+                0,
+                100510.19631958612
+            ],
+            "radius": 6390,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,390 units. Local nebular density index: 6.1. Source field: 1766451691217. Survey profile: thin helium wash over denser collection pockets; field stability dense around the core; collector saturation estimate 64%. Telemetry confidence: limited. Hold station near the inner third for the cleanest skim.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -4579.919966291861,
+                0,
+                -163346.5654679843
+            ],
+            "radius": 5473,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 5,473 units. Local nebular density index: 6.0. Source field: 1766451675265. Survey profile: thin helium wash over denser collection pockets; field stability patchy near the edge; collector saturation estimate 77%. Telemetry confidence: limited. Short passes should outperform a single static collection burn.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                163139.3329809192,
+                0,
+                142296.25604793272
+            ],
+            "radius": 5559,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 5,559 units. Local nebular density index: 5.6. Source field: 1766451714525. Survey profile: cool deuterium traces threaded through ionized gas; field stability uneven but workable; collector saturation estimate 55%. Telemetry confidence: limited. Keep condenser temperature margins high during extended collection.",
+            "hideonmap": false
         }
     },
     "traffic": {}

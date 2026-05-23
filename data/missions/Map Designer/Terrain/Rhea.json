@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -19310.462753141215,
+        -19310.46275314121,
         0,
-        29150.13981573284
+        29150.139815732848
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -196,39 +196,6 @@
                 "Medics": 2
             },
             "description": ""
-        },
-        "FCS1": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -121001.8416319729,
-                0,
-                116211.8370685027
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS2": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -156404.06719279048,
-                0,
-                80169.3490567429
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS3": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -90709.28739912412,
-                0,
-                148494.70674366283
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -374,6 +341,17 @@
             "composition": [
                 "Ast. Std Rand"
             ]
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -121001.8416319729,
+                0,
+                116211.8370685027
+            ],
+            "radius": 6359,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,359 units. Local nebular density index: 13.0. Source field: 1766362940619. Survey profile: cool deuterium traces threaded through ionized gas; field stability slowly drifting; collector saturation estimate 57%. Telemetry confidence: limited. Hold station near the inner third for the cleanest skim.",
+            "hideonmap": false
         }
     },
     "traffic": {}

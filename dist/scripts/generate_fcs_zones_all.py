@@ -1,4 +1,5 @@
 import json
+import random
 import sys
 from pathlib import Path
 import tkinter as tk
@@ -10,22 +11,25 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from SystemEditor import (  # noqa: E402
-    DEFAULT_FCS_DESCRIPTION,
     DEFAULT_FCS_DENSITY_PERCENTILE,
     DEFAULT_FCS_DENSITY_RADIUS,
     DEFAULT_FCS_MIN_SCORE,
-    DEFAULT_FCS_MIN_SPACING,
-    DEFAULT_FCS_ZONE_RADIUS,
     FCS_ZONE_TYPE,
     collect_fcs_blocked_centers,
     collect_nebula_points_for_fcs,
     generate_zone_name,
     get_data_path,
+    percentile_value,
     select_fcs_zone_centers,
 )
 
 
 SKIP_FILENAMES = {"package.json", "galmapinfo.json"}
+FCS_RADIUS_MIN = 5000
+FCS_RADIUS_MAX = 12000
+FCS_RADIUS_JITTER = 1000
+FCS_RADIUS_FULL_DENSITY_PERCENTILE = 90
+DEFAULT_FCS_ALL_MIN_SPACING = 60000
 
 
 def show_window(window):
@@ -156,16 +160,159 @@ def save_system(path, data):
         json.dump(data, handle, indent=4)
 
 
-def count_existing_fcs_objects(system_data):
-    objects = system_data.get("objects", {})
-    if not isinstance(objects, dict):
+def count_existing_fcs_zones(system_data):
+    total = 0
+    for section_name in ("objects", "terrain"):
+        entries = system_data.get(section_name, {})
+        if not isinstance(entries, dict):
+            continue
+        total += sum(
+            1
+            for entry in entries.values()
+            if isinstance(entry, dict)
+            and str(entry.get("type", "")).strip().lower() == FCS_ZONE_TYPE
+        )
+    return total
+
+
+def stable_radius_jitter(zone, max_jitter=FCS_RADIUS_JITTER):
+    max_jitter = max(0, int(max_jitter))
+    if max_jitter <= 0:
         return 0
-    return sum(
-        1
-        for obj in objects.values()
-        if isinstance(obj, dict)
-        and str(obj.get("type", "")).strip().lower() == FCS_ZONE_TYPE
+
+    key = "|".join(
+        (
+            str(zone.get("source", "")),
+            f"{float(zone.get('x', 0.0) or 0.0):.3f}",
+            f"{float(zone.get('z', 0.0) or 0.0):.3f}",
+            f"{float(zone.get('score', 0.0) or 0.0):.3f}",
+        )
     )
+    return random.Random(key).randint(0, max_jitter)
+
+
+def get_radius_score_bounds(score_values):
+    scores = [float(score) for score in score_values if score is not None]
+    if not scores:
+        return 0.0, 0.0
+
+    low_score = min(scores)
+    high_score = percentile_value(scores, FCS_RADIUS_FULL_DENSITY_PERCENTILE)
+    if high_score <= low_score:
+        high_score = max(scores)
+    return float(low_score), float(high_score)
+
+
+def calculate_fcs_zone_radius(zone, low_score, high_score):
+    score = float(zone.get("score", 0.0) or 0.0)
+    base_max = max(FCS_RADIUS_MIN, FCS_RADIUS_MAX - FCS_RADIUS_JITTER)
+
+    if high_score > low_score:
+        density_ratio = (score - low_score) / (high_score - low_score)
+    else:
+        density_ratio = 0.5
+    density_ratio = max(0.0, min(1.0, density_ratio))
+
+    base_radius = FCS_RADIUS_MIN + density_ratio * (base_max - FCS_RADIUS_MIN)
+    radius = int(round(base_radius + stable_radius_jitter(zone)))
+    return max(FCS_RADIUS_MIN, min(FCS_RADIUS_MAX, radius))
+
+
+def build_fcs_zone_description(zone, radius):
+    score = float(zone.get("score", 0.0) or 0.0)
+    source = str(zone.get("source", "") or "").strip()
+    key = "|".join(
+        (
+            "fcs-description",
+            source,
+            f"{float(zone.get('x', 0.0) or 0.0):.3f}",
+            f"{float(zone.get('z', 0.0) or 0.0):.3f}",
+            f"{score:.3f}",
+            str(int(radius)),
+        )
+    )
+    rng = random.Random(key)
+
+    trace_profiles = [
+        "hydrogen-rich vapor with low metallic dust",
+        "cool deuterium traces threaded through ionized gas",
+        "charged nebular wisps with intermittent fuel-cell precursors",
+        "thin helium wash over denser collection pockets",
+        "volatile ice fines suspended in a quiet plasma band",
+        "bright ion trails with usable condenser feedstock",
+    ]
+    stability_profiles = [
+        "stable",
+        "lightly turbulent",
+        "uneven but workable",
+        "slowly drifting",
+        "patchy near the edge",
+        "dense around the core",
+    ]
+    collector_notes = [
+        "Use wide intake sweeps before narrowing to the central plume.",
+        "Hold station near the inner third for the cleanest skim.",
+        "Cycle filters often; particulate load may spike without warning.",
+        "Best yield is expected on a slow spiral through the marked radius.",
+        "Keep condenser temperature margins high during extended collection.",
+        "Short passes should outperform a single static collection burn.",
+    ]
+
+    confidence = "high" if score >= 60 else "moderate" if score >= 20 else "limited"
+    saturation = rng.randint(35, 94)
+    source_text = f" Source field: {source}." if source else ""
+
+    return (
+        "Auto-surveyed fuel collection zone. "
+        f"Estimated radius: {int(radius):,} units. "
+        f"Local nebular density index: {score:.1f}.{source_text} "
+        f"Survey profile: {rng.choice(trace_profiles)}; "
+        f"field stability {rng.choice(stability_profiles)}; "
+        f"collector saturation estimate {saturation}%. "
+        f"Telemetry confidence: {confidence}. "
+        f"{rng.choice(collector_notes)}"
+    )
+
+
+def build_selection_plan(entries, settings, progress=None):
+    selections = {}
+    scores = []
+
+    for index, entry in enumerate(entries, start=1):
+        system_name = entry["path"].name
+        update_progress_window(
+            progress,
+            current=index - 1,
+            status=f"Scoring nebula density for {system_name}...",
+            scored=index - 1,
+        )
+
+        selected = []
+        nebula_points = entry["nebula_points"]
+        if nebula_points:
+            blocked_centers = collect_fcs_blocked_centers(
+                entry["data"],
+                replace_existing=settings["replace_existing"],
+            )
+            selected = select_fcs_zone_centers(
+                nebula_points,
+                min_spacing=settings["min_spacing"],
+                density_radius=settings["density_radius"],
+                percentile=settings["percentile"],
+                min_score=DEFAULT_FCS_MIN_SCORE,
+                blocked_centers=blocked_centers,
+            )
+            scores.extend(float(zone.get("score", 0.0) or 0.0) for zone in selected)
+
+        selections[entry["path"]] = selected
+        update_progress_window(
+            progress,
+            current=index,
+            status=f"Scored {system_name}",
+            scored=index,
+        )
+
+    return selections, get_radius_score_bounds(scores)
 
 
 def build_system_entries(root, paths):
@@ -203,7 +350,7 @@ def build_system_entries(root, paths):
             try:
                 data = load_system(path)
                 nebula_points = collect_nebula_points_for_fcs(data.get("terrain", {}), cache={})
-                existing_fcs_count = count_existing_fcs_objects(data)
+                existing_fcs_count = count_existing_fcs_zones(data)
             except Exception as exc:
                 errors.append(f"{path.name}: {exc}")
                 update_progress_window(
@@ -264,8 +411,7 @@ def show_settings_dialog(root, entries):
     body = tk.Frame(dialog, padx=10, pady=10)
     body.pack(fill="both", expand=True)
 
-    zone_radius_var = tk.IntVar(value=DEFAULT_FCS_ZONE_RADIUS)
-    spacing_var = tk.IntVar(value=DEFAULT_FCS_MIN_SPACING)
+    spacing_var = tk.IntVar(value=DEFAULT_FCS_ALL_MIN_SPACING)
     density_radius_var = tk.IntVar(value=DEFAULT_FCS_DENSITY_RADIUS)
     percentile_var = tk.IntVar(value=DEFAULT_FCS_DENSITY_PERCENTILE)
     replace_var = tk.BooleanVar(value=bool(total_existing_fcs))
@@ -279,7 +425,7 @@ def show_settings_dialog(root, entries):
     tk.Label(body, text=f"Nebula dots available: {total_nebula_points}").grid(
         row=2, column=0, columnspan=2, padx=6, pady=(0, 2), sticky="w"
     )
-    tk.Label(body, text=f"Existing FCS object zones: {total_existing_fcs}").grid(
+    tk.Label(body, text=f"Existing FCS zones: {total_existing_fcs}").grid(
         row=3, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w"
     )
 
@@ -289,22 +435,30 @@ def show_settings_dialog(root, entries):
             row=row, column=1, padx=6, pady=2, sticky="w"
         )
 
-    _labeled_spinbox(4, "Zone Radius:", zone_radius_var, 1, 1000000)
-    _labeled_spinbox(5, "Min Spacing:", spacing_var, 1000, 1000000)
-    _labeled_spinbox(6, "Density Radius:", density_radius_var, 1000, 1000000)
-    _labeled_spinbox(7, "Density Percentile:", percentile_var, 0, 100)
+    tk.Label(
+        body,
+        text=f"Zone radius: {FCS_RADIUS_MIN}-{FCS_RADIUS_MAX} by nebula density.",
+    ).grid(row=4, column=0, columnspan=2, padx=6, pady=(0, 2), sticky="w")
+    tk.Label(
+        body,
+        text=f"Radius jitter: 0-{FCS_RADIUS_JITTER} added per zone.",
+    ).grid(row=5, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w")
+
+    _labeled_spinbox(6, "Min Spacing:", spacing_var, 1000, 1000000)
+    _labeled_spinbox(7, "Density Radius:", density_radius_var, 1000, 1000000)
+    _labeled_spinbox(8, "Density Percentile:", percentile_var, 0, 100)
 
     tk.Checkbutton(
         body,
-        text="Replace existing FCS object zones",
+        text="Replace existing FCS zones",
         variable=replace_var,
-    ).grid(row=8, column=0, columnspan=2, padx=6, pady=(2, 4), sticky="w")
+    ).grid(row=9, column=0, columnspan=2, padx=6, pady=(2, 4), sticky="w")
 
     tk.Label(
         body,
         text="Higher percentile favors tighter nebula clusters.",
         fg="#3a86ff",
-    ).grid(row=9, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w")
+    ).grid(row=10, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w")
 
     footer = tk.Frame(dialog, padx=10)
     footer.pack(fill="x", pady=(0, 10))
@@ -312,8 +466,7 @@ def show_settings_dialog(root, entries):
 
     def _generate():
         try:
-            result["zone_radius"] = max(1, int(zone_radius_var.get() or DEFAULT_FCS_ZONE_RADIUS))
-            result["min_spacing"] = max(1, int(spacing_var.get() or DEFAULT_FCS_MIN_SPACING))
+            result["min_spacing"] = max(1, int(spacing_var.get() or DEFAULT_FCS_ALL_MIN_SPACING))
             result["density_radius"] = max(1, int(density_radius_var.get() or DEFAULT_FCS_DENSITY_RADIUS))
             result["percentile"] = max(
                 0,
@@ -348,11 +501,13 @@ def apply_batch(root, entries, settings):
         "removed_total": 0,
     }
     errors = []
+    total_steps = len(entries) * 2
     progress = create_progress_window(
         root,
         "Generating FCS Zones",
-        len(entries),
+        total_steps,
         [
+            ("Systems scored", "scored"),
             ("Processed systems", "processed"),
             ("Systems changed", "changed"),
             ("FCS zones created", "created"),
@@ -364,11 +519,17 @@ def apply_batch(root, entries, settings):
     )
 
     try:
+        selection_plan, (low_score, high_score) = build_selection_plan(
+            entries,
+            settings,
+            progress=progress,
+        )
+
         for index, entry in enumerate(entries, start=1):
             system_name = entry["path"].name
             update_progress_window(
                 progress,
-                current=index - 1,
+                current=len(entries) + index - 1,
                 status=f"Generating zones for {system_name}...",
                 processed=summary["processed_systems"],
                 changed=summary["systems_changed"],
@@ -385,7 +546,7 @@ def apply_batch(root, entries, settings):
                 summary["systems_without_nebula"] += 1
                 update_progress_window(
                     progress,
-                    current=index,
+                    current=len(entries) + index,
                     status=f"Skipped {system_name}: no nebula dots",
                     processed=summary["processed_systems"],
                     changed=summary["systems_changed"],
@@ -399,24 +560,13 @@ def apply_batch(root, entries, settings):
 
             summary["systems_with_nebula"] += 1
             data = entry["data"]
-            blocked_centers = collect_fcs_blocked_centers(
-                data,
-                replace_existing=settings["replace_existing"],
-            )
-            selected = select_fcs_zone_centers(
-                nebula_points,
-                min_spacing=settings["min_spacing"],
-                density_radius=settings["density_radius"],
-                percentile=settings["percentile"],
-                min_score=DEFAULT_FCS_MIN_SCORE,
-                blocked_centers=blocked_centers,
-            )
+            selected = selection_plan.get(entry["path"], [])
 
             if not selected:
                 summary["systems_without_selection"] += 1
                 update_progress_window(
                     progress,
-                    current=index,
+                    current=len(entries) + index,
                     status=f"Skipped {system_name}: no valid placement",
                     processed=summary["processed_systems"],
                     changed=summary["systems_changed"],
@@ -428,12 +578,31 @@ def apply_batch(root, entries, settings):
                 )
                 continue
 
-            objects = data.setdefault("objects", {})
+            objects = data.get("objects", {})
+            if objects is None:
+                objects = {}
             if not isinstance(objects, dict):
                 errors.append(f"{system_name}: objects is not a JSON object.")
                 update_progress_window(
                     progress,
-                    current=index,
+                    current=len(entries) + index,
+                    status=f"Error updating {system_name}",
+                    processed=summary["processed_systems"],
+                    changed=summary["systems_changed"],
+                    created=summary["created_total"],
+                    removed=summary["removed_total"],
+                    without_nebula=summary["systems_without_nebula"],
+                    without_selection=summary["systems_without_selection"],
+                    errors=len(errors),
+                )
+                continue
+
+            terrain = data.setdefault("terrain", {})
+            if not isinstance(terrain, dict):
+                errors.append(f"{system_name}: terrain is not a JSON object.")
+                update_progress_window(
+                    progress,
+                    current=len(entries) + index,
                     status=f"Error updating {system_name}",
                     processed=summary["processed_systems"],
                     changed=summary["systems_changed"],
@@ -455,17 +624,28 @@ def apply_batch(root, entries, settings):
                         continue
                     del objects[name]
                     removed += 1
+                for name in list(terrain.keys()):
+                    feat = terrain.get(name)
+                    if not isinstance(feat, dict):
+                        continue
+                    if str(feat.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
+                        continue
+                    del terrain[name]
+                    removed += 1
 
             created = 0
+            used_names = set(objects.keys()) | set(terrain.keys())
             for zone in selected:
-                name = generate_zone_name(objects, FCS_ZONE_TYPE)
-                objects[name] = {
+                name = generate_zone_name(used_names, FCS_ZONE_TYPE)
+                radius = calculate_fcs_zone_radius(zone, low_score, high_score)
+                terrain[name] = {
                     "type": FCS_ZONE_TYPE,
                     "coordinate": [zone["x"], 0, zone["z"]],
-                    "radius": settings["zone_radius"],
-                    "description": DEFAULT_FCS_DESCRIPTION,
+                    "radius": radius,
+                    "description": build_fcs_zone_description(zone, radius),
                     "hideonmap": bool(zone.get("hideonmap", False)),
                 }
+                used_names.add(name)
                 created += 1
 
             try:
@@ -474,7 +654,7 @@ def apply_batch(root, entries, settings):
                 errors.append(f"{system_name}: {exc}")
                 update_progress_window(
                     progress,
-                    current=index,
+                    current=len(entries) + index,
                     status=f"Error saving {system_name}",
                     processed=summary["processed_systems"],
                     changed=summary["systems_changed"],
@@ -491,7 +671,7 @@ def apply_batch(root, entries, settings):
             summary["removed_total"] += removed
             update_progress_window(
                 progress,
-                current=index,
+                current=len(entries) + index,
                 status=f"Saved {system_name}: +{created} zone(s)",
                 processed=summary["processed_systems"],
                 changed=summary["systems_changed"],

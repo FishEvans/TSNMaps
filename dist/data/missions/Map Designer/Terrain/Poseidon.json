@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -10838.070834874681,
+        -10838.070834874678,
         0,
-        -2908.632575617386
+        -2908.6325756173837
     ],
     "systemalignment": "Unknown",
     "metadata": {
@@ -11,12 +11,16 @@
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
         "visible": true,
         "original_author": "Fish Evans",
-        "revision_date": "2026-01-29",
-        "revision_number": 15,
+        "revision_date": "2026-05-16",
+        "revision_number": 17,
         "all_authors": [
             "Fish Evans"
         ],
@@ -31,7 +35,9 @@
             ],
             "type": "jumpnode",
             "jumppointtype": "Node",
-            "destinations": {},
+            "destinations": {
+                "Poseidon Gate": "Arietis"
+            },
             "state": "Tethered",
             "drift": 0
         }

@@ -724,6 +724,7 @@ HTML_TEMPLATE = '''
     }})();
 
   var ctrl = document.getElementById('object-buttons');
+  var activeSection = null;
 
   // Helper: create and append a single button
 function addButton(label, fn, header, color, isHidden) {{
@@ -732,12 +733,30 @@ function addButton(label, fn, header, color, isHidden) {{
     btn.textContent = label;
     if (header) {{
       btn.className = 'header';     // section header style
+      btn.dataset.section = label;
       btn.onclick = null;           // no click action
     }} else {{
       btn.onclick = fn;             // bind the handler
       if (color) btn.style.backgroundColor = color;
+      if (activeSection) btn.dataset.section = activeSection;
     }}
     ctrl.appendChild(btn);
+  }}
+
+  function addSection(label, populate) {{
+    var before = ctrl.children.length;
+    addButton(label, null, true, null);
+    var header = ctrl.children[ctrl.children.length - 1];
+    var previousSection = activeSection;
+    activeSection = label;
+    if (typeof populate === 'function') {{
+      populate();
+    }}
+    activeSection = previousSection;
+    var added = ctrl.children.length - before - 1;
+    if (added <= 0 && header && header.parentNode === ctrl) {{
+      ctrl.removeChild(header);
+    }}
   }}
   
   function enterGMMode() {{
@@ -794,34 +813,50 @@ function addButton(label, fn, header, color, isHidden) {{
   // ——— Populate the sidebar ———
   addButton('None', clearAnnotations, false, null);
 
-  addButton('--- Gates ---', null, true, null);
-  {gate_buttons}
+  addSection('--- Gates ---', function() {{
+    {gate_buttons}
+  }});
 
-  addButton('--- Nav Points/POI ---', null, true, null);
-  {relay_buttons}
+  addSection('--- Nav Points/POI ---', function() {{
+    {relay_buttons}
+  }});
 
-    addButton('--- Zones ---', null, true, null);
+  addSection('--- Zones ---', function() {{
     {zone_buttons}
+  }});
 
-    addButton('--- Planets ---', null, true, null);
+  addSection('--- Planets ---', function() {{
     {planet_buttons}
+  }});
 
-    addButton('--- Stations ---', null, true, null);
+  addSection('--- Stations ---', function() {{
     {station_buttons}
+  }});
     
   // Search filter
   document.getElementById('search-box').addEventListener('input', function() {{
     const query = this.value.toLowerCase();
-    const buttons = document.querySelectorAll('#object-buttons button');
+    const buttons = Array.from(document.querySelectorAll('#object-buttons button'));
     buttons.forEach(btn => {{
       const label = btn.textContent.toLowerCase();
       const isHeader = btn.classList.contains('header');
       if (isHeader) {{
-        btn.style.display = ''; // always show section headers
+        btn.style.display = 'none';
       }} else {{
         btn.style.display = label.includes(query) ? '' : 'none';
       }}
     }});
+    buttons
+      .filter(btn => btn.classList.contains('header'))
+      .forEach(header => {{
+        const section = header.dataset.section;
+        const hasVisibleEntry = buttons.some(btn =>
+          !btn.classList.contains('header') &&
+          btn.dataset.section === section &&
+          btn.style.display !== 'none'
+        );
+        header.style.display = hasVisibleEntry ? '' : 'none';
+      }});
   }});
 </script>
 </body>

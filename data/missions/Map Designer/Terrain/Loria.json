@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        25511.96261779448,
+        25511.962617794477,
         0,
-        8214.76812613237
+        8214.768126132369
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -1240,116 +1240,6 @@
                 "Medics": 0
             },
             "description": ""
-        },
-        "FCS1": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -132442.71176107568,
-                0,
-                -31128.097176450872
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS2": {
-            "type": "fcs_zone",
-            "coordinate": [
-                126359.38526808802,
-                0,
-                -77651.38314746092
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS3": {
-            "type": "fcs_zone",
-            "coordinate": [
-                12493.55629768221,
-                0,
-                -121206.97750840898
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS4": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -263221.80695293786,
-                0,
-                69160.46569130753
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS5": {
-            "type": "fcs_zone",
-            "coordinate": [
-                29435.22513590224,
-                0,
-                169042.7823247199
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS6": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -111243.82843737607,
-                0,
-                -14908.90317853413
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS7": {
-            "type": "fcs_zone",
-            "coordinate": [
-                148934.67305066754,
-                0,
-                -44300.5520431802
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS8": {
-            "type": "fcs_zone",
-            "coordinate": [
-                128495.9228304087,
-                0,
-                -51648.48248550014
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS9": {
-            "type": "fcs_zone",
-            "coordinate": [
-                -154346.994121046,
-                0,
-                -37719.41369830755
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
-        },
-        "FCS10": {
-            "type": "fcs_zone",
-            "coordinate": [
-                149587.06599997613,
-                0,
-                -20621.083093716283
-            ],
-            "radius": 5000,
-            "description": "Auto-generated from nebula density.",
-            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -1741,6 +1631,61 @@
             "density": 225,
             "scatter": 20000,
             "composition": []
+        },
+        "FCS1": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -132442.71176107568,
+                0,
+                -31128.097176450872
+            ],
+            "radius": 9149,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 9,149 units. Local nebular density index: 41.1. Source field: 1766355995732. Survey profile: thin helium wash over denser collection pockets; field stability lightly turbulent; collector saturation estimate 45%. Telemetry confidence: moderate. Use wide intake sweeps before narrowing to the central plume.",
+            "hideonmap": false
+        },
+        "FCS2": {
+            "type": "fcs_zone",
+            "coordinate": [
+                126359.38526808802,
+                0,
+                -77651.38314746092
+            ],
+            "radius": 7370,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 7,370 units. Local nebular density index: 20.5. Source field: 1766356216664. Survey profile: charged nebular wisps with intermittent fuel-cell precursors; field stability slowly drifting; collector saturation estimate 66%. Telemetry confidence: moderate. Best yield is expected on a slow spiral through the marked radius.",
+            "hideonmap": false
+        },
+        "FCS3": {
+            "type": "fcs_zone",
+            "coordinate": [
+                12493.55629768221,
+                0,
+                -121206.97750840898
+            ],
+            "radius": 6181,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,181 units. Local nebular density index: 10.7. Source field: 1766355874740. Survey profile: bright ion trails with usable condenser feedstock; field stability lightly turbulent; collector saturation estimate 39%. Telemetry confidence: limited. Hold station near the inner third for the cleanest skim.",
+            "hideonmap": false
+        },
+        "FCS4": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -263221.80695293786,
+                0,
+                69160.46569130753
+            ],
+            "radius": 5709,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 5,709 units. Local nebular density index: 6.3. Source field: 1766355415936. Survey profile: cool deuterium traces threaded through ionized gas; field stability lightly turbulent; collector saturation estimate 37%. Telemetry confidence: limited. Use wide intake sweeps before narrowing to the central plume.",
+            "hideonmap": false
+        },
+        "FCS5": {
+            "type": "fcs_zone",
+            "coordinate": [
+                29435.22513590224,
+                0,
+                169042.7823247199
+            ],
+            "radius": 5741,
+            "description": "Auto-surveyed fuel collection zone. Estimated radius: 5,741 units. Local nebular density index: 2.9. Source field: 1766355652980. Survey profile: bright ion trails with usable condenser feedstock; field stability dense around the core; collector saturation estimate 59%. Telemetry confidence: limited. Best yield is expected on a slow spiral through the marked radius.",
+            "hideonmap": false
         }
     },
     "traffic": {}

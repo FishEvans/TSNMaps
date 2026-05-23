@@ -53,6 +53,7 @@ ZONE_STYLE_MAP = {
         'text_color': '#bff7ff',
         'button_color': '#2d7f8e',
         'show_plot_label': False,
+        'show_zone_button': False,
     }
 }
 DEFAULT_ZONE_STYLE = {
@@ -348,8 +349,9 @@ class MapViewer:
         if zone.get('description'):
             entry['description'] = zone['description']
         obj_data[name] = entry
-        zones.append(name)
-        zone_button_color_map[name] = style['button_color']
+        if style.get('show_zone_button', True):
+            zones.append(name)
+            zone_button_color_map[name] = style['button_color']
         return True
 
     def generate(self, output_html=None):

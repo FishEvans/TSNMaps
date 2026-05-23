@@ -512,19 +512,23 @@ def on_canvas_press(event, ctx):
             cx = (event.x - pan_x) / scale
             cz = -(event.y - pan_y) / scale
             sm = ctx['sm']
-            objs = ctx['objs']
-            obj_lb = ctx['obj_lb']
+            terrain_keys = ctx['terrain_keys']
+            ter_lb = ctx['ter_lb']
 
             zone_type = str(cfg.get('type') or Toolbar.ZONE_TYPE_OPTIONS[0]).strip().lower()
             if zone_type not in Toolbar.ZONE_TYPE_OPTIONS:
                 zone_type = Toolbar.ZONE_TYPE_OPTIONS[0]
 
             name = (cfg.get('name') or '').strip() or toolbar.gen_zone_name(zone_type)
-            existing = sm.data.setdefault('objects', {})
-            if name in existing:
+            existing = sm.data.setdefault('terrain', {})
+            existing_names = set(existing.keys())
+            existing_objects = sm.data.get('objects', {})
+            if isinstance(existing_objects, dict):
+                existing_names.update(existing_objects.keys())
+            if name in existing_names:
                 base = name
                 suffix = 2
-                while f"{base} {suffix}" in existing:
+                while f"{base} {suffix}" in existing_names:
                     suffix += 1
                 name = f"{base} {suffix}"
 
@@ -534,8 +538,8 @@ def on_canvas_press(event, ctx):
                 'radius': int(cfg.get('radius', 5000)),
                 'description': '',
             }
-            objs.append(name)
-            obj_lb.insert(tk.END, name)
+            terrain_keys.append(name)
+            ter_lb.insert(tk.END, name)
             ctx['draw_map'](ctx)
 
             toolbar.zone_pending = None

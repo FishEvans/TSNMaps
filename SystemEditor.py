@@ -129,6 +129,123 @@ def get_zone_style(zone_type: Any) -> Optional[Dict[str, str]]:
 def is_zone_type(zone_type: Any) -> bool:
     return get_zone_style(zone_type) is not None
 
+
+STATION_OR_PLATFORM_TYPES = {"station", "platform"}
+INCOMING_ONLY_GATES_KEY = "incomingOnlyGates"
+INCOMING_ONLY_GATES_ALIASES = (INCOMING_ONLY_GATES_KEY, "incoming_only_gates")
+
+
+def object_has_blank_or_invalid_hull(obj: Any, valid_hull_keys: set) -> bool:
+    if not isinstance(obj, dict):
+        return False
+    if str(obj.get("type", "")).strip().lower() not in STATION_OR_PLATFORM_TYPES:
+        return False
+    hull = str(obj.get("hull", "") or "").strip()
+    if not hull:
+        return True
+    return bool(valid_hull_keys) and hull.casefold() not in valid_hull_keys
+
+
+def draw_red_cross(canvas, sx, sy, radius=8, width=3, tags=()):
+    canvas.create_line(
+        sx - radius, sy - radius, sx + radius, sy + radius,
+        fill="red", width=width, tags=tags
+    )
+    canvas.create_line(
+        sx - radius, sy + radius, sx + radius, sy - radius,
+        fill="red", width=width, tags=tags
+    )
+
+
+def get_incoming_only_gate_list(data: Any) -> List[str]:
+    meta = data.get("metadata", {}) if isinstance(data, dict) else {}
+    if not isinstance(meta, dict):
+        return []
+
+    cleaned = []
+    seen = set()
+    for key in INCOMING_ONLY_GATES_ALIASES:
+        raw_names = meta.get(key, [])
+        if isinstance(raw_names, str):
+            raw_names = [raw_names]
+        if not isinstance(raw_names, (list, tuple, set)):
+            continue
+        for name in raw_names:
+            gate_name = str(name or "").strip()
+            gate_key = gate_name.casefold()
+            if not gate_name or gate_key in seen:
+                continue
+            cleaned.append(gate_name)
+            seen.add(gate_key)
+    return cleaned
+
+
+def get_incoming_only_gate_names(data: Any) -> set:
+    return {name.casefold() for name in get_incoming_only_gate_list(data)}
+
+
+def set_incoming_only_gate(data: Dict[str, Any], gate_name: str, enabled: bool) -> None:
+    md = data.setdefault("metadata", {})
+    if not isinstance(md, dict):
+        md = {}
+        data["metadata"] = md
+
+    cleaned_name = str(gate_name or "").strip()
+    existing = get_incoming_only_gate_list(data)
+    existing_keys = {name.casefold() for name in existing}
+    gate_key = cleaned_name.casefold()
+
+    if enabled and cleaned_name and gate_key not in existing_keys:
+        existing.append(cleaned_name)
+    elif not enabled:
+        existing = [name for name in existing if name.casefold() != gate_key]
+
+    for key in INCOMING_ONLY_GATES_ALIASES:
+        md.pop(key, None)
+    if existing:
+        md[INCOMING_ONLY_GATES_KEY] = existing
+
+
+def rename_incoming_only_gate(data: Dict[str, Any], old_name: str, new_name: str) -> None:
+    cleaned_new = str(new_name or "").strip()
+    old_key = str(old_name or "").strip().casefold()
+    if not old_key or not cleaned_new:
+        return
+
+    existing = get_incoming_only_gate_list(data)
+    changed = False
+    renamed = []
+    seen = set()
+    for name in existing:
+        candidate = cleaned_new if name.casefold() == old_key else name
+        candidate_key = candidate.casefold()
+        if candidate_key in seen:
+            changed = True
+            continue
+        renamed.append(candidate)
+        seen.add(candidate_key)
+        changed = changed or candidate != name
+
+    if changed:
+        md = data.setdefault("metadata", {})
+        if isinstance(md, dict):
+            for key in INCOMING_ONLY_GATES_ALIASES:
+                md.pop(key, None)
+            if renamed:
+                md[INCOMING_ONLY_GATES_KEY] = renamed
+
+
+def remove_incoming_only_gate(data: Dict[str, Any], gate_name: str) -> None:
+    set_incoming_only_gate(data, gate_name, False)
+
+
+def draw_blue_gate_ring(canvas, sx, sy, radius=14, width=2, tags=()):
+    canvas.create_oval(
+        sx - radius, sy - radius, sx + radius, sy + radius,
+        outline="#3aa7ff", width=width, tags=tags
+    )
+
+
 def parse_database_snapshot(path):
     source = path.read_text(encoding="utf-8")
     module = ast.parse(source, filename=str(path))
@@ -560,8 +677,11 @@ def collect_fcs_blocked_centers(system_data, replace_existing=False):
     if not isinstance(system_data, dict):
         return blocked
 
+    if replace_existing:
+        return blocked
+
     objects = system_data.get("objects", {})
-    if isinstance(objects, dict) and not replace_existing:
+    if isinstance(objects, dict):
         for obj in objects.values():
             if not isinstance(obj, dict):
                 continue
@@ -1250,6 +1370,11 @@ def open_system_editor(filename: str) -> None:
         with open(os.path.join(base, 'HTML', 'Images', 'Ships', 'ShipMap.json'), 'r') as sf:
             ship_entries = json.load(sf)
             valid_hulls = [entry['key'] for entry in ship_entries]
+            valid_hull_keys = {
+                str(hull).strip().casefold()
+                for hull in valid_hulls
+                if str(hull).strip()
+            }
             valid_planet_classes = sorted(
                 [
                     str(entry.get('key')).strip()
@@ -1313,7 +1438,9 @@ def open_system_editor(filename: str) -> None:
                         cats.add(v.strip().lower())
                 hull_category_map[key] = cats
     except Exception:
+        ship_entries = []
         valid_hulls = []
+        valid_hull_keys = set()
         valid_planet_classes = [DEFAULT_PLANET_CLASS]
         ship_sides = []
         hull_ranges = {}
@@ -1448,6 +1575,8 @@ def open_system_editor(filename: str) -> None:
                     new = old.replace('-', ' ')
                     if new not in d:
                         d[new] = d.pop(old)
+                        if category == 'objects':
+                            rename_incoming_only_gate(sm.data, old, new)
                         renamed = True
         if renamed:
             # write out the updated JSON silently
@@ -2254,6 +2383,7 @@ def open_system_editor(filename: str) -> None:
     def delete_object(obj_name):
         push_undo()
         idx = objs.index(obj_name)
+        remove_incoming_only_gate(sm.data, obj_name)
         del sm.data['objects'][obj_name]
         objs.pop(idx)
         obj_lb.delete(idx)
@@ -2296,6 +2426,7 @@ def open_system_editor(filename: str) -> None:
         if new_name != name:
             push_undo()
             sm.data['objects'][new_name] = sm.data['objects'].pop(name)
+            rename_incoming_only_gate(sm.data, name, new_name)
             idx = objs.index(name)
             objs[idx] = new_name
             obj_lb.delete(idx)
@@ -2864,9 +2995,12 @@ def open_system_editor(filename: str) -> None:
             hull_cb.pack(anchor='w', pady=2)
             hull_cb.bind("<Button-1>", lambda e, cb=hull_cb: SysMapCanvas._schedule_combobox_colors(cb), add="+")
             SysMapCanvas._ensure_hull_color_binding(hull_cb)
-            hull_var.trace_add('write',
-                lambda *a, v=hull_var: obj.__setitem__('hull', v.get())
-            )
+
+            def apply_platform_hull(*_, v=hull_var):
+                obj['hull'] = v.get()
+                draw_map(ctx)
+
+            hull_var.trace_add('write', apply_platform_hull)
 
             show_all_var = tk.BooleanVar(value=False)
             relax_role_var = tk.BooleanVar(value=False)
@@ -2933,8 +3067,10 @@ def open_system_editor(filename: str) -> None:
             def _rename_gate(event, old=name, var=name_var):
                 new_name = var.get().strip()
                 if new_name and new_name != old:
+                    push_undo()
                     # mirror rename_object logic for objects
                     sm.data['objects'][new_name] = sm.data['objects'].pop(old)
+                    rename_incoming_only_gate(sm.data, old, new_name)
                     idx = objs.index(old)
                     objs[idx] = new_name
                     obj_lb.delete(idx)
@@ -2988,6 +3124,24 @@ def open_system_editor(filename: str) -> None:
             )
             state_cb.pack(anchor='w', pady=2)
             state_var.trace_add('write', lambda *a: obj.__setitem__('state', state_var.get()))
+
+            incoming_only_var = tk.BooleanVar(
+                value=name.casefold() in get_incoming_only_gate_names(sm.data)
+            )
+
+            def apply_incoming_only():
+                push_undo()
+                set_incoming_only_gate(sm.data, name, incoming_only_var.get())
+                draw_map(ctx)
+
+            tk.Checkbutton(
+                edit_frame,
+                text="Incoming only",
+                variable=incoming_only_var,
+                command=apply_incoming_only,
+                anchor='w',
+                justify='left'
+            ).pack(anchor='w', pady=2)
 
             # Destinations table (System | Gate)
             table = tk.Frame(edit_frame)
@@ -3101,7 +3255,12 @@ def open_system_editor(filename: str) -> None:
             hull_cb.grid(row=3, column=1, padx=5, pady=2, sticky='w')
             hull_cb.bind("<Button-1>", lambda e, cb=hull_cb: SysMapCanvas._schedule_combobox_colors(cb), add="+")
             SysMapCanvas._ensure_hull_color_binding(hull_cb)
-            hull_var.trace_add('write', lambda *a: obj.__setitem__('hull', hull_var.get()))
+
+            def apply_station_hull(*_):
+                obj['hull'] = hull_var.get()
+                draw_map(ctx)
+
+            hull_var.trace_add('write', apply_station_hull)
 
             show_all_var = tk.BooleanVar(value=False)
             relax_role_var = tk.BooleanVar(value=False)
@@ -3837,6 +3996,13 @@ def open_system_editor(filename: str) -> None:
         }
         gate_index = dict(other_gate_index)
         gate_index[filename] = current_gate_names
+        incoming_only_gate_list = get_incoming_only_gate_list(sm.data)
+        incoming_only_gate_names = {name.casefold() for name in incoming_only_gate_list}
+        for gate_name in incoming_only_gate_list:
+            if gate_name.casefold() not in current_gate_names:
+                warnings.append(
+                    f"Incoming-only metadata references missing jump object '{gate_name}'."
+                )
         for obj_name, obj in objects.items():
             if not isinstance(obj, dict):
                 errors.append(f"Object '{obj_name}' must be a JSON object.")
@@ -3847,29 +4013,30 @@ def open_system_editor(filename: str) -> None:
             coord = obj.get('coordinate')
             validate_coordinate_value(coord, f"Object '{obj_name}' coordinate", errors)
             if obj_type in ('jumpnode', 'jumppoint', 'jump_point'):
-                destinations = obj.get('destinations')
-                if not isinstance(destinations, dict) or not destinations:
-                    warnings.append(f"Jump object '{obj_name}' has no valid destinations.")
-                else:
-                    for dest_gate_name, dest_system_name in destinations.items():
-                        gate_name = str(dest_gate_name or '').strip()
-                        system_name = str(dest_system_name or '').strip()
-                        if not gate_name or not system_name:
-                            errors.append(f"Jump object '{obj_name}' has a blank destination entry.")
-                            continue
-                        dest_system_key = system_name.lower()
-                        if dest_system_key.endswith('.json'):
-                            dest_system_key = dest_system_key[:-5]
-                        dest_filename = system_files.get(dest_system_key)
-                        if not dest_filename:
-                            warnings.append(
-                                f"Jump object '{obj_name}' points to missing system '{system_name}'."
-                            )
-                            continue
-                        if gate_name.lower() not in gate_index.get(dest_filename, set()):
-                            warnings.append(
-                                f"Jump object '{obj_name}' points to missing gate '{gate_name}' in system '{system_name}'."
-                            )
+                if str(obj_name).casefold() not in incoming_only_gate_names:
+                    destinations = obj.get('destinations')
+                    if not isinstance(destinations, dict) or not destinations:
+                        warnings.append(f"Jump object '{obj_name}' has no valid destinations.")
+                    else:
+                        for dest_gate_name, dest_system_name in destinations.items():
+                            gate_name = str(dest_gate_name or '').strip()
+                            system_name = str(dest_system_name or '').strip()
+                            if not gate_name or not system_name:
+                                errors.append(f"Jump object '{obj_name}' has a blank destination entry.")
+                                continue
+                            dest_system_key = system_name.lower()
+                            if dest_system_key.endswith('.json'):
+                                dest_system_key = dest_system_key[:-5]
+                            dest_filename = system_files.get(dest_system_key)
+                            if not dest_filename:
+                                warnings.append(
+                                    f"Jump object '{obj_name}' points to missing system '{system_name}'."
+                                )
+                                continue
+                            if gate_name.lower() not in gate_index.get(dest_filename, set()):
+                                warnings.append(
+                                    f"Jump object '{obj_name}' points to missing gate '{gate_name}' in system '{system_name}'."
+                                )
             if is_zone_type(obj_type):
                 radius = obj.get('radius')
                 if not is_number_like(radius) or float(radius) <= 0:
@@ -4036,7 +4203,12 @@ def open_system_editor(filename: str) -> None:
                 hull_vals = platform_hulls if type_var.get() == 'platform' else valid_hulls
                 hull_cb = ttk.Combobox(rows_frame, textvariable=hull_var, values=hull_vals, state='readonly', width=16)
                 hull_cb.grid(row=row, column=2, sticky='w', padx=2, pady=2)
-                hull_var.trace_add('write', lambda *a, o=obj, v=hull_var: o.__setitem__('hull', v.get()))
+
+                def apply_overview_hull(*_, o=obj, v=hull_var):
+                    o['hull'] = v.get()
+                    draw_map(ctx)
+
+                hull_var.trace_add('write', apply_overview_hull)
 
                 fac_frame = tk.Frame(rows_frame)
                 fac_frame.grid(row=row, column=3, sticky='w', padx=2, pady=2)
@@ -4086,6 +4258,7 @@ def open_system_editor(filename: str) -> None:
                         hcb['values'] = vals
                         sfs(True)
                     refresh_objects_list()
+                    draw_map(ctx)
 
                 type_var.trace_add('write', on_type_change)
                 set_facility_state(type_var.get() == 'station')
@@ -4243,11 +4416,27 @@ def open_system_editor(filename: str) -> None:
             )
             return
 
-        existing_objects = sm.data.setdefault("objects", {})
+        existing_objects = sm.data.get("objects", {})
+        if existing_objects is None:
+            existing_objects = {}
+        if not isinstance(existing_objects, dict):
+            messagebox.showerror("Generate FCS Zones", "objects must be a JSON object.")
+            return
+        terrain_store = sm.data.setdefault("terrain", {})
+        if not isinstance(terrain_store, dict):
+            messagebox.showerror("Generate FCS Zones", "terrain must be a JSON object.")
+            return
         existing_fcs_objects = {
             name: obj for name, obj in existing_objects.items()
-            if str(obj.get("type", "")).strip().lower() == FCS_ZONE_TYPE
+            if isinstance(obj, dict)
+            and str(obj.get("type", "")).strip().lower() == FCS_ZONE_TYPE
         }
+        existing_fcs_terrain = {
+            name: feat for name, feat in terrain_store.items()
+            if isinstance(feat, dict)
+            and str(feat.get("type", "")).strip().lower() == FCS_ZONE_TYPE
+        }
+        existing_fcs_count = len(existing_fcs_objects) + len(existing_fcs_terrain)
 
         dlg, body, footer = toolbar.make_dialog("Generate Fuel Collection Zones", near="toolbar")
 
@@ -4255,7 +4444,7 @@ def open_system_editor(filename: str) -> None:
         spacing_var = tk.IntVar(value=DEFAULT_FCS_MIN_SPACING)
         density_radius_var = tk.IntVar(value=DEFAULT_FCS_DENSITY_RADIUS)
         percentile_var = tk.IntVar(value=DEFAULT_FCS_DENSITY_PERCENTILE)
-        replace_var = tk.BooleanVar(value=bool(existing_fcs_objects))
+        replace_var = tk.BooleanVar(value=bool(existing_fcs_count))
 
         tk.Label(
             body,
@@ -4263,7 +4452,7 @@ def open_system_editor(filename: str) -> None:
         ).grid(row=0, column=0, columnspan=2, padx=6, pady=(2, 2), sticky="w")
         tk.Label(
             body,
-            text=f"Existing FCS object zones: {len(existing_fcs_objects)}"
+            text=f"Existing FCS zones: {existing_fcs_count}"
         ).grid(row=1, column=0, columnspan=2, padx=6, pady=(0, 6), sticky="w")
 
         toolbar.labeled_spinbox(body, "Zone Radius:", zone_radius_var,
@@ -4277,7 +4466,7 @@ def open_system_editor(filename: str) -> None:
 
         tk.Checkbutton(
             body,
-            text="Replace existing FCS object zones",
+            text="Replace existing FCS zones",
             variable=replace_var
         ).grid(row=6, column=0, columnspan=2, padx=6, pady=(2, 4), sticky="w")
 
@@ -4325,25 +4514,31 @@ def open_system_editor(filename: str) -> None:
                         continue
                     del existing_objects[name]
                     removed += 1
+                for name in list(terrain_store.keys()):
+                    feat = terrain_store.get(name, {})
+                    if not isinstance(feat, dict):
+                        continue
+                    if str(feat.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
+                        continue
+                    del terrain_store[name]
+                    removed += 1
 
             created = []
+            used_names = set(existing_objects.keys()) | set(terrain_store.keys())
             for zone in selected:
-                name = toolbar.gen_zone_name(FCS_ZONE_TYPE)
-                existing_objects[name] = {
+                name = generate_zone_name(used_names, FCS_ZONE_TYPE)
+                terrain_store[name] = {
                     "type": FCS_ZONE_TYPE,
                     "coordinate": [zone["x"], 0, zone["z"]],
                     "radius": zone_radius,
                     "description": DEFAULT_FCS_DESCRIPTION,
                     "hideonmap": bool(zone.get("hideonmap", False)),
                 }
+                used_names.add(name)
                 created.append(name)
 
             dlg.destroy()
-            refresh_objects_list()
-            clear_edit_pane()
-            draw_map(ctx)
-            current_selection["type"] = None
-            current_selection["name"] = None
+            _refresh_ui()
 
         def _cancel():
             dlg.destroy()
@@ -4493,6 +4688,7 @@ def open_system_editor(filename: str) -> None:
         current_filename = ctx.get('current_system_filename', '')
         gate_index = dict(other_gate_index)
         current_objects = sm.data.get('objects', {})
+        incoming_only_gate_names = get_incoming_only_gate_names(sm.data)
         if current_filename:
             current_gate_names = set()
             for obj_name, obj in current_objects.items():
@@ -4502,7 +4698,9 @@ def open_system_editor(filename: str) -> None:
                 if otype in ('jumpnode', 'jumppoint', 'jump_point'):
                     current_gate_names.add(obj_name.lower())
             gate_index[current_filename] = current_gate_names
-        def has_invalid_destination(obj):
+        def has_invalid_destination(obj_name, obj):
+            if str(obj_name).strip().casefold() in incoming_only_gate_names:
+                return False
             destinations = obj.get('destinations')
             if not isinstance(destinations, dict) or not destinations:
                 return True
@@ -4666,13 +4864,16 @@ def open_system_editor(filename: str) -> None:
                         tags=('obj', name)
                     )
 
-            if otype in ('jumpnode', 'jumppoint') and has_invalid_destination(obj):
+            if otype in ('jumpnode', 'jumppoint') and has_invalid_destination(name, obj):
                 ring_r = 12
                 map_canvas.create_oval(
                     sx - ring_r, sy - ring_r, sx + ring_r, sy + ring_r,
                     outline='yellow', width=2,
                     tags=('obj', name)
                 )
+
+            if otype in ('jumpnode', 'jumppoint') and name.casefold() in incoming_only_gate_names:
+                draw_blue_gate_ring(map_canvas, sx, sy, radius=14, width=2, tags=('obj', name))
 
 
             # ── Station/static range visuals (weapon ranges) ───────────────────
@@ -4725,6 +4926,8 @@ def open_system_editor(filename: str) -> None:
                 sx-r, sy-r, sx+r, sy+r,
                 fill=color, tags=('obj', name)
             )
+            if object_has_blank_or_invalid_hull(obj, valid_hull_keys):
+                draw_red_cross(map_canvas, sx, sy, radius=9, width=3, tags=('obj', name))
             map_canvas.create_text(
                 sx, sy-10,
                 text=name, fill=color,
