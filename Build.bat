@@ -6,6 +6,18 @@ REM Clean previous builds
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
 
+REM Prepare the application icon for PyInstaller
+set "ICON_PNG=%CD%\Icon.png"
+set "ICON_ICO=%CD%\Icon.ico"
+set "PYTHON_CMD=py -3"
+where py >nul 2>nul || set "PYTHON_CMD=python"
+if exist "%ICON_PNG%" goto :prepare_icon
+echo Missing Icon.png. Add Icon.png to the project root before building.
+goto :error
+
+:prepare_icon
+%PYTHON_CMD% -c "from PIL import Image; img=Image.open(r'%ICON_PNG%').convert('RGBA'); img.save(r'%ICON_ICO%', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])" || goto :error
+
 REM Build using spec files (keeps hidden imports + data definitions in sync)
 pyinstaller "StellarCartography.spec" || goto :error
 pyinstaller "LocMapGen.spec" || goto :error
@@ -28,6 +40,7 @@ powershell -NoProfile -Command "New-Item -ItemType Directory -Force -Path '%DIST
 powershell -NoProfile -Command "$src='%CD%\SystemEditorSettings.json'; $dst='%DIST%\SystemEditorSettings.json'; if (Test-Path $src) { $q=[char]34; $pattern='(?ms)('+$q+'author'+$q+'\s*:\s*)'+$q+'(?:\\.|[^'+$q+'\\])*'+$q; $replacement='$1'+$q+$q; $content=[System.IO.File]::ReadAllText($src); $content=[regex]::Replace($content, $pattern, $replacement, 1); [System.IO.File]::WriteAllText($dst, $content, [System.Text.UTF8Encoding]::new($false)) }" || goto :error
 powershell -NoProfile -Command "$src='%CD%\Settings.json'; $dst='%DIST%\Settings.json'; if (Test-Path $src) { $q=[char]34; $pattern='(?ms)('+$q+'author'+$q+'\s*:\s*)'+$q+'(?:\\.|[^'+$q+'\\])*'+$q; $replacement='$1'+$q+$q; $content=[System.IO.File]::ReadAllText($src); $content=[regex]::Replace($content, $pattern, $replacement, 1); [System.IO.File]::WriteAllText($dst, $content, [System.Text.UTF8Encoding]::new($false)) }" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%GALMAPINFO_SRC%') { Copy-Item -LiteralPath '%GALMAPINFO_SRC%' -Destination '%DIST%\GalMapInfo.json' -Force }" || goto :error
+powershell -NoProfile -Command "if (Test-Path -LiteralPath '%ICON_PNG%') { Copy-Item -LiteralPath '%ICON_PNG%' -Destination '%DIST%\Icon.png' -Force }; if (Test-Path -LiteralPath '%ICON_ICO%') { Copy-Item -LiteralPath '%ICON_ICO%' -Destination '%DIST%\Icon.ico' -Force }" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%HTML_DST%') { Remove-Item -LiteralPath '%HTML_DST%' -Recurse -Force }; Copy-Item -LiteralPath '%HTML_SRC%' -Destination '%HTML_DST%' -Recurse -Force" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%SCRIPTS_DST%') { Remove-Item -LiteralPath '%SCRIPTS_DST%' -Recurse -Force }; Copy-Item -LiteralPath '%SCRIPTS_SRC%' -Destination '%SCRIPTS_DST%' -Recurse -Force" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%CD%\cargo_teams.json') { Copy-Item -LiteralPath '%CD%\cargo_teams.json' -Destination '%DIST%\cargo_teams.json' -Force }" || goto :error

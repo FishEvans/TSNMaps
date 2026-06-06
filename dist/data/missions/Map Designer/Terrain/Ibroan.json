@@ -1,6 +1,6 @@
 {
     "systemMapCoord": [
-        13138.415583777793,
+        13138.415583777798,
         0,
         -24200.923274095967
     ],
@@ -10,13 +10,17 @@
         "security": "Neutral",
         "exports": [],
         "focus": "",
-        "intel": {},
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Low",
+            "assets": []
+        },
         "development": "Unclaimed",
         "visible": true,
         "skybox": "sky1.png",
         "original_author": "Fish Evans",
-        "revision_date": "2026-01-29",
-        "revision_number": 15,
+        "revision_date": "2026-06-06",
+        "revision_number": 16,
         "all_authors": [
             "Fish Evans"
         ],
@@ -437,6 +441,20 @@
             "cargo": {},
             "teams": {},
             "description": ""
+        },
+        "JP 24": {
+            "coordinate": [
+                212685.18518518523,
+                0,
+                -82295.52469135802
+            ],
+            "type": "jumppoint",
+            "jumppointtype": "Node",
+            "destinations": {
+                "JP 14": "A632"
+            },
+            "state": "Unteathered",
+            "drift": 15000
         }
     },
     "sensor_relay": {},
@@ -1028,7 +1046,8 @@
                 -100402.221138625,
                 0,
                 135030.69875509283
-            ]
+            ],
+            "class": "EarthLike"
         },
         "1766456782890": {
             "type": "asteroids",

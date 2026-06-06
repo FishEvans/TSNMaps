@@ -26,6 +26,7 @@ def get_base_path():
 STATION_OR_PLATFORM_TYPES = {"station", "platform"}
 INCOMING_ONLY_GATES_KEY = "incomingOnlyGates"
 INCOMING_ONLY_GATES_ALIASES = (INCOMING_ONLY_GATES_KEY, "incoming_only_gates")
+APP_ICON_FILENAME = "Icon.png"
 
 
 def load_valid_hull_keys():
@@ -98,6 +99,71 @@ def draw_red_cross(canvas, sx, sy, radius, width, tags):
 class SystemMapEditor:
     INITIAL_SCALE = 10000
     ICON_RADIUS = 18000000  # half-size for click detection
+
+    def _load_app_icon_image(self, size):
+        icon_path = os.path.join(get_base_path(), APP_ICON_FILENAME)
+        if not os.path.exists(icon_path):
+            return None
+        try:
+            with Image.open(icon_path) as img:
+                icon = img.convert("RGBA")
+            icon.thumbnail((size, size), Image.LANCZOS)
+            canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+            offset = ((size - icon.width) // 2, (size - icon.height) // 2)
+            canvas.alpha_composite(icon, offset)
+            return ImageTk.PhotoImage(canvas)
+        except (OSError, ValueError, tk.TclError):
+            return None
+
+    def _build_control_row(self, parent, label_text, button_specs):
+        row = tk.Frame(parent)
+        row.pack(side=tk.TOP, anchor="w", fill=tk.X, pady=(0, 2))
+        tk.Label(row, text=f"{label_text}:", width=6, anchor="w").pack(side=tk.LEFT)
+        for text, command in button_specs:
+            tk.Button(row, text=text, command=command).pack(side=tk.LEFT, padx=(0, 4))
+
+    def _build_controls(self):
+        control_frame = tk.Frame(self.root)
+        control_frame.pack(side=tk.TOP, fill=tk.X, padx=6, pady=4)
+
+        self.app_icon_image = self._load_app_icon_image(64)
+        if self.app_icon_image is not None:
+            try:
+                self.root.iconphoto(True, self.app_icon_image)
+            except tk.TclError:
+                pass
+            tk.Label(control_frame, image=self.app_icon_image).pack(side=tk.LEFT, padx=(0, 10), pady=2)
+
+        button_frame = tk.Frame(control_frame)
+        button_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        self._build_control_row(
+            button_frame,
+            "Map",
+            [
+                ("Open Map", self.open_or_generate_maps),
+                ("Reload Systems", self.reload_systems_data),
+                ("Re-generate Ship Data", self.regenerate_ship_data),
+            ],
+        )
+        self._build_control_row(
+            button_frame,
+            "Edit",
+            [
+                ("New System", self.create_new_system),
+                ("Auto Link Gates", self.auto_link_gates),
+                ("Save Changes", self.save_changes),
+            ],
+        )
+        self._build_control_row(
+            button_frame,
+            "View",
+            [
+                ("Zoom In", self.zoom_in),
+                ("Zoom Out", self.zoom_out),
+                ("Help", self.show_help),
+            ],
+        )
 
     def _get_index_html_path(self):
         return Path(get_base_path()) / "HTML" / "index.html"
@@ -774,34 +840,7 @@ class SystemMapEditor:
         self.root.title("Stellar Cartography")
         self.ct_config = self._load_cargo_teams()
         self.settings_config = self._load_settings()
-        control_frame = tk.Frame(root)
-        control_frame.pack(side=tk.TOP, fill=tk.X)
-        open_map_button = tk.Button(control_frame, text="Open Map", command=self.open_or_generate_maps)
-        open_map_button.pack(side=tk.LEFT)
-        auto_link_button = tk.Button(control_frame, text="Auto Link Gates", command=self.auto_link_gates)
-        auto_link_button.pack(side=tk.LEFT)
-        reload_button = tk.Button(control_frame, text="Reload Systems", command=self.reload_systems_data)
-        reload_button.pack(side=tk.LEFT)
-        regenerate_ship_data_button = tk.Button(
-            control_frame,
-            text="Re-generate Ship Data",
-            command=self.regenerate_ship_data,
-        )
-        regenerate_ship_data_button.pack(side=tk.LEFT)
-        save_button = tk.Button(control_frame, text="Save Changes", command=self.save_changes)
-        save_button.pack(side=tk.LEFT)
-
-        zoom_in_button = tk.Button(control_frame, text="Zoom In", command=self.zoom_in)
-        zoom_in_button.pack(side=tk.LEFT)
-
-        zoom_out_button = tk.Button(control_frame, text="Zoom Out", command=self.zoom_out)
-        zoom_out_button.pack(side=tk.LEFT)
-        
-        new_button = tk.Button(control_frame, text="New System", command=self.create_new_system)
-        new_button.pack(side=tk.LEFT)
-
-        help_button = tk.Button(control_frame, text="Help", command=self.show_help)
-        help_button.pack(side=tk.LEFT)
+        self._build_controls()
 
         self.drag_data = {
             "item": None,

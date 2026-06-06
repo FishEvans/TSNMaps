@@ -2,7 +2,7 @@
     "systemMapCoord": [
         -29158.91111657427,
         0,
-        13032.92189861291
+        13032.921898612909
     ],
     "systemalignment": "USFP",
     "metadata": {
@@ -19,8 +19,8 @@
         "development": "Uninhabited",
         "visible": true,
         "original_author": "Fish Evans",
-        "revision_date": "2026-04-12",
-        "revision_number": 16,
+        "revision_date": "2026-05-23",
+        "revision_number": 18,
         "all_authors": [
             "Fish Evans"
         ],
@@ -57,63 +57,6 @@
             },
             "state": "Tethered",
             "drift": 0
-        },
-        "DS 82": {
-            "coordinate": [
-                -13791.377425841114,
-                0.0,
-                -6093.905340290381
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_civil",
-            "type": "station",
-            "facilities": [
-                "Docking",
-                "Refuel",
-                "Repair"
-            ],
-            "cargo": {
-                "Comms Relay": 6,
-                "Coolant": 4,
-                "Fuel Cell 100": 5,
-                "Fuel Cell 200": 4,
-                "Fuel Cell 400": 2,
-                "Sensor Relay": 1,
-                "Warning Buoy": 4,
-                "Disruptor": 4,
-                "EMP": 3,
-                "Homing": 16,
-                "Mine": 2,
-                "Nuke": 1,
-                "Penetration": 3,
-                "Scorch": 7,
-                "Aid Package": 8,
-                "Alcohol": 2,
-                "Analysis Suite": 2,
-                "Casing": 6,
-                "Coffee": 10,
-                "Guidance System": 24,
-                "Meals": 4,
-                "Pets": 2,
-                "Power Relay": 9,
-                "Rations": 15,
-                "Repair Materials": 10,
-                "Sensor Suite": 12,
-                "Tea": 3,
-                "Tharium Plating": 10,
-                "Torpedo Casing": 27,
-                "Warhead": 4
-            },
-            "teams": {
-                "Combat Engineers": 3,
-                "DamCon": 2,
-                "Diplomats": 0,
-                "Marines": 2,
-                "Medics": 1
-            },
-            "description": ""
         },
         "Happy Eater Trading": {
             "coordinate": [
@@ -169,7 +112,7 @@
                 "DamCon": 2,
                 "Medics": 2
             },
-            "description": "The Happy Eater Trading Co (HET) is an start up company takeing advantatge of Waypoint 60's growing importance as a net work hub. Bar, Crew rest facilitys and flea market with plenty of storage for transshiping.g"
+            "description": "The Happy Eater Trading Co (HET) is an start up company takeing advantatge of Waypoint 60's growing importance as a network hub. Bar, Crew rest facilitys and flea market with plenty of storage for transshiping."
         },
         "HET S07": {
             "coordinate": [
@@ -281,7 +224,7 @@
                 "DamCon": 2,
                 "Medics": 1
             },
-            "description": ""
+            "description": "Inderpendent Mining Operation Claim 31. Extra Ore, Morag Industries call this station Home."
         },
         "IMO 224": {
             "coordinate": [
@@ -300,28 +243,29 @@
             ],
             "cargo": {
                 "Fuel Cell 100": 2,
+                "Life Support": 1,
                 "Homing": 35,
-                "Casing": 14,
+                "Casing": 15,
                 "Guidance System": 2,
-                "Meals": 5,
-                "Micro Controller": 7,
+                "Meals": 4,
+                "Micro Controller": 8,
                 "Power Relay": 16,
-                "Rations": 26,
+                "Rations": 25,
                 "Sensor Suite": 5,
-                "Torpedo Casing": 12,
+                "Torpedo Casing": 10,
                 "Warhead": 10,
                 "Aegirine": 20,
-                "Alerite": 38,
-                "Ashfilum": 49,
-                "Cabrite": 36,
-                "Denebite": 3,
-                "Gredian": 29,
-                "Ice": 148,
-                "Iron": 81,
-                "Mexalon": 10,
-                "Nuidinium": 58,
+                "Alerite": 40,
+                "Ashfilum": 42,
+                "Cabrite": 35,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 150,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 54,
                 "Reisium": 25,
-                "Tharium": 34
+                "Tharium": 31
             },
             "teams": {
                 "DamCon": 1,
@@ -411,9 +355,9 @@
         },
         "WP 53": {
             "coordinate": [
-                -21289.56995408448,
-                0.0,
-                -492.718536792323
+                -19965.49833509944,
+                0,
+                -1894.676721600013
             ],
             "sides": [
                 "USFP"
@@ -422,6 +366,63 @@
             "type": "platform",
             "cargo": {},
             "teams": {}
+        },
+        "DS 60 Kay": {
+            "coordinate": [
+                -13791.377425841114,
+                0.0,
+                -6093.905340290381
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_deep_space",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel",
+                "Repair"
+            ],
+            "cargo": {
+                "Comms Relay": 5,
+                "Coolant": 5,
+                "Fuel Cell 100": 4,
+                "Fuel Cell 200": 2,
+                "Fuel Cell 400": 1,
+                "Sensor Relay": 1,
+                "Warning Buoy": 5,
+                "Disruptor": 4,
+                "EMP": 3,
+                "Homing": 15,
+                "Mine": 4,
+                "Nuke": 2,
+                "Penetration": 4,
+                "Scorch": 8,
+                "Aid Package": 6,
+                "Alcohol": 2,
+                "Analysis Suite": 2,
+                "Casing": 5,
+                "Coffee": 10,
+                "Guidance System": 25,
+                "Meals": 5,
+                "Pets": 1,
+                "Power Relay": 10,
+                "Rations": 15,
+                "Repair Materials": 10,
+                "Sensor Suite": 11,
+                "Tea": 5,
+                "Tharium Plating": 10,
+                "Torpedo Casing": 25,
+                "Warhead": 5
+            },
+            "teams": {
+                "Combat Engineers": 1,
+                "DamCon": 3,
+                "Diplomats": 1,
+                "Marines": 1,
+                "Medics": 1
+            },
+            "description": "Officaly DS 60 its been nicknamed Kay for so long its starting to appear as such on offical Charts. This station started life as a standard S and R station but due to the development of the system has become much more."
         }
     },
     "sensor_relay": {
@@ -780,7 +781,7 @@
         }
     },
     "traffic": {
-        "commercial": "light",
+        "commercial": "medium",
         "civilian": "medium",
         "security": "light"
     }

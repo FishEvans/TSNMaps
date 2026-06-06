@@ -27,8 +27,8 @@
         "development": "Colony",
         "visible": true,
         "original_author": "Draeco",
-        "revision_date": "2026-02-06",
-        "revision_number": 16,
+        "revision_date": "2026-05-23",
+        "revision_number": 17,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -148,25 +148,6 @@
             "cargo": {},
             "teams": {}
         },
-        "DS 12": {
-            "coordinate": [
-                139346.21620292627,
-                0,
-                -21937.6532199144
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_command",
-            "type": "station",
-            "facilities": [
-                "Refuel",
-                "Repair"
-            ],
-            "cargo": {},
-            "teams": {},
-            "description": ""
-        },
         "WP 3": {
             "coordinate": [
                 44437.74907803272,
@@ -263,8 +244,40 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Comms Relay": 1,
+                "Fuel Cell 100": 2,
+                "Sensor Relay": 3,
+                "Data Chip": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Denebite Crystals": 5,
+                "Iso B Circuit": 3,
+                "Meals": 15,
+                "Micro Controller": 8,
+                "Packaging": 25,
+                "Power Relay": 16,
+                "Rations": 26,
+                "Sensor Suite": 10,
+                "Tharium Plating": 20,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 151,
+                "Alerite": 54,
+                "Ashfilum": 58,
+                "Cabrite": 35,
+                "Denebite": 30,
+                "Gredian": 10,
+                "Iron": 60,
+                "Nuidinium": 159,
+                "Reisium": 60,
+                "Tharium": 60
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "C 40": {
@@ -278,9 +291,37 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "Stephenson Labs": {
@@ -295,8 +336,39 @@
             "hull": "starbase_science",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Coolant": 10,
+                "Fuel Cell 400": 2,
+                "Data Chip": 4,
+                "Data Core": 2,
+                "Computer Core": 2,
+                "Life Support": 1,
+                "EMP": 11,
+                "Homing": 33,
+                "Analysis Suite": 8,
+                "Casing": 14,
+                "Denebite Crystals": 3,
+                "Guidance System": 17,
+                "High Yield Warhead": 11,
+                "Iso B Circuit": 2,
+                "Meals": 14,
+                "Medical Supplies": 17,
+                "Micro Controller": 22,
+                "Power Relay": 16,
+                "Rations": 7,
+                "Receiver": 4,
+                "Repair Materials": 7,
+                "Sensor Suite": 8,
+                "Transmitter": 10,
+                "Wild Animals": 15,
+                "Ice": 41,
+                "Mexalon": 9
+            },
+            "teams": {
+                "DamCon": 0,
+                "Medics": 5
+            },
+            "description": ""
         },
         "Brunell": {
             "coordinate": [
@@ -311,10 +383,37 @@
             "type": "station",
             "facilities": [
                 "Refuel",
-                "Repair"
+                "Repair",
+                "Docking"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "Juaqim Apartments": {
@@ -329,8 +428,34 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "DS 33": {
@@ -460,9 +585,9 @@
         },
         "WP 69": {
             "coordinate": [
-                -73043.44135074966,
+                -73100.82626801975,
                 0,
-                117338.05974895762
+                117494.56406878516
             ],
             "sides": [
                 "USFP"
@@ -481,38 +606,39 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_deep_space",
             "type": "station",
             "facilities": [
                 "Docking",
-                "Refuel",
-                "Repair"
+                "Refuel"
             ],
             "cargo": {
-                "Homing": 38,
-                "EMP": 11,
-                "Mine": 11,
-                "High Yield Warhead": 14,
-                "Warhead": 54,
-                "Torpedo Casing": 40,
-                "Casing": 53,
-                "Scorch": 55,
-                "AMC": 5,
-                "Computer Core": 4,
-                "FCS": 2,
-                "Sensor Suite": 7,
-                "Guidance System": 55,
-                "Life Support": 4,
-                "Navigational Array": 6,
-                "Iso B Circuit": 47,
-                "Micro Controller": 49,
-                "Black Box": 3,
-                "Repair Materials": 81
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Disruptor": 5,
+                "EMP": 6,
+                "Homing": 50,
+                "Mine": 6,
+                "Nuke": 2,
+                "Penetration": 2,
+                "Scorch": 8,
+                "Casing": 20,
+                "Guidance System": 25,
+                "High Yield Warhead": 15,
+                "Power Relay": 5,
+                "Sensor Suite": 8,
+                "Tharium Plating": 9,
+                "Torpedo Casing": 27,
+                "Warhead": 26,
+                "Mexalon": 3
             },
             "teams": {
+                "Combat Engineers": 2,
                 "DamCon": 3,
-                "Medics": 2,
-                "Combat Engineers": 9
+                "Marines": 1,
+                "Medics": 2
             },
             "description": ""
         },
@@ -528,8 +654,41 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Comms Relay": 1,
+                "Fuel Cell 100": 2,
+                "Sensor Relay": 3,
+                "Data Chip": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Denebite Crystals": 5,
+                "Iso B Circuit": 3,
+                "Meals": 15,
+                "Micro Controller": 8,
+                "Packaging": 25,
+                "Power Relay": 16,
+                "Rations": 26,
+                "Sensor Suite": 10,
+                "Tharium Plating": 20,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 151,
+                "Alerite": 54,
+                "Ashfilum": 58,
+                "Cabrite": 35,
+                "Denebite": 30,
+                "Gredian": 10,
+                "Iron": 60,
+                "Nuidinium": 159,
+                "Reisium": 60,
+                "Tharium": 60
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": ""
         },
         "I 82S": {
             "coordinate": [
@@ -543,8 +702,36 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Guidance System": 2,
+                "Meals": 4,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Rations": 25,
+                "Sensor Suite": 5,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 20,
+                "Alerite": 40,
+                "Ashfilum": 42,
+                "Cabrite": 35,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 150,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 54,
+                "Reisium": 25,
+                "Tharium": 31
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "I 902S": {
@@ -556,11 +743,40 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_industry",
+            "hull": "usfp_industrial_storage",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Guidance System": 2,
+                "Meals": 4,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Rations": 25,
+                "Sensor Suite": 5,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 20,
+                "Alerite": 40,
+                "Ashfilum": 42,
+                "Cabrite": 35,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 150,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 54,
+                "Reisium": 25,
+                "Tharium": 31
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": ""
         },
         "I 32A": {
             "coordinate": [
@@ -571,11 +787,40 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_industry",
+            "hull": "usfp_industrial_refinary",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Guidance System": 2,
+                "Meals": 4,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Rations": 25,
+                "Sensor Suite": 5,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 20,
+                "Alerite": 40,
+                "Ashfilum": 42,
+                "Cabrite": 35,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 150,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 54,
+                "Reisium": 25,
+                "Tharium": 31
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": ""
         },
         "C 45B": {
             "coordinate": [
@@ -588,9 +833,37 @@
             ],
             "hull": "starbase_civil",
             "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 10,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Medics": 1
+            },
+            "description": "Dorms and Recreation facilitys for Local Miners and dependents"
         },
         "I 23": {
             "coordinate": [
@@ -617,7 +890,7 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_industry",
+            "hull": "usfp_industrial_assembly",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -633,7 +906,7 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_industry",
+            "hull": "usfp_industrial_unit",
             "type": "station",
             "facilities": [],
             "cargo": {},
@@ -697,7 +970,7 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_command",
+            "hull": "starbase_deep_space",
             "type": "station",
             "facilities": [
                 "Docking",
@@ -705,25 +978,43 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 79,
-                "Nuke": 13,
-                "EMP": 11,
-                "Mine": 13,
-                "High Yield Warhead": 15,
-                "Warhead": 55,
-                "Torpedo Casing": 37,
-                "Casing": 15,
-                "Coolant": 33,
-                "Navigational Array": 2,
-                "Tactical Array": 10,
-                "Sensor Suite": 6,
-                "Guidance System": 65,
-                "Power Relay": 16
+                "Comms Relay": 5,
+                "Coolant": 5,
+                "Fuel Cell 100": 4,
+                "Fuel Cell 200": 2,
+                "Fuel Cell 400": 1,
+                "Sensor Relay": 1,
+                "Warning Buoy": 5,
+                "Disruptor": 4,
+                "EMP": 3,
+                "Homing": 15,
+                "Mine": 4,
+                "Nuke": 2,
+                "Penetration": 4,
+                "Scorch": 8,
+                "Aid Package": 6,
+                "Alcohol": 2,
+                "Analysis Suite": 2,
+                "Casing": 5,
+                "Coffee": 10,
+                "Guidance System": 25,
+                "Meals": 5,
+                "Pets": 1,
+                "Power Relay": 10,
+                "Rations": 15,
+                "Repair Materials": 10,
+                "Sensor Suite": 11,
+                "Tea": 5,
+                "Tharium Plating": 10,
+                "Torpedo Casing": 25,
+                "Warhead": 5
             },
             "teams": {
-                "DamCon": 8,
-                "Medics": 3,
-                "Combat Engineers": 9
+                "Combat Engineers": 1,
+                "DamCon": 3,
+                "Diplomats": 1,
+                "Marines": 1,
+                "Medics": 1
             },
             "description": ""
         },
@@ -739,8 +1030,35 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {}
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
+            "description": ""
         },
         "R 56X": {
             "coordinate": [
@@ -820,11 +1138,48 @@
             "sides": [
                 "USFP"
             ],
-            "hull": "starbase_civil",
+            "hull": "starbase_industry",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Coolant": 15,
+                "Fuel Cell 100": 7,
+                "Fuel Cell 200": 1,
+                "Fuel Cell 400": 1,
+                "Life Support": 3,
+                "EMP": 10,
+                "Homing": 35,
+                "Alcohol": 16,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Coffee": 15,
+                "Container": 18,
+                "Denebite Crystals": 5,
+                "Guidance System": 15,
+                "High Yield Warhead": 3,
+                "Iso B Circuit": 7,
+                "Meals": 14,
+                "Medical Supplies": 25,
+                "Micro Controller": 25,
+                "Packaging": 8,
+                "Pets": 4,
+                "Power Relay": 16,
+                "Produce": 15,
+                "Rations": 25,
+                "Receiver": 6,
+                "Repair Materials": 8,
+                "Sensor Suite": 8,
+                "Tea": 12,
+                "Tharium Plating": 16,
+                "Torpedo Casing": 21,
+                "Transmitter": 8,
+                "Warhead": 13,
+                "Wild Animals": 15
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
             "description": ""
         },
         "P 282": {
@@ -839,8 +1194,40 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Comms Relay": 1,
+                "Fuel Cell 100": 2,
+                "Sensor Relay": 3,
+                "Data Chip": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Denebite Crystals": 5,
+                "Iso B Circuit": 3,
+                "Meals": 15,
+                "Micro Controller": 8,
+                "Packaging": 25,
+                "Power Relay": 16,
+                "Rations": 26,
+                "Sensor Suite": 10,
+                "Tharium Plating": 20,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 151,
+                "Alerite": 54,
+                "Ashfilum": 58,
+                "Cabrite": 35,
+                "Denebite": 30,
+                "Gredian": 10,
+                "Iron": 60,
+                "Nuidinium": 159,
+                "Reisium": 60,
+                "Tharium": 60
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "S 382": {
@@ -855,8 +1242,38 @@
             "hull": "starbase_science",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Coolant": 8,
+                "Fuel Cell 400": 1,
+                "Data Chip": 5,
+                "Data Core": 2,
+                "Computer Core": 2,
+                "Life Support": 2,
+                "EMP": 10,
+                "Homing": 35,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Denebite Crystals": 2,
+                "Guidance System": 15,
+                "High Yield Warhead": 10,
+                "Iso B Circuit": 2,
+                "Meals": 15,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Rations": 8,
+                "Receiver": 6,
+                "Repair Materials": 6,
+                "Sensor Suite": 8,
+                "Transmitter": 8,
+                "Wild Animals": 15,
+                "Ice": 40,
+                "Mexalon": 9
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 5
+            },
             "description": ""
         },
         "Cerberus Armory": {
@@ -876,26 +1293,88 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 150,
-                "Nuke": 25,
-                "EMP": 25,
-                "Mine": 20,
-                "High Yield Warhead": 15,
-                "Warhead": 60,
-                "Torpedo Casing": 100,
+                "Comms Relay": 10,
+                "Coolant": 3,
+                "Fuel Cell 100": 10,
+                "Fuel Cell 200": 4,
+                "Fuel Cell 400": 1,
+                "Sensor Relay": 8,
+                "Warning Buoy": 10,
                 "Navigational Array": 1,
                 "Tactical Array": 10,
+                "Disruptor": 10,
+                "EMP": 25,
+                "Homing": 100,
+                "Mine": 20,
+                "Nuke": 25,
+                "Penetration": 10,
+                "Scorch": 25,
                 "Guidance System": 60,
+                "High Yield Warhead": 15,
                 "Medical Supplies": 12,
-                "Repair Materials": 5
+                "Power Relay": 7,
+                "Repair Materials": 9,
+                "Tharium Plating": 11,
+                "Torpedo Casing": 100,
+                "Warhead": 60
             },
             "teams": {
-                "DamCon": 4,
-                "Medics": 2,
-                "Marines": 2,
-                "Combat Engineers": 2
+                "Combat Engineers": 2,
+                "DamCon": 5,
+                "Marines": 5,
+                "Medics": 2
             },
             "description": ""
+        },
+        "DS Components inc": {
+            "coordinate": [
+                139346.21620292627,
+                0,
+                -21937.6532199144
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_unit",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Comms Relay": 1,
+                "Fuel Cell 100": 2,
+                "Sensor Relay": 3,
+                "Data Chip": 2,
+                "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Denebite Crystals": 5,
+                "Iso B Circuit": 3,
+                "Meals": 15,
+                "Micro Controller": 8,
+                "Packaging": 25,
+                "Power Relay": 16,
+                "Rations": 26,
+                "Sensor Suite": 10,
+                "Tharium Plating": 20,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 151,
+                "Alerite": 54,
+                "Ashfilum": 58,
+                "Cabrite": 35,
+                "Denebite": 30,
+                "Gredian": 10,
+                "Iron": 60,
+                "Nuidinium": 159,
+                "Reisium": 60,
+                "Tharium": 60
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": "Fab for Components used in all sorts of Industiral Machinery"
         }
     },
     "sensor_relay": {},
