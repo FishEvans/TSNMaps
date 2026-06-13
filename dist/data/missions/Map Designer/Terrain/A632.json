@@ -1,21 +1,21 @@
 {
     "systemMapCoord": [
-        34677.02428518797,
-        0.0,
+        34677.02428518798,
+        0,
         -698.3017381431682
     ],
     "systemalignment": "Unknown",
     "metadata": {
-        "sysdescription": "",
+        "sysdescription": "Discovered 2126",
         "security": "Neutral",
         "exports": [],
         "focus": "Defense & Security",
         "development": "Unclaimed",
-        "visible": false,
+        "visible": true,
         "skybox": "sky1.png",
         "intel": {
             "pirate": "Low",
-            "enemy": "Low",
+            "enemy": "High",
             "assets": [
                 "Slingshot",
                 "Fortification"
@@ -26,8 +26,8 @@
         "all_authors": [
             "Fish Evans"
         ],
-        "revision_number": 23,
-        "revision_date": "2026-06-06"
+        "revision_number": 28,
+        "revision_date": "2026-06-13"
     },
     "objects": {
         "JP 82": {
@@ -60,7 +60,7 @@
             "cargo": {},
             "teams": {},
             "description": "",
-            "hideonmap": true
+            "hideonmap": false
         },
         "Gen 23": {
             "coordinate": [
@@ -75,7 +75,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "WP 14": {
             "coordinate": [
@@ -90,13 +90,13 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "WP 82": {
             "coordinate": [
                 123286.65340912312,
                 0,
-                38966.83971871537
+                38921.554903950455
             ],
             "sides": [
                 "Kralien"
@@ -105,7 +105,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "Gen 77": {
             "coordinate": [
@@ -120,7 +120,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "Gen 74": {
             "coordinate": [
@@ -135,7 +135,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "Gen 67": {
             "coordinate": [
@@ -150,7 +150,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "Gen 40": {
             "coordinate": [
@@ -165,7 +165,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "WP 40": {
             "coordinate": [
@@ -180,7 +180,7 @@
             "type": "platform",
             "cargo": {},
             "teams": {},
-            "hideonmap": true
+            "hideonmap": false
         },
         "DS 12": {
             "coordinate": [
@@ -197,30 +197,13 @@
             "cargo": {},
             "teams": {},
             "description": "",
-            "hideonmap": true
-        },
-        "DS 98": {
-            "coordinate": [
-                -45547.197460261006,
-                0,
-                189246.7234206307
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": "",
-            "hideonmap": true
+            "hideonmap": false
         },
         "DS 18": {
             "coordinate": [
-                -57212.79245340232,
+                -52383.82537239805,
                 0,
-                177291.56224093246
+                181419.55022953288
             ],
             "sides": [
                 "Torgoth"
@@ -228,10 +211,15 @@
             "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "Data Core": 1,
+                "Virus": 1,
+                "Gredian": 20,
+                "Reisium": 10
+            },
             "teams": {},
-            "description": "",
-            "hideonmap": true
+            "description": "Kraliean Base, type 14 Suspected of beeing used for storage and refitting of Ordinace.",
+            "hideonmap": false
         },
         "JP 14": {
             "coordinate": [
@@ -263,7 +251,7 @@
             "cargo": {},
             "teams": {},
             "description": "",
-            "hideonmap": true
+            "hideonmap": false
         },
         "DS 21": {
             "coordinate": [
@@ -280,7 +268,7 @@
             "cargo": {},
             "teams": {},
             "description": "",
-            "hideonmap": true
+            "hideonmap": false
         },
         "WP 88": {
             "coordinate": [
@@ -298,7 +286,7 @@
         },
         "DS 80": {
             "coordinate": [
-                26284.207611262373,
+                26768.724359931923,
                 0,
                 -66968.88164444559
             ],
@@ -311,7 +299,7 @@
             "cargo": {},
             "teams": {},
             "description": "",
-            "hideonmap": true
+            "hideonmap": false
         },
         "DS 49": {
             "coordinate": [
@@ -325,16 +313,24 @@
             "hull": "hegemony_gasextractor",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "Coolant": 5,
+                "Denebite": 20,
+                "Fuel Cell 200": 4,
+                "Aegirine": 50,
+                "Iron": 40,
+                "Ashfilum": 15,
+                "Data Core": 1
+            },
             "teams": {},
-            "description": "",
-            "hideonmap": true
+            "description": "Gas Extraction and Processing for Fuel Collection",
+            "hideonmap": false
         },
         "DS 23": {
             "coordinate": [
-                -42417.04336411207,
+                -42385.59557608088,
                 0,
-                -52909.77965162696
+                -52616.26696333587
             ],
             "sides": [
                 "Torgoth"
@@ -345,13 +341,13 @@
             "cargo": {},
             "teams": {},
             "description": "",
-            "hideonmap": true
+            "hideonmap": false
         },
         "DS 28": {
             "coordinate": [
-                -182667.57790042,
+                -191000.91123375332,
                 0,
-                -23787.595600940036
+                -79620.92893427335
             ],
             "sides": [
                 "Pirate"
@@ -366,9 +362,9 @@
         },
         "DS 75": {
             "coordinate": [
-                -179275.96065973325,
+                -220942.62732639993,
                 0,
-                -83167.81491010667
+                998.8517565599865
             ],
             "sides": [
                 "Pirate"
@@ -391,6 +387,206 @@
                 "Torgoth"
             ],
             "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": false
+        },
+        "WP 57": {
+            "coordinate": [
+                -42332.03508361322,
+                0,
+                -52200.778077596726
+            ],
+            "sides": [
+                "Arvonian"
+            ],
+            "hull": "arvonian_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 52": {
+            "coordinate": [
+                -43516.56843278798,
+                0,
+                -52892.62941428287
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 55": {
+            "coordinate": [
+                -53587.716137625495,
+                0,
+                180462.99717607835
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 62": {
+            "coordinate": [
+                -44550.710986480866,
+                0,
+                187613.41662174105
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 97": {
+            "coordinate": [
+                -47846.23288271055,
+                0,
+                182861.3611889831
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Under Construction"
+        },
+        "DS 26": {
+            "coordinate": [
+                -45295.755017830495,
+                0,
+                187724.51382157594
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Virus": 1,
+                "Gredian": 20,
+                "Reisium": 10,
+                "Data Core": 1
+            },
+            "teams": {},
+            "description": "Kraliean Base, type 14 Suspected of beeing used for storage and refitting of Ordinace.",
+            "hideonmap": false
+        },
+        "WP 46": {
+            "coordinate": [
+                97462.5271490626,
+                0,
+                40815.699932327414
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 47": {
+            "coordinate": [
+                97462.5271490626,
+                0,
+                37755.40840409504
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 91": {
+            "coordinate": [
+                97462.5271490626,
+                0,
+                34699.00130390588
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 72": {
+            "coordinate": [
+                97369.06327007542,
+                0,
+                31589.185066243284
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 68": {
+            "coordinate": [
+                97649.45490703694,
+                0,
+                44032.77150972804
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 33": {
+            "coordinate": [
+                100920.69067158822,
+                0,
+                41976.56617201009
+            ],
+            "sides": [
+                "Arvonian"
+            ],
+            "hull": "arvonian_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "WP 98": {
+            "coordinate": [
+                100640.29903462667,
+                0,
+                33190.961547215236
+            ],
+            "sides": [
+                "Arvonian"
+            ],
+            "hull": "arvonian_platform",
             "type": "platform",
             "cargo": {},
             "teams": {},
@@ -418,65 +614,48 @@
             "ping": 2,
             "range": 15000
         },
-        "Scan Point Beta [G12]": {
+        "SR 001": {
             "coordinate": [
-                10178.742823094972,
+                93333.33333333334,
                 0,
-                -113876.75756111978
+                -185000.00000000003
             ],
-            "type": "Warning Buoy",
-            "description": "",
-            "broadcast": "",
-            "ping": 2,
-            "range": 15000
+            "type": "Sensor Relay"
         },
-        "Scan Point Gamma [I07]": {
+        "SR 002": {
             "coordinate": [
-                -90278.08418147996,
+                -142500.0,
                 0,
-                -67299.32566563544
+                66666.66666666667
             ],
-            "type": "Warning Buoy",
-            "description": "",
-            "broadcast": "",
-            "ping": 2,
-            "range": 15000
+            "type": "Sensor Relay",
+            "description": ""
         },
-        "Scan Point Mu [O03]": {
+        "SR 003": {
             "coordinate": [
-                -167373.47107910382,
+                -70000.0,
                 0,
-                49653.06355738454
+                -120833.33333333334
             ],
-            "type": "Warning Buoy",
-            "description": "",
-            "broadcast": "",
-            "ping": 2,
-            "range": 15000
+            "type": "Sensor Relay"
         },
-        "Scan Point Delta [T08]": {
+        "SR 004": {
             "coordinate": [
-                -66101.97142283316,
+                141364.11536922725,
                 0,
-                143761.33989356298
+                55534.693644261555
             ],
-            "type": "Warning Buoy",
-            "description": "",
-            "broadcast": "",
-            "ping": 2,
-            "range": 15000
+            "type": "Sensor Relay",
+            "description": ""
         },
-        "Scan Point Epsilon [O19]": {
+        "SR 005": {
             "coordinate": [
-                142708.15078575572,
+                35957.174624793806,
                 0,
-                53149.49296175935
+                172282.17331546065
             ],
-            "type": "Warning Buoy",
-            "description": "",
-            "broadcast": "",
-            "ping": 2,
-            "range": 15000
+            "type": "Sensor Relay",
+            "description": ""
         }
     },
     "terrain": {
@@ -656,7 +835,7 @@
             "composition": [
                 "Ast. Std Rand"
             ],
-            "hideonmap": true
+            "hideonmap": false
         },
         "Asteroid Field 7": {
             "type": "asteroids",
@@ -904,9 +1083,9 @@
             "type": "nebulas",
             "seed": 7748176,
             "start": [
-                -71988.32,
+                -72865.37700725016,
                 0,
-                187384.69
+                187548.72567771125
             ],
             "end": [
                 -29874.56,
@@ -1076,7 +1255,7 @@
             "density": 387,
             "scatter": 24974,
             "composition": [],
-            "hideonmap": true
+            "hideonmap": false
         },
         "Debris Field": {
             "type": "debris_field",
@@ -1088,19 +1267,19 @@
             ],
             "density": 32,
             "scatter": 7813,
-            "hideonmap": true
+            "hideonmap": false
         },
         "Hidden Mine Field 1": {
             "type": "hidden_minefield",
             "coordinate": [
-                105463.14029479827,
+                106333.34846725484,
                 0,
-                18905.32558582474
+                17587.075499742277
             ],
             "height": 10000,
             "width": 25000,
             "density": 70,
-            "hideonmap": true
+            "hideonmap": false
         },
         "Hidden Mine Field 2": {
             "type": "hidden_minefield",
@@ -1112,26 +1291,26 @@
             "height": 10000,
             "width": 25000,
             "density": 70,
-            "hideonmap": true
+            "hideonmap": false
         },
         "Mine Field Alpha": {
             "type": "hidden_minefield",
             "coordinate": [
-                145693.47466727873,
+                141700.40652149063,
                 0,
-                28496.04652621594
+                27815.07201646091
             ],
             "height": 20000,
             "width": 15000,
             "density": 70,
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS1": {
             "type": "fcs_zone",
             "coordinate": [
-                -44911.26307007998,
+                -49012.564572957686,
                 0,
-                -47440.23144070154
+                -46415.50949677113
             ],
             "radius": 11625,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 11,625 units. Local nebular density index: 74.9. Source field: Nebula Field 6. Survey profile: charged nebular wisps with intermittent fuel-cell precursors; field stability dense around the core; collector saturation estimate 74%. Telemetry confidence: high. Keep condenser temperature margins high during extended collection.",
@@ -1212,7 +1391,7 @@
             ],
             "radius": 7790,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 7,790 units. Local nebular density index: 27.1. Source field: Nebula Field 13. Survey profile: bright ion trails with usable condenser feedstock; field stability stable; collector saturation estimate 53%. Telemetry confidence: moderate. Cycle filters often; particulate load may spike without warning.",
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS9": {
             "type": "fcs_zone",
@@ -1245,7 +1424,7 @@
             ],
             "radius": 9822,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 9,822 units. Local nebular density index: 51.1. Source field: Nebula Field 5. Survey profile: charged nebular wisps with intermittent fuel-cell precursors; field stability patchy near the edge; collector saturation estimate 78%. Telemetry confidence: moderate. Use wide intake sweeps before narrowing to the central plume.",
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS12": {
             "type": "fcs_zone",
@@ -1295,12 +1474,36 @@
         "Hidden Mine Field 4": {
             "type": "hidden_minefield",
             "coordinate": [
-                -4888.227428174032,
+                -32678.929077529356,
                 0,
-                185179.46363930806
+                167742.14785090552
             ],
             "height": 15000,
             "width": 15000,
+            "density": 70,
+            "hideonmap": true
+        },
+        "Hidden Mine Field 5": {
+            "type": "hidden_minefield",
+            "coordinate": [
+                -90884.34891119365,
+                0,
+                -76835.54848097714
+            ],
+            "height": 15000,
+            "width": 20000,
+            "density": 70,
+            "hideonmap": true
+        },
+        "Hidden Mine Field 6": {
+            "type": "hidden_minefield",
+            "coordinate": [
+                149235.61099679925,
+                0,
+                58234.97156492914
+            ],
+            "height": 10000,
+            "width": 10000,
             "density": 70,
             "hideonmap": true
         }
