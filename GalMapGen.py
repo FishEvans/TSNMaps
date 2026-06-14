@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -12,6 +13,11 @@ MAP_INFO_FILENAME = "GalMapInfo.json"
 HTML_OUTPUT_NAME = "index.html"
 JUMP_TYPES = {"jump_point", "jumppoint", "jumpnode"}
 DEFAULT_MAP_INFO = {"borders": [], "texts": []}
+PUBLIC_JUMP_COLOR = "#50CC50"
+HIDDEN_JUMP_COLOR = "#B8E6FF"
+HIDDEN_JUMP_BASE_COLOR = "#7FCBFF"
+HIDDEN_JUMP_OFFSET = 28
+SELF_JUMP_RADIUS = 140
 
 
 def get_base_path():
@@ -215,7 +221,50 @@ def build_directed_jumps(systems, coords):
     return directed_jumps
 
 
-def build_one_way_jump_svg(src_name, tgt_name, hidden_jump, coords):
+def build_self_jump_svg(src_name, hidden_jump, coords, offset=0):
+    src_class = src_name.replace(" ", "-")
+    px = coords[src_name]["x"]
+    py = coords[src_name]["y"]
+    radius = SELF_JUMP_RADIUS + abs(offset)
+    horizontal_shift = offset * 0.5
+    start_x = px + 58 + horizontal_shift
+    start_y = py - 34 - abs(offset) * 0.35
+    end_x = px - 58 - horizontal_shift
+    end_y = start_y
+    control_y = py - radius - abs(offset)
+    path = (
+        f"M {start_x} {start_y} "
+        f"C {px + radius + horizontal_shift} {control_y}, "
+        f"{px - radius - horizontal_shift} {control_y}, "
+        f"{end_x} {end_y}"
+    )
+    line_style = ' style="display:none;"' if hidden_jump else ""
+    line_class = " hidden-jump" if hidden_jump else ""
+
+    if hidden_jump:
+        return [
+            f'<path d="{path}" stroke="{HIDDEN_JUMP_BASE_COLOR}" stroke-width="9" '
+            f'fill="none" opacity="0.45" stroke-dasharray="28 18" stroke-linecap="round" '
+            f'class="jump-base jump-from-{src_class}{line_class}"{line_style} />',
+            f'<path d="{path}" stroke="{HIDDEN_JUMP_COLOR}" stroke-width="10" '
+            f'fill="none" stroke-dasharray="28 18" stroke-linecap="round" '
+            f'marker-end="url(#hidden-arrow)" '
+            f'class="jump-line jump-from-{src_class}{line_class}"{line_style} />',
+        ]
+
+    return [
+        f'<path d="{path}" stroke="#666666" stroke-width="9" opacity="0.6" '
+        f'fill="none" class="jump-base jump-from-{src_class}" />',
+        f'<path d="{path}" stroke="{PUBLIC_JUMP_COLOR}" stroke-width="12" '
+        f'fill="none" marker-end="url(#arrow)" '
+        f'class="jump-line jump-from-{src_class}" />',
+    ]
+
+
+def build_one_way_jump_svg(src_name, tgt_name, hidden_jump, coords, offset=0):
+    if src_name == tgt_name:
+        return build_self_jump_svg(src_name, hidden_jump, coords, offset)
+
     src_class = src_name.replace(" ", "-")
     px = coords[src_name]["x"]
     py = coords[src_name]["y"]
@@ -225,15 +274,38 @@ def build_one_way_jump_svg(src_name, tgt_name, hidden_jump, coords):
     line_class = " hidden-jump" if hidden_jump else ""
     dx = tx - px
     dy = ty - py
+    distance = math.hypot(dx, dy)
+    if offset and distance:
+        offset_x = -dy / distance * offset
+        offset_y = dx / distance * offset
+        px += offset_x
+        py += offset_y
+        tx += offset_x
+        ty += offset_y
+
+    dx = tx - px
+    dy = ty - py
     arrow_x = px + dx * (2 / 3)
     arrow_y = py + dy * (2 / 3)
+
+    if hidden_jump:
+        return [
+            f'<line x1="{px}" y1="{py}" x2="{tx}" y2="{ty}" '
+            f'stroke="{HIDDEN_JUMP_BASE_COLOR}" stroke-width="9" opacity="0.45" '
+            f'stroke-dasharray="28 18" stroke-linecap="round" '
+            f'class="jump-base jump-from-{src_class}{line_class}"{line_style} />',
+            f'<line x1="{px}" y1="{py}" x2="{arrow_x}" y2="{arrow_y}" '
+            f'stroke="{HIDDEN_JUMP_COLOR}" stroke-width="10" marker-end="url(#hidden-arrow)" '
+            f'stroke-dasharray="28 18" stroke-linecap="round" '
+            f'class="jump-line jump-from-{src_class}{line_class}"{line_style} />',
+        ]
 
     return [
         f'<line x1="{px}" y1="{py}" x2="{tx}" y2="{ty}" '
         f'stroke="#666666" stroke-width="9" opacity="0.6" '
         f'class="jump-base jump-from-{src_class}{line_class}"{line_style} />',
         f'<line x1="{px}" y1="{py}" x2="{arrow_x}" y2="{arrow_y}" '
-        f'stroke="#50CC50" stroke-width="12" marker-end="url(#arrow)" '
+        f'stroke="{PUBLIC_JUMP_COLOR}" stroke-width="12" marker-end="url(#arrow)" '
         f'class="jump-line jump-from-{src_class}{line_class}"{line_style} />',
     ]
 
@@ -256,14 +328,26 @@ def build_jump_lines(systems, system_meta, coords):
             system_meta.get(a_name, {}).get("visible", True)
             and system_meta.get(b_name, {}).get("visible", True)
         )
-        a_to_b_public = pair_public and any(
+        a_to_b_has_public_entry = any(
             not entry.get("hidden", False) for entry in a_to_b_entries
         )
-        b_to_a_public = pair_public and any(
+        b_to_a_has_public_entry = any(
             not entry.get("hidden", False) for entry in b_to_a_entries
         )
-        a_to_b_hidden = any(entry.get("hidden", False) for entry in a_to_b_entries) or not pair_public
-        b_to_a_hidden = any(entry.get("hidden", False) for entry in b_to_a_entries) or not pair_public
+        a_to_b_has_hidden_entry = any(
+            entry.get("hidden", False) for entry in a_to_b_entries
+        )
+        b_to_a_has_hidden_entry = any(
+            entry.get("hidden", False) for entry in b_to_a_entries
+        )
+        a_to_b_public = pair_public and a_to_b_has_public_entry
+        b_to_a_public = pair_public and b_to_a_has_public_entry
+        a_to_b_hidden = bool(a_to_b_entries) and (
+            a_to_b_has_hidden_entry or not pair_public
+        )
+        b_to_a_hidden = bool(b_to_a_entries) and (
+            b_to_a_has_hidden_entry or not pair_public
+        )
 
         ax = coords[a_name]["x"]
         ay = coords[a_name]["y"]
@@ -272,23 +356,38 @@ def build_jump_lines(systems, system_meta, coords):
         a_class = a_name.replace(" ", "-")
         b_class = b_name.replace(" ", "-")
 
+        if a_name == b_name:
+            if a_to_b_public:
+                svg_lines.extend(build_one_way_jump_svg(a_name, b_name, False, coords))
+            if a_to_b_hidden:
+                offset = HIDDEN_JUMP_OFFSET if a_to_b_public else 0
+                svg_lines.extend(
+                    build_one_way_jump_svg(a_name, b_name, True, coords, offset)
+                )
+            continue
+
+        public_line_drawn = a_to_b_public or b_to_a_public
         if a_to_b_public and b_to_a_public:
             svg_lines.append(
                 f'<line x1="{ax}" y1="{ay}" x2="{bx}" y2="{by}" '
-                f'stroke="#50CC50" stroke-width="12" '
+                f'stroke="{PUBLIC_JUMP_COLOR}" stroke-width="12" '
                 f'class="jump-line jump-from-{a_class} jump-from-{b_class}" />'
             )
-            continue
+        else:
+            if a_to_b_public:
+                svg_lines.extend(build_one_way_jump_svg(a_name, b_name, False, coords))
+            if b_to_a_public:
+                svg_lines.extend(build_one_way_jump_svg(b_name, a_name, False, coords))
 
-        if a_to_b_public:
-            svg_lines.extend(build_one_way_jump_svg(a_name, b_name, False, coords))
-        elif a_to_b_hidden:
-            svg_lines.extend(build_one_way_jump_svg(a_name, b_name, True, coords))
-
-        if b_to_a_public:
-            svg_lines.extend(build_one_way_jump_svg(b_name, a_name, False, coords))
-        elif b_to_a_hidden:
-            svg_lines.extend(build_one_way_jump_svg(b_name, a_name, True, coords))
+        hidden_offset = HIDDEN_JUMP_OFFSET if public_line_drawn else 0
+        if a_to_b_hidden:
+            svg_lines.extend(
+                build_one_way_jump_svg(a_name, b_name, True, coords, hidden_offset)
+            )
+        if b_to_a_hidden:
+            svg_lines.extend(
+                build_one_way_jump_svg(b_name, a_name, True, coords, hidden_offset)
+            )
 
     return svg_lines
 
@@ -396,13 +495,22 @@ def build_styles(layout):
       pointer-events: none;
     }}
     @keyframes jumpPulse {{
-      0%   {{ stroke: #50CC50; stroke-width: 12; }}
+      0%   {{ stroke: {PUBLIC_JUMP_COLOR}; stroke-width: 12; }}
       100% {{ stroke: #c8facc; stroke-width: 18; }}
     }}
-    .jump-line {{ stroke: #50CC50; }}
+    @keyframes hiddenJumpPulse {{
+      0%   {{ stroke: {HIDDEN_JUMP_COLOR}; stroke-width: 10; }}
+      100% {{ stroke: #E4F6FF; stroke-width: 15; }}
+    }}
+    .jump-line {{ stroke: {PUBLIC_JUMP_COLOR}; }}
+    .hidden-jump.jump-line {{ stroke: {HIDDEN_JUMP_COLOR}; }}
+    .hidden-jump.jump-base {{ stroke: {HIDDEN_JUMP_BASE_COLOR}; }}
     .jump-arrow-active {{
       animation: jumpPulse 1s infinite alternate ease-in-out !important;
       pointer-events: none !important;
+    }}
+    .hidden-jump.jump-arrow-active {{
+      animation: hiddenJumpPulse 1s infinite alternate ease-in-out !important;
     }}
     #info {{
       width: 300px;
@@ -1034,7 +1142,10 @@ def build_page_html(system_divs, svg_lines, system_list_html, layout, system_met
       <svg width="100%" height="100%">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 Z" fill="#50CC50" />
+            <path d="M0,0 L10,5 L0,10 Z" fill="{PUBLIC_JUMP_COLOR}" />
+          </marker>
+          <marker id="hidden-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="{HIDDEN_JUMP_COLOR}" />
           </marker>
         </defs>
         {''.join(svg_lines)}

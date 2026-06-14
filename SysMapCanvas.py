@@ -901,17 +901,6 @@ def on_canvas_press(event, ctx):
         dlg.geometry(f"+{x}+{y}")
         return
 
-    # Relay selection / start drag
-    for item in map_canvas.find_withtag('relay_pt'):
-        x1, y1, x2, y2 = map_canvas.bbox(item)
-        if x1 <= event.x <= x2 and y1 <= event.y <= y2:
-            tags = map_canvas.gettags(item)
-            if len(tags) > 1:
-                relay = tags[1]
-                show_relay(relay)
-                drag_data['relay'] = relay
-                drag_data['x'], drag_data['y'] = event.x, event.y
-                return
     # New terrain placement modes
     if toolbar.asteroid_mode or toolbar.nebula_mode:
         ctx['push_undo']()
@@ -1086,60 +1075,108 @@ def on_canvas_press(event, ctx):
 
 
 
-    # Terrain point selection / start drag
-    for tag in map_canvas.find_withtag('terrain_pt'):
-        x1, y1, x2, y2 = map_canvas.bbox(tag)
-        if x1 <= event.x <= x2 and y1 <= event.y <= y2:
-            tags = map_canvas.gettags(tag)
-            # Some terrain points (e.g., asteroid/nebula dots) only carry ('terrain_pt', key)
-            # and are not intended to be draggable.
+    def object_hit_priority(obj):
+        otype = str(obj.get('type', '') or '').strip().lower()
+        if otype == 'station':
+            return 0
+        if otype == 'platform':
+            return 1
+        if otype in ('jumpnode', 'jumppoint', 'jump_point'):
+            return 2
+        if SystemEditor.is_zone_type(otype):
+            return 6
+        return 3
+
+    def relay_hit_priority(relay_name):
+        relay_store = sm.data.get('sensor_relay', {})
+        relay_entry = relay_store.get(relay_name)
+        relay_type = ''
+        if isinstance(relay_entry, dict):
+            relay_type = SystemEditor.normalize_relay_type(relay_entry.get('type'))
+        if relay_type == SystemEditor.RELAY_TYPE_WARNING_BUOY:
+            return 4
+        return 5
+
+    def terrain_hit_priority(feature):
+        ttype = str(feature.get('type', '') or '').strip().lower()
+        if ttype in ('hidden_minefield', 'minefield') or SystemEditor.is_zone_type(ttype):
+            return 6
+        return 7
+
+    def point_hits_center(coord, radius_px=8):
+        if not isinstance(coord, (list, tuple)) or len(coord) < 3:
+            return False
+        sx, sy = ctx['coord_to_screen'](coord[0], coord[2])
+        return math.hypot(event.x - sx, event.y - sy) <= radius_px
+
+    hit_candidates = []
+    # Inspect topmost first, then let explicit priority decide the winner.
+    for draw_order, item in enumerate(reversed(map_canvas.find_overlapping(event.x, event.y, event.x, event.y))):
+        tags = map_canvas.gettags(item)
+        if 'obj' in tags:
+            name = next((t for t in tags if t != 'obj'), None)
+            if not name:
+                continue
+            obj = sm.get_object(name)
+            otype = str(obj.get('type', '') or '').strip().lower()
+            # Zone objects are selected only from their center point, not their radius fill.
+            if SystemEditor.is_zone_type(otype) and not point_hits_center(obj.get('coordinate')):
+                continue
+            hit_candidates.append((object_hit_priority(obj), draw_order, 'obj', name, None))
+            continue
+
+        if 'relay_pt' in tags and len(tags) > 1:
+            relay = tags[1]
+            hit_candidates.append((relay_hit_priority(relay), draw_order, 'relay', relay, None))
+            continue
+
+        if 'terrain_pt' in tags:
+            # Some terrain points (e.g. asteroid/nebula scatter dots) only carry
+            # ('terrain_pt', key) and are not intended to be draggable/selectable.
             if len(tags) < 3:
                 continue
             key, pt_type = tags[1], tags[2]
             if key not in terrain_keys:
                 continue
-            idx = terrain_keys.index(key)
+            feature = sm.get_terrain_feature(key)
+            hit_candidates.append((terrain_hit_priority(feature), draw_order, 'terrain', key, pt_type))
+            continue
+
+        if 'terrain' in tags and len(tags) > 1:
+            key = tags[1]
+            if key not in terrain_keys:
+                continue
+            feature = sm.get_terrain_feature(key)
+            ttype = str(feature.get('type', '') or '').strip().lower()
+            # FCS and other zone terrain is selected only by the center terrain_pt.
+            if SystemEditor.is_zone_type(ttype):
+                continue
+            if ttype in ('blackhole', 'debris_field', 'planet', 'hidden_minefield', 'minefield'):
+                hit_candidates.append((terrain_hit_priority(feature), draw_order, 'terrain', key, 'coord'))
+
+    if hit_candidates:
+        _, _, kind, name, point_type = min(hit_candidates, key=lambda item: (item[0], item[1]))
+        if kind == 'obj':
+            ctx['push_undo']()
+            show_object(name)
+            drag_data['obj'] = name
+            drag_data['x'], drag_data['y'] = event.x, event.y
+            return
+        if kind == 'relay':
+            show_relay(name)
+            drag_data['relay'] = name
+            drag_data['x'], drag_data['y'] = event.x, event.y
+            return
+        if kind == 'terrain':
+            idx = terrain_keys.index(name)
             ter_lb.selection_clear(0, tk.END)
             ter_lb.selection_set(idx)
             ter_lb.see(idx)
-            # capture before any terrain-point move
             ctx['push_undo']()
-            show_terrain(key)
-            drag_data['terrain'] = (key, pt_type)
+            show_terrain(name)
+            drag_data['terrain'] = (name, point_type)
             drag_data['x'], drag_data['y'] = event.x, event.y
             return
-    # — allow black‐hole dots (tagged 'terrain') to be dragged like terrain_pts —
-    for tag in map_canvas.find_withtag('terrain'):
-        x1,y1,x2,y2 = map_canvas.bbox(tag)
-        if x1 <= event.x <= x2 and y1 <= event.y <= y2:
-            key = map_canvas.gettags(tag)[1]  # the terrain key
-            feat = sm.get_terrain_feature(key)
-            ttype = feat.get('type','').lower()
-            if ttype in ('blackhole', 'debris_field', 'planet', 'hidden_minefield', 'minefield') or SystemEditor.is_zone_type(ttype):
-                # capture before blackhole center move
-                ctx['push_undo']()
-                show_terrain(key)
-                drag_data['terrain'] = (key, 'coord')
-                drag_data['x'], drag_data['y'] = event.x, event.y
-                return
-    # Object selection / start drag
-    # Prefer true hit-testing under the cursor; do NOT depend on sidebar list membership.
-    for item in reversed(map_canvas.find_overlapping(event.x, event.y, event.x, event.y)):
-        tags = map_canvas.gettags(item)
-        if 'obj' in tags:
-            # tags are ('obj', <name>) from draw_map; find the object name tag
-            name = None
-            for t in tags:
-                if t != 'obj':
-                    name = t
-                    break
-            if name:
-                # capture before any object move
-                ctx['push_undo']()
-                show_object(name)
-                drag_data['obj'] = name
-                drag_data['x'], drag_data['y'] = event.x, event.y
-                return
     # Copy object placement on empty space
     copy_state = ctx.get('copy_state')
     if event.num == 1 and copy_state and copy_state.get('source_obj') is not None:

@@ -43,6 +43,10 @@ PLANET_CLASS_COLORS = {
     'Ocean': '#4fc3f7'
 }
 PLANET_CLASS_FALLBACK = '#98FB98'  # pale green
+JUMP_GATE_TYPES = {'jump_point', 'jumppoint', 'jumpnode'}
+JUMP_DRIFT_TYPES = {'jump_point', 'jumppoint'}
+JUMP_POINT_COLOR = '#50CC50'
+JUMP_DRIFT_FILL = 'rgba(80,204,80,0.12)'
 
 ZONE_STYLE_MAP = {
     'fcs_zone': {
@@ -800,6 +804,7 @@ class MapViewer:
 
             x, y = self.project(obj.get('coordinate', [0, 0, 0]))
             typ = obj.get('type', '')
+            typ_key = str(typ).strip().lower()
             grid_ref = get_grid_reference(x, y)
             symbol = 'circle'
             mode = 'markers+text'
@@ -808,15 +813,39 @@ class MapViewer:
             text_size = 14
             marker_line = None
             text_color = 'white'
+            drift_radius = 0.0
 
-            if typ in ('jumppoint', 'jumpnode'):
+            if typ_key in JUMP_GATE_TYPES:
                 symbol = 'circle-open'
                 size = 16
                 text_size = 20
-                color = '#50CC50'
-                marker_line = {'color': '#50CC50', 'width': 5}  # bolder circle outline
-                text_color = '#50CC50'  # gate label color
+                color = JUMP_POINT_COLOR
+                marker_line = {'color': JUMP_POINT_COLOR, 'width': 5}  # bolder circle outline
+                text_color = JUMP_POINT_COLOR  # gate label color
                 gates.append(name)
+                try:
+                    drift_radius = float(obj.get('drift', 0) or 0)
+                except Exception:
+                    drift_radius = 0.0
+                if typ_key in JUMP_DRIFT_TYPES and drift_radius > 0:
+                    drift_xs, drift_ys = build_circle_points(x, y, drift_radius)
+                    drift_trace = {
+                        'type': 'scatter',
+                        'x': drift_xs + [drift_xs[0]],
+                        'y': drift_ys + [drift_ys[0]],
+                        'fill': 'toself',
+                        'fillcolor': JUMP_DRIFT_FILL,
+                        'line': {
+                            'shape': 'spline',
+                            'color': JUMP_POINT_COLOR,
+                            'width': 2,
+                        },
+                        'hoverinfo': 'skip',
+                        'showlegend': False,
+                    }
+                    if hidden:
+                        drift_trace['gmOnly'] = True
+                    data.append(drift_trace)
             elif typ == 'station':
                 symbol = 'square'
                 color = self.get_station_color(obj)
@@ -901,7 +930,9 @@ class MapViewer:
                     if relay_field in obj and obj.get(relay_field) not in (None, ''):
                         entry[relay_field] = obj.get(relay_field)
             
-            if typ in ('jump_point', 'jumppoint', 'jumpnode'):
+            if typ_key in JUMP_GATE_TYPES:
+                if typ_key in JUMP_DRIFT_TYPES and drift_radius > 0:
+                    entry['drift'] = int(drift_radius) if drift_radius.is_integer() else drift_radius
                 raw_dest = obj.get('destinations', {})
                 clean_dest = {
                     str(k): str(v) for k, v in raw_dest.items()
