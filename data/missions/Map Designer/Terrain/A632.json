@@ -26,8 +26,8 @@
         "all_authors": [
             "Fish Evans"
         ],
-        "revision_number": 28,
-        "revision_date": "2026-06-13"
+        "revision_number": 30,
+        "revision_date": "2026-06-14"
     },
     "objects": {
         "JP 82": {
@@ -199,28 +199,6 @@
             "description": "",
             "hideonmap": false
         },
-        "DS 18": {
-            "coordinate": [
-                -52383.82537239805,
-                0,
-                181419.55022953288
-            ],
-            "sides": [
-                "Torgoth"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {
-                "Data Core": 1,
-                "Virus": 1,
-                "Gredian": 20,
-                "Reisium": 10
-            },
-            "teams": {},
-            "description": "Kraliean Base, type 14 Suspected of beeing used for storage and refitting of Ordinace.",
-            "hideonmap": false
-        },
         "JP 14": {
             "coordinate": [
                 -298372.9449946653,
@@ -319,8 +297,7 @@
                 "Fuel Cell 200": 4,
                 "Aegirine": 50,
                 "Iron": 40,
-                "Ashfilum": 15,
-                "Data Core": 1
+                "Ashfilum": 15
             },
             "teams": {},
             "description": "Gas Extraction and Processing for Fuel Collection",
@@ -435,58 +412,6 @@
             "cargo": {},
             "teams": {}
         },
-        "WP 62": {
-            "coordinate": [
-                -44550.710986480866,
-                0,
-                187613.41662174105
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "hegemony_beam_platform",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "DS 97": {
-            "coordinate": [
-                -47846.23288271055,
-                0,
-                182861.3611889831
-            ],
-            "sides": [
-                "Torgoth"
-            ],
-            "hull": "starbase_torgoth",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": "Under Construction"
-        },
-        "DS 26": {
-            "coordinate": [
-                -45295.755017830495,
-                0,
-                187724.51382157594
-            ],
-            "sides": [
-                "Torgoth"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {
-                "Virus": 1,
-                "Gredian": 20,
-                "Reisium": 10,
-                "Data Core": 1
-            },
-            "teams": {},
-            "description": "Kraliean Base, type 14 Suspected of beeing used for storage and refitting of Ordinace.",
-            "hideonmap": false
-        },
         "WP 46": {
             "coordinate": [
                 97462.5271490626,
@@ -600,7 +525,8 @@
                 0,
                 -159894.43250100102
             ],
-            "type": "Sensor Relay"
+            "type": "Sensor Relay",
+            "description": ""
         },
         "Scan Point Alpha [C17]": {
             "coordinate": [
@@ -1481,7 +1407,7 @@
             "height": 15000,
             "width": 15000,
             "density": 70,
-            "hideonmap": true
+            "hideonmap": false
         },
         "Hidden Mine Field 5": {
             "type": "hidden_minefield",
@@ -1506,6 +1432,39 @@
             "width": 10000,
             "density": 70,
             "hideonmap": true
+        },
+        "1781440711321": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -43930.530107461396,
+                0,
+                187939.85084325966
+            ],
+            "density": 30,
+            "scatter": 10000
+        },
+        "1781440742657": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -48482.92776260468,
+                0,
+                182891.64750290275
+            ],
+            "density": 10,
+            "scatter": 2000
+        },
+        "1781440755946": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -52584.59297664467,
+                0,
+                177212.41874500125
+            ],
+            "density": 10,
+            "scatter": 5000
         }
     },
     "traffic": {

@@ -84,8 +84,6 @@ USABLE_DEPLOYABLE_ITEMS = {
 }
 INTEL_SPECIAL_ITEMS = {
     # Manual category override list for cargo/team dropdown grouping.
-    "Data Chip",
-    "Data Core",
     "Vaccine",
     "Virus",
     "Virus Sample",
