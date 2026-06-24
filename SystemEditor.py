@@ -131,6 +131,37 @@ def is_zone_type(zone_type: Any) -> bool:
 STATION_OR_PLATFORM_TYPES = {"station", "platform"}
 INCOMING_ONLY_GATES_KEY = "incomingOnlyGates"
 INCOMING_ONLY_GATES_ALIASES = (INCOMING_ONLY_GATES_KEY, "incoming_only_gates")
+SIDE_VIEW_DIRECT_COLOURS = {
+    "usfp": "#003f8f",
+    "tsn": "#72cfff",
+    "pirate": "#ff8c00",
+    "pirates": "#ff8c00",
+    "unknown": "#ffffff",
+    "hjorden": "#2fbd5b",
+    "hajorden": "#2fbd5b",
+    "torgoth": "#c43b2f",
+    "kralien": "#a55cff",
+    "arvonian": "#d782ff",
+    "skaraan": "#e3c84a",
+    "ximni": "#ff66cc",
+    "euphini": "#ffb347",
+    "skull": "#ff6a00",
+}
+SIDE_VIEW_FACTION_COLOURS = {
+    "usfp": "#003f8f",
+    "pirate": "#ff8c00",
+    "hegemony": "#b45cff",
+    "ximni": "#ff66cc",
+}
+SIDE_VIEW_FALLBACK_COLOURS = (
+    "#7dd3fc",
+    "#f472b6",
+    "#facc15",
+    "#34d399",
+    "#fb7185",
+    "#c084fc",
+    "#a3e635",
+)
 
 
 def object_has_blank_or_invalid_hull(obj: Any, valid_hull_keys: set) -> bool:
@@ -153,6 +184,85 @@ def draw_red_cross(canvas, sx, sy, radius=8, width=3, tags=()):
         sx - radius, sy + radius, sx + radius, sy - radius,
         fill="red", width=width, tags=tags
     )
+
+
+def _normalise_side_key(value):
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().casefold())
+
+
+def get_object_primary_side(obj):
+    if not isinstance(obj, dict):
+        return ""
+    sides = obj.get("sides")
+    if isinstance(sides, (list, tuple)):
+        for side in sides:
+            side_text = str(side or "").strip()
+            if side_text:
+                return side_text
+        return ""
+    if isinstance(sides, str):
+        return sides.strip()
+    return ""
+
+
+def get_station_side_colour(side_value, race_to_faction_cf=None):
+    side_text = str(side_value or "").strip()
+    side_key = _normalise_side_key(side_text)
+    if not side_key:
+        return SIDE_VIEW_DIRECT_COLOURS["unknown"]
+    if side_key in SIDE_VIEW_DIRECT_COLOURS:
+        return SIDE_VIEW_DIRECT_COLOURS[side_key]
+
+    faction_cf = ""
+    if isinstance(race_to_faction_cf, dict):
+        faction_cf = race_to_faction_cf.get(side_text.casefold(), "")
+    faction_key = _normalise_side_key(faction_cf)
+    if faction_key in SIDE_VIEW_FACTION_COLOURS:
+        return SIDE_VIEW_FACTION_COLOURS[faction_key]
+
+    return SIDE_VIEW_FALLBACK_COLOURS[sum(ord(ch) for ch in side_key) % len(SIDE_VIEW_FALLBACK_COLOURS)]
+
+
+def draw_station_side_colour_legend(canvas):
+    legend_items = (
+        ("USFP", SIDE_VIEW_DIRECT_COLOURS["usfp"]),
+        ("TSN", SIDE_VIEW_DIRECT_COLOURS["tsn"]),
+        ("Pirate", SIDE_VIEW_DIRECT_COLOURS["pirate"]),
+        ("Unknown", SIDE_VIEW_DIRECT_COLOURS["unknown"]),
+        ("Hjorden", SIDE_VIEW_DIRECT_COLOURS["hjorden"]),
+        ("Hegemony", SIDE_VIEW_FACTION_COLOURS["hegemony"]),
+        ("Ximni", SIDE_VIEW_DIRECT_COLOURS["ximni"]),
+    )
+    x0, y0 = 10, 10
+    row_h = 18
+    width = 142
+    height = 24 + (len(legend_items) * row_h)
+    canvas.create_rectangle(
+        x0, y0, x0 + width, y0 + height,
+        fill="#071311", outline="#4aa68f", tags=("side_legend",)
+    )
+    canvas.create_text(
+        x0 + 8, y0 + 8,
+        text="Side Colours",
+        fill="#d7fff2",
+        anchor="nw",
+        font=("Arial", 8, "bold"),
+        tags=("side_legend",)
+    )
+    for idx, (label, colour) in enumerate(legend_items):
+        y = y0 + 28 + (idx * row_h)
+        canvas.create_rectangle(
+            x0 + 10, y, x0 + 22, y + 12,
+            fill=colour, outline="#111111", tags=("side_legend",)
+        )
+        canvas.create_text(
+            x0 + 28, y - 1,
+            text=label,
+            fill="#eef6ff",
+            anchor="nw",
+            font=("Arial", 8),
+            tags=("side_legend",)
+        )
 
 
 def get_incoming_only_gate_list(data: Any) -> List[str]:
@@ -4148,6 +4258,91 @@ def open_system_editor(filename: str) -> None:
                         return True
             return False
 
+        def _first_side(obj):
+            sides = obj.get('sides')
+            if isinstance(sides, (list, tuple)) and sides:
+                return str(sides[0] or '')
+            if isinstance(sides, str):
+                return sides
+            return ''
+
+        def _count_positive_values(values):
+            if not isinstance(values, dict):
+                return 0
+            count = 0
+            for qty in values.values():
+                try:
+                    if int(qty) > 0:
+                        count += 1
+                except Exception:
+                    if qty:
+                        count += 1
+            return count
+
+        def _cargo_team_counts(obj):
+            return (
+                _count_positive_values(obj.get('cargo') or {}),
+                _count_positive_values(obj.get('teams') or {}),
+            )
+
+        def _cargo_team_summary(obj):
+            cargo_count, team_count = _cargo_team_counts(obj)
+            if cargo_count or team_count:
+                return f"Cargo {cargo_count} / Teams {team_count}"
+            return "Empty"
+
+        def _facilities_text(obj):
+            facilities = obj.get('facilities') or []
+            if not isinstance(facilities, (list, tuple, set)):
+                return str(facilities or '')
+            return ", ".join(str(item) for item in facilities)
+
+        sort_state = {'column': 'name', 'reverse': False}
+        overview_columns = (
+            ('name', 'Name', 200),
+            ('type', 'Type', 110),
+            ('side', 'Side', 140),
+            ('hull', 'Hull', 180),
+            ('facilities', 'Facilities', 280),
+            ('cargo', 'Cargo/Teams', 160),
+        )
+
+        def _station_sort_value(obj_name, obj, column):
+            if column == 'name':
+                return _az09_key(obj_name)
+            if column == 'type':
+                return _az09_key(str(obj.get('type', '') or ''))
+            if column == 'side':
+                return _az09_key(_first_side(obj))
+            if column == 'hull':
+                return _az09_key(str(obj.get('hull', '') or ''))
+            if column == 'facilities':
+                return _az09_key(_facilities_text(obj))
+            if column == 'cargo':
+                cargo_count, team_count = _cargo_team_counts(obj)
+                return (cargo_count + team_count, cargo_count, team_count)
+            return _az09_key(obj_name)
+
+        def _sort_entries(entries):
+            column = sort_state.get('column', 'name')
+            return sorted(
+                entries,
+                key=lambda item: (_station_sort_value(item[0], item[1], column), _az09_key(item[0])),
+                reverse=bool(sort_state.get('reverse')),
+            )
+
+        def _set_station_sort(column):
+            if sort_state.get('column') == column:
+                sort_state['reverse'] = not sort_state.get('reverse', False)
+            else:
+                sort_state['column'] = column
+                sort_state['reverse'] = False
+            build_rows()
+
+        def _maybe_resort_after_change(column):
+            if sort_state.get('column') == column:
+                list_win.after_idle(build_rows)
+
         def open_ct_dialog(obj_name):
             open_cargo_teams_dialog(obj_name)
             build_rows()
@@ -4157,16 +4352,23 @@ def open_system_editor(filename: str) -> None:
             for child in rows_frame.winfo_children():
                 child.destroy()
 
-            for idx, minsize in enumerate((200, 110, 180, 280, 120)):
+            for idx, (_, _, minsize) in enumerate(overview_columns):
                 rows_frame.grid_columnconfigure(idx, minsize=minsize, weight=0)
             rows_frame.grid_columnconfigure(0, weight=1)
-            rows_frame.grid_columnconfigure(3, weight=1)
+            rows_frame.grid_columnconfigure(4, weight=1)
 
-            tk.Label(rows_frame, text="Name", font=('Arial', 9, 'bold')).grid(row=0, column=0, sticky='w', padx=2, pady=(0, 4))
-            tk.Label(rows_frame, text="Type", font=('Arial', 9, 'bold')).grid(row=0, column=1, sticky='w', padx=2, pady=(0, 4))
-            tk.Label(rows_frame, text="Hull", font=('Arial', 9, 'bold')).grid(row=0, column=2, sticky='w', padx=2, pady=(0, 4))
-            tk.Label(rows_frame, text="Facilities", font=('Arial', 9, 'bold')).grid(row=0, column=3, sticky='w', padx=2, pady=(0, 4))
-            tk.Label(rows_frame, text="Cargo/Teams", font=('Arial', 9, 'bold')).grid(row=0, column=4, sticky='w', padx=2, pady=(0, 4))
+            active_sort = sort_state.get('column', 'name')
+            sort_suffix = " v" if sort_state.get('reverse') else " ^"
+            for col_idx, (key, label, _) in enumerate(overview_columns):
+                header_text = f"{label}{sort_suffix if key == active_sort else ''}"
+                tk.Button(
+                    rows_frame,
+                    text=header_text,
+                    font=('Arial', 9, 'bold'),
+                    relief=tk.SUNKEN if key == active_sort else tk.RAISED,
+                    command=lambda k=key: _set_station_sort(k),
+                    anchor='w',
+                ).grid(row=0, column=col_idx, sticky='ew', padx=2, pady=(0, 4))
 
             entries = []
             for obj_name in sm.list_objects():
@@ -4175,10 +4377,10 @@ def open_system_editor(filename: str) -> None:
                 if otype not in ('station', 'platform'):
                     continue
                 entries.append((obj_name, obj))
-            entries.sort(key=lambda item: _az09_key(item[0]))
+            entries = _sort_entries(entries)
 
             if not entries:
-                tk.Label(rows_frame, text="No stations or platforms found.").grid(row=1, column=0, columnspan=5, sticky='w', padx=2, pady=4)
+                tk.Label(rows_frame, text="No stations or platforms found.").grid(row=1, column=0, columnspan=len(overview_columns), sticky='w', padx=2, pady=4)
                 return
 
             row = 1
@@ -4197,19 +4399,35 @@ def open_system_editor(filename: str) -> None:
                 type_cb = ttk.Combobox(rows_frame, textvariable=type_var, values=type_values, state='readonly', width=10)
                 type_cb.grid(row=row, column=1, sticky='w', padx=2, pady=2)
 
+                current_side = _first_side(obj)
+                side_values = list(valid_sides)
+                if current_side and current_side not in side_values:
+                    side_values = [current_side] + side_values
+                side_var = tk.StringVar(value=current_side)
+                side_cb = ttk.Combobox(rows_frame, textvariable=side_var, values=side_values, state='readonly', width=14)
+                side_cb.grid(row=row, column=2, sticky='w', padx=2, pady=2)
+
+                def apply_overview_side(*_, o=obj, v=side_var):
+                    o['sides'] = [v.get()]
+                    draw_map(ctx)
+                    _maybe_resort_after_change('side')
+
+                side_var.trace_add('write', apply_overview_side)
+
                 hull_var = tk.StringVar(value=obj.get('hull', ''))
                 hull_vals = platform_hulls if type_var.get() == 'platform' else valid_hulls
                 hull_cb = ttk.Combobox(rows_frame, textvariable=hull_var, values=hull_vals, state='readonly', width=16)
-                hull_cb.grid(row=row, column=2, sticky='w', padx=2, pady=2)
+                hull_cb.grid(row=row, column=3, sticky='w', padx=2, pady=2)
 
                 def apply_overview_hull(*_, o=obj, v=hull_var):
                     o['hull'] = v.get()
                     draw_map(ctx)
+                    _maybe_resort_after_change('hull')
 
                 hull_var.trace_add('write', apply_overview_hull)
 
                 fac_frame = tk.Frame(rows_frame)
-                fac_frame.grid(row=row, column=3, sticky='w', padx=2, pady=2)
+                fac_frame.grid(row=row, column=4, sticky='w', padx=2, pady=2)
                 facs = obj.get('facilities', [])
                 dock_var = tk.BooleanVar(value="Docking" in facs)
                 refuel_var = tk.BooleanVar(value="Refuel" in facs)
@@ -4224,6 +4442,7 @@ def open_system_editor(filename: str) -> None:
                     if pv.get():
                         new_list.append("Repair")
                     o['facilities'] = new_list
+                    _maybe_resort_after_change('facilities')
 
                 dock_cb = tk.Checkbutton(fac_frame, text="Docking", variable=dock_var, command=apply_facilities)
                 refuel_cb = tk.Checkbutton(fac_frame, text="Refuel", variable=refuel_var, command=apply_facilities)
@@ -4257,13 +4476,18 @@ def open_system_editor(filename: str) -> None:
                         sfs(True)
                     refresh_objects_list()
                     draw_map(ctx)
+                    _maybe_resort_after_change('type')
 
                 type_var.trace_add('write', on_type_change)
                 set_facility_state(type_var.get() == 'station')
 
-                tk.Button(rows_frame, text="Edit", command=lambda n=obj_name: open_ct_dialog(n)).grid(
-                    row=row, column=4, sticky='w', padx=2, pady=2
-                )
+                cargo_frame = tk.Frame(rows_frame)
+                cargo_frame.grid(row=row, column=5, sticky='w', padx=2, pady=2)
+                cargo_lbl = tk.Label(cargo_frame, text=_cargo_team_summary(obj))
+                if not has_cargo(obj):
+                    cargo_lbl.configure(fg='red')
+                cargo_lbl.pack(side='left', padx=(0, 4))
+                tk.Button(cargo_frame, text="Edit", command=lambda n=obj_name: open_ct_dialog(n)).pack(side='left')
 
                 row += 1
 
@@ -4554,6 +4778,13 @@ def open_system_editor(filename: str) -> None:
     button_frame = tk.Frame(frame)
     # span all columns and allow horizontal expansion
     button_frame.grid(row=row+2, column=0, columnspan=8, sticky='ew', pady=2)
+    side_colour_view_var = tk.BooleanVar(value=False)
+
+    def toggle_side_colour_view():
+        try:
+            draw_map(ctx)
+        except NameError:
+            pass
 
     # define each action
     actions = [
@@ -4635,6 +4866,12 @@ def open_system_editor(filename: str) -> None:
         ter_lb    = ter_lb,
         map_canvas= map_canvas
     )
+    tk.Checkbutton(
+        toolbar_frame,
+        text="Side Colours",
+        variable=side_colour_view_var,
+        command=toggle_side_colour_view,
+    ).pack(side=tk.LEFT, padx=(10, 2), pady=2)
 
     # bind resize (unchanged)
     def on_canvas_resize(event):
@@ -4684,6 +4921,7 @@ def open_system_editor(filename: str) -> None:
         system_files = ctx.get('system_files', {})
         other_gate_index = ctx.get('other_gate_index', {})
         current_filename = ctx.get('current_system_filename', '')
+        side_colour_view = bool(side_colour_view_var.get())
         gate_index = dict(other_gate_index)
         current_objects = sm.data.get('objects', {})
         incoming_only_gate_names = get_incoming_only_gate_names(sm.data)
@@ -4838,7 +5076,10 @@ def open_system_editor(filename: str) -> None:
                 continue
 
             # use green for jumpnode/jumppoint, white otherwise
-            color = 'light green' if otype in ('jumpnode','jumppoint') else 'white'
+            if side_colour_view and otype in STATION_OR_PLATFORM_TYPES:
+                color = get_station_side_colour(get_object_primary_side(obj), race_to_faction_cf)
+            else:
+                color = 'light green' if otype in ('jumpnode','jumppoint') else 'white'
 
             # ── Jump node/point drift ring (pale blue) ─────────────────────────
             # If the object is a jumpnode/jumppoint and has a drift value,
@@ -5143,6 +5384,9 @@ def open_system_editor(filename: str) -> None:
         map_canvas.tag_raise('terrain_pt')
         map_canvas.tag_raise('relay_pt')
         map_canvas.tag_raise('obj')
+        if side_colour_view:
+            draw_station_side_colour_legend(map_canvas)
+            map_canvas.tag_raise('side_legend')
 
     def on_canvas_release(event):
         # After drag, update sidebar
@@ -5271,6 +5515,7 @@ def open_system_editor(filename: str) -> None:
         'obj_lb': obj_lb,
         'terrain_keys': terrain_keys,
         'valid_sides': valid_sides,
+        'side_colour_view_var': side_colour_view_var,
         'valid_hulls': valid_hulls,
         'valid_planet_classes': valid_planet_classes,
         'hull_ranges': hull_ranges,

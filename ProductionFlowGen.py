@@ -782,6 +782,87 @@ def build_root_selector(tier_code, ordered_roots):
     return "".join(selector_items)
 
 
+def build_recipe_result_buttons(ordered_roots, recipes, minimum_tier, raw_materials):
+    result_buttons = []
+    for index, root in enumerate(ordered_roots):
+        selected_class = " is-selected" if index == 0 else ""
+        root_token = build_dom_token(root)
+        classification = classify_item(root, minimum_tier, raw_materials)
+        search_blob = " ".join([root, *collect_subtree_items(root, recipes)]).casefold()
+        result_buttons.append(
+            f'<button class="root-tag recipe-result{selected_class}" type="button" '
+            f'data-recipe-result data-focus-tier="search" data-focus-root="{root_token}" '
+            f'data-recipe-name="{html.escape(root, quote=True)}" '
+            f'data-recipe-search="{html.escape(search_blob, quote=True)}">'
+            f'<span>{html.escape(root)}</span>'
+            f'<span class="recipe-result-tier">{html.escape(classification["label"])}</span>'
+            f"</button>"
+        )
+    return "".join(result_buttons)
+
+
+def build_recipe_focus_panel(ordered_roots, recipes, minimum_tier, raw_materials, industrial_items, item_meta):
+    columns = []
+    for index, root in enumerate(ordered_roots):
+        root_token = build_dom_token(root)
+        subtree_items = collect_visible_subtree_items(
+            root,
+            recipes,
+            minimum_tier,
+            industrial_items,
+            "ALL",
+        )
+        raw_count = sum(1 for item in subtree_items if item in raw_materials)
+        external_count = sum(1 for item in subtree_items if item not in minimum_tier and item not in raw_materials)
+        node_count = max(len(subtree_items) - 1, 0)
+        hidden_attr = "" if index == 0 else " hidden"
+        columns.append(
+            f"""
+            <section class="workflow-column recipe-focus-column" id="workflow-search-{root_token}" data-workflow-root="{root_token}" data-main-recipe-root="{root_token}"{hidden_attr}>
+              <header class="workflow-header">
+                <p class="workflow-eyebrow">Selected Schematic</p>
+                <h2>{html.escape(root)}</h2>
+                <div class="workflow-stats">
+                  <span class="summary-pill">{node_count} node{"s" if node_count != 1 else ""}</span>
+                  <span class="summary-pill">{raw_count} raw</span>
+                  <span class="summary-pill">{external_count} external</span>
+                </div>
+              </header>
+              <div class="workflow-tree">
+{render_tree_node(root, recipes, minimum_tier, raw_materials, industrial_items, item_meta, set(), "ALL")}
+              </div>
+            </section>"""
+        )
+
+    first_root = ordered_roots[0] if ordered_roots else "No recipe selected"
+    return f"""
+    <section class="recipe-focus" data-recipe-panel="search">
+      <div class="recipe-search-header">
+        <div>
+          <p class="eyebrow">Recipe Search</p>
+          <h2>Selected Production Schematic</h2>
+        </div>
+        <div class="recipe-current" data-recipe-current>{html.escape(first_root)}</div>
+      </div>
+      <div class="recipe-search-controls">
+        <label class="recipe-search-field">
+          <span class="sr-only">Search recipes</span>
+          <input type="search" data-recipe-search-input placeholder="Search recipes or ingredients" autocomplete="off">
+        </label>
+        <div class="recipe-search-count" data-recipe-search-count>{len(ordered_roots)} matches</div>
+      </div>
+      <div class="root-selector recipe-result-strip" data-root-selector="search" data-recipe-results>
+        {build_recipe_result_buttons(ordered_roots, recipes, minimum_tier, raw_materials)}
+      </div>
+      <div class="recipe-empty" data-recipe-empty hidden>No matching recipes.</div>
+      <div class="tree-viewport recipe-focus-viewport" data-pan-viewport="search">
+        <div class="tree-surface" data-pan-surface="search">
+{''.join(columns)}
+        </div>
+      </div>
+    </section>"""
+
+
 def build_signature_explorer(tier_roots, recipes, minimum_tier, raw_materials, industrial_items, item_meta):
     tier_code = "ALL"
     roots = get_display_roots_for_tier(tier_code, tier_roots)
@@ -1234,6 +1315,21 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
     raw_items, external_items = collect_external_and_raw_items(all_roots, recipes, minimum_tier, raw_materials)
     sprite_href = build_sprite_href()
     tab_buttons = build_tier_buttons(tier_codes)
+    ordered_roots = sorted(
+        all_roots,
+        key=lambda item: (
+            classify_item(item, minimum_tier, raw_materials)["order"],
+            item.casefold(),
+        ),
+    )
+    recipe_focus_panel = build_recipe_focus_panel(
+        ordered_roots,
+        recipes,
+        minimum_tier,
+        raw_materials,
+        industrial_items,
+        item_meta,
+    )
     signature_explorer = build_signature_explorer(
         tier_roots,
         recipes,
@@ -1270,8 +1366,8 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
     body::before {{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(147,255,215,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(147,255,215,.05) 1px,transparent 1px);background-size:36px 36px;opacity:.34;mix-blend-mode:screen;}}
     body::after {{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(255,255,255,.03) 0 1px,transparent 1px 4px);opacity:.08;}}
     .page {{position:relative;width:min(100vw - 18px,1880px);margin:10px auto 22px;}}
-    .hero,.signature-explorer,.tab-shell {{position:relative;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);}}
-    .hero::before,.signature-explorer::before,.tab-shell::before {{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent,var(--line-bright),transparent);opacity:.88;}}
+    .hero,.recipe-focus,.stats-shell,.signature-explorer,.tab-shell {{position:relative;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);}}
+    .hero::before,.recipe-focus::before,.stats-shell::before,.signature-explorer::before,.tab-shell::before {{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent,var(--line-bright),transparent);opacity:.88;}}
     .hero {{padding:24px;border-radius:26px;background:linear-gradient(180deg,rgba(8,24,21,.96),rgba(5,14,15,.94));}}
     .hero-top,.tier-panel-header {{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;}}
     .hero-copy {{max-width:78rem;}}
@@ -1283,9 +1379,9 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
     .terminal-status-row {{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}}
     .terminal-status-pill {{display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(13,34,29,.86);color:#dcfff4;font-family:"Consolas","Lucida Console",monospace;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;}}
     .page-nav-stack {{display:grid;gap:8px;width:min(100%,280px);}}
-    .legend-row,.tier-tabs,.workflow-stats {{display:flex;gap:10px;flex-wrap:wrap;}}
-    .nav-link,.tier-tab,.summary-pill,.node-chip,.root-tag,.legend-pill,.signature-filter,.signature-explorer-status,.signature-active-chip,.signature-result-count,.node-fact,.node-fact-title {{font-family:"Consolas","Lucida Console",monospace;}}
-    .nav-link,.tier-tab,.summary-pill,.node-chip {{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:6px 11px;border:1px solid rgba(255,255,255,.09);border-radius:999px;color:var(--text);text-decoration:none;background:rgba(12,29,25,.92);}}
+    .legend-row,.tier-tabs,.workflow-stats,.resource-tabs {{display:flex;gap:10px;flex-wrap:wrap;}}
+    .nav-link,.tier-tab,.resource-tab,.summary-pill,.node-chip,.root-tag,.legend-pill,.signature-filter,.signature-explorer-status,.signature-active-chip,.signature-result-count,.node-fact,.node-fact-title,.recipe-current,.recipe-search-count,.recipe-result-tier {{font-family:"Consolas","Lucida Console",monospace;}}
+    .nav-link,.tier-tab,.resource-tab,.summary-pill,.node-chip {{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:6px 11px;border:1px solid rgba(255,255,255,.09);border-radius:999px;color:var(--text);text-decoration:none;background:rgba(12,29,25,.92);}}
     .nav-link {{min-width:164px;padding:12px 18px;border-color:var(--line-strong);letter-spacing:.08em;text-transform:uppercase;font-size:.82rem;}}
     .page-nav-link {{width:100%;min-height:44px;padding:12px 18px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);border-radius:999px;color:#f1f5fb;background:rgba(54,54,54,.94);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);cursor:pointer;text-decoration:none;text-align:center;font-family:"Consolas","Lucida Console",monospace;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease;}}
     .page-nav-link:hover,.page-nav-link:focus-visible {{transform:translateY(-1px);filter:brightness(1.06);outline:none;}}
@@ -1303,6 +1399,29 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
     .legend-pill::before {{content:"";width:10px;height:10px;border-radius:999px;background:currentColor;box-shadow:0 0 14px currentColor;}}
     .legend-pill.amc-c {{color:var(--amc-c);background:rgba(43,89,88,.3);}} .legend-pill.amc-1 {{color:var(--amc-1);background:rgba(47,83,46,.28);}} .legend-pill.amc-2 {{color:var(--amc-2);background:rgba(94,68,24,.32);}} .legend-pill.amc-3 {{color:var(--amc-3);background:rgba(92,47,26,.34);}} .legend-pill.amc-i,.industrial,.node-chip.industrial {{color:var(--amc-i);background:rgba(95,31,82,.34);}} .legend-pill.amc-m {{color:var(--amc-m);background:rgba(104,34,34,.36);}} .legend-pill.raw,.badge.raw {{color:var(--raw);background:rgba(37,69,104,.42);}} .legend-pill.external,.badge.external {{color:#edf2fa;background:rgba(64,71,85,.44);}} .badge.amc {{color:#effff6;background:rgba(47,83,46,.4);}}
     .eyebrow,.workflow-eyebrow {{margin:0 0 8px;color:var(--accent);font-size:.8rem;font-family:"Consolas","Lucida Console",monospace;letter-spacing:.18em;text-transform:uppercase;}}
+    .recipe-focus,.stats-shell {{padding:18px;border-radius:0 26px 26px 26px;background:linear-gradient(180deg,rgba(8,22,20,.96),rgba(5,14,15,.92));}}
+    .recipe-search-header {{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px;}}
+    .recipe-search-header h2 {{margin:0;}}
+    .recipe-current {{display:inline-flex;align-items:center;min-height:38px;max-width:520px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(13,31,27,.78);color:#d7fff2;font-size:.84rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}}
+    .recipe-search-controls {{display:grid;grid-template-columns:minmax(240px,560px) auto;gap:12px;align-items:center;margin-bottom:12px;}}
+    .recipe-search-field input {{width:100%;min-height:46px;padding:10px 14px;border:1px solid var(--line-strong);border-radius:14px;background:rgba(4,13,12,.92);color:var(--text);font:inherit;font-size:1rem;outline:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);}}
+    .recipe-search-field input:focus {{border-color:var(--line-bright);box-shadow:0 0 0 2px rgba(147,255,215,.12),inset 0 0 0 1px rgba(255,255,255,.05);}}
+    .recipe-search-count {{color:var(--muted);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;}}
+    .recipe-result-strip {{max-height:132px;overflow:auto;padding:2px 2px 10px;margin-bottom:12px;}}
+    .recipe-result {{gap:8px;text-align:left;}}
+    .recipe-result > span:first-child {{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
+    .recipe-result-tier {{display:inline-flex;align-items:center;min-height:21px;padding:2px 7px;border-radius:999px;background:rgba(8,14,22,.42);color:#dcefff;font-size:.68rem;line-height:1;}}
+    .recipe-empty {{margin:0 0 12px;color:var(--muted);font-size:.92rem;}}
+    .recipe-focus-viewport {{height:min(72vh,940px);}}
+    .stats-shell .summary-grid {{margin-top:0;}}
+    .resource-tabs {{align-items:flex-end;flex-wrap:nowrap;overflow-x:auto;margin-top:16px;padding:0 18px;border-bottom:1px solid var(--line);gap:4px;}}
+    .resource-tab {{position:relative;z-index:1;min-height:44px;padding:10px 18px;border-color:rgba(255,255,255,.08);border-bottom-color:var(--line);border-radius:16px 16px 0 0;background:linear-gradient(180deg,rgba(13,31,27,.78),rgba(8,22,20,.7));color:var(--muted);cursor:pointer;letter-spacing:.08em;text-transform:uppercase;font-size:.82rem;box-shadow:none;white-space:nowrap;}}
+    .resource-tab:hover,.resource-tab:focus-visible {{color:var(--text);border-color:var(--line-strong);outline:none;}}
+    .resource-tab.is-selected {{z-index:3;margin-bottom:-1px;min-height:48px;color:var(--text);border-color:var(--line);border-bottom-color:rgba(8,22,20,.96);background:linear-gradient(180deg,rgba(24,74,61,.98),rgba(8,22,20,.96));box-shadow:0 -8px 22px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08);}}
+    .resource-panel {{margin-top:0;}}
+    .resource-panel > .recipe-focus,.resource-panel > .stats-shell,.resource-panel > .signature-explorer,.resource-panel > .tab-shell {{margin-top:0;border-top-color:rgba(146,255,232,.34);}}
+    .resource-panel > .signature-explorer,.resource-panel > .tab-shell {{border-radius:0 26px 26px 26px;}}
+    .sr-only {{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}}
     .tab-shell {{padding:18px;border-radius:26px;background:linear-gradient(180deg,rgba(8,22,20,.96),rgba(5,14,15,.92));}}
     .tab-shell-header {{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07);}}
     .tab-shell-header h2,.tier-panel-header h2,.workflow-header h2 {{margin:0;}}
@@ -1400,7 +1519,7 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
     .lateral-children.single::after {{content:"";position:absolute;top:50%;left:0;width:8px;height:8px;border-radius:999px;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 4px rgba(140,211,255,.1);z-index:3;pointer-events:none;}}
     .lateral-children.single > .tree-node::before {{display:none;}}
     @media (max-width:1120px) {{.tree-viewport {{height:min(68vh,880px);}}}}
-    @media (max-width:760px) {{.page {{width:min(100vw - 10px,1880px);margin-top:6px;}} .hero,.signature-explorer,.tab-shell {{padding:12px 18px;}} .hero-top,.tier-panel-header,.signature-explorer-header,.tab-shell-header {{flex-direction:column;align-items:flex-start;}} .hero-side {{justify-items:stretch;width:100%;}} .terminal-status {{width:100%;}} .terminal-status-row {{justify-content:flex-start;}} .tree-viewport {{height:72vh;}} .tree-surface {{padding:18px;gap:18px;}} .workflow-column {{padding:14px;}} .signature-result-group {{grid-template-columns:1fr;}}}}
+    @media (max-width:760px) {{.page {{width:min(100vw - 10px,1880px);margin-top:6px;}} .hero,.recipe-focus,.stats-shell,.signature-explorer,.tab-shell {{padding:12px 18px;}} .resource-tabs {{padding:0 10px;}} .hero-top,.tier-panel-header,.signature-explorer-header,.tab-shell-header,.recipe-search-header {{flex-direction:column;align-items:flex-start;}} .hero-side {{justify-items:stretch;width:100%;}} .terminal-status {{width:100%;}} .terminal-status-row {{justify-content:flex-start;}} .recipe-current {{max-width:100%;}} .recipe-search-controls {{grid-template-columns:1fr;}} .tree-viewport {{height:72vh;}} .tree-surface {{padding:18px;gap:18px;}} .workflow-column {{padding:14px;}} .signature-result-group {{grid-template-columns:1fr;}}}}
   </style>
 </head>
 <body>
@@ -1410,42 +1529,83 @@ def build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta
         <div class="hero-copy"><p class="eyebrow">TSN Industrial Archive</p><h1>Manufacturing Data Terminal</h1><p>Each channel loads the production schematics cleared for a specific AMC class and traces every visible dependency in that band.</p><p>Lower AMC channels halt when a dependency exceeds channel clearance. Use <strong>Show All</strong> to unlock the full archive, then drag across the schematic board to inspect each chain.</p></div>
         <div class="hero-side"><div class="terminal-status"><span class="terminal-id">Terminal // MFG-DATACORE-7</span><div class="terminal-status-row"><span class="terminal-status-pill">Archive Sync: Live</span><span class="terminal-status-pill">Source: TSN DB</span></div></div><div class="page-nav-stack"><a class="page-nav-link page-nav-map" href="index.html">Galactic Map</a><a class="page-nav-link page-nav-library" href="Library.html">Ship Library</a><button class="page-nav-link page-nav-production" type="button">Production Flow</button></div></div>
       </div>
-      <div class="summary-grid">
-        <div class="summary-box"><strong>{len(all_roots)}</strong><span>Tracked Outputs</span></div>
-        <div class="summary-box"><strong>{len(raw_items)}</strong><span>Raw Extractions</span></div>
-        <div class="summary-box"><strong>{len(external_items)}</strong><span>External Feeds</span></div>
-        <div class="summary-box"><strong>{len(industrial_items)}</strong><span>IAMC Cross-Cert</span></div>
-        <div class="summary-box"><strong>{len(all_items)}</strong><span>Indexed Nodes</span></div>
-      </div>
-      <div class="legend-row"><span class="legend-pill amc-c">AMC C</span><span class="legend-pill amc-1">AMC 1</span><span class="legend-pill amc-2">AMC 2</span><span class="legend-pill amc-3">AMC 3</span><span class="legend-pill amc-i">AMC I</span><span class="legend-pill amc-m">AMC M</span><span class="legend-pill raw">Raw Resource</span><span class="legend-pill external">External Chain</span><span class="legend-pill amc-i">Also in IAMC</span></div>
     </section>
-    {signature_explorer}
-    <section class="tab-shell"><div class="tab-shell-header"><div><p class="eyebrow">Schematic Bank</p><h2>Tiered Production Channels</h2><p class="tab-shell-copy">Switch AMC channels to compare which branches remain manufacturable, which dependencies fall back to raw extraction, and which routes leave the archive entirely.</p></div></div><div class="tier-tabs" role="tablist" aria-label="AMC Type Views">{tab_buttons}</div>{tab_panels}</section>
+    <nav class="resource-tabs" aria-label="Production reference panels">
+      <button class="resource-tab is-selected" type="button" data-resource-tab="search" aria-expanded="true">Recipe Search</button>
+      <button class="resource-tab" type="button" data-resource-tab="stats" aria-expanded="false">Stats</button>
+      <button class="resource-tab" type="button" data-resource-tab="signatures" aria-expanded="false">Signature Index</button>
+      <button class="resource-tab" type="button" data-resource-tab="schematics" aria-expanded="false">Schematic Bank</button>
+    </nav>
+    <section class="resource-panel" data-resource-panel="search">
+      {recipe_focus_panel}
+    </section>
+    <section class="resource-panel" data-resource-panel="stats" hidden>
+      <section class="stats-shell">
+        <div class="summary-grid">
+          <div class="summary-box"><strong>{len(all_roots)}</strong><span>Tracked Outputs</span></div>
+          <div class="summary-box"><strong>{len(raw_items)}</strong><span>Raw Extractions</span></div>
+          <div class="summary-box"><strong>{len(external_items)}</strong><span>External Feeds</span></div>
+          <div class="summary-box"><strong>{len(industrial_items)}</strong><span>IAMC Cross-Cert</span></div>
+          <div class="summary-box"><strong>{len(all_items)}</strong><span>Indexed Nodes</span></div>
+        </div>
+        <div class="legend-row"><span class="legend-pill amc-c">AMC C</span><span class="legend-pill amc-1">AMC 1</span><span class="legend-pill amc-2">AMC 2</span><span class="legend-pill amc-3">AMC 3</span><span class="legend-pill amc-i">AMC I</span><span class="legend-pill amc-m">AMC M</span><span class="legend-pill raw">Raw Resource</span><span class="legend-pill external">External Chain</span><span class="legend-pill amc-i">Also in IAMC</span></div>
+      </section>
+    </section>
+    <section class="resource-panel" data-resource-panel="signatures" hidden>
+      {signature_explorer}
+    </section>
+    <section class="resource-panel" data-resource-panel="schematics" hidden>
+      <section class="tab-shell"><div class="tab-shell-header"><div><p class="eyebrow">Schematic Bank</p><h2>Tiered Production Channels</h2><p class="tab-shell-copy">Switch AMC channels to compare which branches remain manufacturable, which dependencies fall back to raw extraction, and which routes leave the archive entirely.</p></div></div><div class="tier-tabs" role="tablist" aria-label="AMC Type Views">{tab_buttons}</div>{tab_panels}</section>
+    </section>
   </main>
   <script>
-    const tabButtons=Array.from(document.querySelectorAll('[data-tier-tab]')); const tabPanels=Array.from(document.querySelectorAll('[data-tier-panel]')); const signaturePanels=Array.from(document.querySelectorAll('[data-signature-panel]')); const signatureExplorer=document.querySelector('.signature-explorer'); const signatureExplorerKey='all'; const panState=new Map();
-    function getSurfaceBounds(state){{ const columns=Array.from(state.surface.querySelectorAll('[data-workflow-root]')); if(!columns.length) return {{left:0,top:0,right:state.surface.scrollWidth,bottom:state.surface.scrollHeight}}; const left=Math.min(...columns.map((column)=>column.offsetLeft)); const top=Math.min(...columns.map((column)=>column.offsetTop)); const right=Math.max(...columns.map((column)=>column.offsetLeft+column.offsetWidth)); const bottom=Math.max(...columns.map((column)=>column.offsetTop+column.offsetHeight)); return {{left,top,right,bottom}}; }}
+    const tabButtons=Array.from(document.querySelectorAll('[data-tier-tab]'));
+    const tabPanels=Array.from(document.querySelectorAll('[data-tier-panel]'));
+    const resourceTabs=Array.from(document.querySelectorAll('[data-resource-tab]'));
+    const resourcePanels=Array.from(document.querySelectorAll('[data-resource-panel]'));
+    const signaturePanels=Array.from(document.querySelectorAll('[data-signature-panel]'));
+    const signatureExplorer=document.querySelector('.signature-explorer');
+    const recipeSearchInput=document.querySelector('[data-recipe-search-input]');
+    const recipeResultButtons=Array.from(document.querySelectorAll('[data-recipe-result]'));
+    const recipeEmpty=document.querySelector('[data-recipe-empty]');
+    const recipeCurrent=document.querySelector('[data-recipe-current]');
+    const recipeSearchCount=document.querySelector('[data-recipe-search-count]');
+    const signatureExplorerKey='all';
+    const panState=new Map();
+    let activeTierKey='c';
+    let activeWorkflowKey='search';
+
+    function getWorkflowPanel(key){{ return document.querySelector('[data-recipe-panel="'+key+'"], [data-tier-panel="'+key+'"]'); }}
+    function getSurfaceBounds(state){{ const columns=Array.from(state.surface.querySelectorAll('[data-workflow-root]')).filter((column)=>!column.hidden); if(!columns.length) return {{left:0,top:0,right:state.surface.scrollWidth,bottom:state.surface.scrollHeight}}; const left=Math.min(...columns.map((column)=>column.offsetLeft)); const top=Math.min(...columns.map((column)=>column.offsetTop)); const right=Math.max(...columns.map((column)=>column.offsetLeft+column.offsetWidth)); const bottom=Math.max(...columns.map((column)=>column.offsetTop+column.offsetHeight)); return {{left,top,right,bottom}}; }}
     function clampPan(state){{ const bounds=getSurfaceBounds(state); const scaledLeft=bounds.left*state.scale; const scaledTop=bounds.top*state.scale; const scaledRight=bounds.right*state.scale; const scaledBottom=bounds.bottom*state.scale; const maxX=24-scaledLeft; const maxY=24-scaledTop; const minX=Math.min(maxX,state.viewport.clientWidth-scaledRight-24); const minY=Math.min(maxY,state.viewport.clientHeight-scaledBottom-24); state.x=Math.max(minX,Math.min(maxX,state.x)); state.y=Math.max(minY,Math.min(maxY,state.y)); }}
-    function applyPan(state){{ clampPan(state); state.surface.style.transform=`translate(${{state.x}}px, ${{state.y}}px) scale(${{state.scale}})`; }}
+    function applyPan(state){{ clampPan(state); state.surface.style.transform='translate('+state.x+'px, '+state.y+'px) scale('+state.scale+')'; }}
     function resetPan(key){{ const state=panState.get(key); if(!state)return; state.scale=0.92; const bounds=getSurfaceBounds(state); state.x=24-(bounds.left*state.scale); state.y=24-(bounds.top*state.scale); applyPan(state); }}
-    function setSelectedRoot(key, rootToken){{ document.querySelectorAll(`[data-root-selector="${{key}}"] .root-tag`).forEach((button)=>button.classList.toggle('is-selected', button.dataset.focusRoot===rootToken)); document.querySelectorAll(`[data-tier-panel="${{key}}"] [data-workflow-root]`).forEach((column)=>column.classList.toggle('is-focused', column.dataset.workflowRoot===rootToken)); }}
-    function focusRoot(key, rootToken){{ const state=panState.get(key); if(!state)return; const target=state.surface.querySelector(`[data-workflow-root="${{rootToken}}"]`); if(!target)return; const bounds=getSurfaceBounds(state); state.x=(state.viewport.clientWidth/2)-((target.offsetLeft+(target.offsetWidth/2))*state.scale); state.y=Math.min(24-(bounds.top*state.scale), (state.viewport.clientHeight*0.14)-(target.offsetTop*state.scale)); applyPan(state); setSelectedRoot(key, rootToken); }}
+    function setSelectedRoot(key, rootToken){{ document.querySelectorAll('[data-root-selector="'+key+'"] .root-tag').forEach((button)=>button.classList.toggle('is-selected', button.dataset.focusRoot===rootToken)); const panel=getWorkflowPanel(key); if(panel) panel.querySelectorAll('[data-workflow-root]').forEach((column)=>column.classList.toggle('is-focused', column.dataset.workflowRoot===rootToken)); }}
+    function focusRoot(key, rootToken){{ const state=panState.get(key); const panel=getWorkflowPanel(key); if(!state||!panel)return; const target=state.surface.querySelector('[data-workflow-root="'+rootToken+'"]'); if(!target)return; syncPrimaryBranchConnectors(panel); const bounds=getSurfaceBounds(state); state.x=(state.viewport.clientWidth/2)-((target.offsetLeft+(target.offsetWidth/2))*state.scale); state.y=Math.min(24-(bounds.top*state.scale), (state.viewport.clientHeight*0.14)-(target.offsetTop*state.scale)); applyPan(state); setSelectedRoot(key, rootToken); }}
     function zoomTier(key, direction){{ const state=panState.get(key); if(!state)return; const nextScale=direction==='in'?state.scale+0.08:state.scale-0.08; state.scale=Math.max(0.58, Math.min(1.24, Number(nextScale.toFixed(2)))); applyPan(state); }}
+    function showSearchRecipe(rootToken){{ const panel=getWorkflowPanel('search'); if(!panel)return; panel.querySelectorAll('[data-main-recipe-root]').forEach((column)=>{{ column.hidden=column.dataset.mainRecipeRoot!==rootToken; }}); const selectedButton=recipeResultButtons.find((button)=>button.dataset.focusRoot===rootToken); if(recipeCurrent&&selectedButton) recipeCurrent.textContent=selectedButton.dataset.recipeName; activeWorkflowKey='search'; requestAnimationFrame(()=>focusRoot('search', rootToken)); }}
+    function applyRecipeSearch(){{ const term=(recipeSearchInput?recipeSearchInput.value:'').trim().toLowerCase(); let visibleCount=0; let firstMatch=null; let selectedVisible=false; recipeResultButtons.forEach((button)=>{{ const visible=!term||button.dataset.recipeSearch.includes(term); button.hidden=!visible; if(visible){{ visibleCount+=1; if(!firstMatch) firstMatch=button; if(button.classList.contains('is-selected')) selectedVisible=true; }} }}); if(recipeSearchCount) recipeSearchCount.textContent=visibleCount+' match'+(visibleCount===1?'':'es'); if(recipeEmpty) recipeEmpty.hidden=visibleCount!==0; if(firstMatch&&!selectedVisible) showSearchRecipe(firstMatch.dataset.focusRoot); }}
+    function activateResourcePanel(key){{ const target=resourcePanels.find((panel)=>panel.dataset.resourcePanel===key); if(!target)return; resourcePanels.forEach((panel)=>{{ panel.hidden=panel!==target; }}); resourceTabs.forEach((button)=>{{ const selected=button.dataset.resourceTab===key; button.classList.toggle('is-selected',selected); button.setAttribute('aria-expanded',selected?'true':'false'); }}); if(key==='schematics'){{ activateTier(activeTierKey); }} else if(key==='signatures'){{ activeWorkflowKey='search'; syncSignatureExplorer(); }} else {{ activeWorkflowKey='search'; const selectedRecipe=document.querySelector('[data-root-selector="search"] .root-tag.is-selected')||document.querySelector('[data-root-selector="search"] .root-tag:not([hidden])'); if(selectedRecipe) requestAnimationFrame(()=>focusRoot('search', selectedRecipe.dataset.focusRoot)); }} }}
     function syncSignatureExplorer(){{ if(!signatureExplorer)return; signaturePanels.forEach((panel)=>{{ panel.hidden=panel.dataset.signaturePanel!==signatureExplorerKey; }}); applySignatureFilters(signatureExplorerKey); }}
-    function applySignatureFilters(key){{ const lookup=document.querySelector(`[data-signature-lookup="${{key}}"]`); const panel=tabPanels.find((entry)=>!entry.hidden) || document.querySelector(`[data-tier-panel="${{key}}"]`); const status=signatureExplorer?signatureExplorer.querySelector('[data-signature-status]'):null; if(!lookup||!panel){{ if(status) status.textContent='Archive scope unavailable'; return; }} const selectedButtons=Array.from(lookup.querySelectorAll('.signature-filter.is-selected')); const selectedTokens=selectedButtons.map((button)=>button.dataset.signature); const selectedNames=selectedButtons.map((button)=>button.dataset.signatureName); const activeWrap=lookup.querySelector(`[data-signature-active="${{key}}"]`); const activeList=lookup.querySelector(`[data-signature-active-list="${{key}}"]`); const results=lookup.querySelector(`[data-signature-results="${{key}}"]`); const empty=lookup.querySelector(`[data-signature-empty="${{key}}"]`); const label=lookup.dataset.signatureLabel||key.toUpperCase(); if(activeWrap) activeWrap.hidden=!selectedTokens.length; if(activeList) activeList.innerHTML=selectedButtons.map((button)=>`<span class="signature-active-chip" style="--signature-colour:${{button.style.getPropertyValue('--signature-colour')}};">${{button.dataset.signatureName}}</span>`).join(''); let visibleCount=0; lookup.querySelectorAll('.signature-match-card').forEach((card)=>{{ const keys=card.dataset.signatureKeys||''; const visible=selectedTokens.length>0 && selectedTokens.every((token)=>keys.includes(`|${{token}}|`)); card.hidden=!visible; if(visible) visibleCount+=1; }}); if(results) results.hidden=!selectedTokens.length; if(empty){{ if(!selectedTokens.length) empty.textContent='Select one or more signature channels to query the archive.'; else if(!visibleCount) empty.textContent=`No archive entries match ${{selectedNames.join(' + ')}}.`; empty.hidden=selectedTokens.length>0 && visibleCount>0; }} const activeColour=selectedButtons.length===1?getComputedStyle(selectedButtons[0]).getPropertyValue('--signature-colour').trim():''; if(activeColour) panel.style.setProperty('--active-signature-colour',activeColour); else panel.style.removeProperty('--active-signature-colour'); panel.querySelectorAll('.node-card').forEach((card)=>{{ const keys=card.dataset.signatureKeys||''; card.classList.toggle('signature-match', selectedTokens.length>0 && selectedTokens.every((token)=>keys.includes(`|${{token}}|`))); }}); if(status){{ if(!selectedTokens.length) status.textContent=`Archive scope: ${{label}}`; else status.textContent=`Filter lock: ${{selectedNames.join(' + ')}} | ${{visibleCount}} entr${{visibleCount===1?'y':'ies'}}`; }} }}
-    function toggleSignature(key, signatureToken){{ const lookup=document.querySelector(`[data-signature-lookup="${{key}}"]`); if(!lookup)return; const button=lookup.querySelector(`.signature-filter[data-signature="${{signatureToken}}"]`); if(!button)return; button.classList.toggle('is-selected'); applySignatureFilters(key); }}
-    function syncPrimaryBranchConnectors(scope=document){{ scope.querySelectorAll('.tree-children.multi').forEach((branch)=>{{ const childNodes=Array.from(branch.children).filter((child)=>child.classList&&child.classList.contains('tree-node')); if(childNodes.length<2){{ branch.style.removeProperty('--branch-start'); branch.style.removeProperty('--branch-end'); return; }} const firstNode=childNodes[0]; const lastNode=childNodes[childNodes.length-1]; const start=firstNode.offsetLeft+(firstNode.offsetWidth/2); const end=lastNode.offsetLeft+(lastNode.offsetWidth/2); branch.style.setProperty('--branch-start',`${{start}}px`); branch.style.setProperty('--branch-end',`${{end}}px`); }}); }}
-    function activateTier(key){{ tabButtons.forEach((button)=>{{ const selected=button.dataset.tierTab===key; button.classList.toggle('is-selected',selected); button.setAttribute('aria-selected',selected?'true':'false'); }}); tabPanels.forEach((panel)=>{{ panel.hidden=panel.dataset.tierPanel!==key; }}); syncSignatureExplorer(); requestAnimationFrame(()=>{{ const panel=document.querySelector(`[data-tier-panel="${{key}}"]`); if(panel) syncPrimaryBranchConnectors(panel); const selected=document.querySelector(`[data-root-selector="${{key}}"] .root-tag.is-selected`) || document.querySelector(`[data-root-selector="${{key}}"] .root-tag`); if(selected) focusRoot(key, selected.dataset.focusRoot); else resetPan(key); }}); }}
+    function applySignatureFilters(key){{ const lookup=document.querySelector('[data-signature-lookup="'+key+'"]'); const panel=getWorkflowPanel(activeWorkflowKey)||getWorkflowPanel('search'); const status=signatureExplorer?signatureExplorer.querySelector('[data-signature-status]'):null; if(!lookup||!panel){{ if(status) status.textContent='Archive scope unavailable'; return; }} const selectedButtons=Array.from(lookup.querySelectorAll('.signature-filter.is-selected')); const selectedTokens=selectedButtons.map((button)=>button.dataset.signature); const selectedNames=selectedButtons.map((button)=>button.dataset.signatureName); const activeWrap=lookup.querySelector('[data-signature-active="'+key+'"]'); const activeList=lookup.querySelector('[data-signature-active-list="'+key+'"]'); const results=lookup.querySelector('[data-signature-results="'+key+'"]'); const empty=lookup.querySelector('[data-signature-empty="'+key+'"]'); const label=lookup.dataset.signatureLabel||key.toUpperCase(); if(activeWrap) activeWrap.hidden=!selectedTokens.length; if(activeList) activeList.innerHTML=selectedButtons.map((button)=>'<span class="signature-active-chip" style="--signature-colour:'+button.style.getPropertyValue('--signature-colour')+';">'+button.dataset.signatureName+'</span>').join(''); let visibleCount=0; lookup.querySelectorAll('.signature-match-card').forEach((card)=>{{ const keys=card.dataset.signatureKeys||''; const visible=selectedTokens.length>0&&selectedTokens.every((token)=>keys.includes('|'+token+'|')); card.hidden=!visible; if(visible) visibleCount+=1; }}); if(results) results.hidden=!selectedTokens.length; if(empty){{ if(!selectedTokens.length) empty.textContent='Select one or more signature channels to query the archive.'; else if(!visibleCount) empty.textContent='No archive entries match '+selectedNames.join(' + ')+'.'; empty.hidden=selectedTokens.length>0&&visibleCount>0; }} const activeColour=selectedButtons.length===1?getComputedStyle(selectedButtons[0]).getPropertyValue('--signature-colour').trim():''; if(activeColour) panel.style.setProperty('--active-signature-colour',activeColour); else panel.style.removeProperty('--active-signature-colour'); panel.querySelectorAll('.node-card').forEach((card)=>{{ const keys=card.dataset.signatureKeys||''; card.classList.toggle('signature-match', selectedTokens.length>0&&selectedTokens.every((token)=>keys.includes('|'+token+'|'))); }}); if(status){{ if(!selectedTokens.length) status.textContent='Archive scope: '+label; else status.textContent='Filter lock: '+selectedNames.join(' + ')+' | '+visibleCount+' entr'+(visibleCount===1?'y':'ies'); }} }}
+    function toggleSignature(key, signatureToken){{ const lookup=document.querySelector('[data-signature-lookup="'+key+'"]'); if(!lookup)return; const button=Array.from(lookup.querySelectorAll('.signature-filter')).find((entry)=>entry.dataset.signature===signatureToken); if(!button)return; button.classList.toggle('is-selected'); applySignatureFilters(key); }}
+    function syncPrimaryBranchConnectors(scope=document){{ scope.querySelectorAll('.tree-children.multi').forEach((branch)=>{{ const childNodes=Array.from(branch.children).filter((child)=>child.classList&&child.classList.contains('tree-node')); if(childNodes.length<2){{ branch.style.removeProperty('--branch-start'); branch.style.removeProperty('--branch-end'); return; }} const firstNode=childNodes[0]; const lastNode=childNodes[childNodes.length-1]; const start=firstNode.offsetLeft+(firstNode.offsetWidth/2); const end=lastNode.offsetLeft+(lastNode.offsetWidth/2); branch.style.setProperty('--branch-start',start+'px'); branch.style.setProperty('--branch-end',end+'px'); }}); }}
+    function activateTier(key){{ activeTierKey=key; activeWorkflowKey=key; tabButtons.forEach((button)=>{{ const selected=button.dataset.tierTab===key; button.classList.toggle('is-selected',selected); button.setAttribute('aria-selected',selected?'true':'false'); }}); tabPanels.forEach((panel)=>{{ panel.hidden=panel.dataset.tierPanel!==key; }}); syncSignatureExplorer(); requestAnimationFrame(()=>{{ const panel=document.querySelector('[data-tier-panel="'+key+'"]'); if(panel) syncPrimaryBranchConnectors(panel); const selected=document.querySelector('[data-root-selector="'+key+'"] .root-tag.is-selected')||document.querySelector('[data-root-selector="'+key+'"] .root-tag'); if(selected) focusRoot(key, selected.dataset.focusRoot); else resetPan(key); }}); }}
     document.querySelectorAll('[data-pan-viewport]').forEach((viewport)=>{{ const key=viewport.dataset.panViewport; const surface=viewport.querySelector('[data-pan-surface]'); const state={{viewport,surface,x:24,y:24,scale:0.92,startX:0,startY:0,pointerId:null}}; panState.set(key,state); applyPan(state); viewport.addEventListener('pointerdown',(event)=>{{ state.pointerId=event.pointerId; state.startX=event.clientX-state.x; state.startY=event.clientY-state.y; viewport.classList.add('is-dragging'); viewport.setPointerCapture(event.pointerId); }}); viewport.addEventListener('pointermove',(event)=>{{ if(state.pointerId!==event.pointerId)return; state.x=event.clientX-state.startX; state.y=event.clientY-state.startY; applyPan(state); }}); function releasePointer(event){{ if(state.pointerId!==event.pointerId)return; state.pointerId=null; viewport.classList.remove('is-dragging'); }} viewport.addEventListener('pointerup',releasePointer); viewport.addEventListener('pointercancel',releasePointer); viewport.addEventListener('lostpointercapture',()=>{{ state.pointerId=null; viewport.classList.remove('is-dragging'); }}); }});
     tabButtons.forEach((button)=>button.addEventListener('click',()=>activateTier(button.dataset.tierTab)));
-    document.querySelectorAll('.root-tag').forEach((button)=>button.addEventListener('click',()=>focusRoot(button.dataset.focusTier, button.dataset.focusRoot)));
+    resourceTabs.forEach((button)=>button.addEventListener('click',()=>activateResourcePanel(button.dataset.resourceTab)));
+    recipeResultButtons.forEach((button)=>button.addEventListener('click',()=>showSearchRecipe(button.dataset.focusRoot)));
+    if(recipeSearchInput) recipeSearchInput.addEventListener('input',applyRecipeSearch);
+    document.querySelectorAll('.root-tag:not([data-recipe-result])').forEach((button)=>button.addEventListener('click',()=>focusRoot(button.dataset.focusTier, button.dataset.focusRoot)));
     document.querySelectorAll('.signature-filter').forEach((button)=>button.addEventListener('click',()=>toggleSignature(button.dataset.signatureTier, button.dataset.signature)));
-    document.querySelectorAll('.signature-match-card').forEach((button)=>button.addEventListener('click',()=>{{ activateTier(button.dataset.resultTier); requestAnimationFrame(()=>focusRoot(button.dataset.resultTier, button.dataset.resultRoot)); }}));
+    document.querySelectorAll('.signature-match-card').forEach((button)=>button.addEventListener('click',()=>{{ activateResourcePanel('schematics'); activateTier(button.dataset.resultTier); requestAnimationFrame(()=>focusRoot(button.dataset.resultTier, button.dataset.resultRoot)); }}));
     document.querySelectorAll('[data-reset-tier]').forEach((button)=>button.addEventListener('click',()=>resetPan(button.dataset.resetTier)));
     document.querySelectorAll('[data-zoom-tier]').forEach((button)=>button.addEventListener('click',()=>zoomTier(button.dataset.zoomTier, button.dataset.zoomDirection)));
-    window.addEventListener('resize',()=>{{ panState.forEach((state)=>applyPan(state)); const panel=tabPanels.find((entry)=>!entry.hidden); if(panel) syncPrimaryBranchConnectors(panel); }});
+    window.addEventListener('resize',()=>{{ panState.forEach((state)=>applyPan(state)); const panel=getWorkflowPanel(activeWorkflowKey); if(panel) syncPrimaryBranchConnectors(panel); }});
     activateTier('c');
-    ['c','1','2','3','i','m','all'].forEach((key)=>{{ const first=document.querySelector(`[data-root-selector="${{key}}"] .root-tag`); if(first) setSelectedRoot(key, first.dataset.focusRoot); }});
+    ['c','1','2','3','i','m','all'].forEach((key)=>{{ const first=document.querySelector('[data-root-selector="'+key+'"] .root-tag'); if(first) setSelectedRoot(key, first.dataset.focusRoot); }});
+    const firstRecipe=recipeResultButtons[0]; if(firstRecipe) showSearchRecipe(firstRecipe.dataset.focusRoot);
+    applyRecipeSearch();
   </script>
 </body>
 </html>"""
@@ -1456,10 +1616,12 @@ def main():
     recipes, minimum_tier, industrial_items, tier_roots = build_recipe_catalog(snapshot)
     raw_materials = set(snapshot["rawMaterials"])
     item_meta = build_item_meta(snapshot)
+    page_html = build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta, tier_roots)
+    page_html = "\n".join(line.rstrip() for line in page_html.splitlines()) + "\n"
 
     HTML_DIR.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(
-        build_page(recipes, minimum_tier, raw_materials, industrial_items, item_meta, tier_roots),
+        page_html,
         encoding="utf-8",
     )
     print(f"ProductionFlowGen summary: built 1 production flow page with {len(recipes)} recipe trees.")

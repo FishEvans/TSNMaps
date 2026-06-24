@@ -137,11 +137,25 @@ class SystemMapEditor:
         button_frame = tk.Frame(control_frame)
         button_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
+        action_frame = tk.Frame(control_frame)
+        action_frame.pack(side=tk.RIGHT, anchor="ne", padx=(10, 0))
+        tk.Button(
+            action_frame,
+            text="Save and Generate HTML",
+            command=self.save_changes,
+            width=22,
+        ).pack(side=tk.TOP, fill=tk.X, pady=(0, 4))
+        tk.Button(
+            action_frame,
+            text="Open HTML",
+            command=self.open_or_generate_maps,
+            width=22,
+        ).pack(side=tk.TOP, fill=tk.X)
+
         self._build_control_row(
             button_frame,
             "Map",
             [
-                ("Open Map", self.open_or_generate_maps),
                 ("Reload Systems", self.reload_systems_data),
                 ("Re-generate Ship Data", self.regenerate_ship_data),
             ],
@@ -152,7 +166,6 @@ class SystemMapEditor:
             [
                 ("New System", self.create_new_system),
                 ("Auto Link Gates", self.auto_link_gates),
-                ("Save Changes", self.save_changes),
             ],
         )
         self._build_control_row(
@@ -188,11 +201,11 @@ class SystemMapEditor:
         if index_path.exists():
             opened = self._open_index_html()
             if not opened:
-                messagebox.showerror("Open Map", f"Unable to open {index_path}.")
+                messagebox.showerror("Open HTML", f"Unable to open {index_path}.")
             return
 
         should_generate = messagebox.askyesno(
-            "Open Map",
+            "Open HTML",
             "HTML/index.html was not found.\n\nGenerate the maps now and open the galactic map?",
         )
         if not should_generate:
@@ -206,7 +219,7 @@ class SystemMapEditor:
 
         if not self._open_index_html():
             messagebox.showerror(
-                "Open Map",
+                "Open HTML",
                 f"Maps were generated, but {index_path} could not be opened.",
             )
 
@@ -226,7 +239,8 @@ class SystemMapEditor:
        - On border point: remove nearest point
 
     UI Buttons:
-    • Save Changes – Writes all system edits and regenerates maps
+    • Save and Generate HTML – Writes all system edits and regenerates maps
+    • Open HTML – Opens the generated galactic map
     • Zoom In / Out – Adjust zoom level
     • New System – Create a new system at the current view center
     • Rename System – Edit the system name in System Properties

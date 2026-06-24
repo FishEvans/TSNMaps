@@ -1,7 +1,7 @@
 {
     "systemMapCoord": [
         34677.02428518798,
-        0,
+        0.0,
         -698.3017381431682
     ],
     "systemalignment": "Unknown",
@@ -26,8 +26,8 @@
         "all_authors": [
             "Fish Evans"
         ],
-        "revision_number": 28,
-        "revision_date": "2026-06-13"
+        "revision_number": 32,
+        "revision_date": "2026-06-24"
     },
     "objects": {
         "JP 82": {
@@ -57,7 +57,27 @@
             "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
-            "cargo": {},
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7
+            },
             "teams": {},
             "description": "",
             "hideonmap": false
@@ -194,31 +214,29 @@
             "hull": "starbase_torgoth",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": "",
-            "hideonmap": false
-        },
-        "DS 18": {
-            "coordinate": [
-                -52383.82537239805,
-                0,
-                181419.55022953288
-            ],
-            "sides": [
-                "Torgoth"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
             "cargo": {
-                "Data Core": 1,
-                "Virus": 1,
-                "Gredian": 20,
-                "Reisium": 10
+                "Fuel Cell 100": 5,
+                "Fuel Cell 200": 2,
+                "Warning Buoy": 5,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Casing": 16,
+                "Guidance System": 20,
+                "High Yield Warhead": 15,
+                "Power Relay": 8,
+                "Receiver": 15,
+                "Sensor Suite": 6,
+                "Transmitter": 35,
+                "Warhead": 26,
+                "Mexalon": 5
             },
-            "teams": {},
-            "description": "Kraliean Base, type 14 Suspected of beeing used for storage and refitting of Ordinace.",
+            "teams": {
+                "Combat Engineers": 2,
+                "DamCon": 5,
+                "Marines": 4,
+                "Medics": 2
+            },
+            "description": "",
             "hideonmap": false
         },
         "JP 14": {
@@ -234,7 +252,7 @@
             },
             "state": "Unteathered",
             "drift": 60000,
-            "hideonmap": true
+            "hideonmap": false
         },
         "DS 29": {
             "coordinate": [
@@ -319,8 +337,7 @@
                 "Fuel Cell 200": 4,
                 "Aegirine": 50,
                 "Iron": 40,
-                "Ashfilum": 15,
-                "Data Core": 1
+                "Ashfilum": 15
             },
             "teams": {},
             "description": "Gas Extraction and Processing for Fuel Collection",
@@ -342,23 +359,6 @@
             "teams": {},
             "description": "",
             "hideonmap": false
-        },
-        "DS 28": {
-            "coordinate": [
-                -191000.91123375332,
-                0,
-                -79620.92893427335
-            ],
-            "sides": [
-                "Pirate"
-            ],
-            "hull": "pirate_military_base",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": "",
-            "hideonmap": true
         },
         "DS 75": {
             "coordinate": [
@@ -434,58 +434,6 @@
             "type": "platform",
             "cargo": {},
             "teams": {}
-        },
-        "WP 62": {
-            "coordinate": [
-                -44550.710986480866,
-                0,
-                187613.41662174105
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "hegemony_beam_platform",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "DS 97": {
-            "coordinate": [
-                -47846.23288271055,
-                0,
-                182861.3611889831
-            ],
-            "sides": [
-                "Torgoth"
-            ],
-            "hull": "starbase_torgoth",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": "Under Construction"
-        },
-        "DS 26": {
-            "coordinate": [
-                -45295.755017830495,
-                0,
-                187724.51382157594
-            ],
-            "sides": [
-                "Torgoth"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {
-                "Virus": 1,
-                "Gredian": 20,
-                "Reisium": 10,
-                "Data Core": 1
-            },
-            "teams": {},
-            "description": "Kraliean Base, type 14 Suspected of beeing used for storage and refitting of Ordinace.",
-            "hideonmap": false
         },
         "WP 46": {
             "coordinate": [
@@ -591,6 +539,104 @@
             "cargo": {},
             "teams": {},
             "hideonmap": true
+        },
+        "Gen 60": {
+            "coordinate": [
+                120567.72473371089,
+                0,
+                34018.47815324503
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": false
+        },
+        "Acu 9738": {
+            "coordinate": [
+                123671.72707695696,
+                0,
+                36679.05159031309
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": false
+        },
+        "Acu 3171": {
+            "coordinate": [
+                120854.64932006136,
+                0,
+                33001.20007436606
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": false
+        },
+        "Acu 4832": {
+            "coordinate": [
+                122054.51577207245,
+                0,
+                32557.77116818805
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": false
+        },
+        "CheCan": {
+            "coordinate": [
+                -191000.91123375332,
+                0,
+                -79620.92893427335
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Comms Relay": 1,
+                "Fuel Cell 100": 2,
+                "Sensor Relay": 3,
+                "Life Support": 1,
+                "Homing": 5,
+                "Casing": 15,
+                "Denebite Crystals": 5,
+                "Iso B Circuit": 3,
+                "Meals": 15,
+                "Micro Controller": 8,
+                "Packaging": 25,
+                "Power Relay": 16,
+                "Rations": 26,
+                "Sensor Suite": 10,
+                "Tharium Plating": 20,
+                "Torpedo Casing": 10,
+                "Warhead": 10
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
+            "description": "",
+            "hideonmap": true
         }
     },
     "sensor_relay": {
@@ -600,7 +646,8 @@
                 0,
                 -159894.43250100102
             ],
-            "type": "Sensor Relay"
+            "type": "Sensor Relay",
+            "description": ""
         },
         "Scan Point Alpha [C17]": {
             "coordinate": [
@@ -636,14 +683,6 @@
                 -70000.0,
                 0,
                 -120833.33333333334
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 004": {
-            "coordinate": [
-                141364.11536922725,
-                0,
-                55534.693644261555
             ],
             "type": "Sensor Relay",
             "description": ""
@@ -981,14 +1020,14 @@
                 -73002.77
             ],
             "end": [
-                -288226.91,
+                -288583.27836045064,
                 0,
-                -97266.05
+                -96504.62169130721
             ],
             "density": 116,
             "scatter": 8579,
             "composition": [],
-            "hideonmap": true
+            "hideonmap": false
         },
         "Nebula Arc 2": {
             "type": "nebulas",
@@ -1024,7 +1063,7 @@
             "density": 96,
             "scatter": 8000,
             "composition": [],
-            "hideonmap": true
+            "hideonmap": false
         },
         "Nebula Field": {
             "type": "nebulas",
@@ -1183,7 +1222,7 @@
             "density": 679,
             "scatter": 17993,
             "composition": [],
-            "hideonmap": true
+            "hideonmap": false
         },
         "Nebula Field 10": {
             "type": "nebulas",
@@ -1325,7 +1364,7 @@
             ],
             "radius": 11326,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 11,326 units. Local nebular density index: 70.3. Source field: Nebula Arc 2. Survey profile: thin helium wash over denser collection pockets; field stability patchy near the edge; collector saturation estimate 84%. Telemetry confidence: high. Cycle filters often; particulate load may spike without warning.",
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS3": {
             "type": "fcs_zone",
@@ -1336,7 +1375,7 @@
             ],
             "radius": 10983,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 10,983 units. Local nebular density index: 68.9. Source field: Nebula Field 9. Survey profile: volatile ice fines suspended in a quiet plasma band; field stability slowly drifting; collector saturation estimate 64%. Telemetry confidence: high. Cycle filters often; particulate load may spike without warning.",
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS4": {
             "type": "fcs_zone",
@@ -1402,7 +1441,7 @@
             ],
             "radius": 10293,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 10,293 units. Local nebular density index: 60.8. Source field: Nebula Field 4. Survey profile: charged nebular wisps with intermittent fuel-cell precursors; field stability patchy near the edge; collector saturation estimate 40%. Telemetry confidence: high. Cycle filters often; particulate load may spike without warning.",
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS10": {
             "type": "fcs_zone",
@@ -1435,7 +1474,7 @@
             ],
             "radius": 9603,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 9,603 units. Local nebular density index: 46.3. Source field: Nebula Field 10. Survey profile: bright ion trails with usable condenser feedstock; field stability patchy near the edge; collector saturation estimate 89%. Telemetry confidence: moderate. Cycle filters often; particulate load may spike without warning.",
-            "hideonmap": true
+            "hideonmap": false
         },
         "FCS13": {
             "type": "fcs_zone",
@@ -1481,7 +1520,7 @@
             "height": 15000,
             "width": 15000,
             "density": 70,
-            "hideonmap": true
+            "hideonmap": false
         },
         "Hidden Mine Field 5": {
             "type": "hidden_minefield",
@@ -1505,7 +1544,40 @@
             "height": 10000,
             "width": 10000,
             "density": 70,
-            "hideonmap": true
+            "hideonmap": false
+        },
+        "1781440711321": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -43930.530107461396,
+                0,
+                187939.85084325966
+            ],
+            "density": 30,
+            "scatter": 10000
+        },
+        "1781440742657": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -48482.92776260468,
+                0,
+                182891.64750290275
+            ],
+            "density": 10,
+            "scatter": 2000
+        },
+        "1781440755946": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -52584.59297664467,
+                0,
+                177212.41874500125
+            ],
+            "density": 10,
+            "scatter": 5000
         }
     },
     "traffic": {
