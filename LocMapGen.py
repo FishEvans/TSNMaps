@@ -9,6 +9,7 @@ import random
 import re
 from LocMapTemplate import build_object_button, render_locmap_html
 from ShipDescriptionResolver import resolve_ship_description
+import SystemEditor
 
 # Helper to locate resources when running as a module or frozen executable
 def get_base_path():
@@ -22,8 +23,8 @@ def get_base_path():
 
 # Base directories\
 BASE = get_base_path()
-JSON_FOLDER =  Path(get_base_path()) / "data/missions/Map Designer/Terrain"
-DEFAULT_HTML_DIR = Path(BASE) / 'HTML'
+JSON_FOLDER = Path(SystemEditor.get_data_path())
+DEFAULT_HTML_DIR = Path(SystemEditor.get_html_output_path())
 
 # Configuration for station side colors
 STATION_SIDE_COLORS = {

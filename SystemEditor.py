@@ -1012,7 +1012,27 @@ def get_base_path():
 
 def get_data_path():
     """Directory where system JSON files live under data/missions/.../Terrain"""
+    settings = load_editor_settings()
+    return str(resolve_configured_path(settings.get('systemMapsPath'), get_default_data_path()))
+
+def get_default_data_path():
     return os.path.join(get_base_path(), 'data', 'missions', 'Map Designer', 'Terrain')
+
+def get_default_html_path():
+    return os.path.join(get_base_path(), 'HTML')
+
+def resolve_configured_path(value: Any, default_path: str) -> Path:
+    raw = str(value or '').strip()
+    if not raw:
+        return Path(default_path)
+    path = Path(os.path.expandvars(os.path.expanduser(raw)))
+    if not path.is_absolute():
+        path = Path(get_base_path()) / path
+    return path
+
+def get_html_output_path():
+    settings = load_editor_settings()
+    return str(resolve_configured_path(settings.get('htmlOutputPath'), get_default_html_path()))
 
 def get_settings_path():
     base = get_base_path()
@@ -1048,6 +1068,279 @@ def save_editor_settings(settings: Dict[str, Any]) -> None:
         os.makedirs(os.path.dirname(path), exist_ok=True)
     except Exception:
         pass
+    try:
+        with open(path, 'w') as f:
+            json.dump(settings, f, indent=4)
+    except Exception:
+        pass
+
+
+def _parse_multiline_values(value: str) -> List[str]:
+    values = []
+    seen = set()
+    for raw in re.split(r'[\n,]+', value or ''):
+        item = raw.strip()
+        if not item:
+            continue
+        key = item.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        values.append(item)
+    return values
+
+
+def prompt_for_author(parent, settings: Optional[Dict[str, Any]] = None) -> Optional[str]:
+    settings = settings if isinstance(settings, dict) else load_editor_settings()
+    result = {'author': None}
+
+    dlg = tk.Toplevel(parent)
+    dlg.title("Author")
+    dlg.transient(parent)
+    dlg.grab_set()
+    dlg.resizable(False, False)
+
+    tk.Label(dlg, text="Enter your author name for this session:").grid(
+        row=0, column=0, columnspan=2, sticky='w', padx=12, pady=(12, 6)
+    )
+    author_var = tk.StringVar()
+    entry = ttk.Entry(dlg, textvariable=author_var, width=36)
+    entry.grid(row=1, column=0, columnspan=2, sticky='ew', padx=12)
+
+    save_var = tk.BooleanVar(value=False)
+    ttk.Checkbutton(
+        dlg,
+        text="Save this author to Settings.json",
+        variable=save_var,
+    ).grid(row=2, column=0, columnspan=2, sticky='w', padx=12, pady=(8, 10))
+
+    buttons = ttk.Frame(dlg)
+    buttons.grid(row=3, column=0, columnspan=2, sticky='e', padx=12, pady=(0, 12))
+
+    def accept():
+        author = author_var.get().strip()
+        if not author:
+            messagebox.showwarning("Author", "Enter an author name or cancel.", parent=dlg)
+            return
+        result['author'] = author
+        if save_var.get():
+            settings['author'] = author
+            save_editor_settings(settings)
+        dlg.destroy()
+
+    def cancel():
+        dlg.destroy()
+
+    ttk.Button(buttons, text="OK", command=accept).pack(side=tk.LEFT, padx=(0, 6))
+    ttk.Button(buttons, text="Cancel", command=cancel).pack(side=tk.LEFT)
+    dlg.bind('<Return>', lambda _event: accept())
+    dlg.bind('<Escape>', lambda _event: cancel())
+    entry.focus_set()
+    dlg.wait_window()
+    return result['author']
+
+
+def open_settings_editor(parent=None, on_save=None):
+    settings = load_editor_settings()
+    if not isinstance(settings, dict):
+        settings = {}
+
+    dlg = tk.Toplevel(parent) if parent is not None else tk.Toplevel()
+    dlg.title("Settings")
+    dlg.geometry("720x560")
+    if parent is not None:
+        dlg.transient(parent)
+    dlg.grab_set()
+
+    notebook = ttk.Notebook(dlg)
+    notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    general = ttk.Frame(notebook)
+    races_tab = ttk.Frame(notebook)
+    advanced = ttk.Frame(notebook)
+    notebook.add(general, text="General")
+    notebook.add(races_tab, text="Races")
+    notebook.add(advanced, text="Advanced JSON")
+
+    author_var = tk.StringVar(value=str(settings.get('author', '') or ''))
+    ttk.Label(general, text="Author").grid(row=0, column=0, sticky='w', padx=8, pady=(8, 2))
+    ttk.Entry(general, textvariable=author_var, width=48).grid(row=1, column=0, sticky='ew', padx=8)
+    general.columnconfigure(0, weight=1)
+
+    factions_value = settings.get('Factions', [])
+    if not isinstance(factions_value, list):
+        factions_value = []
+    paths_frame = ttk.LabelFrame(general, text="Map folders")
+    paths_frame.grid(row=2, column=0, sticky='ew', padx=8, pady=(12, 2))
+    paths_frame.columnconfigure(1, weight=1)
+
+    system_maps_var = tk.StringVar(value=str(settings.get('systemMapsPath', '') or ''))
+    html_output_var = tk.StringVar(value=str(settings.get('htmlOutputPath', '') or ''))
+
+    def browse_directory(var, title, fallback):
+        initial = str(resolve_configured_path(var.get(), fallback))
+        if not os.path.isdir(initial):
+            initial = fallback
+        selected = filedialog.askdirectory(parent=dlg, title=title, initialdir=initial)
+        if selected:
+            var.set(selected)
+
+    ttk.Label(paths_frame, text="Read/save system maps").grid(row=0, column=0, sticky='w', padx=8, pady=(8, 2))
+    ttk.Entry(paths_frame, textvariable=system_maps_var, width=56).grid(row=0, column=1, sticky='ew', padx=(0, 6), pady=(8, 2))
+    ttk.Button(
+        paths_frame,
+        text="Browse",
+        command=lambda: browse_directory(system_maps_var, "System map folder", get_default_data_path()),
+    ).grid(row=0, column=2, sticky='e', padx=(0, 8), pady=(8, 2))
+    ttk.Label(paths_frame, text="Save generated HTML").grid(row=1, column=0, sticky='w', padx=8, pady=(2, 8))
+    ttk.Entry(paths_frame, textvariable=html_output_var, width=56).grid(row=1, column=1, sticky='ew', padx=(0, 6), pady=(2, 8))
+    ttk.Button(
+        paths_frame,
+        text="Browse",
+        command=lambda: browse_directory(html_output_var, "Generated HTML folder", get_default_html_path()),
+    ).grid(row=1, column=2, sticky='e', padx=(0, 8), pady=(2, 8))
+
+    ttk.Label(general, text="Factions (one per line)").grid(row=3, column=0, sticky='w', padx=8, pady=(12, 2))
+    factions_text = tk.Text(general, height=10, wrap='none')
+    factions_text.grid(row=4, column=0, sticky='nsew', padx=8, pady=(0, 8))
+    factions_text.insert('1.0', "\n".join(str(item) for item in factions_value))
+    general.rowconfigure(4, weight=1)
+
+    races_tab.columnconfigure(0, weight=1)
+    races_tab.rowconfigure(0, weight=1)
+    races_frame = ttk.Frame(races_tab)
+    races_frame.grid(row=0, column=0, sticky='nsew', padx=8, pady=8)
+    races_frame.columnconfigure(0, weight=1)
+    races_frame.rowconfigure(0, weight=1)
+
+    races_tree = ttk.Treeview(races_frame, columns=('race', 'faction'), show='headings', selectmode='browse')
+    races_tree.heading('race', text='Race')
+    races_tree.heading('faction', text='Faction')
+    races_tree.column('race', width=260, stretch=True)
+    races_tree.column('faction', width=220, stretch=True)
+    races_tree.grid(row=0, column=0, sticky='nsew')
+    races_scroll = ttk.Scrollbar(races_frame, orient='vertical', command=races_tree.yview)
+    races_scroll.grid(row=0, column=1, sticky='ns')
+    races_tree.configure(yscrollcommand=races_scroll.set)
+
+    races_map = settings.get('Races', {})
+    if not isinstance(races_map, dict):
+        races_map = {}
+    for race, info in sorted(races_map.items(), key=lambda item: str(item[0]).casefold()):
+        faction = info.get('Faction', '') if isinstance(info, dict) else ''
+        races_tree.insert('', 'end', values=(str(race), str(faction or '')))
+
+    race_edit = ttk.Frame(races_tab)
+    race_edit.grid(row=1, column=0, sticky='ew', padx=8, pady=(0, 8))
+    race_edit.columnconfigure(1, weight=1)
+    race_edit.columnconfigure(3, weight=1)
+    race_var = tk.StringVar()
+    faction_var = tk.StringVar()
+    ttk.Label(race_edit, text="Race").grid(row=0, column=0, sticky='w')
+    ttk.Entry(race_edit, textvariable=race_var).grid(row=0, column=1, sticky='ew', padx=(4, 8))
+    ttk.Label(race_edit, text="Faction").grid(row=0, column=2, sticky='w')
+    ttk.Entry(race_edit, textvariable=faction_var).grid(row=0, column=3, sticky='ew', padx=(4, 0))
+
+    race_buttons = ttk.Frame(races_tab)
+    race_buttons.grid(row=2, column=0, sticky='e', padx=8, pady=(0, 8))
+
+    def on_race_select(_event=None):
+        selected = races_tree.selection()
+        if not selected:
+            return
+        race, faction = races_tree.item(selected[0], 'values')
+        race_var.set(race)
+        faction_var.set(faction)
+
+    def add_or_update_race():
+        race = race_var.get().strip()
+        faction = faction_var.get().strip()
+        if not race:
+            messagebox.showwarning("Settings", "Enter a race name.", parent=dlg)
+            return
+        selected = races_tree.selection()
+        target = selected[0] if selected else None
+        if target is None:
+            for item in races_tree.get_children():
+                existing = races_tree.item(item, 'values')[0]
+                if existing.casefold() == race.casefold():
+                    target = item
+                    break
+        if target is None:
+            races_tree.insert('', 'end', values=(race, faction))
+        else:
+            races_tree.item(target, values=(race, faction))
+        race_var.set('')
+        faction_var.set('')
+
+    def delete_race():
+        for item in races_tree.selection():
+            races_tree.delete(item)
+        race_var.set('')
+        faction_var.set('')
+
+    races_tree.bind('<<TreeviewSelect>>', on_race_select)
+    ttk.Button(race_buttons, text="Add/Update", command=add_or_update_race).pack(side=tk.LEFT, padx=(0, 6))
+    ttk.Button(race_buttons, text="Delete", command=delete_race).pack(side=tk.LEFT)
+
+    known_keys = {'author', 'Factions', 'Races', 'systemMapsPath', 'htmlOutputPath'}
+    extra_settings = {k: v for k, v in settings.items() if k not in known_keys}
+    ttk.Label(advanced, text="Additional Settings JSON").pack(anchor='w', padx=8, pady=(8, 2))
+    extra_text = tk.Text(advanced, wrap='none')
+    extra_text.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+    extra_text.insert('1.0', json.dumps(extra_settings, indent=4))
+
+    button_row = ttk.Frame(dlg)
+    button_row.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+    def save():
+        try:
+            extra = json.loads(extra_text.get('1.0', 'end').strip() or '{}')
+            if not isinstance(extra, dict):
+                raise ValueError("Additional settings must be a JSON object.")
+        except Exception as exc:
+            messagebox.showerror("Settings", f"Invalid Additional Settings JSON:\n{exc}", parent=dlg)
+            notebook.select(advanced)
+            return
+
+        new_settings = dict(extra)
+        new_settings['Factions'] = _parse_multiline_values(factions_text.get('1.0', 'end'))
+        new_settings['Races'] = {}
+        for item in races_tree.get_children():
+            race, faction = races_tree.item(item, 'values')
+            race = str(race).strip()
+            if race:
+                new_settings['Races'][race] = {'Faction': str(faction).strip()}
+        new_settings['author'] = author_var.get().strip()
+        system_maps_path = system_maps_var.get().strip()
+        html_output_path = html_output_var.get().strip()
+        for label, value, default_path in (
+            ("System map folder", system_maps_path, get_default_data_path()),
+            ("Generated HTML folder", html_output_path, get_default_html_path()),
+        ):
+            target = resolve_configured_path(value, default_path)
+            try:
+                target.mkdir(parents=True, exist_ok=True)
+            except Exception as exc:
+                messagebox.showerror("Settings", f"{label} could not be created:\n{target}\n\n{exc}", parent=dlg)
+                notebook.select(general)
+                return
+            if not target.is_dir():
+                messagebox.showerror("Settings", f"{label} is not a directory:\n{target}", parent=dlg)
+                notebook.select(general)
+                return
+        if system_maps_path:
+            new_settings['systemMapsPath'] = system_maps_path
+        if html_output_path:
+            new_settings['htmlOutputPath'] = html_output_path
+        save_editor_settings(new_settings)
+        if callable(on_save):
+            on_save(new_settings)
+        dlg.destroy()
+
+    ttk.Button(button_row, text="Save", command=save).pack(side=tk.RIGHT, padx=(6, 0))
+    ttk.Button(button_row, text="Cancel", command=dlg.destroy).pack(side=tk.RIGHT)
+    return dlg
 
 def _normalize_roles(entry: Dict[str, Any]) -> set:
     roles = set()
@@ -1060,11 +1353,6 @@ def _normalize_roles(entry: Dict[str, Any]) -> set:
     if isinstance(raw_role, str) and raw_role.strip():
         roles.add(raw_role.strip().lower())
     return roles
-    try:
-        with open(path, 'w') as f:
-            json.dump(settings, f, indent=4)
-    except Exception:
-        pass
 
 def _normalize_author_list(value: Any) -> List[str]:
     if value is None:
@@ -1941,17 +2229,9 @@ def open_system_editor(filename: str) -> None:
         save_editor_settings(editor_settings)
 
     if not author_var.get().strip():
-        try:
-            entered = simpledialog.askstring(
-                "Author",
-                "Enter your author name for this session:",
-                parent=win
-            )
-        except Exception:
-            entered = None
+        entered = prompt_for_author(win, editor_settings)
         if entered is not None:
             author_var.set(entered.strip())
-            persist_author_setting()
 
     author_entry.bind('<FocusOut>', persist_author_setting)
     author_entry.bind('<Return>', persist_author_setting)

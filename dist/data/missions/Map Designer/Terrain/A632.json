@@ -26,8 +26,8 @@
         "all_authors": [
             "Fish Evans"
         ],
-        "revision_number": 32,
-        "revision_date": "2026-06-24"
+        "revision_number": 33,
+        "revision_date": "2026-07-04"
     },
     "objects": {
         "JP 82": {
@@ -57,27 +57,7 @@
             "hull": "starbase_kralien",
             "type": "station",
             "facilities": [],
-            "cargo": {
-                "Fuel Cell 100": 2,
-                "Fuel Cell 200": 1,
-                "Life Support": 1,
-                "Aid Package": 16,
-                "Alcohol": 8,
-                "Casing": 6,
-                "Coffee": 7,
-                "Container": 25,
-                "Iso B Circuit": 25,
-                "Meals": 30,
-                "Medical Supplies": 6,
-                "Micro Controller": 8,
-                "Packaging": 15,
-                "Pets": 6,
-                "Power Relay": 16,
-                "Produce": 10,
-                "Rations": 25,
-                "Repair Materials": 16,
-                "Tea": 7
-            },
+            "cargo": {},
             "teams": {},
             "description": "",
             "hideonmap": false
@@ -99,9 +79,9 @@
         },
         "WP 14": {
             "coordinate": [
-                123568.82482472571,
+                123177.56402515687,
                 0,
-                37440.74317342229
+                36897.32539624336
             ],
             "sides": [
                 "Kralien"
@@ -189,9 +169,9 @@
         },
         "WP 40": {
             "coordinate": [
-                121048.72701774994,
+                121353.04097297015,
                 0,
-                32301.081190040062
+                32735.81541178321
             ],
             "sides": [
                 "Kralien"
@@ -214,28 +194,8 @@
             "hull": "starbase_torgoth",
             "type": "station",
             "facilities": [],
-            "cargo": {
-                "Fuel Cell 100": 5,
-                "Fuel Cell 200": 2,
-                "Warning Buoy": 5,
-                "Navigational Array": 1,
-                "Tactical Array": 10,
-                "Casing": 16,
-                "Guidance System": 20,
-                "High Yield Warhead": 15,
-                "Power Relay": 8,
-                "Receiver": 15,
-                "Sensor Suite": 6,
-                "Transmitter": 35,
-                "Warhead": 26,
-                "Mexalon": 5
-            },
-            "teams": {
-                "Combat Engineers": 2,
-                "DamCon": 5,
-                "Marines": 4,
-                "Medics": 2
-            },
+            "cargo": {},
+            "teams": {},
             "description": "",
             "hideonmap": false
         },
@@ -359,6 +319,23 @@
             "teams": {},
             "description": "",
             "hideonmap": false
+        },
+        "DS 28": {
+            "coordinate": [
+                -191000.91123375332,
+                0,
+                -79620.92893427335
+            ],
+            "sides": [
+                "Pirate"
+            ],
+            "hull": "pirate_military_base",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "",
+            "hideonmap": true
         },
         "DS 75": {
             "coordinate": [
@@ -557,9 +534,9 @@
         },
         "Acu 9738": {
             "coordinate": [
-                123671.72707695696,
+                123584.78023260833,
                 0,
-                36679.05159031309
+                36157.37052422131
             ],
             "sides": [
                 "Torgoth"
@@ -600,43 +577,34 @@
             "teams": {},
             "hideonmap": false
         },
-        "CheCan": {
+        "SS A632": {
             "coordinate": [
-                -191000.91123375332,
+                122148.49129603991,
                 0,
-                -79620.92893427335
+                34814.32612115093
             ],
             "sides": [
-                "Pirate"
+                "Kralien"
             ],
-            "hull": "pirate_military_base",
-            "type": "station",
-            "facilities": [],
-            "cargo": {
-                "Comms Relay": 1,
-                "Fuel Cell 100": 2,
-                "Sensor Relay": 3,
-                "Life Support": 1,
-                "Homing": 5,
-                "Casing": 15,
-                "Denebite Crystals": 5,
-                "Iso B Circuit": 3,
-                "Meals": 15,
-                "Micro Controller": 8,
-                "Packaging": 25,
-                "Power Relay": 16,
-                "Rations": 26,
-                "Sensor Suite": 10,
-                "Tharium Plating": 20,
-                "Torpedo Casing": 10,
-                "Warhead": 10
-            },
-            "teams": {
-                "DamCon": 1,
-                "Medics": 1
-            },
-            "description": "",
-            "hideonmap": true
+            "hull": "Hegemony_Slingshot",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 79": {
+            "coordinate": [
+                120141.75812847354,
+                0,
+                31615.551717564853
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_fighter_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": false
         }
     },
     "sensor_relay": {
@@ -684,8 +652,7 @@
                 0,
                 -120833.33333333334
             ],
-            "type": "Sensor Relay",
-            "description": ""
+            "type": "Sensor Relay"
         },
         "SR 005": {
             "coordinate": [

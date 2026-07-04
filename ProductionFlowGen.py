@@ -4,6 +4,8 @@ import os
 import sys
 from pathlib import Path
 
+import SystemEditor
+
 
 OUTPUT_NAME = "ProductionFlow.html"
 SPRITE_COLUMNS = 20
@@ -55,7 +57,7 @@ def get_base_path():
 
 
 BASE = Path(get_base_path())
-HTML_DIR = BASE / "HTML"
+HTML_DIR = Path(SystemEditor.get_html_output_path())
 OUTPUT_PATH = HTML_DIR / OUTPUT_NAME
 DATABASE_PATH = BASE / DATABASE_SOURCE
 SPRITE_PATH = BASE / SPRITE_SOURCE

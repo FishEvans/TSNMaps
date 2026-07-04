@@ -9,6 +9,8 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import quote
 
+import SystemEditor
+
 from ShipDescriptionResolver import (
     clean_description,
     load_authoritative_description_index,
@@ -46,12 +48,12 @@ def get_base_path():
 
 
 BASE = Path(get_base_path())
-HTML_DIR = BASE / "HTML"
+HTML_DIR = Path(SystemEditor.get_html_output_path())
 SHIPS_DIR = HTML_DIR / "Images" / "Ships"
 FACTIONS_DIR = HTML_DIR / "Images" / "Factions"
 SHIPMAP_PATH = SHIPS_DIR / "ShipMap.json"
 SHIPDATA_PATH = BASE / "scripts" / "Referance" / "shipData.yaml"
-SETTINGS_PATH = BASE / "Settings.json"
+SETTINGS_PATH = Path(SystemEditor.get_settings_path())
 OUTPUT_PATH = HTML_DIR / OUTPUT_NAME
 FACTION_ICON_ALIASES = {
     "skaraan": "Skarran",

@@ -158,6 +158,7 @@ class SystemMapEditor:
             [
                 ("Reload Systems", self.reload_systems_data),
                 ("Re-generate Ship Data", self.regenerate_ship_data),
+                ("\u2699", self.open_settings_editor),
             ],
         )
         self._build_control_row(
@@ -179,12 +180,26 @@ class SystemMapEditor:
         )
 
     def _get_index_html_path(self):
-        return Path(get_base_path()) / "HTML" / "index.html"
+        return Path(SystemEditor.get_html_output_path()) / "index.html"
 
     def _get_ship_image_extractor_path(self):
         return Path(get_base_path()) / "scripts" / "ShipImageExtractor.py"
 
     def _run_generators(self):
+        systems_dir = Path(SystemEditor.get_data_path())
+        html_dir = Path(SystemEditor.get_html_output_path())
+        LocMapGen.JSON_FOLDER = systems_dir
+        LocMapGen.DEFAULT_HTML_DIR = html_dir
+        GalMapGen.JSON_FOLDER = systems_dir
+        GalMapGen.HTML_OUTPUT = html_dir / "index.html"
+        LibraryGen.HTML_DIR = html_dir
+        LibraryGen.SHIPS_DIR = html_dir / "Images" / "Ships"
+        LibraryGen.FACTIONS_DIR = html_dir / "Images" / "Factions"
+        LibraryGen.SHIPMAP_PATH = LibraryGen.SHIPS_DIR / "ShipMap.json"
+        LibraryGen.SETTINGS_PATH = Path(SystemEditor.get_settings_path())
+        LibraryGen.OUTPUT_PATH = html_dir / "Library.html"
+        ProductionFlowGen.HTML_DIR = html_dir
+        ProductionFlowGen.OUTPUT_PATH = html_dir / "ProductionFlow.html"
         LocMapGen.main()
         GalMapGen.main()
         LibraryGen.main()
@@ -273,14 +288,107 @@ class SystemMapEditor:
             return {}
 
     def _load_settings(self):
-        base = get_base_path()
-        settings_path = os.path.join(base, "Settings.json")
         try:
-            with open(settings_path, "r") as f:
-                data = json.load(f)
+            data = SystemEditor.load_editor_settings()
             return data if isinstance(data, dict) else {}
         except Exception:
             return {}
+
+    def _ensure_configured_paths(self):
+        settings = self.settings_config if isinstance(self.settings_config, dict) else {}
+        missing_systems_path = not str(settings.get("systemMapsPath", "") or "").strip()
+        missing_html_path = not str(settings.get("htmlOutputPath", "") or "").strip()
+        if not missing_systems_path and not missing_html_path:
+            return
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title("Map Folder Settings")
+        dlg.transient(self.root)
+        dlg.grab_set()
+        dlg.resizable(False, False)
+
+        default_systems = SystemEditor.get_default_data_path()
+        default_html = SystemEditor.get_default_html_path()
+        systems_var = tk.StringVar(value=str(settings.get("systemMapsPath", "") or default_systems))
+        html_var = tk.StringVar(value=str(settings.get("htmlOutputPath", "") or default_html))
+
+        ttk.Label(
+            dlg,
+            text="Choose where Stellar Cartography reads and saves map files.",
+        ).grid(row=0, column=0, columnspan=3, sticky="w", padx=12, pady=(12, 8))
+
+        def browse(var, title, fallback):
+            initial = str(SystemEditor.resolve_configured_path(var.get(), fallback))
+            if not os.path.isdir(initial):
+                initial = fallback
+            selected = filedialog.askdirectory(parent=dlg, title=title, initialdir=initial)
+            if selected:
+                var.set(selected)
+
+        ttk.Label(dlg, text="System map JSON folder").grid(row=1, column=0, sticky="w", padx=12, pady=(0, 4))
+        ttk.Entry(dlg, textvariable=systems_var, width=64).grid(row=1, column=1, sticky="ew", pady=(0, 4))
+        ttk.Button(
+            dlg,
+            text="Browse",
+            command=lambda: browse(systems_var, "System map JSON folder", default_systems),
+        ).grid(row=1, column=2, sticky="e", padx=12, pady=(0, 4))
+
+        ttk.Label(dlg, text="Generated HTML folder").grid(row=2, column=0, sticky="w", padx=12, pady=(0, 8))
+        ttk.Entry(dlg, textvariable=html_var, width=64).grid(row=2, column=1, sticky="ew", pady=(0, 8))
+        ttk.Button(
+            dlg,
+            text="Browse",
+            command=lambda: browse(html_var, "Generated HTML folder", default_html),
+        ).grid(row=2, column=2, sticky="e", padx=12, pady=(0, 8))
+
+        button_row = ttk.Frame(dlg)
+        button_row.grid(row=3, column=0, columnspan=3, sticky="e", padx=12, pady=(0, 12))
+
+        def save_paths(system_path, html_path):
+            for label, value, fallback in (
+                ("System map JSON folder", system_path, default_systems),
+                ("Generated HTML folder", html_path, default_html),
+            ):
+                target = SystemEditor.resolve_configured_path(value, fallback)
+                try:
+                    target.mkdir(parents=True, exist_ok=True)
+                except Exception as exc:
+                    messagebox.showerror("Map Folder Settings", f"{label} could not be created:\n{target}\n\n{exc}", parent=dlg)
+                    return False
+                if not target.is_dir():
+                    messagebox.showerror("Map Folder Settings", f"{label} is not a directory:\n{target}", parent=dlg)
+                    return False
+            settings["systemMapsPath"] = str(system_path).strip() or default_systems
+            settings["htmlOutputPath"] = str(html_path).strip() or default_html
+            SystemEditor.save_editor_settings(settings)
+            self.settings_config = dict(settings)
+            return True
+
+        def save_selected():
+            if save_paths(systems_var.get(), html_var.get()):
+                dlg.destroy()
+
+        def use_defaults():
+            if save_paths(default_systems, default_html):
+                dlg.destroy()
+
+        ttk.Button(button_row, text="Use Defaults", command=use_defaults).pack(side=tk.RIGHT, padx=(6, 0))
+        ttk.Button(button_row, text="Save", command=save_selected).pack(side=tk.RIGHT, padx=(6, 0))
+
+        dlg.protocol("WM_DELETE_WINDOW", use_defaults)
+        dlg.bind("<Return>", lambda _event: save_selected())
+        self.root.wait_window(dlg)
+
+    def open_settings_editor(self):
+        def refresh_settings(new_settings):
+            self.settings_config = new_settings if isinstance(new_settings, dict) else self._load_settings()
+            self.load_galmapinfo()
+            self.systems = {}
+            self.load_systems()
+            self.clear_selection()
+            self.redraw_map()
+
+        SystemEditor.open_settings_editor(self.root, on_save=refresh_settings)
 
     def _get_valid_alignments(self):
         settings = getattr(self, "settings_config", None) or {}
@@ -301,13 +409,16 @@ class SystemMapEditor:
         return skyboxes if isinstance(skyboxes, list) else []
 
     def _get_systems_dir(self):
-        return os.path.join(get_base_path(), "data", "missions", "Map Designer", "Terrain")
+        return SystemEditor.get_data_path()
 
     def _get_system_file_path(self, filename):
         return os.path.join(self._get_systems_dir(), filename)
 
     def _iter_system_filenames(self):
         systems_dir = self._get_systems_dir()
+        if not os.path.isdir(systems_dir):
+            print(f"Systems directory not found: {systems_dir}")
+            return
         for filename in os.listdir(systems_dir):
             if filename.endswith(".json") and filename != "package.json":
                 yield filename
@@ -605,8 +716,7 @@ class SystemMapEditor:
         self._write_system_json(filename, data)
 
     def auto_link_gates(self):
-        base = get_base_path()
-        systems_dir = os.path.join(base, "data", "missions", "Map Designer", "Terrain")
+        systems_dir = self._get_systems_dir()
         if not os.path.isdir(systems_dir):
             print(f"Systems directory not found: {systems_dir}")
             return
@@ -854,6 +964,7 @@ class SystemMapEditor:
         self.root.title("Stellar Cartography")
         self.ct_config = self._load_cargo_teams()
         self.settings_config = self._load_settings()
+        self._ensure_configured_paths()
         self._build_controls()
 
         self.drag_data = {

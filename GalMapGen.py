@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 from urllib.parse import quote
 
+import SystemEditor
+
 
 VIEWPORT_WIDTH = 1600
 VIEWPORT_HEIGHT = 800
@@ -27,8 +29,8 @@ def get_base_path():
 
 
 BASE = Path(get_base_path())
-HTML_OUTPUT = BASE / "HTML" / HTML_OUTPUT_NAME
-JSON_FOLDER = BASE / "data/missions/Map Designer/Terrain"
+HTML_OUTPUT = Path(SystemEditor.get_html_output_path()) / HTML_OUTPUT_NAME
+JSON_FOLDER = Path(SystemEditor.get_data_path())
 
 
 def load_map_info(warnings):
