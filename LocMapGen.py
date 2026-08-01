@@ -37,13 +37,19 @@ DEFAULT_STATION_COLOR = 'red'
 # 'class' value in planet objects. Fallback color used when no class
 # or no mapping entry exists.
 PLANET_CLASS_COLORS = {
-    'Terrestrial': '#9acd32',
-    'Gas Giant': '#ffd27f',
-    'Ice': '#bfefff',
-    'Desert': '#f4a460',
-    'Ocean': '#4fc3f7'
+    'EarthLike': '#0b5d1e',
+    'Earth Like': '#0b5d1e',
+    'ToxicPlanet': '#a8b820',
+    'Toxic': '#a8b820',
+    'LavaPlanet': '#8b1a1a',
+    'Lava': '#8b1a1a',
+    'RingPlanet': '#e67e22',
+    'Ring': '#e67e22',
+    'IronMoonPlanet': '#f5f5f5',
+    'IronMoon': '#f5f5f5',
 }
-PLANET_CLASS_FALLBACK = '#98FB98'  # pale green
+PLANET_CLASS_FALLBACK = '#f5f5f5'
+DEFAULT_PLANET_RADIUS = 10000
 JUMP_GATE_TYPES = {'jump_point', 'jumppoint', 'jumpnode'}
 JUMP_DRIFT_TYPES = {'jump_point', 'jumppoint'}
 JUMP_POINT_COLOR = '#50CC50'
@@ -315,6 +321,7 @@ class MapViewer:
             'fillcolor': fill,
             'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
             'hoverinfo': 'none',
+            'meta': {'render_layer': 1},
         }
         center_trace = {
             'type': 'scatter',
@@ -329,6 +336,7 @@ class MapViewer:
             },
             'hovertext': [f"{name} [{grid_ref}]"],
             'hoverinfo': 'text',
+            'meta': {'render_layer': 1},
         }
         if show_plot_label:
             center_trace['text'] = [display_name]
@@ -515,7 +523,8 @@ class MapViewer:
                     'fill': 'toself',
                     'fillcolor': fill,
                     'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
-                    'hoverinfo': 'none'
+                    'hoverinfo': 'none',
+                    'meta': {'render_layer': 0 if ttype == 'asteroids' else 1},
                 }
                 if hidden:
                     terrain_trace['gmOnly'] = True
@@ -559,6 +568,7 @@ class MapViewer:
                                 'opacity': 0.8,
                             },
                             'hoverinfo': 'none',
+                            'meta': {'render_layer': 0 if ttype == 'asteroids' else 1},
                         }
                         if hidden:
                             dot_trace['gmOnly'] = True
@@ -603,7 +613,8 @@ class MapViewer:
                     'fill': 'toself',
                     'fillcolor': fill,
                     'line': {'shape': 'spline', 'color': line_color, 'width': line_width},
-                    'hoverinfo': 'none'
+                    'hoverinfo': 'none',
+                    'meta': {'render_layer': 0},
                 }
                 if hidden:
                     terrain_trace['gmOnly'] = True
@@ -653,7 +664,8 @@ class MapViewer:
                     'fill': 'toself',
                     'fillcolor': fill,
                     'line': {'shape': 'linear', 'color': line_color, 'width': line_width},
-                    'hoverinfo': 'none'
+                    'hoverinfo': 'none',
+                    'meta': {'render_layer': 0},
                 }
                 if hidden:
                     terrain_trace['gmOnly'] = True
@@ -674,7 +686,8 @@ class MapViewer:
                     'text': ['Mines'],
                     'textposition': 'bottom center',
                     'textfont': {'color': 'white', 'size': 12},
-                    'hoverinfo': 'none'
+                    'hoverinfo': 'none',
+                    'meta': {'render_layer': 3},
                 }
                 if hidden:
                     warn_trace['gmOnly'] = True
@@ -698,31 +711,58 @@ class MapViewer:
                     fill_color = 'yellow'
                 else:
                     fill_color = PLANET_CLASS_COLORS.get(cls, PLANET_CLASS_FALLBACK)
-                # increase icon size by 10x (user request)
-                size = 50
-                text_size = 14
+                try:
+                    planet_radius = float(r.get('radius', DEFAULT_PLANET_RADIUS))
+                except (TypeError, ValueError):
+                    planet_radius = DEFAULT_PLANET_RADIUS
+                if not math.isfinite(planet_radius) or planet_radius <= 0:
+                    planet_radius = DEFAULT_PLANET_RADIUS
+                text_size = 20
+                circle_steps = 48
+                circle_x = []
+                circle_y = []
+                for step in range(circle_steps + 1):
+                    angle = (2 * math.pi * step) / circle_steps
+                    circle_x.append(x0 + planet_radius * math.cos(angle))
+                    circle_y.append(y0 + planet_radius * math.sin(angle))
 
-                trace = {
+                planet_trace = {
                     'type': 'scatter',
-                    'x': [x0], 'y': [y0],
-                    'mode': 'markers+text',
-                    'marker': {'symbol': 'circle', 'size': size, 'color': fill_color},
+                    'x': circle_x,
+                    'y': circle_y,
+                    'mode': 'lines',
+                    'fill': 'toself',
+                    'fillcolor': fill_color,
+                    'line': {'color': fill_color, 'width': 1.5},
+                    'hoveron': 'fills+points',
+                    'hovertext': [f"{display} [{grid_ref}]"] * len(circle_x),
+                    'hoverinfo': 'text',
+                    'meta': {
+                        'map_object_type': 'planet',
+                        'planet_radius': planet_radius,
+                        'render_layer': 5,
+                    },
+                    'showlegend': False,
+                }
+                label_trace = {
+                    'type': 'scatter',
+                    'x': [x0],
+                    'y': [y0 + planet_radius * 1.1],
+                    'mode': 'text',
                     'text': [display],
                     'textposition': 'top center',
                     'textfont': {'color': 'white', 'size': text_size},
                     'hovertext': [f"{display} [{grid_ref}]"],
-                    'hoverinfo': 'text'
+                    'hoverinfo': 'text',
+                    'meta': {'map_object_type': 'planet_label', 'render_layer': 6.5},
+                    'showlegend': False,
                 }
                 if hidden:
-                    trace['gmOnly'] = True
+                    planet_trace['gmOnly'] = True
+                    label_trace['gmOnly'] = True
 
-                trace['meta'] = {
-                    'base_marker_size': size,
-                    'base_text_size': text_size,
-                    'scale_on_zoom': True,
-                    'map_object_type': 'planet',
-                }
-                terrain_traces.append(trace)
+                terrain_traces.append(planet_trace)
+                terrain_traces.append(label_trace)
                 # We'll expose planets into obj_data later (alongside blackholes)
                 # store a lightweight marker in a temp list for later processing
                 # use the display name as the key
@@ -743,26 +783,97 @@ class MapViewer:
                 x, y = self.project(coord)
                 display = key
                 grid_ref = get_grid_reference(x, y)
-                # add scatter marker+label for the black hole
-                bh_size = 20
+                try:
+                    blackhole_radius = float(
+                        r.get('radius', r.get('size', DEFAULT_PLANET_RADIUS))
+                    )
+                except (TypeError, ValueError):
+                    blackhole_radius = DEFAULT_PLANET_RADIUS
+                if not math.isfinite(blackhole_radius) or blackhole_radius <= 0:
+                    blackhole_radius = DEFAULT_PLANET_RADIUS
+
+                # Data-coordinate approximation of the editor icon: an irregular
+                # bright accretion shape surrounding a dark event-horizon disc.
+                outer_x = []
+                outer_y = []
+                ray_scales = (1.0, 0.88, 1.0, 0.82, 0.94, 1.0, 0.86, 0.96)
+                ray_count = len(ray_scales)
+                accretion_radius = blackhole_radius / 0.42
+                for step in range(ray_count * 2 + 1):
+                    ray_index = (step // 2) % ray_count
+                    radius_scale = ray_scales[ray_index] if step % 2 == 0 else 0.56
+                    angle = (2 * math.pi * step) / (ray_count * 2)
+                    radius = accretion_radius * radius_scale
+                    outer_x.append(x + radius * math.cos(angle))
+                    outer_y.append(y + radius * math.sin(angle))
+
+                horizon_x = []
+                horizon_y = []
+                horizon_radius = blackhole_radius
+                circle_steps = 48
+                for step in range(circle_steps + 1):
+                    angle = (2 * math.pi * step) / circle_steps
+                    horizon_x.append(x + horizon_radius * math.cos(angle))
+                    horizon_y.append(y + horizon_radius * math.sin(angle))
+
+                hover_label = f"{display} [{grid_ref}]"
+                accretion_trace = {
+                    'type': 'scatter',
+                    'x': outer_x,
+                    'y': outer_y,
+                    'mode': 'lines',
+                    'fill': 'toself',
+                    'fillcolor': '#d45ad8',
+                    'line': {'color': '#f08cf0', 'width': 1},
+                    'hoveron': 'fills+points',
+                    'hovertext': [hover_label] * len(outer_x),
+                    'hoverinfo': 'text',
+                    'meta': {
+                        'map_object_type': 'blackhole',
+                        'blackhole_radius': blackhole_radius,
+                        'render_layer': 5,
+                    },
+                    'showlegend': False,
+                }
+                horizon_trace = {
+                    'type': 'scatter',
+                    'x': horizon_x,
+                    'y': horizon_y,
+                    'mode': 'lines',
+                    'fill': 'toself',
+                    'fillcolor': '#111111',
+                    'line': {'color': '#d8d8d8', 'width': 1},
+                    'hoveron': 'fills+points',
+                    'hovertext': [hover_label] * len(horizon_x),
+                    'hoverinfo': 'text',
+                    'meta': {'map_object_type': 'blackhole_horizon', 'render_layer': 5},
+                    'showlegend': False,
+                }
+
+                # Fixed-size label and centre interaction target.
                 text_size = 12
                 bh_trace = {
                     'type': 'scatter',
                     'x': [x], 'y': [y],
                     'mode': 'markers+text',
-                    'marker': {'symbol': 'star', 'size': bh_size, 'color': 'yellow'},
+                    'marker': {
+                        'symbol': 'circle',
+                        'size': 20,
+                        'color': 'rgba(0,0,0,0)',
+                        'line': {'width': 0},
+                    },
                     'text': [display],
                     'textposition': 'top center',
                     'textfont': {'color': 'white', 'size': text_size},
-                    'hovertext': [f"{display} [{grid_ref}]"],
+                    'hovertext': [hover_label],
                     'hoverinfo': 'text'
                 }
                 bh_trace['meta'] = {
-                    'base_marker_size': bh_size,
-                    'base_text_size': text_size,
-                    'scale_on_zoom': True,
-                    'map_object_type': 'blackhole',
+                    'map_object_type': 'blackhole_label',
+                    'render_layer': 6.5,
                 }
+                data.append(accretion_trace)
+                data.append(horizon_trace)
                 data.append(bh_trace)
                 # expose it to the JS highlight/info panel
                 obj_data[display] = {'type': 'blackhole', 'x': x, 'y': y, 'grid': grid_ref}
@@ -843,6 +954,7 @@ class MapViewer:
                         },
                         'hoverinfo': 'skip',
                         'showlegend': False,
+                        'meta': {'render_layer': 7},
                     }
                     if hidden:
                         drift_trace['gmOnly'] = True
@@ -858,12 +970,9 @@ class MapViewer:
                     size = 8
                     color = 'orange'
                     text_color = 'orange'
+                    mode = 'markers'
                     if re.match(r'^(?:WB[- ]?\d+|Warning Buoy \d+)$', name):
                         size = 5
-                        mode = 'markers'
-                    else:
-                        mode = 'markers+text'
-                        relays.append(name)
                 else:
                     symbol = 'circle'
                     if re.match(r'^(?:SR[- ]?\d+|Sensor Relay \d+)$', name):
@@ -897,7 +1006,10 @@ class MapViewer:
                 trace['marker']['line'] = marker_line
 
             display_name = f"**{name}**" if hidden else name
-            if 'text' in mode:
+            if 'text' in mode or (
+                typ == 'sensor_relay'
+                and str(obj.get('relayType', '')).strip().casefold() == 'warning buoy'
+            ):
                 trace.update({
                     'text': [display_name],
                     'textposition': 'top center',
@@ -909,7 +1021,56 @@ class MapViewer:
                 trace['gmOnly'] = True
             # attach meta so JS can rescale markers on zoom
             trace['meta'] = {'base_marker_size': size, 'base_text_size': text_size}
+            trace['meta']['render_layer'] = {
+                'sensor_relay': 2,
+                'platform': 4,
+                'station': 6,
+                'jump_point': 7,
+                'jumppoint': 7,
+                'jumpnode': 7,
+            }.get(typ_key, 2)
+            if typ == 'station':
+                station_label_trace = {
+                    'type': 'scatter',
+                    'x': [x],
+                    'y': [y],
+                    'mode': 'text',
+                    'text': [display_name],
+                    'textposition': 'top center',
+                    'textfont': {'color': text_color, 'size': text_size},
+                    'marker': {'size': 0, 'opacity': 0},
+                    'hovertext': [f"{name} [{grid_ref}]"],
+                    'hoverinfo': 'text',
+                    'meta': {
+                        'base_text_size': text_size,
+                        'render_layer': 6.5,
+                        'station_label': True,
+                        'station_name': name,
+                        'station_x': x,
+                        'station_y': y,
+                    },
+                }
+                if hidden:
+                    station_label_trace['gmOnly'] = True
+                trace['mode'] = 'markers'
+                trace.pop('text', None)
+                trace.pop('textposition', None)
+                trace.pop('textfont', None)
+                trace['meta'].update({
+                    'station_marker': True,
+                    'station_name': name,
+                    'station_x': x,
+                    'station_y': y,
+                })
+            if (
+                typ == 'sensor_relay'
+                and str(obj.get('relayType', '')).strip().casefold() == 'warning buoy'
+            ):
+                trace['meta']['warning_buoy'] = True
+                trace['meta']['render_layer'] = 3
             data.append(trace)
+            if typ == 'station':
+                data.append(station_label_trace)
 
             entry = {
                 'type': typ,
@@ -959,6 +1120,75 @@ class MapViewer:
                     )['description']
             obj_data[name] = entry
 
+        # Choose stable wide-view station-label representatives. Stations form
+        # a cluster when connected by neighbours no more than 75,000 units
+        # apart. Command/Armory labels always win; otherwise prefer a
+        # descriptive name over a short letter/number code.
+        station_cluster_distance = 75000
+        station_cluster_distance_sq = station_cluster_distance ** 2
+        station_points = [
+            (name, obj_data[name]['x'], obj_data[name]['y'])
+            for name, _color in stations
+            if name in obj_data and not obj_data[name].get('hidden')
+        ]
+        unvisited = set(range(len(station_points)))
+        station_wide_labels = set()
+        coded_station_name = re.compile(r'^[A-Za-z]{1,2}\s*[- ]?\s*\d+$')
+
+        while unvisited:
+            seed = unvisited.pop()
+            cluster = [seed]
+            pending = [seed]
+            while pending:
+                current = pending.pop()
+                _name, current_x, current_y = station_points[current]
+                neighbours = [
+                    candidate for candidate in unvisited
+                    if (
+                        (station_points[candidate][1] - current_x) ** 2
+                        + (station_points[candidate][2] - current_y) ** 2
+                    ) <= station_cluster_distance_sq
+                ]
+                for neighbour in neighbours:
+                    unvisited.remove(neighbour)
+                    cluster.append(neighbour)
+                    pending.append(neighbour)
+
+            priority_names = [
+                station_points[index][0] for index in cluster
+                if re.search(r'(?:command|armory)', station_points[index][0], re.IGNORECASE)
+            ]
+            if priority_names:
+                station_wide_labels.update(priority_names)
+                continue
+
+            center_x = sum(station_points[index][1] for index in cluster) / len(cluster)
+            center_y = sum(station_points[index][2] for index in cluster) / len(cluster)
+            representative = min(
+                cluster,
+                key=lambda index: (
+                    bool(coded_station_name.fullmatch(station_points[index][0].strip())),
+                    (station_points[index][1] - center_x) ** 2
+                    + (station_points[index][2] - center_y) ** 2,
+                    station_points[index][0].casefold(),
+                ),
+            )
+            station_wide_labels.add(station_points[representative][0])
+
+        for trace in data:
+            meta = trace.get('meta', {})
+            if not meta.get('station_label'):
+                continue
+            name = meta.get('station_name', '')
+            meta['station_wide_label'] = (
+                name in station_wide_labels
+                or bool(re.search(r'(?:command|armory)', name, re.IGNORECASE))
+            )
+
+        # Plotly paints later traces on top. Python's sort is stable, so
+        # multi-trace features retain their internal geometry/label ordering.
+        data.sort(key=lambda trace: trace.get('meta', {}).get('render_layer', 0))
+
         gates.sort()
         stations.sort(key=lambda x: x[0])
         relays.sort()
@@ -976,15 +1206,19 @@ class MapViewer:
         'hovermode': 'closest',
     'xaxis': {
         'color': 'white',
-        'showgrid': True,
+        'showgrid': False,
         'gridcolor': 'gray',
+        'gridwidth': 1.5,
+        'zeroline': False,
         'dtick': 20000,
         'title': 'X Axis'
     },
     'yaxis': {
         'color': 'white',
-        'showgrid': True,
+        'showgrid': False,
         'gridcolor': 'gray',
+        'gridwidth': 1.5,
+        'zeroline': False,
         'dtick': 20000,
         'scaleanchor': 'x',
         'scaleratio': 1,
@@ -994,11 +1228,12 @@ class MapViewer:
     ]
 }
         fig_json = {'data': data, 'layout': layout}
-        # compute trace indices for planets and blackholes so JS can efficiently rescale only them
+        # Compute trace indices for legacy template context. Planets now use
+        # data-coordinate polygons and no longer require JavaScript resizing.
         planet_trace_indices = []
         blackhole_trace_indices = []
         # data is terrain_traces followed by object traces; only traces explicitly
-        # tagged as scalable should resize during Plotly zoom.
+        # Only traces explicitly tagged as scalable should resize during zoom.
         for i, t in enumerate(data):
             try:
                 meta = t.get('meta', {})

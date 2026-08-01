@@ -481,7 +481,7 @@
          bindGalacticButton();
     
 
-    var fig = {"data": [], "layout": {"title": "Meera", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": true, "gridcolor": "gray", "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
+    var fig = {"data": [], "layout": {"title": "Meera", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": false, "gridcolor": "gray", "gridwidth": 1.5, "zeroline": false, "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": false, "gridcolor": "gray", "gridwidth": 1.5, "zeroline": false, "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
     fig.layout.showlegend = false;
     fig.layout.dragmode = 'pan';
     fig.layout.title = 'Meera';
@@ -489,11 +489,127 @@
         fig.data = fig.data.filter(t => !t.gmOnly);
         }
     setDefaultInfo();
-    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: true});
+    Plotly.newPlot('plot', fig.data, fig.layout, {responsive: true, scrollZoom: false});
         console.log("[DEBUG JS] Plotted traces count:", fig.data.length);
         console.log("[DEBUG JS] fig.data sample:", fig.data.slice(0,3));
 
     var plotDiv = document.getElementById('plot');
+
+    // ——— Below-data grid: 20,000-unit gray, then 100,000-unit blue ———
+    (function() {
+        var minorGridSpacing = 20000;
+        var majorGridSpacing = 100000;
+        var minorGridMaxSpan = 500000;
+        var minorGridColor = 'gray';
+        var majorGridColor = '#1f4f8a';
+        var baseShapes = (fig.layout.shapes || []).slice();
+        var updateTimer = null;
+        var refreshGridOnRelayout = true;
+
+        function gridShapes(xRange, yRange) {
+            var shapes = baseShapes.slice();
+            var xSpan = Math.abs(xRange[1] - xRange[0]);
+            var ySpan = Math.abs(yRange[1] - yRange[0]);
+            var showMinorGrid = Math.max(xSpan, ySpan) <= minorGridMaxSpan;
+            var lastX = Math.max(xRange[0], xRange[1]);
+            var lastY = Math.max(yRange[0], yRange[1]);
+
+            if (showMinorGrid) {
+                var firstMinorX = Math.ceil(
+                    Math.min(xRange[0], xRange[1]) / minorGridSpacing
+                ) * minorGridSpacing;
+                var firstMinorY = Math.ceil(
+                    Math.min(yRange[0], yRange[1]) / minorGridSpacing
+                ) * minorGridSpacing;
+                for (var minorX = firstMinorX; minorX <= lastX; minorX += minorGridSpacing) {
+                    shapes.push({
+                        type: 'line',
+                        xref: 'x',
+                        yref: 'paper',
+                        x0: minorX,
+                        x1: minorX,
+                        y0: 0,
+                        y1: 1,
+                        layer: 'below',
+                        line: {color: minorGridColor, width: 1.5}
+                    });
+                }
+                for (var minorY = firstMinorY; minorY <= lastY; minorY += minorGridSpacing) {
+                    shapes.push({
+                        type: 'line',
+                        xref: 'paper',
+                        yref: 'y',
+                        x0: 0,
+                        x1: 1,
+                        y0: minorY,
+                        y1: minorY,
+                        layer: 'below',
+                        line: {color: minorGridColor, width: 1.5}
+                    });
+                }
+            }
+
+            var firstX = Math.ceil(Math.min(xRange[0], xRange[1]) / majorGridSpacing) * majorGridSpacing;
+            var firstY = Math.ceil(Math.min(yRange[0], yRange[1]) / majorGridSpacing) * majorGridSpacing;
+
+            for (var x = firstX; x <= lastX; x += majorGridSpacing) {
+                shapes.push({
+                    type: 'line',
+                    xref: 'x',
+                    yref: 'paper',
+                    x0: x,
+                    x1: x,
+                    y0: 0,
+                    y1: 1,
+                    layer: 'below',
+                    line: {color: majorGridColor, width: 1.5}
+                });
+            }
+            for (var y = firstY; y <= lastY; y += majorGridSpacing) {
+                shapes.push({
+                    type: 'line',
+                    xref: 'paper',
+                    yref: 'y',
+                    x0: 0,
+                    x1: 1,
+                    y0: y,
+                    y1: y,
+                    layer: 'below',
+                    line: {color: majorGridColor, width: 1.5}
+                });
+            }
+            return shapes;
+        }
+
+        function applyGridLayers() {
+            var full = plotDiv._fullLayout || {};
+            var xaxis = full.xaxis;
+            var yaxis = full.yaxis;
+            if (!xaxis || !yaxis || !xaxis.range || !yaxis.range) return;
+            var update = {
+                'shapes': gridShapes(xaxis.range, yaxis.range)
+            };
+            Plotly.relayout(plotDiv, update);
+        }
+
+        function scheduleGridUpdate(eventData) {
+            var changedKeys = eventData ? Object.keys(eventData) : [];
+            if (changedKeys.length && changedKeys.every(function(key) {
+                return key === 'shapes';
+            })) return;
+            if (updateTimer !== null) clearTimeout(updateTimer);
+            updateTimer = setTimeout(function() {
+                updateTimer = null;
+                applyGridLayers();
+            }, 140);
+        }
+
+        setTimeout(applyGridLayers, 250);
+        if (refreshGridOnRelayout) {
+            plotDiv.on('plotly_relayout', scheduleGridUpdate);
+        }
+    })();
+
     // Use Plotly's built-in nearest-point selection for accurate clicks
     plotDiv.on('plotly_click', function(ev) {
         if (!ev || !ev.points || !ev.points.length) return;
@@ -565,6 +681,85 @@
         return null;
     }
 
+    // ——— Cursor-centred wheel zoom with a single equal-scale range update ———
+    (function() {
+        var pendingWheelDelta = 0;
+        var lastWheelClientX = 0;
+        var lastWheelClientY = 0;
+        var wheelFrame = null;
+
+        function normalizedWheelDelta(evt) {
+            if (evt.deltaMode === 1) return evt.deltaY * 16;
+            if (evt.deltaMode === 2) return evt.deltaY * window.innerHeight;
+            return evt.deltaY;
+        }
+
+        function applyWheelZoom() {
+            wheelFrame = null;
+            var full = plotDiv._fullLayout || {};
+            var size = full._size;
+            var xaxis = full.xaxis;
+            var yaxis = full.yaxis;
+            if (!size || !xaxis || !yaxis || !xaxis.range || !yaxis.range) {
+                pendingWheelDelta = 0;
+                return;
+            }
+
+            var rect = plotDiv.getBoundingClientRect();
+            var xpx = lastWheelClientX - rect.left - size.l;
+            var ypx = lastWheelClientY - rect.top - size.t;
+            if (xpx < 0 || ypx < 0 || xpx > size.w || ypx > size.h) {
+                pendingWheelDelta = 0;
+                return;
+            }
+
+            var cursorX = axisPixelToData(xaxis, xpx);
+            var cursorY = axisPixelToData(yaxis, ypx);
+            if (!isFinite(cursorX) || !isFinite(cursorY)) {
+                pendingWheelDelta = 0;
+                return;
+            }
+
+            var delta = Math.max(-600, Math.min(600, pendingWheelDelta));
+            pendingWheelDelta = 0;
+            var zoomFactor = Math.exp(delta * 0.0015);
+            var xRange = xaxis.range.slice();
+            var yRange = yaxis.range.slice();
+
+            Plotly.relayout(plotDiv, {
+                'xaxis.range': [
+                    cursorX + (xRange[0] - cursorX) * zoomFactor,
+                    cursorX + (xRange[1] - cursorX) * zoomFactor
+                ],
+                'yaxis.range': [
+                    cursorY + (yRange[0] - cursorY) * zoomFactor,
+                    cursorY + (yRange[1] - cursorY) * zoomFactor
+                ],
+                'xaxis.autorange': false,
+                'yaxis.autorange': false
+            });
+        }
+
+        plotDiv.addEventListener('wheel', function(evt) {
+            var full = plotDiv._fullLayout || {};
+            var size = full._size;
+            if (!size) return;
+            var rect = plotDiv.getBoundingClientRect();
+            var xpx = evt.clientX - rect.left - size.l;
+            var ypx = evt.clientY - rect.top - size.t;
+            if (xpx < 0 || ypx < 0 || xpx > size.w || ypx > size.h) return;
+
+            evt.preventDefault();
+            evt.stopPropagation();
+            pendingWheelDelta += normalizedWheelDelta(evt);
+            lastWheelClientX = evt.clientX;
+            lastWheelClientY = evt.clientY;
+            if (wheelFrame === null) {
+                wheelFrame = requestAnimationFrame(applyWheelZoom);
+            }
+        }, {passive: false});
+    })();
+
     var gridReadout = document.createElement('div');
     gridReadout.id = 'grid-readout';
     plotDiv.appendChild(gridReadout);
@@ -626,44 +821,119 @@
         });
     }
 
-    // ——— Auto-scale markers based on current zoom/span (optimized: planets & blackholes only) ———
+    // ——— Show warning-buoy labels only at close zoom ———
     (function() {
-        var refSpan = null;
-        var scalableIdx = fig.data
-            .map(function(t, i) { return t && t.meta && t.meta.scale_on_zoom ? i : null; })
+        var warningLabelMaxSpan = 250000;
+        var warningLabelHysteresis = 5000;
+        var warningLabelTimer = null;
+        var labelsVisible = null;
+        var warningBuoyIdx = fig.data
+            .map(function(t, i) { return t && t.meta && t.meta.warning_buoy ? i : null; })
             .filter(function(i) { return i !== null; });
-        function rescaleMarkers() {
-            try {
-                var full = plotDiv._fullLayout || {};
-                var xaxis = full.xaxis || (fig.layout && fig.layout.xaxis);
-                if (!xaxis || !xaxis.range) return;
-                var curr = Math.abs(xaxis.range[1] - xaxis.range[0]);
-                if (!curr) return;
-                if (!refSpan) refSpan = curr;
-                var scale = refSpan / curr;
-                var indices = [];
-                var markerSizes = [];
-                var textSizes = [];
-                function pushForIndex(i) {
-                    var t = fig.data[i];
-                    if (!t || !t.meta || !t.meta.base_marker_size) return;
-                    var base = t.meta.base_marker_size;
-                    var baseText = t.meta.base_text_size || (t.textfont && t.textfont.size) || 12;
-                    var newMarker = Math.max(2, Math.round(base * scale));
-                    var newText = Math.max(8, Math.round(baseText * Math.sqrt(scale)));
-                    indices.push(i);
-                    markerSizes.push(newMarker);
-                    textSizes.push(newText);
-                }
-                scalableIdx.forEach(pushForIndex);
-                if (indices.length) {
-                    Plotly.restyle(plotDiv, {'marker.size': markerSizes, 'textfont.size': textSizes}, indices);
-                }
-            } catch (e) { console.error(e); }
+
+        function updateWarningLabels() {
+            if (!warningBuoyIdx.length) return;
+            var full = plotDiv._fullLayout || {};
+            var xaxis = full.xaxis;
+            var yaxis = full.yaxis;
+            if (!xaxis || !yaxis || !xaxis.range || !yaxis.range) return;
+            var xSpan = Math.abs(xaxis.range[1] - xaxis.range[0]);
+            var ySpan = Math.abs(yaxis.range[1] - yaxis.range[0]);
+            var viewSpan = Math.max(xSpan, ySpan);
+            var shouldShow;
+            if (labelsVisible === null) {
+                shouldShow = viewSpan <= warningLabelMaxSpan;
+            } else if (labelsVisible) {
+                shouldShow = viewSpan < warningLabelMaxSpan + warningLabelHysteresis;
+            } else {
+                shouldShow = viewSpan <= warningLabelMaxSpan - warningLabelHysteresis;
+            }
+            if (shouldShow === labelsVisible) return;
+            labelsVisible = shouldShow;
+            Plotly.update(
+                plotDiv,
+                {mode: shouldShow ? 'markers+text' : 'markers'},
+                {
+                    'xaxis.range': xaxis.range.slice(),
+                    'yaxis.range': yaxis.range.slice(),
+                    'xaxis.autorange': false,
+                    'yaxis.autorange': false
+                },
+                warningBuoyIdx
+            );
         }
-        // initial scale after plot settles
-        setTimeout(rescaleMarkers, 250);
-        plotDiv.on('plotly_relayout', rescaleMarkers);
+
+        function scheduleWarningLabelUpdate() {
+            if (warningLabelTimer !== null) clearTimeout(warningLabelTimer);
+            warningLabelTimer = setTimeout(function() {
+                warningLabelTimer = null;
+                updateWarningLabels();
+            }, 120);
+        }
+
+        setTimeout(updateWarningLabels, 250);
+        plotDiv.on('plotly_relayout', scheduleWarningLabelUpdate);
+    })();
+
+    // ——— Reduce station-label density at wide zoom ———
+    (function() {
+        var stationLabelMaxSpan = 250000;
+        var stationLabelHysteresis = 5000;
+        var stationLabelTimer = null;
+        var showAllStationLabels = null;
+        var stationLabelIdx = fig.data
+            .map(function(t, i) { return t && t.meta && t.meta.station_label ? i : null; })
+            .filter(function(i) { return i !== null; });
+
+        function updateStationLabels() {
+            if (!stationLabelIdx.length) return;
+            var full = plotDiv._fullLayout || {};
+            var xaxis = full.xaxis;
+            var yaxis = full.yaxis;
+            if (!xaxis || !yaxis || !xaxis.range || !yaxis.range) return;
+            var xSpan = Math.abs(xaxis.range[1] - xaxis.range[0]);
+            var ySpan = Math.abs(yaxis.range[1] - yaxis.range[0]);
+            var viewSpan = Math.max(xSpan, ySpan);
+            var shouldShowAll;
+            if (showAllStationLabels === null) {
+                shouldShowAll = viewSpan <= stationLabelMaxSpan;
+            } else if (showAllStationLabels) {
+                shouldShowAll = viewSpan < stationLabelMaxSpan + stationLabelHysteresis;
+            } else {
+                shouldShowAll = viewSpan <= stationLabelMaxSpan - stationLabelHysteresis;
+            }
+            if (shouldShowAll === showAllStationLabels) return;
+            showAllStationLabels = shouldShowAll;
+
+            var modes = stationLabelIdx.map(function(index) {
+                var trace = fig.data[index];
+                return shouldShowAll || (trace.meta && trace.meta.station_wide_label)
+                    ? 'text'
+                    : 'markers';
+            });
+            Plotly.update(
+                plotDiv,
+                {mode: modes},
+                {
+                    'xaxis.range': xaxis.range.slice(),
+                    'yaxis.range': yaxis.range.slice(),
+                    'xaxis.autorange': false,
+                    'yaxis.autorange': false
+                },
+                stationLabelIdx
+            );
+        }
+
+        function scheduleStationLabelUpdate() {
+            if (stationLabelTimer !== null) clearTimeout(stationLabelTimer);
+            stationLabelTimer = setTimeout(function() {
+                stationLabelTimer = null;
+                updateStationLabels();
+            }, 120);
+        }
+
+        setTimeout(updateStationLabels, 250);
+        plotDiv.on('plotly_relayout', scheduleStationLabelUpdate);
     })();
 
   var ctrl = document.getElementById('object-buttons');

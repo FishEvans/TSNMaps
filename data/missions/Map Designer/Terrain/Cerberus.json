@@ -1,27 +1,35 @@
 {
     "systemMapCoord": [
-        -28893.75946487504,
+        -28893.759464875046,
         0,
-        -2398.7722430357403
+        -2398.7722430357408
     ],
     "systemalignment": "USFP",
     "metadata": {
         "skybox": "sky1.png",
-        "sysdescription": "",
-        "security": "Neutral",
-        "exports": [],
-        "focus": "",
-        "intel": {},
-        "development": "Unclaimed",
+        "sysdescription": "Boardering the Hijordan Empire Cerberus is an important port of call for traders entering and exiting the USFP it is also gate way to Atlantis one of the major systems of the USFP, Moderatly rich in resorces, and has a few Torist attractions catering to passing trade.",
+        "security": "Normal",
+        "exports": [
+            "Agriculture",
+            "Mining",
+            "Research"
+        ],
+        "focus": "Trade & Logistics",
+        "intel": {
+            "pirate": "Mid",
+            "enemy": "Low",
+            "assets": []
+        },
+        "development": "Colony",
         "visible": true,
         "original_author": "Draeco",
-        "revision_date": "2005-12-23",
-        "revision_number": 15,
+        "revision_date": "2026-07-25",
+        "revision_number": 17,
         "all_authors": [
             "Fish Evans",
             "Draeco"
         ],
-        "last_revision_author": ""
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Krisenda Gate": {
@@ -439,9 +447,9 @@
         },
         "Serena Resorts": {
             "coordinate": [
-                106317.16178993334,
+                118654.393816241,
                 0,
-                -65612.93687834029
+                -56453.47673759672
             ],
             "sides": [
                 "USFP"
@@ -449,31 +457,44 @@
             "hull": "starbase_civil",
             "type": "station",
             "facilities": [
-                "Docking"
+                "Docking",
+                "Refuel"
             ],
             "cargo": {
-                "Life Support": 3,
-                "Medical Supplies": 16,
-                "Micro Controller": 25,
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
                 "Power Relay": 16,
-                "Transmitter": 8,
-                "Receiver": 6,
-                "Analysis Suite": 8,
-                "Sensor Suite": 8,
-                "Tea": 20,
-                "Alcohol": 50,
-                "Coffee": 70
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
             },
             "teams": {
-                "Medics": 2
+                "Diplomats": 1,
+                "Medics": 1
             },
             "description": ""
         },
         "Diana Concourse": {
             "coordinate": [
-                115038.2614822209,
-                0.0,
-                -74325.29913968737
+                113729.76717640039,
+                0,
+                -73297.19647082839
             ],
             "sides": [
                 "USFP"
@@ -653,9 +674,9 @@
         },
         "WP 4": {
             "coordinate": [
-                115365.32576136003,
+                118636.5615259113,
                 0,
-                -79804.2354877598
+                -57933.687804759844
             ],
             "sides": [
                 "USFP"
@@ -668,9 +689,9 @@
         },
         "WP 50": {
             "coordinate": [
-                109390.07954516386,
+                113315.56246262538,
                 0,
-                -76858.9897697393
+                -71998.86806240598
             ],
             "sides": [
                 "USFP"
@@ -1636,6 +1657,259 @@
             "type": "platform",
             "cargo": {},
             "teams": {}
+        },
+        "Transhiping 1": {
+            "coordinate": [
+                111996.81601604464,
+                0,
+                -44224.40255175173
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Transhiping 8": {
+            "coordinate": [
+                95079.8539193652,
+                0,
+                -43289.76376187994
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Transhiping 3": {
+            "coordinate": [
+                83023.01353001906,
+                0,
+                -54038.109845405554
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Transhiping 5": {
+            "coordinate": [
+                118726.21530312154,
+                0,
+                -66749.19738766194
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Transhiping 2": {
+            "coordinate": [
+                88256.9907533011,
+                0,
+                -76282.51304435423
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Horizon Homes": {
+            "coordinate": [
+                98070.69804695493,
+                0,
+                -43850.547035803014
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [],
+            "cargo": {
+                "Fuel Cell 100": 1,
+                "Fuel Cell 200": 2,
+                "Life Support": 0,
+                "Aid Package": 17,
+                "Alcohol": 7,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 23,
+                "Meals": 27,
+                "Medical Supplies": 5,
+                "Micro Controller": 9,
+                "Packaging": 15,
+                "Pets": 5,
+                "Power Relay": 17,
+                "Produce": 11,
+                "Rations": 24,
+                "Repair Materials": 15,
+                "Tea": 7,
+                "Torpedo Casing": 6,
+                "Ashfilum": 18,
+                "Ice": 104
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 2
+            },
+            "description": ""
+        },
+        "Veritas Homes": {
+            "coordinate": [
+                111436.03274212156,
+                0,
+                -46934.85504237993
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
+            "description": ""
+        },
+        "Aevum Retirment": {
+            "coordinate": [
+                116763.47384439078,
+                0,
+                -66562.26962968758
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_civil",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 5
+            },
+            "description": ""
+        },
+        "Three Head Shiping": {
+            "coordinate": [
+                86200.78541558316,
+                0,
+                -52449.22390262351
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_industry",
+            "type": "station",
+            "facilities": [
+                "Docking",
+                "Refuel"
+            ],
+            "cargo": {
+                "Coolant": 15,
+                "Fuel Cell 100": 7,
+                "Fuel Cell 200": 1,
+                "Fuel Cell 400": 1,
+                "Life Support": 3,
+                "EMP": 10,
+                "Homing": 35,
+                "Alcohol": 16,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Coffee": 15,
+                "Container": 18,
+                "Denebite Crystals": 5,
+                "Guidance System": 15,
+                "High Yield Warhead": 3,
+                "Iso B Circuit": 7,
+                "Meals": 14,
+                "Medical Supplies": 25,
+                "Micro Controller": 25,
+                "Packaging": 8,
+                "Pets": 4,
+                "Power Relay": 16,
+                "Produce": 15,
+                "Rations": 25,
+                "Receiver": 6,
+                "Repair Materials": 8,
+                "Sensor Suite": 8,
+                "Tea": 12,
+                "Tharium Plating": 16,
+                "Torpedo Casing": 21,
+                "Transmitter": 8,
+                "Warhead": 13,
+                "Wild Animals": 15
+            },
+            "teams": {
+                "DamCon": 2,
+                "Medics": 2
+            },
+            "description": "Orbital HQ for the Three Head Shiping Company Registered in Cerberus."
         }
     },
     "sensor_relay": {
@@ -2044,6 +2318,62 @@
                 152997.37332942995,
                 0,
                 30110.126077424437
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 616": {
+            "coordinate": [
+                145340.44684328957,
+                0,
+                -59821.62975524744
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 666": {
+            "coordinate": [
+                128397.48792693258,
+                0,
+                -24639.2130441861
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 061": {
+            "coordinate": [
+                90327.00481525542,
+                0,
+                -15949.87370706538
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 052": {
+            "coordinate": [
+                59796.84778768071,
+                0,
+                -40296.861494957324
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 981": {
+            "coordinate": [
+                59796.84778768071,
+                0,
+                -79346.39801553756
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 285": {
+            "coordinate": [
+                90327.00481525541,
+                0,
+                -103693.3858034295
+            ],
+            "type": "Sensor Relay"
+        },
+        "SR 359": {
+            "coordinate": [
+                128397.48792693258,
+                0,
+                -95004.04646630879
             ],
             "type": "Sensor Relay"
         }
@@ -2456,23 +2786,12 @@
                 "Ast. Std Rand"
             ]
         },
-        "Little John": {
-            "type": "blackhole",
-            "name": "1753744585889",
-            "coordinate": [
-                279269.3769909156,
-                0,
-                100306.25293435222
-            ],
-            "size": 1000,
-            "strength": 500
-        },
         "FCS1": {
             "type": "fcs_zone",
             "coordinate": [
-                278481.45930575114,
+                279416.89485689945,
                 0,
-                100585.02135537585
+                99923.28072362684
             ],
             "radius": 11464,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 11,464 units. Local nebular density index: 451.6. Source field: 1753746622652. Survey profile: bright ion trails with usable condenser feedstock; field stability lightly turbulent; collector saturation estimate 82%. Telemetry confidence: high. Short passes should outperform a single static collection burn.",
@@ -2576,6 +2895,59 @@
             "radius": 5819,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 5,819 units. Local nebular density index: 6.9. Source field: 1753746373624. Survey profile: cool deuterium traces threaded through ionized gas; field stability uneven but workable; collector saturation estimate 61%. Telemetry confidence: limited. Hold station near the inner third for the cleanest skim.",
             "hideonmap": false
+        },
+        "Priscus": {
+            "type": "blackhole",
+            "name": "Priscus",
+            "coordinate": [
+                -215271.84785093737,
+                0,
+                12988.486654092338
+            ],
+            "size": 2000,
+            "GravityRadius": 15000,
+            "strength": 1,
+            "turbulence_strength": 1,
+            "description": "Latin for the past or ancient times. Matter that fell in long ago."
+        },
+        "Futurus": {
+            "type": "blackhole",
+            "name": "Futurus",
+            "coordinate": [
+                279259.41995988204,
+                0,
+                99912.45606687164
+            ],
+            "size": 2000,
+            "GravityRadius": 15000,
+            "strength": 10,
+            "turbulence_strength": 1,
+            "description": "Latin for the future. The ultimate, inevitable end destination for everything"
+        },
+        "Vivus": {
+            "type": "blackhole",
+            "name": "Vivus",
+            "coordinate": [
+                -29588.170153177827,
+                0,
+                -180410.68315614996
+            ],
+            "size": 2000,
+            "GravityRadius": 15000,
+            "strength": 1,
+            "turbulence_strength": 1,
+            "description": "Latin for the present or the living moment"
+        },
+        "1784981944194": {
+            "type": "planet",
+            "class": "EarthLike",
+            "name": "Ancora",
+            "coordinate": [
+                100688.69629926403,
+                0,
+                -60617.289024511556
+            ],
+            "description": ""
         }
     },
     "traffic": {

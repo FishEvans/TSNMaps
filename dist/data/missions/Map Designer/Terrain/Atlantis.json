@@ -1,13 +1,13 @@
 {
     "systemMapCoord": [
-        -24065.303903081283,
+        -24065.303903081287,
         0,
-        1490.6698491918767
+        1490.6698491918821
     ],
     "systemalignment": "USFP",
     "metadata": {
         "skybox": "sky1.png",
-        "sysdescription": "Atlantis is the Regional Capital for the Lower Arc",
+        "sysdescription": "Atlantis is the well-developed regional capital of the Lower Arc, a multicultural hub of government, trade, shipbuilding, research, and entertainment. Its busy worlds and stations offer everything from naval industry to tourism, diplomacy, and frontier commerce.",
         "security": "Neutral",
         "exports": [],
         "focus": "Industry",
@@ -23,12 +23,13 @@
         "development": "Regional Capital",
         "visible": true,
         "original_author": "Draeco",
-        "revision_date": "2026-02-06",
-        "revision_number": 16,
+        "revision_date": "2026-07-16",
+        "revision_number": 17,
         "all_authors": [
-            "Draeco"
+            "Draeco",
+            "Fish Evans"
         ],
-        "last_revision_author": "Draeco"
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Waypoint 60 Gate": {
@@ -580,9 +581,9 @@
         },
         "Takede Atrium": {
             "coordinate": [
-                -76372.51272634312,
-                0.0,
-                -52522.93037828864
+                -62355.48194867331,
+                0,
+                -188572.23586107627
             ],
             "sides": [
                 "USFP"
@@ -854,9 +855,9 @@
         },
         "Dalenger Propulsion": {
             "coordinate": [
-                -100334.68622314237,
-                0.0,
-                -110112.43297888305
+                -105960.97223137284,
+                0,
+                -83588.51322579663
             ],
             "sides": [
                 "USFP"
@@ -868,29 +869,53 @@
                 "Refuel"
             ],
             "cargo": {
-                "Aegirine": 5,
-                "Alerite": 20,
-                "Ashfilum": 15,
-                "Cabrite": 80,
-                "Coolant": 24,
-                "Denebite Crystals": 5,
-                "Computer Core": 1,
-                "Navigational Array": 2,
-                "Nuidinium": 15,
-                "Power Relay": 3,
-                "Repair Materials": 10,
-                "Sensor Suite": 1,
-                "Tactical Array": 1,
-                "Tharium Plating": 34
+                "Fuel Cell 100": 10,
+                "Fuel Cell 200": 3,
+                "Fuel Cell 400": 3,
+                "Sensor Relay": 2,
+                "Warning Buoy": 10,
+                "AMC": 2,
+                "Computer Core": 2,
+                "FCS": 2,
+                "Navigational Array": 8,
+                "Tactical Array": 2,
+                "EMP": 12,
+                "Homing": 35,
+                "Mine": 12,
+                "Analysis Suite": 1,
+                "Casing": 50,
+                "Guidance System": 25,
+                "High Yield Warhead": 15,
+                "Iso B Circuit": 52,
+                "Micro Controller": 52,
+                "Power Relay": 62,
+                "Rations": 10,
+                "Receiver": 25,
+                "Repair Materials": 83,
+                "Sensor Suite": 8,
+                "Tharium Plating": 85,
+                "Torpedo Casing": 40,
+                "Transmitter": 60,
+                "Warhead": 60,
+                "Alerite": 5,
+                "Ashfilum": 12,
+                "Ice": 6,
+                "Iron": 14,
+                "Mexalon": 5,
+                "Tharium": 9
             },
-            "teams": {},
+            "teams": {
+                "Combat Engineers": 2,
+                "DamCon": 4,
+                "Medics": 2
+            },
             "description": ""
         },
         "Yuki Luxury Shuttles": {
             "coordinate": [
-                -103189.02822474897,
-                0.0,
-                -119346.03016386132
+                -31654.82040581892,
+                0,
+                -202534.68757126873
             ],
             "sides": [
                 "USFP"
@@ -914,7 +939,7 @@
                 "DamCon": 2,
                 "Medics": 1
             },
-            "description": ""
+            "description": "Pelagos is a temperate ocean world whose island continents hold most of Atlantis\u2019s population. Dense coastal  cities, floating habitats, and orbital elevators make it the political, cultural, and administrative heart of the Lower Arc."
         },
         "Wynter Mines": {
             "coordinate": [
@@ -977,9 +1002,9 @@
         },
         "Sprout BioProducts": {
             "coordinate": [
-                -60705.092315963586,
-                0.0,
-                -175975.70172602526
+                -48861.349570708226,
+                0,
+                -184373.99203629725
             ],
             "sides": [
                 "USFP"
@@ -1224,9 +1249,9 @@
         },
         "Orwed Properties": {
             "coordinate": [
-                -12191.367957751994,
-                0.0,
-                -246244.85811003958
+                -14323.241651897959,
+                0,
+                -249151.95860205684
             ],
             "sides": [
                 "USFP"
@@ -1249,9 +1274,9 @@
         },
         "Honor Port": {
             "coordinate": [
-                -12660.380170464108,
-                0.0,
-                -256657.9111861925
+                -34366.73051085939,
+                0,
+                -213245.21050540198
             ],
             "sides": [
                 "USFP"
@@ -1291,8 +1316,8 @@
         },
         "Ordan Havenhold": {
             "coordinate": [
-                -18371.217581449047,
-                0.0,
+                -19146.44437932031,
+                0,
                 -252704.25451704903
             ],
             "sides": [
@@ -1303,8 +1328,34 @@
             "facilities": [
                 "Docking"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "Seer Entertainment": {
@@ -1382,25 +1433,34 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 76,
-                "Nuke": 12,
-                "EMP": 13,
-                "Mine": 14,
-                "High Yield Warhead": 16,
-                "Warhead": 59,
-                "Torpedo Casing": 50,
-                "Casing": 16,
-                "Transmitter": 33,
-                "Navigational Array": 0,
+                "Fuel Cell 100": 5,
+                "Fuel Cell 200": 2,
+                "Warning Buoy": 5,
+                "Navigational Array": 1,
                 "Tactical Array": 10,
+                "Disruptor": 8,
+                "EMP": 12,
+                "Homing": 75,
+                "Mine": 12,
+                "Nuke": 12,
+                "Penetration": 6,
+                "Scorch": 25,
+                "Casing": 16,
+                "Guidance System": 60,
+                "High Yield Warhead": 15,
+                "Power Relay": 8,
+                "Receiver": 15,
                 "Sensor Suite": 6,
-                "Guidance System": 58,
-                "Receiver": 16
+                "Torpedo Casing": 40,
+                "Transmitter": 35,
+                "Warhead": 60,
+                "Mexalon": 5
             },
             "teams": {
-                "DamCon": 8,
-                "Medics": 3,
-                "Combat Engineers": 12
+                "Combat Engineers": 2,
+                "DamCon": 5,
+                "Marines": 4,
+                "Medics": 2
             },
             "description": ""
         },
@@ -1421,29 +1481,33 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 154,
-                "Nuke": 27,
-                "EMP": 28,
-                "Mine": 22,
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Casing": 20,
+                "Guidance System": 25,
                 "High Yield Warhead": 15,
-                "Warhead": 54,
-                "Torpedo Casing": 99,
-                "Navigational Array": 2,
-                "Tactical Array": 9,
-                "Guidance System": 65,
-                "Medical Supplies": 13,
-                "Repair Materials": 6
+                "Power Relay": 5,
+                "Sensor Suite": 8,
+                "Tharium Plating": 9,
+                "Torpedo Casing": 27,
+                "Warhead": 26,
+                "Mexalon": 3
             },
             "teams": {
-                "DamCon": 8
+                "Combat Engineers": 2,
+                "DamCon": 3,
+                "Marines": 1,
+                "Medics": 2
             },
             "description": ""
         },
         "Korczynski Enterprises": {
             "coordinate": [
-                -58103.141425946844,
-                0.0,
-                -246210.9548580794
+                -50673.884613013935,
+                0,
+                -220854.57834437364
             ],
             "sides": [
                 "USFP"
@@ -2222,9 +2286,9 @@
         },
         "RS 03": {
             "coordinate": [
-                -115304.31569003641,
-                0.0,
-                -107415.93576695418
+                -96817.9473772792,
+                0,
+                -87723.9347381476
             ],
             "sides": [
                 "USFP"
@@ -2234,11 +2298,35 @@
             "facilities": [
                 "Docking"
             ],
-            "cargo": {},
+            "cargo": {
+                "Coolant": 8,
+                "Fuel Cell 400": 1,
+                "Computer Core": 1,
+                "Life Support": 3,
+                "EMP": 10,
+                "Homing": 38,
+                "Analysis Suite": 7,
+                "Casing": 16,
+                "Denebite Crystals": 2,
+                "Guidance System": 16,
+                "High Yield Warhead": 11,
+                "Iso B Circuit": 3,
+                "Meals": 14,
+                "Medical Supplies": 16,
+                "Micro Controller": 23,
+                "Power Relay": 16,
+                "Rations": 7,
+                "Receiver": 7,
+                "Repair Materials": 7,
+                "Sensor Suite": 8,
+                "Transmitter": 7,
+                "Wild Animals": 15,
+                "Ice": 37,
+                "Mexalon": 9
+            },
             "teams": {
-                "Combat Engineers": 5,
-                "DamCon": 7,
-                "Medics": 3
+                "DamCon": 1,
+                "Medics": 6
             },
             "description": ""
         },
@@ -2648,9 +2736,9 @@
         },
         "RS 41": {
             "coordinate": [
-                -87443.92527177828,
-                0.0,
-                -199213.60546393215
+                -67148.05702195432,
+                0,
+                -197733.13762077523
             ],
             "sides": [
                 "USFP"
@@ -2661,15 +2749,34 @@
                 "Docking"
             ],
             "cargo": {
-                "Medical Supplies": 16,
-                "Transmitter": 8,
-                "Receiver": 6,
-                "Analysis Suite": 8,
-                "Sensor Suite": 8
+                "Coolant": 7,
+                "Fuel Cell 400": 0,
+                "Computer Core": 3,
+                "Life Support": 3,
+                "EMP": 11,
+                "Homing": 36,
+                "Analysis Suite": 9,
+                "Casing": 15,
+                "Denebite Crystals": 2,
+                "Guidance System": 14,
+                "High Yield Warhead": 10,
+                "Iso B Circuit": 2,
+                "Meals": 16,
+                "Medical Supplies": 17,
+                "Micro Controller": 26,
+                "Power Relay": 16,
+                "Rations": 9,
+                "Receiver": 7,
+                "Repair Materials": 5,
+                "Sensor Suite": 8,
+                "Transmitter": 9,
+                "Wild Animals": 16,
+                "Ice": 43,
+                "Mexalon": 9
             },
             "teams": {
-                "DamCon": 2,
-                "Medics": 2
+                "DamCon": 1,
+                "Medics": 5
             },
             "description": ""
         },
@@ -2756,6 +2863,52 @@
                 "Gredian": 146
             },
             "teams": {},
+            "description": ""
+        },
+        "RS 88": {
+            "coordinate": [
+                -15223.562474277598,
+                0,
+                -257849.30557705538
+            ],
+            "sides": [
+                "USFP"
+            ],
+            "hull": "starbase_science",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {
+                "Coolant": 8,
+                "Fuel Cell 400": 1,
+                "Computer Core": 2,
+                "Life Support": 2,
+                "EMP": 10,
+                "Homing": 35,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Denebite Crystals": 2,
+                "Guidance System": 15,
+                "High Yield Warhead": 10,
+                "Iso B Circuit": 2,
+                "Meals": 15,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Rations": 8,
+                "Receiver": 6,
+                "Repair Materials": 6,
+                "Sensor Suite": 8,
+                "Transmitter": 8,
+                "Wild Animals": 15,
+                "Ice": 40,
+                "Mexalon": 9
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 5
+            },
             "description": ""
         }
     },
@@ -5091,6 +5244,66 @@
             "radius": 6217,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,217 units. Local nebular density index: 12.8. Source field: 1753888758494. Survey profile: hydrogen-rich vapor with low metallic dust; field stability uneven but workable; collector saturation estimate 57%. Telemetry confidence: limited. Hold station near the inner third for the cleanest skim.",
             "hideonmap": false
+        },
+        "Hephaestus": {
+            "type": "planet",
+            "class": "LavaPlanet",
+            "name": "Hephaestus",
+            "coordinate": [
+                188315.57396007833,
+                0,
+                -87741.34267682409
+            ],
+            "description": "Hephaestus is a volcanic world of lava seas, unstable crust plates, and mineral-rich highlands. Automated foundries and shielded extraction sites supply Atlantis\u2019s shipyards, though quakes and eruptions regularly threaten operations."
+        },
+        "Thalassa": {
+            "type": "planet",
+            "class": "RingPlanet",
+            "name": "Thalassa",
+            "coordinate": [
+                -100232.52274774064,
+                0,
+                42868.86822852573
+            ],
+            "description": "Thalassa is a vast blue gas giant surrounded by dozens of moons and extensive orbital infrastructure. Its upper atmosphere provides fuel and rare gases, while its moons host research stations, refineries, and naval tracking post"
+        },
+        "Pelagos": {
+            "type": "planet",
+            "class": "EarthLike",
+            "name": "Pelagos",
+            "coordinate": [
+                -49791.77383401919,
+                0,
+                -201744.255829904
+            ],
+            "description": "Pelagos is a temperate ocean world whose island continents hold most of Atlantis\u2019s population. Dense coastal cities, floating habitats, and orbital elevators make it the political, cultural, and administrative heart of the Lower Arc."
+        },
+        "1784228195569": {
+            "type": "nebulas",
+            "seed": 2010,
+            "start": [
+                -112690.72748025092,
+                0,
+                20363.724195603914
+            ],
+            "end": [
+                -75717.99085473652,
+                0,
+                25990.01020383437
+            ],
+            "density": 125,
+            "scatter": 10000,
+            "composition": []
+        },
+        "FCS20": {
+            "type": "fcs_zone",
+            "coordinate": [
+                -99830.64517572417,
+                0,
+                20363.724195603914
+            ],
+            "radius": 5000,
+            "description": ""
         }
     },
     "traffic": {

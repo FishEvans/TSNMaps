@@ -1003,11 +1003,11 @@ _last_desc_widget = None
 _last_desc_obj    = None
 
 def get_base_path():
-    # when frozen by PyInstaller, use the folder where the EXE was started (the original exe), not the temp unpack directory
+    # When frozen by PyInstaller, use the folder containing the executable,
+    # not the temporary one-file extraction directory or current working directory.
     if getattr(sys, 'frozen', False):
-        # for onefile builds, sys.argv[0] points to the path of the original EXE invoked
-        return os.path.dirname(os.path.abspath(sys.argv[0]))
-    # when running as script, use module directory
+        return os.path.dirname(os.path.abspath(sys.executable))
+    # When running as a script, use the module directory.
     return os.path.dirname(os.path.abspath(__file__))
 
 def get_data_path():

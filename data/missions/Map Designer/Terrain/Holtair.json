@@ -1,26 +1,29 @@
 {
     "systemMapCoord": [
-        -12350.775236349185,
+        -12350.775236349187,
         0,
         -17734.97500425823
     ],
     "systemalignment": "Kralien",
     "metadata": {
-        "sysdescription": "",
-        "security": "Neutral",
+        "sysdescription": "g",
+        "security": "High",
         "exports": [],
-        "focus": "",
+        "focus": "Defense & Security",
         "intel": {
-            "pirate": "Low",
-            "enemy": "Low",
-            "assets": []
+            "pirate": "Mid",
+            "enemy": "High",
+            "assets": [
+                "Shipyard",
+                "Slingshot"
+            ]
         },
-        "development": "Unclaimed",
+        "development": "Colony",
         "visible": true,
         "skybox": "sky1.png",
         "original_author": "Draeco",
-        "revision_date": "2026-05-16",
-        "revision_number": 20,
+        "revision_date": "2026-07-16",
+        "revision_number": 21,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -88,9 +91,9 @@
         },
         "Y 25": {
             "coordinate": [
-                23333.333333333336,
+                46298.415453591166,
                 0,
-                -183333.33333333334
+                -171460.9471925171
             ],
             "sides": [
                 "Kralien"
@@ -135,9 +138,9 @@
         },
         "L 30": {
             "coordinate": [
-                78287.03703703704,
+                54734.13953226786,
                 0,
-                -148333.33333333334
+                -162072.52354444872
             ],
             "sides": [
                 "Kralien"
@@ -242,12 +245,12 @@
         },
         "J 84": {
             "coordinate": [
-                50308.641975308645,
+                49654.39482239839,
                 0,
-                154124.2283950617
+                164218.3273256771
             ],
             "sides": [
-                "Kralien"
+                "Skaraan"
             ],
             "hull": "starbase_kralien",
             "type": "station",
@@ -256,35 +259,21 @@
             "teams": {},
             "description": ""
         },
-        "K 55": {
-            "coordinate": [
-                56666.66666666667,
-                0,
-                140833.33333333334
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
-        },
         "H 47": {
             "coordinate": [
-                36666.66666666667,
+                48434.832218092655,
                 0,
-                149166.6666666667
+                166535.116960332
             ],
             "sides": [
-                "Kralien"
+                "Skaraan"
             ],
             "hull": "starbase_skaraan",
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "L 63": {
             "coordinate": [
@@ -379,54 +368,6 @@
             "teams": {},
             "description": ""
         },
-        "C 45": {
-            "coordinate": [
-                36662.75505829904,
-                0,
-                25395.804755372654
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": ""
-        },
-        "H 11": {
-            "coordinate": [
-                41627.55058299039,
-                0,
-                34566.38303040695
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "starbase_skaraan",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": ""
-        },
-        "P 98": {
-            "coordinate": [
-                49857.1995027435,
-                0,
-                26687.528577960682
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {},
-            "description": ""
-        },
         "W 40": {
             "coordinate": [
                 -16656.39646204844,
@@ -490,9 +431,9 @@
         },
         "Y 15": {
             "coordinate": [
-                -56586.952017604,
+                -178446.57510120477,
                 0,
-                13392.614740512148
+                -23730.484300475302
             ],
             "sides": [
                 "Kralien"
@@ -519,26 +460,11 @@
             "cargo": {},
             "teams": {}
         },
-        "S 18": {
-            "coordinate": [
-                -127767.50757315957,
-                0,
-                -12649.051926154523
-            ],
-            "sides": [
-                "Kralien"
-            ],
-            "hull": "starbase_kralien",
-            "type": "station",
-            "facilities": [],
-            "cargo": {},
-            "teams": {}
-        },
         "Q 49": {
             "coordinate": [
-                -126031.39646204846,
+                -160916.60236625516,
                 0,
-                -44477.755629858235
+                -33172.364827569036
             ],
             "sides": [
                 "Kralien"
@@ -547,7 +473,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "P 01": {
             "coordinate": [
@@ -1120,6 +1047,533 @@
             "cargo": {},
             "teams": {},
             "description": ""
+        },
+        "WP 55": {
+            "coordinate": [
+                -168373.22969024675,
+                0,
+                -31197.867912749047
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 62": {
+            "coordinate": [
+                -172392.17648669548,
+                0,
+                -25029.251899595216
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 6": {
+            "coordinate": [
+                -175009.1650983365,
+                0,
+                -32132.50670262084
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 10": {
+            "coordinate": [
+                -168092.83805328523,
+                0,
+                -18767.172007454203
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "arvonian_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 93": {
+            "coordinate": [
+                -168747.0852061955,
+                0,
+                -19701.810797325994
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Sierra Monitoring": {
+            "coordinate": [
+                -167076.99374790755,
+                0,
+                -19340.514737583893
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [
+                "Docking"
+            ],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "DS 68": {
+            "coordinate": [
+                43003.95220759432,
+                0,
+                -159943.17059259326
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 88": {
+            "coordinate": [
+                43996.80559630372,
+                0,
+                -158637.7472771381
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 50": {
+            "coordinate": [
+                42133.6699972909,
+                0,
+                -161184.67604138938
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Gen H11": {
+            "coordinate": [
+                29073.852507076215,
+                0,
+                138275.450904922
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Gen H12": {
+            "coordinate": [
+                28418.644134527833,
+                0,
+                137639.73613513372
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Gen H99": {
+            "coordinate": [
+                29776.627287291096,
+                0,
+                138838.23365738435
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Gen H07": {
+            "coordinate": [
+                29250.631725567528,
+                0,
+                134947.82415713425
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Gen H17": {
+            "coordinate": [
+                30272.00983119556,
+                0,
+                135366.03944452724
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Gen H39": {
+            "coordinate": [
+                31186.03080380214,
+                0,
+                135800.83066475723
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_generator",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "ACU H41": {
+            "coordinate": [
+                29644.034315735484,
+                0,
+                135468.1691400512
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "ACU H77": {
+            "coordinate": [
+                30708.862657712667,
+                0,
+                136154.76035366693
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "ACU H20": {
+            "coordinate": [
+                29911.84991785023,
+                0,
+                138572.36566458302
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "ACU H63": {
+            "coordinate": [
+                28739.87891173433,
+                0,
+                137337.59971532642
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "Hegemony_SlingAcu",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Holtair Slingshot": {
+            "coordinate": [
+                29844.82839199816,
+                0,
+                136877.50599731493
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "Hegemony_Slingshot",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "DS 56": {
+            "coordinate": [
+                28587.11813659403,
+                0,
+                136198.83757337145
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_torgoth",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "HS Control": {
+            "coordinate": [
+                29821.280288320406,
+                0,
+                138071.81751204818
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 16": {
+            "coordinate": [
+                31466.628558112177,
+                0,
+                138011.4377590283
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "arvonian_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 21": {
+            "coordinate": [
+                42082.8395231786,
+                0,
+                29526.904002313237
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_drydock",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Kore Slips 01": {
+            "coordinate": [
+                46959.073159977226,
+                0,
+                164764.76878708822
+            ],
+            "sides": [
+                "Skaraan"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kore Slips 1": {
+            "coordinate": [
+                45266.21556334445,
+                0,
+                30978.970750981433
+            ],
+            "sides": [
+                "Skaraan"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kore Slips 2": {
+            "coordinate": [
+                45860.70355966821,
+                0,
+                28180.28240623774
+            ],
+            "sides": [
+                "Skaraan"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kore Slips 3": {
+            "coordinate": [
+                43982.710150017214,
+                0,
+                29307.380609701817
+            ],
+            "sides": [
+                "Skaraan"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kore Admin": {
+            "coordinate": [
+                47175.75882303176,
+                0,
+                29953.252051695203
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Ship Yard Adminstration Complex"
+        },
+        "Kore Diagnostics": {
+            "coordinate": [
+                43270.84594117949,
+                0,
+                32010.145806557244
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_skaraan",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": "Kore Shipyard Diagnostict Hub"
+        },
+        "Kore Componants B": {
+            "coordinate": [
+                43642.84772260701,
+                0,
+                26929.547089682477
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "Kore Componants A ": {
+            "coordinate": [
+                47181.96728248312,
+                0,
+                32305.636114126824
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "starbase_kralien",
+            "type": "station",
+            "facilities": [],
+            "cargo": {},
+            "teams": {},
+            "description": ""
+        },
+        "WP 83": {
+            "coordinate": [
+                45523.02149231127,
+                0,
+                29551.160085162242
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "Kore EM Arivals": {
+            "coordinate": [
+                48560.95814534748,
+                0,
+                50352.211835167596
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "Hegemony_SlingAntenna",
+            "type": "platform",
+            "cargo": {},
+            "teams": {},
+            "hideonmap": true
+        },
+        "Kore Depot": {
+            "coordinate": [
+                46727.32648411875,
+                0,
+                31634.63756114617
+            ],
+            "sides": [
+                "Kralien"
+            ],
+            "hull": "usfp_industrial_storage",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
         }
     },
     "sensor_relay": {},
@@ -1874,5 +2328,9 @@
             "hideonmap": false
         }
     },
-    "traffic": {}
+    "traffic": {
+        "commercial": "light",
+        "civilian": "light",
+        "security": "light"
+    }
 }
