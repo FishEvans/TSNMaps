@@ -2695,8 +2695,6 @@ def open_system_editor(filename: str) -> None:
         - 5th element: widget options for combo fields
         """
         clear_edit_pane()
-        # Track selection type and name
-        set_selection(kind.lower(), key)
         edit_title.config(text=f"{kind}: {key}")
         for field in fields:
             label_text, getter, setter = field[0], field[1], field[2]
@@ -2758,14 +2756,25 @@ def open_system_editor(filename: str) -> None:
                     return
             except Exception:
                 return
+            # Preserve the normal Delete-key behaviour while editing text or
+            # choosing a combobox value. Map-item deletion is intended for the
+            # lists, canvas, and other non-editable editor controls.
+            if isinstance(event.widget, (tk.Entry, tk.Text, tk.Spinbox, ttk.Entry, ttk.Combobox)):
+                return
         t = current_selection['type']
         n = current_selection['name']
         if not t or not n:
             return
-        if t == 'object': delete_object(n)
-        elif t == 'relay': delete_relay(n)
-        elif t == 'terrain': delete_terrain(n)
-    win.bind_all('<Delete>', on_delete_key)
+        if t == 'object' and n in sm.data.get('objects', {}):
+            delete_object(n)
+        elif t == 'relay' and n in sm.data.get('sensor_relay', {}):
+            delete_relay(n)
+        elif t == 'terrain' and n in sm.data.get('terrain', {}):
+            delete_terrain(n)
+        else:
+            return
+        return 'break'
+    win.bind('<Delete>', on_delete_key)
 
     # Utility delete functions for objects, relays, and terrain
     def delete_object(obj_name):
@@ -3329,6 +3338,7 @@ def open_system_editor(filename: str) -> None:
         obj = sm.get_object(name)
         if not win.winfo_exists():
             return
+        set_selection('object', name)
         update_coord_display(obj.get('coordinate'), False)
         clear_edit_pane()
         edit_title.config(text=f"Station: {name}" if obj.get('type')=='station' else f"Object: {name}")
@@ -3842,6 +3852,7 @@ def open_system_editor(filename: str) -> None:
 # Adapter: show_terrain via generic helper with blackhole support
     def show_terrain(key: str):
         feat = sm.get_terrain_feature(key)
+        set_selection('terrain', key)
         ttype = feat.get('type','').lower()
         coord = None
         is_center = False
@@ -5119,7 +5130,7 @@ def open_system_editor(filename: str) -> None:
     # first create the map canvas,
     map_canvas = tk.Canvas(win, width=600, height=600, bg='black')
     map_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True, pady=5)
-    # Editor-only: grid mode cycling (press 'g' to toggle)
+    # Editor-only: grid mode cycling (press 'g' while the map has focus)
     grid_mode_index = 0
     def cycle_grid_mode(event=None):
         if event is not None:
@@ -5132,7 +5143,7 @@ def open_system_editor(filename: str) -> None:
         grid_mode_index = (grid_mode_index + 1) % len(GRID_MODES)
         mode = GRID_MODES[grid_mode_index]
         draw_map(ctx)
-    map_canvas.bind_all('<g>', cycle_grid_mode)
+    map_canvas.bind('<g>', cycle_grid_mode)
 
 
 
@@ -5707,6 +5718,7 @@ def open_system_editor(filename: str) -> None:
         relay_store = sm.data.setdefault('sensor_relay', {})
         relay_data = ensure_relay_dict(relay_store.get(name))
         relay_store[name] = relay_data
+        set_selection('relay', name)
         coord = relay_data.get('coordinate', [0, 0, 0])
         update_coord_display(coord, False)
         clear_edit_pane()
@@ -5847,8 +5859,12 @@ def open_system_editor(filename: str) -> None:
     ctx['undo_enabled'] = False
 
 
-    map_canvas.bind('<ButtonPress-1>', lambda e, _ctx=ctx: SysMapCanvas.on_canvas_press(e, _ctx))
-    map_canvas.bind('<ButtonPress-3>', lambda e, _ctx=ctx: SysMapCanvas.on_canvas_press(e, _ctx))
+    def on_map_press(event):
+        map_canvas.focus_set()
+        SysMapCanvas.on_canvas_press(event, ctx)
+
+    map_canvas.bind('<ButtonPress-1>', on_map_press)
+    map_canvas.bind('<ButtonPress-3>', on_map_press)
     map_canvas.bind('<B1-Motion>', lambda e, _ctx=ctx: SysMapCanvas.on_canvas_drag(e, _ctx))
     map_canvas.bind('<ButtonRelease-1>', on_canvas_release)
     map_canvas.bind('<MouseWheel>', lambda e, _ctx=ctx: SysMapCanvas.on_map_zoom(e, _ctx))
