@@ -357,9 +357,22 @@
   },
   {
     "system": "Atlantis",
-    "description": "Atlantis is the Regional Capital for the Lower Arc",
+    "description": "Atlantis is the well-developed regional capital of the Lower Arc, a multicultural hub of government, trade, shipbuilding, research, and entertainment. Its busy worlds and stations offer everything from naval industry to tourism, diplomacy, and frontier commerce.",
     "faction": "USFP",
-    "planets": [],
+    "planets": [
+      {
+        "name": "Hephaestus",
+        "class": "LavaPlanet"
+      },
+      {
+        "name": "Pelagos",
+        "class": "EarthLike"
+      },
+      {
+        "name": "Thalassa",
+        "class": "RingPlanet"
+      }
+    ],
     "strategic_assets": [
       "Armory",
       "Fortification",
@@ -527,11 +540,20 @@
   },
   {
     "system": "Cerberus",
-    "description": "",
+    "description": "Boardering the Hijordan Empire Cerberus is an important port of call for traders entering and exiting the USFP it is also gate way to Atlantis one of the major systems of the USFP, Moderatly rich in resorces, and has a few Torist attractions catering to passing trade.",
     "faction": "USFP",
-    "planets": [],
+    "planets": [
+      {
+        "name": "Ancora",
+        "class": "EarthLike"
+      }
+    ],
     "strategic_assets": [],
-    "exports": [],
+    "exports": [
+      "Agriculture",
+      "Mining",
+      "Research"
+    ],
     "unhidden_jumps": [
       {
         "gate": "Krisenda Gate",
@@ -822,11 +844,37 @@
   },
   {
     "system": "Erebus",
-    "description": "",
+    "description": "Erebus is an Arvonian industrial-research system specialising in sophisticated AI cores, adaptive processors, and personality-matrix hardware. Its elegant public image hides a dense underworld of smugglers, covert laboratories, stolen identities, and illicit access routes.",
     "faction": "Arvonian",
-    "planets": [],
-    "strategic_assets": [],
-    "exports": [],
+    "planets": [
+      {
+        "name": "Lethe",
+        "class": "RingPlanet"
+      },
+      {
+        "name": "Mnemosyne",
+        "class": "ToxicPlanet"
+      },
+      {
+        "name": "Mnemosyne",
+        "class": "IronMoonPlanet"
+      },
+      {
+        "name": "Nyx",
+        "class": "EarthLike"
+      }
+    ],
+    "strategic_assets": [
+      "AI Core Foundries",
+      "Listening Network",
+      "Research Complex"
+    ],
+    "exports": [
+      "AI Cores",
+      "Bio-Engineered Organics",
+      "Quantum Components",
+      "Research"
+    ],
     "unhidden_jumps": [
       {
         "gate": "Cronus Gate",
@@ -1150,10 +1198,13 @@
   },
   {
     "system": "Holtair",
-    "description": "",
+    "description": "g",
     "faction": "Kralien",
     "planets": [],
-    "strategic_assets": [],
+    "strategic_assets": [
+      "Shipyard",
+      "Slingshot"
+    ],
     "exports": [],
     "unhidden_jumps": [
       {
@@ -1663,7 +1714,7 @@
   {
     "system": "Mria",
     "description": "",
-    "faction": "USFP",
+    "faction": "Torgoth",
     "planets": [
       {
         "name": "Planet Ayala",
@@ -1838,13 +1889,27 @@
   },
   {
     "system": "Promethean",
-    "description": "",
+    "description": "Promethean is an established Frountier System for the USFP, Home base to the 2nd Fleet 4th Light Division its the last point of civilisation before the reaches of space pressed in on oneside by the Hegemony, and the other side the Hijorden Allies there is also a narrow corridor to the unknown.",
     "faction": "USFP",
-    "planets": [],
-    "strategic_assets": [
-      "Armory"
+    "planets": [
+      {
+        "name": "Epimetheus",
+        "class": "LavaPlanet"
+      },
+      {
+        "name": "Pandora",
+        "class": "ToxicPlanet"
+      }
     ],
-    "exports": [],
+    "strategic_assets": [
+      "Armory",
+      "Fortification"
+    ],
+    "exports": [
+      "Industrial Goods",
+      "Mining",
+      "Research"
+    ],
     "unhidden_jumps": [
       {
         "gate": "Cerebus Gate",
@@ -1873,7 +1938,7 @@
   {
     "system": "Reema",
     "description": "Reema is a border-economy system: a place where USFP military culture meets League merchant pragmatism. It\u2019s not glamorous, but it\u2019s where misunderstandings become incidents\u2014fast.",
-    "faction": "USFP",
+    "faction": "Kralien",
     "planets": [
       {
         "name": "Planet Aadden",
