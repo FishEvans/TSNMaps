@@ -1463,8 +1463,8 @@ def push_undo():
         return
     undo_stack.append(copy.deepcopy(current_sm.data))
 
-    # cap at 5
-    if len(undo_stack) > 5:
+    # cap at 10
+    if len(undo_stack) > 10:
         undo_stack.pop(0)
     # any new action invalidates redo history
     redo_stack.clear()
@@ -2078,8 +2078,8 @@ def open_system_editor(filename: str) -> None:
         if sm is None:
             return
         undo_stack.append(copy.deepcopy(sm.data))
-        # cap at 5
-        if len(undo_stack) > 5:
+        # cap at 10
+        if len(undo_stack) > 10:
             undo_stack.pop(0)
         # any new action invalidates redo history
         redo_stack.clear()
@@ -2559,6 +2559,12 @@ def open_system_editor(filename: str) -> None:
     # move past the two rows used by each list (label + listbox)
     row += 2
 
+    overview_refreshers = {}
+
+    def refresh_overviews():
+        for refresh in list(overview_refreshers.values()):
+            refresh()
+
     def _refresh_ui():
         obj_names = sm.list_objects()
         objs.clear()
@@ -2583,6 +2589,7 @@ def open_system_editor(filename: str) -> None:
         drag_data.clear()
         current_selection['type'] = None
         current_selection['name'] = None
+        refresh_overviews()
 
     def do_undo():
         if not undo_stack:
@@ -2601,6 +2608,27 @@ def open_system_editor(filename: str) -> None:
         state = redo_stack.pop()
         sm.data = state
         _refresh_ui()
+
+    def bind_history_shortcuts(window):
+        # Precede widget class bindings: Ctrl+X must not also cut text.
+        tag = f"SystemHistory{window}"
+        def invoke(action):
+            flush_pending_text_widgets()
+            action()
+            return 'break'
+        for sequence, action in (('<Control-z>', do_undo), ('<Control-x>', do_redo)):
+            window.bind_class(tag, sequence, lambda event, fn=action: invoke(fn))
+        def attach(widget):
+            tags = widget.bindtags()
+            if tag not in tags:
+                widget.bindtags((tag,) + tags)
+            for child in widget.winfo_children():
+                if child.winfo_toplevel() == window:
+                    attach(child)
+        window.bind('<Map>', lambda event: attach(event.widget), add='+')
+        attach(window)
+
+    bind_history_shortcuts(win)
 
     # Edit pane setup (sidebar on far right)
     edit_frame = tk.Frame(win, bd=1, relief=tk.SUNKEN, width=350)
@@ -3316,10 +3344,13 @@ def open_system_editor(filename: str) -> None:
                     cargo[name] = qv.get()
                 else:
                     teams[name] = qv.get()
+            if obj.get('cargo') != cargo or obj.get('teams') != teams:
+                push_undo()
             obj['cargo'] = cargo
             obj['teams'] = teams
             dlg.destroy()
             show_object(obj_name)
+            refresh_overviews()
 
         tk.Button(dlg, text="Save",   command=save)\
           .grid(row=2, column=1, pady=5)
@@ -3332,6 +3363,21 @@ def open_system_editor(filename: str) -> None:
     def arm_copy_object(name: str, obj: Dict[str, Any]) -> None:
         copy_state['source_name'] = name
         copy_state['source_obj'] = copy.deepcopy(obj)
+
+    def convert_station_type(name, new_type):
+        obj = sm.get_object(name)
+        if obj.get('type') not in STATION_OR_PLATFORM_TYPES or new_type not in STATION_OR_PLATFORM_TYPES:
+            return
+        if obj['type'] == new_type:
+            return
+        flush_pending_text_widgets()
+        push_undo()
+        # Retain hull, cargo, facilities, coordinates and other metadata.
+        obj['type'] = new_type
+        show_object(name)
+        refresh_objects_list()
+        draw_map(ctx)
+        refresh_overviews()
 
     def show_object(name: str):
         nonlocal last_desc_widget, last_desc_obj
@@ -3375,17 +3421,21 @@ def open_system_editor(filename: str) -> None:
         
         # ─── Platform‐type custom layout ──────────────────────────────
         if obj.get('type') == 'platform':
+            platform_frame = tk.Frame(edit_frame)
+            platform_frame.grid(row=1, column=0, columnspan=2, sticky='nsew')
             edit_title.config(text=f"Platform: {name}")
-            side_var, _, _ = _build_faction_side_controls(edit_frame, obj, layout='pack')
+            tk.Button(platform_frame, text="Convert to Station",
+                      command=lambda: convert_station_type(name, 'station')).pack(anchor='w', pady=2)
+            side_var, _, _ = _build_faction_side_controls(platform_frame, obj, layout='pack')
 
             # Hull dropdown (include hulls with role 'platform' or 'defense')
-            tk.Label(edit_frame, text="Hull:").pack(anchor='w', pady=2)
+            tk.Label(platform_frame, text="Hull:").pack(anchor='w', pady=2)
             hull_var = tk.StringVar(value=obj.get('hull',''))
             platform_hulls = SysMapCanvas._filter_hulls_by_roles(
                 valid_hulls, {'platform', 'static', 'defense'}, hull_role_map, hull_category_map
             )
             hull_cb = ttk.Combobox(
-                edit_frame,
+                platform_frame,
                 textvariable=hull_var,
                 values=sorted(platform_hulls),
                 state='readonly'
@@ -3403,11 +3453,11 @@ def open_system_editor(filename: str) -> None:
             show_all_var = tk.BooleanVar(value=False)
             relax_role_var = tk.BooleanVar(value=False)
             tk.Checkbutton(
-                edit_frame, text="Show all hulls",
+                platform_frame, text="Show all hulls",
                 variable=show_all_var
             ).pack(anchor='w', pady=(2, 0))
             tk.Checkbutton(
-                edit_frame, text="Relax role filter",
+                platform_frame, text="Relax role filter",
                 variable=relax_role_var
             ).pack(anchor='w', pady=(0, 2))
 
@@ -3432,7 +3482,7 @@ def open_system_editor(filename: str) -> None:
             update_platform_hulls()
 
             # Rename & Delete buttons
-            frm = tk.Frame(edit_frame)
+            frm = tk.Frame(platform_frame)
             frm.pack(fill='x', pady=5)
             tk.Button(frm, text="Copy",
                       command=lambda n=name, o=obj: arm_copy_object(n, o))\
@@ -3447,7 +3497,7 @@ def open_system_editor(filename: str) -> None:
             # Hide on map
             hide_var = tk.BooleanVar(value=obj.get('hideonmap', False))
             tk.Checkbutton(
-                edit_frame,
+                platform_frame,
                 text="Hide on map",
                 variable=hide_var,
                 command=lambda: obj.__setitem__('hideonmap', hide_var.get())
@@ -3638,6 +3688,9 @@ def open_system_editor(filename: str) -> None:
 
         # ─── Station-only custom layout ────────────────────────────────
         if obj.get('type') == 'station':
+            tk.Button(edit_frame, text="Convert to Platform",
+                      command=lambda: convert_station_type(name, 'platform')).grid(
+                          row=12, column=0, columnspan=2, sticky='w', pady=2)
             # Station pane now starts at row 1 (row 0 is the title)
             side_var, _, _ = _build_faction_side_controls(edit_frame, obj, layout='grid', row=1)
 
@@ -4498,15 +4551,50 @@ def open_system_editor(filename: str) -> None:
         list_win = tk.Toplevel(win)
         list_win.title("Stations Overview")
         list_win.transient(win)
+        list_win.geometry(f"{min(1250, list_win.winfo_screenwidth() - 80)}x{min(700, list_win.winfo_screenheight() - 100)}")
+        list_win.minsize(600, 350)
+        bind_history_shortcuts(list_win)
 
-        tk.Label(list_win, text="Click a station name to edit cargo/teams.").pack(anchor='w', padx=8, pady=(8, 0))
+        tk.Label(list_win, text="Click a name to edit cargo/teams. Drag header dividers to resize columns; click headings to sort.").pack(anchor='w', padx=8, pady=(8, 0))
+
+        bulk = tk.LabelFrame(list_win, text="Change side for all stations and platforms")
+        bulk.pack(fill='x', padx=8, pady=6)
+        source_var = tk.StringVar()
+        target_var = tk.StringVar()
+        tk.Label(bulk, text="From:").pack(side='left')
+        source_cb = ttk.Combobox(bulk, textvariable=source_var, state='readonly', width=20)
+        source_cb.pack(side='left', padx=4)
+        tk.Label(bulk, text="To:").pack(side='left')
+        ttk.Combobox(bulk, textvariable=target_var, values=sorted(valid_sides),
+                     state='readonly', width=20).pack(side='left', padx=4)
+        status_var = tk.StringVar()
+        def change_all_sides():
+            source, target = source_var.get(), target_var.get()
+            if not source or not target or source == target:
+                status_var.set("Choose two different sides.")
+                return
+            matches = [obj for obj in sm.data.get('objects', {}).values()
+                       if str(obj.get('type', '')).lower() in STATION_OR_PLATFORM_TYPES
+                       and _first_side(obj) == source]
+            if matches:
+                flush_pending_text_widgets()
+                push_undo()
+                for obj in matches:
+                    sides = obj.get('sides')
+                    obj['sides'] = [target] + (list(sides[1:]) if isinstance(sides, (list, tuple)) else [])
+                _refresh_ui()
+            status_var.set(f"Changed {len(matches)} objects from {source} to {target}.")
+        tk.Button(bulk, text="Change all", command=change_all_sides).pack(side='left', padx=4)
+        tk.Label(list_win, textvariable=status_var, anchor='w').pack(fill='x', padx=8)
 
         container = tk.Frame(list_win)
         container.pack(fill='both', expand=True, padx=8, pady=8)
 
         canvas = tk.Canvas(container, highlightthickness=0)
         vsb = ttk.Scrollbar(container, orient='vertical', command=canvas.yview)
-        canvas.configure(yscrollcommand=vsb.set)
+        hsb = ttk.Scrollbar(container, orient='horizontal', command=canvas.xview)
+        canvas.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+        hsb.grid(row=1, column=0, sticky='ew')
         canvas.grid(row=0, column=0, sticky='nsew')
         vsb.grid(row=0, column=1, sticky='ns')
         container.grid_rowconfigure(0, weight=1)
@@ -4519,7 +4607,7 @@ def open_system_editor(filename: str) -> None:
             canvas.configure(scrollregion=canvas.bbox('all'))
 
         def _sync_width(event):
-            canvas.itemconfigure(rows_id, width=event.width)
+            canvas.itemconfigure(rows_id, width=max(canvas.winfo_width(), sum(column_widths.values())))
 
         rows_frame.bind("<Configure>", _sync_scrollregion)
         canvas.bind("<Configure>", _sync_width)
@@ -4598,6 +4686,9 @@ def open_system_editor(filename: str) -> None:
             ('cargo', 'Cargo/Teams', 160),
         )
 
+        column_widths = {key: width for key, _, width in overview_columns}
+        initial_layout = True
+
         def _station_sort_value(obj_name, obj, column):
             if column == 'name':
                 return _az09_key(obj_name)
@@ -4640,26 +4731,44 @@ def open_system_editor(filename: str) -> None:
             refresh_objects_list()
 
         def build_rows():
+            nonlocal initial_layout
             for child in rows_frame.winfo_children():
                 child.destroy()
 
             for idx, (_, _, minsize) in enumerate(overview_columns):
-                rows_frame.grid_columnconfigure(idx, minsize=minsize, weight=0)
-            rows_frame.grid_columnconfigure(0, weight=1)
-            rows_frame.grid_columnconfigure(4, weight=1)
+                rows_frame.grid_columnconfigure(idx, minsize=column_widths[overview_columns[idx][0]], weight=0)
+            _sync_width(None)
+            source_cb['values'] = sorted({_first_side(o) for o in sm.data.get('objects', {}).values()
+                                          if str(o.get('type', '')).lower() in STATION_OR_PLATFORM_TYPES and _first_side(o)})
 
             active_sort = sort_state.get('column', 'name')
             sort_suffix = " v" if sort_state.get('reverse') else " ^"
             for col_idx, (key, label, _) in enumerate(overview_columns):
                 header_text = f"{label}{sort_suffix if key == active_sort else ''}"
+                header = tk.Frame(rows_frame, width=column_widths[key], height=30)
+                header.grid(row=0, column=col_idx, sticky='ew')
+                header.pack_propagate(False)
+                grip = tk.Frame(header, width=7, cursor='sb_h_double_arrow', relief='raised', bd=1)
+                grip.pack(side='right', fill='y')
+                drag = {}
+                def start_resize(event, k=key, d=drag):
+                    d.update(x=event.x_root, width=column_widths[k])
+                def resize(event, k=key, d=drag, col=col_idx):
+                    column_widths[k] = max(70, d['width'] + event.x_root - d['x'])
+                    rows_frame.grid_columnconfigure(col, minsize=column_widths[k])
+                    for cell in rows_frame.grid_slaves(column=col):
+                        cell.configure(width=column_widths[k])
+                    _sync_width(None)
+                grip.bind('<ButtonPress-1>', start_resize)
+                grip.bind('<B1-Motion>', resize)
                 tk.Button(
-                    rows_frame,
+                    header,
                     text=header_text,
                     font=('Arial', 9, 'bold'),
                     relief=tk.SUNKEN if key == active_sort else tk.RAISED,
                     command=lambda k=key: _set_station_sort(k),
                     anchor='w',
-                ).grid(row=0, column=col_idx, sticky='ew', padx=2, pady=(0, 4))
+                ).pack(side='left', fill='both', expand=True)
 
             entries = []
             for obj_name in sm.list_objects():
@@ -4680,25 +4789,36 @@ def open_system_editor(filename: str) -> None:
                 if otype not in ('station', 'platform'):
                     otype = 'station'
 
-                name_lbl = tk.Label(rows_frame, text=obj_name, cursor='hand2')
+                cells = []
+                for col, (key, _, _) in enumerate(overview_columns):
+                    cell = tk.Frame(rows_frame, width=column_widths[key], height=32)
+                    cell.grid(row=row, column=col, sticky='ew')
+                    cell.grid_propagate(False)
+                    cell.grid_columnconfigure(0, weight=1)
+                    cells.append(cell)
+
+                name_lbl = tk.Label(cells[0], text=obj_name, cursor='hand2')
                 if not has_cargo(obj):
                     name_lbl.configure(fg='red')
-                name_lbl.grid(row=row, column=0, sticky='w', padx=2, pady=2)
+                name_lbl.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
                 name_lbl.bind("<Button-1>", lambda e, n=obj_name: open_ct_dialog(n))
 
                 type_var = tk.StringVar(value=otype)
-                type_cb = ttk.Combobox(rows_frame, textvariable=type_var, values=type_values, state='readonly', width=10)
-                type_cb.grid(row=row, column=1, sticky='w', padx=2, pady=2)
+                type_cb = ttk.Combobox(cells[1], textvariable=type_var, values=type_values, state='readonly', width=10)
+                type_cb.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
 
                 current_side = _first_side(obj)
                 side_values = list(valid_sides)
                 if current_side and current_side not in side_values:
                     side_values = [current_side] + side_values
                 side_var = tk.StringVar(value=current_side)
-                side_cb = ttk.Combobox(rows_frame, textvariable=side_var, values=side_values, state='readonly', width=14)
-                side_cb.grid(row=row, column=2, sticky='w', padx=2, pady=2)
+                side_cb = ttk.Combobox(cells[2], textvariable=side_var, values=side_values, state='readonly', width=14)
+                side_cb.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
 
                 def apply_overview_side(*_, o=obj, v=side_var):
+                    if o.get('sides') == [v.get()]:
+                        return
+                    push_undo()
                     o['sides'] = [v.get()]
                     draw_map(ctx)
                     _maybe_resort_after_change('side')
@@ -4707,18 +4827,21 @@ def open_system_editor(filename: str) -> None:
 
                 hull_var = tk.StringVar(value=obj.get('hull', ''))
                 hull_vals = platform_hulls if type_var.get() == 'platform' else valid_hulls
-                hull_cb = ttk.Combobox(rows_frame, textvariable=hull_var, values=hull_vals, state='readonly', width=16)
-                hull_cb.grid(row=row, column=3, sticky='w', padx=2, pady=2)
+                hull_cb = ttk.Combobox(cells[3], textvariable=hull_var, values=hull_vals, state='readonly', width=16)
+                hull_cb.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
 
                 def apply_overview_hull(*_, o=obj, v=hull_var):
+                    if o.get('hull') == v.get():
+                        return
+                    push_undo()
                     o['hull'] = v.get()
                     draw_map(ctx)
                     _maybe_resort_after_change('hull')
 
                 hull_var.trace_add('write', apply_overview_hull)
 
-                fac_frame = tk.Frame(rows_frame)
-                fac_frame.grid(row=row, column=4, sticky='w', padx=2, pady=2)
+                fac_frame = tk.Frame(cells[4])
+                fac_frame.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
                 facs = obj.get('facilities', [])
                 dock_var = tk.BooleanVar(value="Docking" in facs)
                 refuel_var = tk.BooleanVar(value="Refuel" in facs)
@@ -4732,6 +4855,9 @@ def open_system_editor(filename: str) -> None:
                         new_list.append("Refuel")
                     if pv.get():
                         new_list.append("Repair")
+                    if o.get('facilities', []) == new_list:
+                        return
+                    push_undo()
                     o['facilities'] = new_list
                     _maybe_resort_after_change('facilities')
 
@@ -4748,32 +4874,14 @@ def open_system_editor(filename: str) -> None:
                     rcb.configure(state=state)
                     pcb.configure(state=state)
 
-                def on_type_change(*_, o=obj, tv=type_var, hv=hull_var, hcb=hull_cb, sfs=set_facility_state):
-                    new_type = tv.get()
-                    o['type'] = new_type
-                    if new_type == 'platform':
-                        vals = list(platform_hulls)
-                        curr = hv.get()
-                        if curr and curr not in vals:
-                            vals = [curr] + vals
-                        hcb['values'] = vals
-                        sfs(False)
-                    else:
-                        vals = list(valid_hulls)
-                        curr = hv.get()
-                        if curr and curr not in vals:
-                            vals = [curr] + vals
-                        hcb['values'] = vals
-                        sfs(True)
-                    refresh_objects_list()
-                    draw_map(ctx)
-                    _maybe_resort_after_change('type')
+                def on_type_change(*_, n=obj_name, tv=type_var):
+                    convert_station_type(n, tv.get())
 
                 type_var.trace_add('write', on_type_change)
                 set_facility_state(type_var.get() == 'station')
 
-                cargo_frame = tk.Frame(rows_frame)
-                cargo_frame.grid(row=row, column=5, sticky='w', padx=2, pady=2)
+                cargo_frame = tk.Frame(cells[5])
+                cargo_frame.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
                 cargo_lbl = tk.Label(cargo_frame, text=_cargo_team_summary(obj))
                 if not has_cargo(obj):
                     cargo_lbl.configure(fg='red')
@@ -4782,6 +4890,33 @@ def open_system_editor(filename: str) -> None:
 
                 row += 1
 
+            # Size for the actual font/DPI and contents on first open. Later
+            # rebuilds retain the user's column widths, including after undo.
+            rows_frame.update_idletasks()
+            for col, (key, _, _) in enumerate(overview_columns):
+                cells = rows_frame.grid_slaves(column=col)
+                for cell in cells:
+                    children = cell.winfo_children()
+                    cell.configure(height=max([32] + [child.winfo_reqheight() + 4 for child in children]))
+                if initial_layout:
+                    content_width = max([column_widths[key]] + [
+                        child.winfo_reqwidth() + 8 for cell in cells
+                        for child in cell.winfo_children()])
+                    column_widths[key] = min(500, content_width)
+                    rows_frame.grid_columnconfigure(col, minsize=column_widths[key])
+                    for cell in cells:
+                        cell.configure(width=column_widths[key])
+            if initial_layout:
+                width = min(sum(column_widths.values()) + 40, list_win.winfo_screenwidth() - 80)
+                list_win.geometry(f"{width}x{min(700, list_win.winfo_screenheight() - 100)}")
+                initial_layout = False
+            _sync_width(None)
+
+        overview_refreshers[list_win] = build_rows
+        def on_destroy(event):
+            if event.widget == list_win:
+                overview_refreshers.pop(list_win, None)
+        list_win.bind('<Destroy>', on_destroy, add='+')
         build_rows()
 
     def show_info():
@@ -4793,6 +4928,7 @@ def open_system_editor(filename: str) -> None:
             "Map Editor For TSN Sandbox by Fish\n"
             "For 1.0.6 of Cosmos and TSN Mod Acendence+\n\n"
             "Help & Styling Guidelines:\n\n"
+            "- Ctrl+Z: Undo; Ctrl+X: Redo (up to 10 actions)\n"
             "- G will cycle grid options\n"
             "- Avoid special Charecters in names\n"
             "- Hide on Map Tickbox will stop that item from beeing shown\n"

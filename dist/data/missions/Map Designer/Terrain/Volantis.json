@@ -1,8 +1,8 @@
 {
     "systemMapCoord": [
-        -18186.910352468014,
+        -18186.910352468018,
         0,
-        -5484.507434257612
+        -5484.507434257614
     ],
     "systemalignment": "Torgoth",
     "metadata": {
@@ -24,7 +24,7 @@
         "skybox": "sky1.png",
         "original_author": "Draeco",
         "revision_date": "2026-09-12",
-        "revision_number": 19,
+        "revision_number": 20,
         "all_authors": [
             "Fish Evans",
             "Draeco"
@@ -32,46 +32,6 @@
         "last_revision_author": "Fish Evans"
     },
     "objects": {
-        "Volantis Command": {
-            "coordinate": [
-                -51251.5,
-                0.0,
-                -47446.12109375
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_command",
-            "type": "station",
-            "facilities": [
-                "Docking",
-                "Refuel",
-                "Repair"
-            ],
-            "cargo": {
-                "Homing": 75,
-                "Nuke": 12,
-                "EMP": 12,
-                "Mine": 12,
-                "High Yield Warhead": 15,
-                "Warhead": 60,
-                "Torpedo Casing": 40,
-                "Casing": 16,
-                "Transmitter": 35,
-                "Navigational Array": 1,
-                "Tactical Array": 10,
-                "Sensor Suite": 6,
-                "Guidance System": 60,
-                "Receiver": 15
-            },
-            "teams": {
-                "DamCon": 8,
-                "Medics": 2,
-                "Combat Engineers": 10,
-                "Marines": 5
-            },
-            "description": ""
-        },
         "Sierra Gate": {
             "coordinate": [
                 167911.5626237714,
@@ -93,7 +53,7 @@
                 -50898.69294379421
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "starbase_industry",
             "type": "station",
@@ -102,58 +62,34 @@
                 "Refuel"
             ],
             "cargo": {
-                "Alerite": 54,
-                "Cabrite": 35,
-                "Ashfilum": 58,
-                "Denebite": 50,
-                "Aegirine": 191,
-                "Nuidinium": 59,
-                "Gredian": 10,
-                "Warhead": 5,
-                "Micro Controller": 8,
-                "Power Relay": 16,
-                "Casing": 15,
-                "Homing": 5,
-                "Torpedo Casing": 10
+                "Fuel Cell 100": 5,
+                "Fuel Cell 200": 2,
+                "Warning Buoy": 5,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Disruptor": 8,
+                "EMP": 12,
+                "Homing": 75,
+                "Mine": 12,
+                "Nuke": 12,
+                "Penetration": 6,
+                "Scorch": 25,
+                "Casing": 16,
+                "Guidance System": 60,
+                "High Yield Warhead": 15,
+                "Power Relay": 8,
+                "Receiver": 15,
+                "Sensor Suite": 6,
+                "Torpedo Casing": 40,
+                "Transmitter": 35,
+                "Warhead": 60,
+                "Mexalon": 5
             },
             "teams": {
+                "Combat Engineers": 2,
                 "DamCon": 5,
-                "Medics": 3
-            },
-            "description": ""
-        },
-        "DS 71": {
-            "coordinate": [
-                -48340.31982263772,
-                0,
-                -48996.59856404612
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "starbase_industry",
-            "type": "station",
-            "facilities": [
-                "Docking",
-                "Refuel"
-            ],
-            "cargo": {
-                "Repair Materials": 16,
-                "Medical Supplies": 10,
-                "Iso B Circuit": 25,
-                "Container": 25,
-                "Life Support": 1,
-                "Micro Controller": 8,
-                "Power Relay": 16,
-                "Aid Package": 16,
-                "Torpedo Casing": 5,
-                "Casing": 6,
-                "Coffee": 5,
-                "Tea": 5,
-                "Alcohol": 5
-            },
-            "teams": {
-                "Diplomats": 1
+                "Marines": 4,
+                "Medics": 2
             },
             "description": ""
         },
@@ -164,7 +100,7 @@
                 49869.105750420815
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "starbase_industry",
             "type": "station",
@@ -201,7 +137,7 @@
                 48649.36997806377
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "starbase_command",
             "type": "station",
@@ -240,7 +176,7 @@
                 -65761.40188807424
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "starbase_industry",
             "type": "station",
@@ -273,7 +209,7 @@
                 42956.104374497234
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "starbase_civil",
             "type": "station",
@@ -303,7 +239,7 @@
                 50944.840857631396
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_beam",
             "type": "platform",
@@ -317,21 +253,7 @@
                 -64411.060765708964
             ],
             "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_beam",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "WP 78": {
-            "coordinate": [
-                47739.562445418334,
-                0,
-                49728.162669534766
-            ],
-            "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_beam",
             "type": "platform",
@@ -340,12 +262,12 @@
         },
         "WP 1": {
             "coordinate": [
-                50900.58560386793,
+                40037.93377327851,
                 0,
-                47397.99600972959
+                42349.79266937269
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_beam",
             "type": "platform",
@@ -359,7 +281,7 @@
                 -67386.14303397431
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_beam",
             "type": "platform",
@@ -373,7 +295,7 @@
                 48774.87892967857
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_beam",
             "type": "platform",
@@ -408,76 +330,6 @@
             "state": "Tethered",
             "drift": 0
         },
-        "WP 86": {
-            "coordinate": [
-                -50609.6638146587,
-                0,
-                -44135.11213283773
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_torp",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "WP 75": {
-            "coordinate": [
-                -53897.105914536754,
-                0,
-                -51525.271155785005
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_torp",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "WP 32": {
-            "coordinate": [
-                -45874.78963480386,
-                0,
-                -50746.40549755851
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_torp",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "QRF 63": {
-            "coordinate": [
-                -58539.87217884765,
-                0,
-                -44774.06363027776
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_fighter",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "QRF 18": {
-            "coordinate": [
-                -43062.25381857075,
-                0,
-                -43697.35974434545
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_fighter",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
         "QRF 4": {
             "coordinate": [
                 -49253.30116268151,
@@ -485,51 +337,9 @@
                 -56886.98234701619
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_fighter",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "WP 61": {
-            "coordinate": [
-                169067.47541389934,
-                0,
-                68759.03995062043
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_torp",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "WP 47": {
-            "coordinate": [
-                172767.08729047517,
-                0,
-                61359.81619746873
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_torp",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "WP 98": {
-            "coordinate": [
-                164069.754106946,
-                0,
-                61684.343555063104
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_torp",
             "type": "platform",
             "cargo": {},
             "teams": {}
@@ -541,51 +351,9 @@
                 63112.26392847834
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_beam",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "QRF 48": {
-            "coordinate": [
-                157059.96318290755,
-                0,
-                56556.81130507202
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_fighter",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "QRF 35": {
-            "coordinate": [
-                169031.78052002657,
-                0,
-                75143.15043711726
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_fighter",
-            "type": "platform",
-            "cargo": {},
-            "teams": {}
-        },
-        "QRF 76": {
-            "coordinate": [
-                179109.72889235296,
-                0,
-                56925.32068714266
-            ],
-            "sides": [
-                "USFP"
-            ],
-            "hull": "defense_platform_fighter",
             "type": "platform",
             "cargo": {},
             "teams": {}
@@ -597,7 +365,7 @@
                 47600.58839138723
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -611,7 +379,7 @@
                 45465.468440563774
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -625,7 +393,7 @@
                 -63846.507150574995
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -639,7 +407,7 @@
                 41449.95361999646
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_fighter",
             "type": "platform",
@@ -653,7 +421,7 @@
                 -69394.804108971
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_fighter",
             "type": "platform",
@@ -667,7 +435,7 @@
                 -98982.5773121365
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -681,7 +449,7 @@
                 -113048.29233271263
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -695,7 +463,7 @@
                 78727.40181735245
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -709,7 +477,7 @@
                 64837.92168882572
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "defense_platform_torp",
             "type": "platform",
@@ -723,7 +491,7 @@
                 -138404.78100569797
             ],
             "sides": [
-                "USFP"
+                "Torgoth"
             ],
             "hull": "starbase_civil",
             "type": "station",
@@ -762,6 +530,48 @@
                 "Medics": 5
             },
             "description": ""
+        },
+        "WP 26": {
+            "coordinate": [
+                -51797.375693714734,
+                0,
+                -50237.50201690655
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 11": {
+            "coordinate": [
+                -49138.05429120529,
+                0,
+                -48840.23144948633
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "arvonian_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
+        },
+        "WP 49": {
+            "coordinate": [
+                -48507.02887366068,
+                0,
+                -49471.25686703094
+            ],
+            "sides": [
+                "Torgoth"
+            ],
+            "hull": "hegemony_beam_platform",
+            "type": "platform",
+            "cargo": {},
+            "teams": {}
         }
     },
     "terrain": {
@@ -1622,6 +1432,39 @@
             ],
             "density": 31,
             "scatter": 16000
+        },
+        "1789230261266": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -42692.58038342817,
+                0,
+                -43792.028109129424
+            ],
+            "density": 30,
+            "scatter": 10000
+        },
+        "1789230270822": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                -44540.58339195168,
+                0,
+                -56097.023751249384
+            ],
+            "density": 30,
+            "scatter": 10000
+        },
+        "1789230427491": {
+            "type": "debris_field",
+            "seed": 2010,
+            "coordinate": [
+                166422.13914342338,
+                0,
+                63920.260249664134
+            ],
+            "density": 70,
+            "scatter": 30000
         }
     },
     "traffic": {
