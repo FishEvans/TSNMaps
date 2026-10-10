@@ -2,11 +2,17 @@ import os
 import json
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-import importlib.util
 from PIL import Image, ImageTk
 import math
-import LocMapGen, GalMapGen, LibraryGen, ProductionFlowGen
-import SystemEditor  # New module for dedicated system editing
+import LibraryGen
+from MapGeneration import generate_maps, configure_generators
+from ToolsWindow import open_tools
+from scripts import ShipImageExtractor
+import SystemEditor
+import EditorSettings
+from MapMetadata import get_incoming_only_gate_names, _normalize_author_list, _coerce_revision_number
+from MapTypes import object_has_blank_or_invalid_hull, system_has_blank_or_invalid_station_hull
+from GalacticMapData import (build_author_meta, normalize_system_record, build_author_source, apply_system_record_to_data)
 import sys
 import SystemTemplates
 import copy
@@ -15,17 +21,14 @@ import datetime
 import webbrowser
 from pathlib import Path
 import SystemMetaOptions as smopts
+from JsonStorage import atomic_write_json, commit_json_updates
+from MapConsistency import (is_gate, system_key, validate_map_coordinate,
+                            parse_map_coordinate_fields, read_system_documents, find_gate_candidates)
 
 # Helper to locate resources in bundled or source context
-def get_base_path():
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(os.path.abspath(__file__))
+from AppPaths import get_base_path
 
 
-STATION_OR_PLATFORM_TYPES = {"station", "platform"}
-INCOMING_ONLY_GATES_KEY = "incomingOnlyGates"
-INCOMING_ONLY_GATES_ALIASES = (INCOMING_ONLY_GATES_KEY, "incoming_only_gates")
 APP_ICON_FILENAME = "Icon.png"
 
 
@@ -45,41 +48,10 @@ def load_valid_hull_keys():
     }
 
 
-def object_has_blank_or_invalid_hull(obj, valid_hull_keys):
-    if not isinstance(obj, dict):
-        return False
-    if str(obj.get("type", "")).strip().lower() not in STATION_OR_PLATFORM_TYPES:
-        return False
-    hull = str(obj.get("hull", "") or "").strip()
-    if not hull:
-        return True
-    return bool(valid_hull_keys) and hull.casefold() not in valid_hull_keys
 
 
-def system_has_blank_or_invalid_station_hull(data, valid_hull_keys):
-    objects = data.get("objects", {}) if isinstance(data, dict) else {}
-    if not isinstance(objects, dict):
-        return False
-    return any(object_has_blank_or_invalid_hull(obj, valid_hull_keys) for obj in objects.values())
 
 
-def get_incoming_only_gate_names(data):
-    meta = data.get("metadata", {}) if isinstance(data, dict) else {}
-    if not isinstance(meta, dict):
-        return set()
-
-    names = set()
-    for key in INCOMING_ONLY_GATES_ALIASES:
-        raw_names = meta.get(key, [])
-        if isinstance(raw_names, str):
-            raw_names = [raw_names]
-        if not isinstance(raw_names, (list, tuple, set)):
-            continue
-        for name in raw_names:
-            cleaned = str(name or "").strip()
-            if cleaned:
-                names.add(cleaned.casefold())
-    return names
 
 
 def draw_red_cross(canvas, sx, sy, radius, width, tags):
@@ -157,7 +129,7 @@ class SystemMapEditor:
             "Map",
             [
                 ("Reload Systems", self.reload_systems_data),
-                ("Re-generate Ship Data", self.regenerate_ship_data),
+                ("Tools", self.open_tools),
                 ("\u2699", self.open_settings_editor),
             ],
         )
@@ -180,30 +152,14 @@ class SystemMapEditor:
         )
 
     def _get_index_html_path(self):
-        return Path(SystemEditor.get_html_output_path()) / "index.html"
+        return Path(EditorSettings.get_html_output_path()) / "index.html"
 
-    def _get_ship_image_extractor_path(self):
-        return Path(get_base_path()) / "scripts" / "ShipImageExtractor.py"
+    def open_tools(self):
+        open_tools(self)
 
     def _run_generators(self):
-        systems_dir = Path(SystemEditor.get_data_path())
-        html_dir = Path(SystemEditor.get_html_output_path())
-        LocMapGen.JSON_FOLDER = systems_dir
-        LocMapGen.DEFAULT_HTML_DIR = html_dir
-        GalMapGen.JSON_FOLDER = systems_dir
-        GalMapGen.HTML_OUTPUT = html_dir / "index.html"
-        LibraryGen.HTML_DIR = html_dir
-        LibraryGen.SHIPS_DIR = html_dir / "Images" / "Ships"
-        LibraryGen.FACTIONS_DIR = html_dir / "Images" / "Factions"
-        LibraryGen.SHIPMAP_PATH = LibraryGen.SHIPS_DIR / "ShipMap.json"
-        LibraryGen.SETTINGS_PATH = Path(SystemEditor.get_settings_path())
-        LibraryGen.OUTPUT_PATH = html_dir / "Library.html"
-        ProductionFlowGen.HTML_DIR = html_dir
-        ProductionFlowGen.OUTPUT_PATH = html_dir / "ProductionFlow.html"
-        LocMapGen.main()
-        GalMapGen.main()
-        LibraryGen.main()
-        ProductionFlowGen.main()
+        generate_maps(EditorSettings.get_data_path(), EditorSettings.get_html_output_path(),
+                      EditorSettings.get_settings_path())
 
     def _open_index_html(self):
         index_path = self._get_index_html_path()
@@ -289,7 +245,7 @@ class SystemMapEditor:
 
     def _load_settings(self):
         try:
-            data = SystemEditor.load_editor_settings()
+            data = EditorSettings.load_editor_settings()
             return data if isinstance(data, dict) else {}
         except Exception:
             return {}
@@ -307,8 +263,8 @@ class SystemMapEditor:
         dlg.grab_set()
         dlg.resizable(False, False)
 
-        default_systems = SystemEditor.get_default_data_path()
-        default_html = SystemEditor.get_default_html_path()
+        default_systems = EditorSettings.get_default_data_path()
+        default_html = EditorSettings.get_default_html_path()
         systems_var = tk.StringVar(value=str(settings.get("systemMapsPath", "") or default_systems))
         html_var = tk.StringVar(value=str(settings.get("htmlOutputPath", "") or default_html))
 
@@ -318,7 +274,7 @@ class SystemMapEditor:
         ).grid(row=0, column=0, columnspan=3, sticky="w", padx=12, pady=(12, 8))
 
         def browse(var, title, fallback):
-            initial = str(SystemEditor.resolve_configured_path(var.get(), fallback))
+            initial = str(EditorSettings.resolve_configured_path(var.get(), fallback))
             if not os.path.isdir(initial):
                 initial = fallback
             selected = filedialog.askdirectory(parent=dlg, title=title, initialdir=initial)
@@ -349,7 +305,7 @@ class SystemMapEditor:
                 ("System map JSON folder", system_path, default_systems),
                 ("Generated HTML folder", html_path, default_html),
             ):
-                target = SystemEditor.resolve_configured_path(value, fallback)
+                target = EditorSettings.resolve_configured_path(value, fallback)
                 try:
                     target.mkdir(parents=True, exist_ok=True)
                 except Exception as exc:
@@ -360,7 +316,7 @@ class SystemMapEditor:
                     return False
             settings["systemMapsPath"] = str(system_path).strip() or default_systems
             settings["htmlOutputPath"] = str(html_path).strip() or default_html
-            SystemEditor.save_editor_settings(settings)
+            EditorSettings.save_editor_settings(settings)
             self.settings_config = dict(settings)
             return True
 
@@ -380,6 +336,8 @@ class SystemMapEditor:
         self.root.wait_window(dlg)
 
     def open_settings_editor(self):
+        if not self._confirm_pending_map_changes("changing settings"):
+            return
         def refresh_settings(new_settings):
             self.settings_config = new_settings if isinstance(new_settings, dict) else self._load_settings()
             self.load_galmapinfo()
@@ -409,7 +367,7 @@ class SystemMapEditor:
         return skyboxes if isinstance(skyboxes, list) else []
 
     def _get_systems_dir(self):
-        return SystemEditor.get_data_path()
+        return EditorSettings.get_data_path()
 
     def _get_system_file_path(self, filename):
         return os.path.join(self._get_systems_dir(), filename)
@@ -420,7 +378,7 @@ class SystemMapEditor:
             print(f"Systems directory not found: {systems_dir}")
             return
         for filename in os.listdir(systems_dir):
-            if filename.endswith(".json") and filename != "package.json":
+            if filename.casefold().endswith(".json") and filename.casefold() not in ("package.json", "galmapinfo.json"):
                 yield filename
 
     def _load_system_json(self, filename):
@@ -428,8 +386,8 @@ class SystemMapEditor:
             return json.load(f)
 
     def _write_system_json(self, filename, data):
-        with open(self._get_system_file_path(filename), "w") as f:
-            json.dump(data, f, indent=4)
+        atomic_write_json(self._get_system_file_path(filename), data)
+        self.saved_system_coords[filename] = copy.deepcopy(data.get("systemMapCoord"))
 
     def _system_name_from_filename(self, filename):
         return os.path.splitext(os.path.basename(filename))[0]
@@ -456,10 +414,7 @@ class SystemMapEditor:
         return f"{cleaned}.json"
 
     def _system_destination_key(self, value):
-        key = str(value or "").strip().casefold()
-        if key.endswith(".json"):
-            key = key[:-5]
-        return key
+        return system_key(value)
 
     def _renamed_destination_value(self, original_value, new_system_name):
         original = str(original_value or "").strip()
@@ -477,7 +432,7 @@ class SystemMapEditor:
         for obj in objects.values():
             if not isinstance(obj, dict):
                 continue
-            if str(obj.get("type", "")).strip().lower() not in ("jumpnode", "jumppoint", "jump_point"):
+            if not is_gate(obj):
                 continue
             destinations = obj.get("destinations")
             if not isinstance(destinations, dict):
@@ -489,67 +444,33 @@ class SystemMapEditor:
                 changed = True
         return changed
 
-    def _rename_system_file(self, old_filename, new_filename):
-        if old_filename == new_filename:
-            return
-
-        old_path = self._get_system_file_path(old_filename)
-        new_path = self._get_system_file_path(new_filename)
-        old_abs = os.path.abspath(old_path)
-        new_abs = os.path.abspath(new_path)
-        same_file = os.path.normcase(old_abs) == os.path.normcase(new_abs)
-
-        if os.path.exists(new_path) and not same_file:
-            raise FileExistsError(f"{new_filename} already exists.")
-        if not os.path.exists(old_path):
-            raise FileNotFoundError(old_path)
-
-        if same_file:
-            temp_filename = f".__rename_tmp__{os.getpid()}.json"
-            temp_path = self._get_system_file_path(temp_filename)
-            suffix = 1
-            while os.path.exists(temp_path):
-                temp_filename = f".__rename_tmp__{os.getpid()}_{suffix}.json"
-                temp_path = self._get_system_file_path(temp_filename)
-                suffix += 1
-            os.replace(old_path, temp_path)
-            os.replace(temp_path, new_path)
-        else:
-            os.replace(old_path, new_path)
-
     def rename_system(self, old_filename, new_system_name):
         new_filename = self._normalize_system_filename_from_input(new_system_name)
-        old_system_name = self._system_name_from_filename(old_filename)
-        new_system_name = self._system_name_from_filename(new_filename)
         if old_filename == new_filename:
             return old_filename
-
-        self._rename_system_file(old_filename, new_filename)
-
-        for filename in list(self._iter_system_filenames()):
-            try:
-                data = self._load_system_json(filename)
-            except (OSError, json.JSONDecodeError):
-                print(f"Warning: Could not parse {filename}, skipping destination rename.")
-                continue
+        old_system_name = self._system_name_from_filename(old_filename)
+        new_system_name = self._system_name_from_filename(new_filename)
+        documents, originals = read_system_documents(self._get_systems_dir())
+        old_path = Path(self._get_system_file_path(old_filename))
+        new_path = Path(self._get_system_file_path(new_filename))
+        if old_path not in documents:
+            raise FileNotFoundError(old_path)
+        updates = {}
+        for path, data in documents.items():
             if self._rewrite_destination_system_names(data, old_system_name, new_system_name):
-                try:
-                    self._write_system_json(filename, data)
-                except OSError:
-                    print(f"Failed to update destinations in {filename}")
-
+                updates[path] = data
+        # Keep an open editor from later recreating the old system filename.
+        for window in self.root.winfo_children():
+            editing = getattr(window, "system_file_path", None)
+            if isinstance(editing, (str, Path)) and Path(editing).resolve() == old_path.resolve():
+                raise ValueError("Close this system's editor before renaming the system.")
+        commit_json_updates(updates, expected=originals, rename=(old_path, new_path))
+        if old_filename in self.saved_system_coords:
+            self.saved_system_coords[new_filename] = self.saved_system_coords.pop(old_filename)
         if old_filename in self.systems:
             self.systems[new_filename] = self.systems.pop(old_filename)
-
-        for system in self.systems.values():
-            cached_data = {"objects": {}}
-            for jp in system.get("jump_points", []):
-                if not isinstance(jp, dict):
-                    continue
-                jp_name = jp.get("name", "")
-                cached_data["objects"][jp_name] = jp
-            self._rewrite_destination_system_names(cached_data, old_system_name, new_system_name)
-
+        for filename in list(self.systems):
+            self._refresh_system_record_from_disk(filename)
         self.clear_selection()
         self.redraw_map()
         return new_filename
@@ -562,153 +483,38 @@ class SystemMapEditor:
             return False
 
         fallback_author_meta = previous.get("author_meta", {}) if isinstance(previous, dict) else {}
-        refreshed = self._normalize_system_record(data, fallback_author_meta=fallback_author_meta)
+        try:
+            refreshed = self._normalize_system_record(data, fallback_author_meta=fallback_author_meta)
+        except ValueError:
+            return False
         if refreshed is None:
             return False
 
         if isinstance(previous, dict):
+            # A child editor refresh must not discard a pending map drag.
+            if previous.get("coord") != self.saved_system_coords.get(filename):
+                refreshed["coord"] = copy.deepcopy(previous.get("coord", refreshed["coord"]))
             for key in ("canvas_items", "link_lines", "incoming_lines"):
                 refreshed[key] = previous.get(key, [])
 
+        self.saved_system_coords[filename] = copy.deepcopy(data.get("systemMapCoord"))
         self.systems[filename] = refreshed
         return True
 
     def _build_author_meta(self, meta, fallback=None):
-        if not isinstance(meta, dict):
-            meta = {}
-        if not isinstance(fallback, dict):
-            fallback = {}
-        all_authors = meta.get("all_authors", fallback.get("all_authors", []))
-        if not isinstance(all_authors, list):
-            all_authors = []
-        return {
-            "original_author": meta.get("original_author", fallback.get("original_author", "")),
-            "last_revision_author": meta.get(
-                "last_revision_author",
-                meta.get("last_author", fallback.get("last_revision_author", "")),
-            ),
-            "revision_number": meta.get("revision_number", fallback.get("revision_number", 0)),
-            "revision_date": meta.get("revision_date", fallback.get("revision_date", "")),
-            "all_authors": list(all_authors),
-        }
+        return build_author_meta(meta, fallback)
 
     def _normalize_system_record(self, data, fallback_author_meta=None):
-        if not isinstance(data, dict) or "systemMapCoord" not in data:
-            return None
-
-        meta = data.get("metadata", {})
-        if not isinstance(meta, dict):
-            meta = {}
-
-        objects = data.get("objects", {})
-        if not isinstance(objects, dict):
-            objects = {}
-
-        jump_points = [
-            {"name": key, **value}
-            for key, value in objects.items()
-            if isinstance(value, dict) and value.get("type") in ("jumpnode", "jumppoint")
-        ]
-
-        intel = meta.get("intel", {})
-        if not isinstance(intel, dict):
-            intel = {}
-
-        traffic = data.get("traffic", {})
-        if not isinstance(traffic, dict):
-            traffic = {}
-
-        coord = data.get("systemMapCoord", [0, 0, 0])
-        if not isinstance(coord, list):
-            coord = list(coord) if isinstance(coord, tuple) else [0, 0, 0]
-
-        exports = meta.get("exports", [])
-        if not isinstance(exports, list):
-            exports = []
-
-        return {
-            "coord": list(coord),
-            "alignment": data.get("systemalignment", "Unknown"),
-            "description": meta.get("sysdescription", ""),
-            "security": meta.get("security", "Neutral"),
-            "exports": list(exports),
-            "focus": meta.get("focus", ""),
-            "intel": dict(intel),
-            "development": meta.get("development", "Unclaimed"),
-            "visible": meta.get("visible", True),
-            "skybox": meta.get("skybox", ""),
-            "traffic": dict(traffic),
-            "author_meta": self._build_author_meta(meta, fallback_author_meta),
-            "jump_points": jump_points,
-            "incoming_only_gates": get_incoming_only_gate_names(data),
-            "has_invalid_station_hull": system_has_blank_or_invalid_station_hull(
-                data, getattr(self, "valid_hull_keys", set())
-            ),
-            "canvas_items": [],
-            "link_lines": [],
-            "incoming_lines": [],
-        }
+        record = normalize_system_record(data, fallback_author_meta, getattr(self, "valid_hull_keys", set()))
+        if record is not None:
+            record.update(canvas_items=[], link_lines=[], incoming_lines=[])
+        return record
 
     def _build_author_source(self, data, author_meta):
-        meta = data.get("metadata", {})
-        if not isinstance(meta, dict):
-            meta = {}
-
-        author_source = dict(meta)
-        if isinstance(author_meta, dict):
-            for key, value in author_meta.items():
-                if author_source.get(key) in (None, "", []):
-                    author_source[key] = value
-
-        for key in (
-            "original_author",
-            "last_revision_author",
-            "last_author",
-            "revision_number",
-            "revision_date",
-            "all_authors",
-        ):
-            if author_source.get(key) in (None, "", []):
-                top_level_value = data.get(key)
-                if top_level_value not in (None, "", []):
-                    author_source[key] = top_level_value
-        return author_source
+        return build_author_source(data, author_meta)
 
     def _apply_system_record_to_data(self, data, system_data, coord_override=None):
-        if not isinstance(data, dict):
-            data = {}
-
-        coord = coord_override if coord_override is not None else system_data.get("coord")
-        if coord:
-            data["systemMapCoord"] = coord
-
-        data["systemalignment"] = system_data.get("alignment", data.get("systemalignment", ""))
-        metadata = data.get("metadata", {})
-        if not isinstance(metadata, dict):
-            metadata = {}
-
-        metadata.update({
-            "sysdescription": system_data.get("description", ""),
-            "security": system_data.get("security", "Neutral"),
-            "exports": system_data.get("exports", []),
-            "focus": system_data.get("focus", ""),
-            "intel": system_data.get("intel", {}),
-            "development": system_data.get("development", "Unclaimed"),
-            "visible": system_data.get("visible", True),
-            "skybox": system_data.get("skybox", metadata.get("skybox", "")),
-        })
-
-        author_meta = system_data.get("author_meta", {})
-        if isinstance(author_meta, dict):
-            metadata.update(author_meta)
-
-        data["metadata"] = metadata
-
-        traffic = system_data.get("traffic", {})
-        if isinstance(traffic, dict):
-            data["traffic"] = traffic
-
-        return data
+        return apply_system_record_to_data(data, system_data, coord_override)
 
     def _save_system_record(self, filename, coord_override=None):
         data = self._load_system_json(filename)
@@ -716,116 +522,45 @@ class SystemMapEditor:
         self._write_system_json(filename, data)
 
     def auto_link_gates(self):
-        systems_dir = self._get_systems_dir()
-        if not os.path.isdir(systems_dir):
-            print(f"Systems directory not found: {systems_dir}")
-            return
-
-        system_files = {}
-        system_paths = {}
-        for filename in os.listdir(systems_dir):
-            if not filename.endswith(".json") or filename == "package.json":
-                continue
-            system_name = filename[:-5]
-            system_files[system_name.lower()] = filename
-            system_paths[filename] = os.path.join(systems_dir, filename)
-
-        system_data = {}
-        for filename, path in system_paths.items():
-            try:
-                with open(path, "r") as f:
-                    system_data[filename] = json.load(f)
-            except (IOError, json.JSONDecodeError):
-                print(f"Warning: Could not parse {filename}, skipping.")
-
-        updates = {}
-        for filename, data in system_data.items():
-            objects = data.get("objects", {})
-            if not isinstance(objects, dict):
-                continue
-            incoming_only_gates = get_incoming_only_gate_names(data)
-            current_system = filename[:-5]
-            current_system_lower = current_system.lower()
-            for gate_name, gate_data in objects.items():
-                if not isinstance(gate_data, dict):
-                    continue
-                if gate_data.get("type") not in ("jumpnode", "jumppoint"):
-                    continue
-                if str(gate_name).strip().casefold() in incoming_only_gates:
-                    continue
-                destinations = gate_data.get("destinations")
-                if isinstance(destinations, dict) and destinations:
-                    continue
-                words = re.findall(r"[A-Za-z0-9]+", gate_name)
-                if not words:
-                    continue
-                matched = False
-                fallback_system = None
-                for word in words:
-                    candidate_file = system_files.get(word.lower())
-                    if not candidate_file:
+        try:
+            documents, originals = read_system_documents(self._get_systems_dir())
+            updates, unresolved = {}, []
+            count = 0
+            for path, data in documents.items():
+                incoming_only = get_incoming_only_gate_names(data)
+                for name, gate in data.get("objects", {}).items():
+                    if not is_gate(gate) or name.strip().casefold() in incoming_only:
                         continue
-                    if candidate_file.lower() == filename.lower():
+                    if gate.get("destinations"):
                         continue
-                    if fallback_system is None:
-                        fallback_system = candidate_file
-                    candidate_data = system_data.get(candidate_file)
-                    if not isinstance(candidate_data, dict):
+                    candidates = find_gate_candidates(documents, path.stem, name)
+                    if len(candidates) != 1:
+                        reason = "ambiguous" if candidates else "no matching destination"
+                        unresolved.append(f"{path.stem} / {name}: {reason}")
                         continue
-                    candidate_objects = candidate_data.get("objects", {})
-                    if not isinstance(candidate_objects, dict):
-                        continue
-                    for candidate_gate_name, candidate_gate_data in candidate_objects.items():
-                        if not isinstance(candidate_gate_data, dict):
-                            continue
-                        if candidate_gate_data.get("type") not in ("jumpnode", "jumppoint"):
-                            continue
-                        if current_system_lower in candidate_gate_name.lower():
-                            dest_system_name = candidate_file[:-5]
-                            gate_data["destinations"] = {candidate_gate_name: dest_system_name}
-                            updates.setdefault(filename, []).append(
-                                (gate_name, candidate_gate_name, dest_system_name)
-                            )
-                            matched = True
-                            break
-                    if matched:
-                        break
-                if not matched and fallback_system:
-                    dest_system_name = fallback_system[:-5]
-                    gate_data["destinations"] = {gate_name: dest_system_name}
-                    updates.setdefault(filename, []).append(
-                        (gate_name, gate_name, dest_system_name)
-                    )
-
-        if not updates:
-            print("Auto Link Gates: no missing destinations matched.")
-            return
-
-        for filename in updates:
-            path = system_paths.get(filename)
-            if not path:
-                continue
-            try:
-                with open(path, "w") as f:
-                    json.dump(system_data[filename], f, indent=4)
-            except IOError:
-                print(f"Failed to write {filename}")
-
-        for filename, changes in updates.items():
-            if filename not in self.systems:
-                continue
-            jump_points = self.systems[filename].get("jump_points", [])
-            for gate_name, dest_gate_name, dest_system_name in changes:
-                for jp in jump_points:
-                    if jp.get("name") == gate_name:
-                        jp["destinations"] = {dest_gate_name: dest_system_name}
-                        break
-
+                    destination, destination_gate = candidates[0]
+                    gate["destinations"] = {destination_gate: destination.stem}
+                    updates[path] = data
+                    count += 1
+            commit_json_updates(updates, expected=originals)
+        except (OSError, ValueError, TypeError) as exc:
+            messagebox.showerror("Auto Link Gates", str(exc), parent=self.root)
+            return False
+        for path in updates:
+            if path.name in self.systems:
+                self._refresh_system_record_from_disk(path.name)
         self.redraw_map()
-        total = sum(len(changes) for changes in updates.values())
-        print(f"Auto Link Gates: updated {total} gate(s).")
+        messagebox.showinfo(
+            "Auto Link Gates",
+            f"Updated {count} gate(s)." +
+            ("\n\nUnchanged gates:\n" + "\n".join(unresolved) if unresolved else ""),
+            parent=self.root,
+        )
+        return True
 
     def reload_systems_data(self):
+        if not self._confirm_pending_map_changes("reloading systems"):
+            return
         self.systems = {}
         self.valid_hull_keys = load_valid_hull_keys()
         self.load_systems()
@@ -853,33 +588,14 @@ class SystemMapEditor:
         if not executable_path:
             return
 
-        script_path = self._get_ship_image_extractor_path()
-        if not script_path.exists():
-            messagebox.showerror(
-                "Re-generate Ship Data",
-                f"Ship image extractor script was not found:\n{script_path}",
-            )
-            return
-
-        validation_error_cls = None
+        validation_error_cls = ShipImageExtractor.ValidationError
         try:
-            spec = importlib.util.spec_from_file_location("ShipImageExtractor", script_path)
-            if spec is None or spec.loader is None:
-                raise ImportError(f"Unable to load module spec from {script_path}")
-
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            validation_error_cls = getattr(module, "ValidationError", None)
-            if not hasattr(module, "main"):
-                raise AttributeError("ShipImageExtractor.py does not define a main() function.")
-
-            prev_cwd = os.getcwd()
-            try:
-                os.chdir(get_base_path())
-                module.main(executable_path)
-                LibraryGen.main()
-            finally:
-                os.chdir(prev_cwd)
+            configure_generators(EditorSettings.get_data_path(),
+                                 EditorSettings.get_html_output_path(),
+                                 EditorSettings.get_settings_path())
+            ShipImageExtractor.DEST_ROOT = str(LibraryGen.SHIPS_DIR)
+            ShipImageExtractor.main(executable_path)
+            LibraryGen.main()
         except Exception as exc:
             if validation_error_cls and isinstance(exc, validation_error_cls):
                 messagebox.showwarning(
@@ -920,7 +636,11 @@ class SystemMapEditor:
             if not name:
                 messagebox.showerror("Invalid Input", "System name cannot be empty.")
                 return
-            filename = f"{name}.json"
+            try:
+                filename = self._normalize_system_filename_from_input(name)
+            except ValueError as exc:
+                messagebox.showerror("Invalid Input", str(exc), parent=top)
+                return
             file_path = self._get_system_file_path(filename)
             if os.path.exists(file_path):
                 messagebox.showerror("File Exists", f"{filename} already exists.")
@@ -949,7 +669,7 @@ class SystemMapEditor:
             editor_window = SystemEditor.open_system_editor(file_path)
             if editor_window is not None:
                 def _refresh_after_editor_close(close_event, target=filename, window=editor_window):
-                    if close_event.widget is not window:
+                    if close_event.widget is not window or getattr(self, "_closing", False):
                         return
                     if self._refresh_system_record_from_disk(target):
                         self.redraw_map()
@@ -1000,6 +720,7 @@ class SystemMapEditor:
         self.canvas.bind("<Button-3>", self.on_right_click)  # context edit
 
         self.systems = {}
+        self.saved_system_coords = {}
         self.borders = []
         self.texts = []
         self.valid_hull_keys = load_valid_hull_keys()
@@ -1020,6 +741,34 @@ class SystemMapEditor:
         self.draw_borders()
         self.draw_texts()
         self.draw_scale()
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def _map_has_unsaved_changes(self):
+        return (self.borders, self.texts) != self.saved_overlays or any(
+            system["coord"] != self.saved_system_coords.get(filename)
+            for filename, system in self.systems.items()
+        )
+
+    def _confirm_pending_map_changes(self, action):
+        if not self._map_has_unsaved_changes():
+            return True
+        response = messagebox.askyesnocancel(
+            "Unsaved map changes", f"Save map changes before {action}?",
+            parent=self.root,
+        )
+        if response is None:
+            return False
+        return self._save_map_data() if response else True
+
+    def on_close(self):
+        # Check child editors before destroying their parent window.
+        for window in self.root.winfo_children():
+            confirm = getattr(window, "confirm_pending_changes", None)
+            if callable(confirm) and not confirm("closing the application"):
+                return
+        if self._confirm_pending_map_changes("closing"):
+            self._closing = True
+            self.root.destroy()
 
     def load_galmapinfo(self):
         """Load borders and texts metadata from GalMapInfo.json"""
@@ -1033,17 +782,22 @@ class SystemMapEditor:
                 self.texts = data.get("texts", [])
             except json.JSONDecodeError:
                 print("Warning: Could not parse GalMapInfo.json, skipping.")
+        self.saved_overlays = copy.deepcopy((self.borders, self.texts))
 
     def load_systems(self):
         """Load system JSON files and cache their data for rendering."""
+        issues = []
         for filename in self._iter_system_filenames():
             try:
                 data = self._load_system_json(filename)
                 system_record = self._normalize_system_record(data)
                 if system_record is not None:
                     self.systems[filename] = system_record
-            except (OSError, json.JSONDecodeError):
-                print(f"Warning: Could not parse {filename}, skipping.")
+                    self.saved_system_coords[filename] = copy.deepcopy(system_record["coord"])
+            except (OSError, ValueError) as exc:
+                issues.append(f"{filename}: {exc}")
+        if issues:
+            messagebox.showwarning("Invalid system files", "Skipped files:\n\n" + "\n".join(issues), parent=self.root)
 
     def auto_center_and_zoom(self):
         if not self.systems:
@@ -1112,11 +866,11 @@ class SystemMapEditor:
         for filename, system in self.systems.items():
             names = set()
             for jp in system.get("jump_points", []):
-                if jp.get("type") not in ("jumpnode", "jumppoint"):
+                if not is_gate(jp):
                     continue
                 name = jp.get("name")
                 if name:
-                    names.add(name.lower())
+                    names.add(name.strip().casefold())
             gate_index[filename] = names
         return gate_index
 
@@ -1124,7 +878,7 @@ class SystemMapEditor:
         system = self.systems.get(filename, {})
         incoming_only_gates = system.get("incoming_only_gates", set())
         for jp in system.get("jump_points", []):
-            if jp.get("type") not in ("jumpnode", "jumppoint"):
+            if not is_gate(jp):
                 continue
             if str(jp.get("name", "")).strip().casefold() in incoming_only_gates:
                 continue
@@ -1134,20 +888,18 @@ class SystemMapEditor:
             for dest_gate_name, dest_system_name in destinations.items():
                 if not dest_gate_name or not dest_system_name:
                     return True
-                dest_system_key = str(dest_system_name).lower()
-                if dest_system_key.endswith(".json"):
-                    dest_system_key = dest_system_key[:-5]
+                dest_system_key = system_key(dest_system_name)
                 dest_filename = system_name_map.get(dest_system_key)
                 if not dest_filename:
                     return True
-                if dest_gate_name.lower() not in gate_index.get(dest_filename, set()):
+                if str(dest_gate_name).strip().casefold() not in gate_index.get(dest_filename, set()):
                     return True
         return False
 
     def draw_systems(self):
         """Draw each system with dynamic icon sizing based on current SCALE"""
         gate_index = self.build_gate_index()
-        system_name_map = {filename.replace(".json", "").lower(): filename for filename in self.systems.keys()}
+        system_name_map = {system_key(filename): filename for filename in self.systems}
         canvas_w, _ = self._get_canvas_size()
         max_scale = canvas_w / 1000.0
         size = max(70, int(160 * (self.SCALE / max_scale)))
@@ -1189,7 +941,7 @@ class SystemMapEditor:
             system["canvas_items"] = [img_id, *indicator_items, text_id]
 
     def draw_jump_links(self):
-        system_names = {filename.replace(".json", "").lower(): filename for filename in self.systems.keys()}
+        system_names = {system_key(filename): filename for filename in self.systems}
         for system in self.systems.values():
             system["link_lines"].clear()
             system["incoming_lines"].clear()
@@ -1199,15 +951,15 @@ class SystemMapEditor:
         for src_filename, system in self.systems.items():
             incoming_only_gates = system.get("incoming_only_gates", set())
             for jp in system["jump_points"]:
-                if jp.get("type") not in ["jumppoint", "jumpnode"]:
+                if not is_gate(jp):
                     continue
                 if str(jp.get("name", "")).strip().casefold() in incoming_only_gates:
                     continue
                 destinations = jp.get("destinations", {})
+                if not isinstance(destinations, dict):
+                    continue
                 for dest_system in destinations.values():
-                    dest_key = str(dest_system).lower()
-                    if dest_key.endswith(".json"):
-                        dest_key = dest_key[:-5]
+                    dest_key = system_key(dest_system)
                     dest_file = system_names.get(dest_key)
                     if not dest_file:
                         continue
@@ -1314,6 +1066,8 @@ class SystemMapEditor:
         self.redraw_map()
 
     def mouse_zoom(self, event):
+        if self.drag_data.get("item"):
+            return
         if event.delta > 0:
             self.zoom_in(event.x, event.y)
         else:
@@ -1413,8 +1167,9 @@ class SystemMapEditor:
         data = {"borders": valid_borders, "texts": self.texts}
         base = get_base_path()
         galinfo_path = os.path.join(base, "GalMapInfo.json")
-        with open(galinfo_path, 'w') as f:
-            json.dump(data, f, indent=4)
+        atomic_write_json(galinfo_path, data)
+        self.borders = valid_borders
+        self.saved_overlays = copy.deepcopy((self.borders, self.texts))
 
     def draw_borders(self):
         self.canvas.delete("border")
@@ -1523,7 +1278,7 @@ class SystemMapEditor:
                 target = system_hit["filename"]
 
                 def _refresh_after_editor_close(close_event, filename=target, window=editor_window):
-                    if close_event.widget is not window:
+                    if close_event.widget is not window or getattr(self, "_closing", False):
                         return
                     if self._refresh_system_record_from_disk(filename):
                         self.redraw_map()
@@ -1551,6 +1306,8 @@ class SystemMapEditor:
         self.drag_data["dragged"] = False
         self.drag_data["press_x"], self.drag_data["press_y"] = x, y
         self.drag_data["drag_distance"] = 0.0
+        self.drag_data["system_drag_scale"] = self.SCALE
+        self.drag_data["panning"] = False
         self.drag_data["system_start_coord"] = None
         self.drag_data["system_start_fname"] = None
         # Detect system under pointer for dragging
@@ -1596,10 +1353,14 @@ class SystemMapEditor:
                 fname = info
                 for cid in self.systems[fname]["canvas_items"]:
                     self.canvas.move(cid, dx, dy)
-                new_x, new_y = self.canvas.coords(self.systems[fname]["canvas_items"][0])
-                nx, _, ny = self.screen_to_coord(new_x, new_y)
-                self.systems[fname]["coord"] = [nx, 0, ny]
-                                # Update outgoing jump lines
+                # Compute displacement once from the original model position,
+                # never from rounded screen pixels or an icon bounding box.
+                start = self.drag_data["system_start_coord"]
+                scale = self.drag_data["system_drag_scale"]
+                nx = start[0] if x == px else start[0] + (x - px) / scale
+                ny = start[2] if y == py else start[2] + (y - py) / scale
+                self.systems[fname]["coord"] = [nx, start[1], ny]
+                # Update outgoing jump lines
                 for link in self.systems[fname]["link_lines"]:
                     line_id = link["line_id"]
                     dest = link["dest"]
@@ -1705,31 +1466,42 @@ class SystemMapEditor:
     
     #Main App Save changes 
   
-    def save_changes(self):
-        """Save galmap info and persist system property and coordinate changes to each system JSON file"""
-        # Save borders and texts
-        self.save_galmapinfo()
-
-        for fn in list(self.systems.keys()):
-            if not self._refresh_system_record_from_disk(fn):
-                print(f"Failed to reload {fn}; using cached data.")
-            sys_data = self.systems.get(fn, {})
-            coords = self.canvas.coords(sys_data["canvas_items"][0])
-            coord_override = None
-            if coords:
-                nx, _, ny = self.screen_to_coord(coords[0], coords[1])
-                coord_override = [nx, 0, ny]
+    def _save_map_data(self):
+        failures = []
+        try:
+            self.save_galmapinfo()
+        except (OSError, TypeError, ValueError) as exc:
+            failures.append(f"GalMapInfo.json: {exc}")
+        for filename in list(self.systems):
             try:
-                self._save_system_record(fn, coord_override=coord_override)
-            except (OSError, json.JSONDecodeError):
-                print(f"Failed to write {fn}")
-        print("Changes saved.")
-        # Invoke integrated map generator modules
+                if not self._refresh_system_record_from_disk(filename):
+                    raise ValueError("Could not reload the existing system file.")
+                # Model coordinates work for both image and fallback icons.
+                self._save_system_record(filename)
+            except (OSError, TypeError, ValueError) as exc:
+                failures.append(f"{filename}: {exc}")
+        if failures:
+            messagebox.showerror(
+                "Save incomplete",
+                "Some files could not be saved. Your pending edits remain open.\n\n"
+                + "\n".join(failures), parent=self.root,
+            )
+            return False
+        return True
+
+    def save_changes(self):
+        if not self._save_map_data():
+            return False
         try:
             self._run_generators()
-            print("Generators ran successfully.")
-        except Exception as e:
-            print(f"Error running generators: {e}")
+        except Exception as exc:
+            messagebox.showerror(
+                "HTML generation failed", f"Map data was saved, but HTML generation failed:\n{exc}",
+                parent=self.root,
+            )
+            return False
+        print("Changes saved and HTML generated.")
+        return True
 
     def add_border_point_at(self, x, y):
         """Adds a new point to the selected border or starts a new border if none is selected"""
@@ -2022,7 +1794,7 @@ class SystemMapEditor:
         # Author & Revision Metadata
         editor_settings = {}
         try:
-            editor_settings = SystemEditor.load_editor_settings()
+            editor_settings = EditorSettings.load_editor_settings()
         except Exception:
             editor_settings = {}
         current_author_default = str(editor_settings.get("author", "") or "").strip()
@@ -2038,10 +1810,10 @@ class SystemMapEditor:
 
         orig_author_var = tk.StringVar(value=str(author_source.get("original_author", "") or ""))
         last_author_var = tk.StringVar(value=str(author_source.get("last_revision_author", "") or author_source.get("last_author", "") or ""))
-        rev_num_var = tk.StringVar(value=str(SystemEditor._coerce_revision_number(author_source.get("revision_number", 0))))
+        rev_num_var = tk.StringVar(value=str(_coerce_revision_number(author_source.get("revision_number", 0))))
         rev_date_var = tk.StringVar(value=str(author_source.get("revision_date", "") or ""))
         all_authors_raw = author_source.get("all_authors", [])
-        all_authors_var = tk.StringVar(value=", ".join(SystemEditor._normalize_author_list(all_authors_raw)))
+        all_authors_var = tk.StringVar(value=", ".join(_normalize_author_list(all_authors_raw)))
         # Keep readonly vars alive for the life of the dialog (avoid GC clearing ttk.Entry values)
         top._author_vars = {
             "orig_author": orig_author_var,
@@ -2077,9 +1849,10 @@ class SystemMapEditor:
 
             # Save coordinates
             try:
-                new_coord = [float(v.get()) for v in coord_vars]
-            except ValueError:
-                new_coord = system.get("coord", [0, 0, 0])
+                new_coord = parse_map_coordinate_fields([v.get() for v in coord_vars], system["coord"])
+            except ValueError as exc:
+                messagebox.showerror("Invalid coordinates", str(exc), parent=top)
+                return
             system["coord"] = new_coord
 
             system["description"] = desc_text.get("1.0", tk.END).strip()
@@ -2114,13 +1887,13 @@ class SystemMapEditor:
             if current_author:
                 editor_settings["author"] = current_author
                 try:
-                    SystemEditor.save_editor_settings(editor_settings)
+                    EditorSettings.save_editor_settings(editor_settings)
                 except Exception:
                     pass
             author_meta = system.get("author_meta", {})
             if not isinstance(author_meta, dict):
                 author_meta = {}
-            authors = SystemEditor._normalize_author_list(author_meta.get("all_authors") or meta.get("all_authors"))
+            authors = _normalize_author_list(author_meta.get("all_authors") or meta.get("all_authors"))
             if current_author:
                 if not any(a.casefold() == current_author.casefold() for a in authors):
                     authors.append(current_author)
@@ -2129,7 +1902,7 @@ class SystemMapEditor:
                 author_meta["last_revision_author"] = current_author
             if authors:
                 author_meta["all_authors"] = authors
-            rev_num = SystemEditor._coerce_revision_number(author_meta.get("revision_number", meta.get("revision_number", 0)))
+            rev_num = _coerce_revision_number(author_meta.get("revision_number", meta.get("revision_number", 0)))
             author_meta["revision_number"] = rev_num + 1
             author_meta["revision_date"] = datetime.date.today().isoformat()
             system["author_meta"] = author_meta

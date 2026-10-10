@@ -5,7 +5,8 @@ import sys
 from pathlib import Path
 from urllib.parse import quote
 
-import SystemEditor
+import EditorSettings
+from MapConsistency import validate_map_coordinate, system_key, is_gate
 
 
 VIEWPORT_WIDTH = 1600
@@ -22,25 +23,22 @@ HIDDEN_JUMP_OFFSET = 28
 SELF_JUMP_RADIUS = 140
 
 
-def get_base_path():
-    if getattr(sys, "frozen", False):
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(os.path.abspath(__file__))
+from AppPaths import get_base_path
 
 
 BASE = Path(get_base_path())
-HTML_OUTPUT = Path(SystemEditor.get_html_output_path()) / HTML_OUTPUT_NAME
-JSON_FOLDER = Path(SystemEditor.get_data_path())
+HTML_OUTPUT = Path(EditorSettings.get_html_output_path()) / HTML_OUTPUT_NAME
+JSON_FOLDER = Path(EditorSettings.get_data_path())
 
 
 def load_map_info(warnings):
-    map_info_file = Path(os.getcwd()) / MAP_INFO_FILENAME
+    map_info_file = Path(get_base_path()) / MAP_INFO_FILENAME
     if not map_info_file.exists():
         return DEFAULT_MAP_INFO
 
     try:
         return json.loads(map_info_file.read_text())
-    except json.JSONDecodeError:
+    except (OSError, ValueError):
         warnings.append(f"Could not parse {MAP_INFO_FILENAME}, skipping overlays.")
         return DEFAULT_MAP_INFO
 
@@ -57,11 +55,16 @@ def load_systems(json_folder, warnings):
         try:
             with open(json_file, "r") as handle:
                 data = json.load(handle)
-        except json.JSONDecodeError:
+        except (OSError, ValueError):
             warnings.append(f"Could not parse {json_file.name}, skipping.")
             continue
 
-        if "systemMapCoord" not in data:
+        if not isinstance(data, dict) or "systemMapCoord" not in data:
+            continue
+        try:
+            validate_map_coordinate(data["systemMapCoord"])
+        except ValueError as exc:
+            warnings.append(f"{json_file.name}: {exc}")
             continue
 
         name = json_file.stem
@@ -82,7 +85,7 @@ def load_systems(json_folder, warnings):
 
         destinations = []
         for obj in data.get("objects", {}).values():
-            if obj.get("type", "").lower() not in JUMP_TYPES:
+            if not is_gate(obj):
                 continue
             for target in obj.get("destinations", {}).values():
                 destinations.append(
@@ -101,8 +104,11 @@ def load_systems(json_folder, warnings):
             }
         )
 
+    canonical_names = {system_key(name): name for name in system_names}
     systems = []
     for system in raw_systems:
+        for destination in system["destinations"]:
+            destination["target"] = canonical_names.get(system_key(destination["target"]), destination["target"])
         filtered_destinations = [
             destination
             for destination in system["destinations"]

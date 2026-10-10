@@ -7,24 +7,17 @@ from pathlib import Path
 import math
 import random
 import re
-from LocMapTemplate import build_object_button, render_locmap_html
+from LocMapTemplate import build_object_button, render_locmap_html, script_json
 from ShipDescriptionResolver import resolve_ship_description
-import SystemEditor
+import EditorSettings
 
 # Helper to locate resources when running as a module or frozen executable
-def get_base_path():
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
-    try:
-        return os.path.dirname(os.path.abspath(__file__))
-    except NameError:
-        # Fallback if __file__ is not defined
-        return os.getcwd()
+from AppPaths import get_base_path
 
 # Base directories\
 BASE = get_base_path()
-JSON_FOLDER = Path(SystemEditor.get_data_path())
-DEFAULT_HTML_DIR = Path(SystemEditor.get_html_output_path())
+JSON_FOLDER = Path(EditorSettings.get_data_path())
+DEFAULT_HTML_DIR = Path(EditorSettings.get_html_output_path())
 
 # Configuration for station side colors
 STATION_SIDE_COLORS = {
@@ -169,17 +162,26 @@ def generate_line_coords(start, end, count, radius, seed=None, y_range=(-600, 60
 
     return coords
 
-# Load external ship map once
-shipmap_path = Path('HTML') / 'Images' / 'Ships' / 'ShipMap.json'
-with open(shipmap_path) as f:
-    loaded_map = json.load(f)
-    if isinstance(loaded_map, list):
-        SHIP_MAP = {entry['key']: entry for entry in loaded_map if 'key' in entry}
-    else:
-        SHIP_MAP = loaded_map
+def load_ship_map(html_dir):
+    path = Path(html_dir) / 'Images' / 'Ships' / 'ShipMap.json'
+    if not path.exists():
+        return {}
+    with path.open(encoding='utf-8') as handle:
+        loaded = json.load(handle)
+    if isinstance(loaded, list):
+        return {entry['key']: entry for entry in loaded
+                if isinstance(entry, dict) and 'key' in entry}
+    if isinstance(loaded, dict):
+        return loaded
+    raise ValueError(f'ShipMap must contain a list or object: {path}')
+
+
+SHIP_MAP = {}
 
 class MapViewer:
     def __init__(self, system_file):
+        global SHIP_MAP
+        SHIP_MAP = load_ship_map(DEFAULT_HTML_DIR)
         try:
             with open(system_file) as f:
                 self.system_data = json.load(f)
@@ -259,9 +261,9 @@ class MapViewer:
             'title': os.path.basename(out_path),
             'sys_name': sys_name,
             'alignment': alignment,
-            'fig_json': json.dumps(fig_json),
-            'obj_data': json.dumps(obj_data),
-            'system_meta': json.dumps(system_meta),
+            'fig_json': script_json(fig_json),
+            'obj_data': script_json(obj_data),
+            'system_meta': script_json(system_meta),
             'gate_buttons': self._build_button_markup(gates, obj_data),
             'station_buttons': self._build_button_markup(
                 [name for name, _ in stations],
@@ -1278,12 +1280,12 @@ class MapViewer:
         self.generate(output_html)
 
 # Module entry point
-def main():
+def main(argv=None):
     os.chdir(BASE)
     parser = argparse.ArgumentParser(description='Generate interactive map HTML from system JSON')
     parser.add_argument('system_files', nargs='*', help='JSON files to process')
     parser.add_argument('-d', '--output-dir', default=None, help='Override HTML output directory')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     files = args.system_files or glob.glob(str(JSON_FOLDER / '*.json'))
     built_systems = []
     failed_systems = []

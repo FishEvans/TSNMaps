@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import SystemEditor
+import MapTypes
 import Toolbar
 import random
 import re
@@ -303,8 +303,8 @@ def on_canvas_press(event, ctx):
 
         dlg, body, footer = _dlg("New Planet", near_pointer=True)
         name_var = tk.StringVar(value=f"Planet {random.randint(1,999)}")
-        planet_classes = list(ctx.get('valid_planet_classes') or [SystemEditor.DEFAULT_PLANET_CLASS])
-        class_var = tk.StringVar(value=planet_classes[0] if planet_classes else SystemEditor.DEFAULT_PLANET_CLASS)
+        planet_classes = list(ctx.get('valid_planet_classes') or [MapTypes.DEFAULT_PLANET_CLASS])
+        class_var = tk.StringVar(value=planet_classes[0] if planet_classes else MapTypes.DEFAULT_PLANET_CLASS)
         toolbar.labeled_entry(body, "Name:", name_var, width=22, row=0, col=0)
         tk.Label(body, text="Class:").grid(row=1, column=0, sticky='w', padx=6, pady=4)
         ttk.Combobox(
@@ -320,7 +320,7 @@ def on_canvas_press(event, ctx):
             key = str(int(time.time() * 1000))
             sm.data.setdefault('terrain', {})[key] = {
                 'type': 'planet',
-                'class': class_var.get() or SystemEditor.DEFAULT_PLANET_CLASS,
+                'class': class_var.get() or MapTypes.DEFAULT_PLANET_CLASS,
                 'name': name_var.get().strip() or key,
                 'coordinate': [bx, 0, bz]
             }
@@ -447,17 +447,6 @@ def on_canvas_press(event, ctx):
             # No config armed; ignore click (user must press Debris icon → Add)
             return
 
-        def add_debris():
-            key = str(int(time.time() * 1000))
-            sm.data.setdefault('terrain', {})[key] = {
-                'type': 'debris_field',
-                'seed': seed_var.get(),
-                'coordinate': [cx, 0, cz],
-                'density': dens_var.get(),
-                'scatter': scat_var.get()
-            }
-            terrain_keys.append(key)
-            ter_lb.insert(tk.END, key)
     # ── Minefield placement mode (armed via toolbar dialog) ────────────────
     if getattr(toolbar, 'minefield_mode', False):
         cfg = getattr(toolbar, 'minefield_pending', None)
@@ -1083,7 +1072,7 @@ def on_canvas_press(event, ctx):
             return 1
         if otype in ('jumpnode', 'jumppoint', 'jump_point'):
             return 2
-        if SystemEditor.is_zone_type(otype):
+        if MapTypes.is_zone_type(otype):
             return 6
         return 3
 
@@ -1092,14 +1081,14 @@ def on_canvas_press(event, ctx):
         relay_entry = relay_store.get(relay_name)
         relay_type = ''
         if isinstance(relay_entry, dict):
-            relay_type = SystemEditor.normalize_relay_type(relay_entry.get('type'))
-        if relay_type == SystemEditor.RELAY_TYPE_WARNING_BUOY:
+            relay_type = MapTypes.normalize_relay_type(relay_entry.get('type'))
+        if relay_type == MapTypes.RELAY_TYPE_WARNING_BUOY:
             return 4
         return 5
 
     def terrain_hit_priority(feature):
         ttype = str(feature.get('type', '') or '').strip().lower()
-        if ttype in ('hidden_minefield', 'minefield') or SystemEditor.is_zone_type(ttype):
+        if ttype in ('hidden_minefield', 'minefield') or MapTypes.is_zone_type(ttype):
             return 6
         return 7
 
@@ -1120,7 +1109,7 @@ def on_canvas_press(event, ctx):
             obj = sm.get_object(name)
             otype = str(obj.get('type', '') or '').strip().lower()
             # Zone objects are selected only from their center point, not their radius fill.
-            if SystemEditor.is_zone_type(otype) and not point_hits_center(obj.get('coordinate')):
+            if MapTypes.is_zone_type(otype) and not point_hits_center(obj.get('coordinate')):
                 continue
             hit_candidates.append((object_hit_priority(obj), draw_order, 'obj', name, None))
             continue
@@ -1149,7 +1138,7 @@ def on_canvas_press(event, ctx):
             feature = sm.get_terrain_feature(key)
             ttype = str(feature.get('type', '') or '').strip().lower()
             # FCS and other zone terrain is selected only by the center terrain_pt.
-            if SystemEditor.is_zone_type(ttype):
+            if MapTypes.is_zone_type(ttype):
                 continue
             if ttype in ('blackhole', 'debris_field', 'planet', 'hidden_minefield', 'minefield'):
                 hit_candidates.append((terrain_hit_priority(feature), draw_order, 'terrain', key, 'coord'))
@@ -1240,7 +1229,7 @@ def on_canvas_drag(event, ctx):
         # convert using current pan/zoom
         x = (sx - pan_x) / map_scale
         z = -(sy - pan_y) / map_scale
-        relay_entry = SystemEditor.ensure_relay_dict(sm.data['sensor_relay'].get(relay))
+        relay_entry = MapTypes.ensure_relay_dict(sm.data['sensor_relay'].get(relay))
         relay_entry['coordinate'] = [x, 0, z]
         sm.data['sensor_relay'][relay] = relay_entry
         drag_data['x'], drag_data['y'] = event.x, event.y

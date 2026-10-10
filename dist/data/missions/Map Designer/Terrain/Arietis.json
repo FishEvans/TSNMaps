@@ -2,26 +2,35 @@
     "systemMapCoord": [
         -17404.73323461613,
         0,
-        10659.53218080122
+        10659.532180801221
     ],
     "systemalignment": "USFP",
     "metadata": {
         "skybox": "sky1.png",
-        "sysdescription": "",
+        "sysdescription": "A prosperous Cross roads system, that makes its home to the tourist trade and sicentests stysing the Posideon Rift area.,due to the unruly space nearby its frequented by pirates.",
         "security": "Neutral",
-        "exports": [],
-        "focus": "",
-        "intel": {},
-        "development": "Unclaimed",
+        "exports": [
+            "Research",
+            "Commercial Goods"
+        ],
+        "focus": "Exploration & Survey",
+        "intel": {
+            "pirate": "High",
+            "enemy": "Low",
+            "assets": [
+                "Listening Post"
+            ]
+        },
+        "development": "Colony",
         "visible": true,
         "original_author": "Draeco",
-        "revision_date": "2005-12-23",
-        "revision_number": 15,
+        "revision_date": "2026-09-26",
+        "revision_number": 16,
         "all_authors": [
             "Fish Evans",
             "Draeco"
         ],
-        "last_revision_author": ""
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Poseidon Gate": {
@@ -643,9 +652,9 @@
         },
         "Skorn's Peak": {
             "coordinate": [
-                -221533.4910886868,
-                0.0,
-                118248.31558778026
+                225466.50891131314,
+                0,
+                188248.31558778026
             ],
             "sides": [
                 "Kralien"
@@ -1244,7 +1253,8 @@
                 0,
                 139886.70267489713
             ],
-            "type": "Sensor Relay"
+            "type": "Sensor Relay",
+            "description": "Rumor has it this Location is visited by the visage of a platapuss in a Trillby."
         },
         "SR 58": {
             "coordinate": [
@@ -1663,5 +1673,9 @@
             "hideonmap": false
         }
     },
-    "traffic": {}
+    "traffic": {
+        "commercial": "light",
+        "civilian": "medium",
+        "security": "light"
+    }
 }

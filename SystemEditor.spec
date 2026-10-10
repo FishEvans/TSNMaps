@@ -3,10 +3,10 @@
 
 a = Analysis(
     ['SystemEditor.py'],
-    pathex=['scripts'],
+    pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=['generate_system_terrain'],
+    datas=[] + [('scripts/Referance/tsn_databases.py', 'scripts/Referance'), ('scripts/Referance/shipData.yaml', 'scripts/Referance'), ('scripts/Referance/ship_descriptions_fallback.json', 'scripts/Referance')],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

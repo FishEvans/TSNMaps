@@ -4,7 +4,7 @@ import os
 import sys
 from pathlib import Path
 
-import SystemEditor
+import EditorSettings
 
 
 OUTPUT_NAME = "ProductionFlow.html"
@@ -50,17 +50,14 @@ SIGNATURE_COLOURS = {
 }
 
 
-def get_base_path():
-    if getattr(sys, "frozen", False):
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(os.path.abspath(__file__))
+from AppPaths import get_base_path, get_resource_path
 
 
 BASE = Path(get_base_path())
-HTML_DIR = Path(SystemEditor.get_html_output_path())
+HTML_DIR = Path(EditorSettings.get_html_output_path())
 OUTPUT_PATH = HTML_DIR / OUTPUT_NAME
-DATABASE_PATH = BASE / DATABASE_SOURCE
-SPRITE_PATH = BASE / SPRITE_SOURCE
+DATABASE_PATH = get_resource_path(DATABASE_SOURCE)
+SPRITE_PATH = HTML_DIR / "Images" / "Production" / "grid-icon-sheet2.png"
 
 
 def build_sprite_href():

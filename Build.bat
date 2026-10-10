@@ -18,12 +18,8 @@ goto :error
 :prepare_icon
 %PYTHON_CMD% -c "from PIL import Image; img=Image.open(r'%ICON_PNG%').convert('RGBA'); img.save(r'%ICON_ICO%', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])" || goto :error
 
-REM Build using spec files (keeps hidden imports + data definitions in sync)
+REM Two applications; generators and Tools utilities are bundled through imports.
 pyinstaller "StellarCartography.spec" || goto :error
-pyinstaller "LocMapGen.spec" || goto :error
-pyinstaller "GalMapGen.spec" || goto :error
-pyinstaller "LibraryGen.spec" || goto :error
-pyinstaller "ProductionFlowGen.spec" || goto :error
 pyinstaller "SystemEditor.spec" || goto :error
 
 REM Stage distributable data (terrain JSON + settings with user-specific values removed)
@@ -33,8 +29,6 @@ set "TERRAIN_DST=%DIST%\data\missions\Map Designer\Terrain"
 set "GALMAPINFO_SRC=%CD%\GalMapInfo.json"
 set "HTML_SRC=%CD%\HTML"
 set "HTML_DST=%DIST%\HTML"
-set "SCRIPTS_SRC=%CD%\scripts"
-set "SCRIPTS_DST=%DIST%\scripts"
 
 powershell -NoProfile -Command "New-Item -ItemType Directory -Force -Path '%DIST%' | Out-Null; New-Item -ItemType Directory -Force -Path '%TERRAIN_DST%' | Out-Null; Copy-Item -Path (Join-Path '%TERRAIN_SRC%' '*.json') -Destination '%TERRAIN_DST%' -Force" || goto :error
 powershell -NoProfile -Command "$src='%CD%\SystemEditorSettings.json'; $dst='%DIST%\SystemEditorSettings.json'; if (Test-Path -LiteralPath $src) { $settings=Get-Content -LiteralPath $src -Raw | ConvertFrom-Json; foreach ($key in @('author','systemMapsPath','htmlOutputPath')) { if ($settings.PSObject.Properties.Name -contains $key) { $settings.$key='' } }; $json=$settings | ConvertTo-Json -Depth 100; [System.IO.File]::WriteAllText($dst, $json + [Environment]::NewLine, [System.Text.UTF8Encoding]::new($false)) }" || goto :error
@@ -42,7 +36,6 @@ powershell -NoProfile -Command "$src='%CD%\Settings.json'; $dst='%DIST%\Settings
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%GALMAPINFO_SRC%') { Copy-Item -LiteralPath '%GALMAPINFO_SRC%' -Destination '%DIST%\GalMapInfo.json' -Force }" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%ICON_PNG%') { Copy-Item -LiteralPath '%ICON_PNG%' -Destination '%DIST%\Icon.png' -Force }; if (Test-Path -LiteralPath '%ICON_ICO%') { Copy-Item -LiteralPath '%ICON_ICO%' -Destination '%DIST%\Icon.ico' -Force }" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%HTML_DST%') { Remove-Item -LiteralPath '%HTML_DST%' -Recurse -Force }; Copy-Item -LiteralPath '%HTML_SRC%' -Destination '%HTML_DST%' -Recurse -Force" || goto :error
-powershell -NoProfile -Command "if (Test-Path -LiteralPath '%SCRIPTS_DST%') { Remove-Item -LiteralPath '%SCRIPTS_DST%' -Recurse -Force }; Copy-Item -LiteralPath '%SCRIPTS_SRC%' -Destination '%SCRIPTS_DST%' -Recurse -Force" || goto :error
 powershell -NoProfile -Command "if (Test-Path -LiteralPath '%CD%\cargo_teams.json') { Copy-Item -LiteralPath '%CD%\cargo_teams.json' -Destination '%DIST%\cargo_teams.json' -Force }" || goto :error
 
 echo.

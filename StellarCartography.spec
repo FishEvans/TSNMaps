@@ -5,7 +5,7 @@ a = Analysis(
     ['StellarCartography.py'],
     pathex=[],
     binaries=[],
-    datas=[('HTML\\Images', 'HTML\\Images'), ('GalMapInfo.json', '.'), ('LocMapGen.py', '.'), ('GalMapGen.py', '.')],
+    datas=[('HTML\\Images', 'HTML\\Images'), ('GalMapInfo.json', '.')] + [('scripts/Referance/tsn_databases.py', 'scripts/Referance'), ('scripts/Referance/shipData.yaml', 'scripts/Referance'), ('scripts/Referance/ship_descriptions_fallback.json', 'scripts/Referance')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

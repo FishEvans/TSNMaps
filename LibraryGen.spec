@@ -5,7 +5,7 @@ a = Analysis(
     ['LibraryGen.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[] + [('scripts/Referance/tsn_databases.py', 'scripts/Referance'), ('scripts/Referance/shipData.yaml', 'scripts/Referance'), ('scripts/Referance/ship_descriptions_fallback.json', 'scripts/Referance')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

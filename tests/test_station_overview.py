@@ -5,29 +5,39 @@ change real system files. Requires Tk and the project's reference data.
 """
 import copy
 import sys
+import re
 import unittest
 from unittest.mock import patch
 
 import SystemEditor as editor
 
 
-class StationOverviewTests(unittest.TestCase):
+class EditorFixture(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.root = editor.tk.Tk()
+        cls.root.withdraw()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.root.destroy()
+
     def setUp(self):
-        self.root = editor.tk.Tk()
         self.root.withdraw()
-        self.addCleanup(self.root.destroy)
+        self.addCleanup(self.destroy_windows)
         self.errors = []
         self.root.report_callback_exception = lambda *args: self.errors.append(args)
         self.state = {}
         station = dict(type='station', sides=['USFP'], hull='starbase_command',
                        coordinate=[0, 0, 0], description='Keep this description',
                        cargo={}, teams={}, facilities=['Docking'])
-        data = dict(metadata={}, terrain={}, sensor_relay={}, objects={
+        data = dict(systemMapCoord=[0, 0, 0], metadata={}, terrain={}, sensor_relay={}, objects={
             'Alpha': station,
             'Beta': dict(copy.deepcopy(station), type='platform', coordinate=[10000, 0, 0]),
             'Other': dict(copy.deepcopy(station), sides=['Pirate'], coordinate=[20000, 0, 0]),
             'Static': dict(copy.deepcopy(station), type='static', coordinate=[30000, 0, 0]),
         })
+        data = self.make_test_data(data)
         # Capture the editor's closures without adding a production test API.
         def capture(frame, event, result):
             if frame.f_code is editor.open_system_editor.__code__ and event == 'return':
@@ -53,6 +63,28 @@ class StationOverviewTests(unittest.TestCase):
     def tearDown(self):
         self.assertEqual(self.errors, [])
 
+    def make_test_data(self, data):
+        return data
+
+    def destroy_windows(self):
+        for timer in self.root.tk.call('after', 'info'):
+            self.root.tk.call('after', 'cancel', timer)
+        for window in list(self.root.winfo_children()):
+            window.destroy()
+
+    def invoke_shortcut(self, widget, sequence):
+        # Exercise the registered Tk binding without requiring OS foreground
+        # focus (unreliable for withdrawn windows in a multi-test run).
+        tags = widget.bindtags()
+        history = next(tag for tag in tags if tag.startswith('SystemHistory'))
+        self.assertLess(tags.index(history), tags.index(widget.winfo_class()))
+        script = widget.bind_class(history, sequence)
+        self.assertTrue(script)
+        script = script.replace('%W', str(widget))
+        script = re.sub(r'%[A-Za-z#]', '0', script)
+        # TCL_BREAK prevents the widget class's Cut binding from running.
+        self.assertEqual(int(widget.tk.call('catch', script)), 3)
+
     def object(self, name='Alpha'):
         return self.state['sm'].get_object(name)
 
@@ -60,6 +92,7 @@ class StationOverviewTests(unittest.TestCase):
         cell = self.ui['rows_frame'].grid_slaves(row=row, column=column)[0]
         return cell.winfo_children()[0]
 
+class StationOverviewTests(EditorFixture):
     def test_conversion_and_ten_action_history(self):
         before = copy.deepcopy(self.object())
         # Exercise the actual overview dropdown, then the edit-pane button.
@@ -97,17 +130,13 @@ class StationOverviewTests(unittest.TestCase):
         self.assertEqual(self.object('Beta')['sides'], ['Pirate'])
         self.assertEqual(self.object('Static')['sides'], ['USFP'])
         self.assertEqual(len(self.state['undo_stack']), 1)
-        # Check the shortcut even when a combobox has focus: no Cut fallback.
+        # Check the combobox shortcut binding and its no-Cut fallback.
         control = self.row_control(2)
-        control.focus_force()
-        self.root.update()
-        control.event_generate('<Control-z>')
+        self.invoke_shortcut(control, '<Control-z>')
         self.root.update()
         self.assertEqual(self.object()['sides'], ['USFP'])
         self.assertEqual(self.object('Beta')['sides'], ['USFP'])
-        self.overview.focus_force()
-        self.root.update()
-        self.overview.event_generate('<Control-x>')
+        self.invoke_shortcut(self.overview, '<Control-x>')
         self.root.update()
         self.assertEqual(self.object()['sides'], ['Pirate'])
 

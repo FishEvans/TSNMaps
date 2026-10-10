@@ -3,6 +3,12 @@ import json
 import math
 from datetime import date
 from pathlib import Path
+import sys
+
+# Support both direct CLI use and the bundled application.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from JsonStorage import atomic_write_json
 
 
 DEFAULT_SHIPMAP = Path("HTML") / "Images" / "Ships" / "ShipMap.json"
@@ -28,9 +34,9 @@ def load_shipmap(path):
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise SystemExit(f"Failed to read ShipMap: {path} ({exc})")
+        raise ValueError(f"Failed to read ShipMap: {path} ({exc})")
     if not isinstance(data, list):
-        raise SystemExit(f"ShipMap is not a list: {path}")
+        raise ValueError(f"ShipMap is not a list: {path}")
     return data
 
 
@@ -231,15 +237,24 @@ def main():
         help="Number of objects per row.",
     )
     args = parser.parse_args()
-    if args.per_row <= 0:
-        raise SystemExit("--per-row must be a positive integer.")
+    try:
+        generate_test_system(args.shipmap, args.out, spacing=args.spacing, per_row=args.per_row)
+    except (ValueError, OSError) as exc:
+        parser.error(str(exc))
 
-    entries = load_shipmap(args.shipmap)
+
+def generate_test_system(shipmap, out_path, *, spacing=1000.0, per_row=10):
+    if not math.isfinite(spacing) or spacing <= 0:
+        raise ValueError("Spacing must be a positive finite number.")
+    if per_row <= 0:
+        raise ValueError("--per-row must be a positive integer.")
+
+    entries = load_shipmap(Path(shipmap))
     spawns, planets, counts = collect_spawn_entries(entries)
     if not spawns and not planets:
-        raise SystemExit("No station/platform/static/planet hulls found in ShipMap.")
+        raise ValueError("No station/platform/static/planet hulls found in ShipMap.")
 
-    objects = build_objects(spawns, args.spacing, args.per_row)
+    objects = build_objects(spawns, spacing, per_row)
     terrain = build_terrain(planets)
     terrain_features = len(terrain) - counts["planets"]
     generated_on = date.today().isoformat()
@@ -263,9 +278,9 @@ def main():
         "traffic": {},
     }
 
-    out_path = args.out
+    out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(payload, indent=4), encoding="utf-8")
+    atomic_write_json(out_path, payload)
 
     print(
         f"Wrote {len(objects)} objects "
@@ -275,6 +290,8 @@ def main():
         f"{counts['planets']} planets, and "
         f"{terrain_features} terrain items to {out_path}"
     )
+
+    return out_path
 
 
 if __name__ == "__main__":

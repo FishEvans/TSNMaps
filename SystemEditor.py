@@ -1,4 +1,3 @@
-#import os
 import os
 import argparse
 import sys
@@ -6,18 +5,59 @@ import json
 import datetime
 import ast
 from pathlib import Path
-#import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
-from typing import Any, Dict, List, Optional, Tuple
-from Toolbar import *
+from typing import Any, Dict, List, Optional
+import tkinter as tk
+from Toolbar import Toolbar
 import SysMapCanvas
-import math
-from math import hypot
 import random
 import copy
 from PIL import Image, ImageTk
 import re
 import SystemMetaOptions as smopts
+from JsonStorage import atomic_write_json
+# Re-export established helpers for compatibility with external scripts.
+# New code should import their owning modules directly (see ARCHITECTURE.md).
+from MapTypes import (
+    ZONE_STYLE_MAP, DEFAULT_ZONE_STYLE, FCS_ZONE_TYPE,
+    DEFAULT_FCS_ZONE_RADIUS, DEFAULT_FCS_MIN_SPACING, DEFAULT_FCS_DENSITY_RADIUS,
+    DEFAULT_FCS_DENSITY_PERCENTILE, DEFAULT_FCS_MIN_SCORE, DEFAULT_FCS_SPACING_JITTER,
+    DEFAULT_FCS_DESCRIPTION, STATION_OR_PLATFORM_TYPES, DEFAULT_PLANET_CLASS,
+    RELAY_TYPE_SENSOR, RELAY_TYPE_WARNING_BUOY, RELAY_TYPE_OPTIONS,
+    WARNING_BUOY_DEFAULT_PING, WARNING_BUOY_DEFAULT_RANGE, GRID_MODES,
+    GRID_SPACING, get_zone_style, is_zone_type,
+    object_has_blank_or_invalid_hull, _normalize_roles, normalize_relay_type,
+    ensure_relay_dict
+)
+from MapMetadata import (
+    INCOMING_ONLY_GATES_KEY, INCOMING_ONLY_GATES_ALIASES, get_incoming_only_gate_list,
+    get_incoming_only_gate_names, set_incoming_only_gate, rename_incoming_only_gate,
+    remove_incoming_only_gate, _normalize_author_list, _coerce_revision_number,
+    build_gate_index_for_systems
+)
+from EditorSettings import (
+    get_data_path, get_default_data_path, get_default_html_path,
+    resolve_configured_path, get_html_output_path, get_settings_path,
+    _load_settings_file, load_editor_settings, save_editor_settings
+)
+from StationOverview import open_station_overview
+from SystemValidation import (is_number_like, validate_coordinate_value,
+    collect_cargo_team_validation_issues as collect_cargo_issues, verify_system_data as verify_map_data)
+from SystemMigrations import migrate_legacy_structure, migrate_sides, migrate_planet_classes
+from SystemMap import SystemMap
+from TerrainGeometry import (
+    distance_to_spine, influence, generate_line_coords,
+    distance_sq_2d, percentile_value, jittered_fcs_spacing,
+    collect_nebula_points_for_fcs, collect_fcs_blocked_centers, generate_zone_name,
+    select_fcs_zone_centers
+)
+from SystemMapRenderer import (
+    draw_red_cross, _normalise_side_key, get_object_primary_side,
+    get_station_side_colour, draw_station_side_colour_legend, draw_blue_gate_ring,
+    draw_system_map
+)
+
+from MapConsistency import is_gate, parse_map_coordinate_fields, rewrite_gate_references
 
 # Icon display constants (from ProductionFlowGen.py)
 SPRITE_COLUMNS = 20
@@ -88,270 +128,6 @@ INTEL_SPECIAL_ITEMS = {
     "Virus",
     "Virus Sample",
 }
-ZONE_STYLE_MAP = {
-    "fcs_zone": {
-        "label": "Fuel Collection Zone",
-        "fill": "#2f7986",
-        "outline": "#7fe7ff",
-        "text": "#c9fbff",
-    }
-}
-DEFAULT_ZONE_STYLE = {
-    "label": "Zone",
-    "fill": "#7a5622",
-    "outline": "#ffd37f",
-    "text": "#fff0bf",
-}
-FCS_ZONE_TYPE = "fcs_zone"
-DEFAULT_FCS_ZONE_RADIUS = 5000
-DEFAULT_FCS_MIN_SPACING = 30000
-DEFAULT_FCS_DENSITY_RADIUS = 12500
-DEFAULT_FCS_DENSITY_PERCENTILE = 56
-DEFAULT_FCS_MIN_SCORE = 8.0
-DEFAULT_FCS_SPACING_JITTER = 0.30
-DEFAULT_FCS_DESCRIPTION = "Auto-generated from nebula density."
-
-def get_zone_style(zone_type: Any) -> Optional[Dict[str, str]]:
-    zone_key = str(zone_type or "").strip().lower()
-    if not zone_key:
-        return None
-    if zone_key in ZONE_STYLE_MAP:
-        return ZONE_STYLE_MAP[zone_key]
-    if zone_key.endswith("_zone"):
-        return {
-            **DEFAULT_ZONE_STYLE,
-            "label": zone_key.replace("_", " ").title(),
-        }
-    return None
-
-def is_zone_type(zone_type: Any) -> bool:
-    return get_zone_style(zone_type) is not None
-
-
-STATION_OR_PLATFORM_TYPES = {"station", "platform"}
-INCOMING_ONLY_GATES_KEY = "incomingOnlyGates"
-INCOMING_ONLY_GATES_ALIASES = (INCOMING_ONLY_GATES_KEY, "incoming_only_gates")
-SIDE_VIEW_DIRECT_COLOURS = {
-    "usfp": "#003f8f",
-    "tsn": "#72cfff",
-    "pirate": "#ff8c00",
-    "pirates": "#ff8c00",
-    "unknown": "#ffffff",
-    "hjorden": "#2fbd5b",
-    "hajorden": "#2fbd5b",
-    "torgoth": "#c43b2f",
-    "kralien": "#a55cff",
-    "arvonian": "#d782ff",
-    "skaraan": "#e3c84a",
-    "ximni": "#ff66cc",
-    "euphini": "#ffb347",
-    "skull": "#ff6a00",
-}
-SIDE_VIEW_FACTION_COLOURS = {
-    "usfp": "#003f8f",
-    "pirate": "#ff8c00",
-    "hegemony": "#b45cff",
-    "ximni": "#ff66cc",
-}
-SIDE_VIEW_FALLBACK_COLOURS = (
-    "#7dd3fc",
-    "#f472b6",
-    "#facc15",
-    "#34d399",
-    "#fb7185",
-    "#c084fc",
-    "#a3e635",
-)
-
-
-def object_has_blank_or_invalid_hull(obj: Any, valid_hull_keys: set) -> bool:
-    if not isinstance(obj, dict):
-        return False
-    if str(obj.get("type", "")).strip().lower() not in STATION_OR_PLATFORM_TYPES:
-        return False
-    hull = str(obj.get("hull", "") or "").strip()
-    if not hull:
-        return True
-    return bool(valid_hull_keys) and hull.casefold() not in valid_hull_keys
-
-
-def draw_red_cross(canvas, sx, sy, radius=8, width=3, tags=()):
-    canvas.create_line(
-        sx - radius, sy - radius, sx + radius, sy + radius,
-        fill="red", width=width, tags=tags
-    )
-    canvas.create_line(
-        sx - radius, sy + radius, sx + radius, sy - radius,
-        fill="red", width=width, tags=tags
-    )
-
-
-def _normalise_side_key(value):
-    return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().casefold())
-
-
-def get_object_primary_side(obj):
-    if not isinstance(obj, dict):
-        return ""
-    sides = obj.get("sides")
-    if isinstance(sides, (list, tuple)):
-        for side in sides:
-            side_text = str(side or "").strip()
-            if side_text:
-                return side_text
-        return ""
-    if isinstance(sides, str):
-        return sides.strip()
-    return ""
-
-
-def get_station_side_colour(side_value, race_to_faction_cf=None):
-    side_text = str(side_value or "").strip()
-    side_key = _normalise_side_key(side_text)
-    if not side_key:
-        return SIDE_VIEW_DIRECT_COLOURS["unknown"]
-    if side_key in SIDE_VIEW_DIRECT_COLOURS:
-        return SIDE_VIEW_DIRECT_COLOURS[side_key]
-
-    faction_cf = ""
-    if isinstance(race_to_faction_cf, dict):
-        faction_cf = race_to_faction_cf.get(side_text.casefold(), "")
-    faction_key = _normalise_side_key(faction_cf)
-    if faction_key in SIDE_VIEW_FACTION_COLOURS:
-        return SIDE_VIEW_FACTION_COLOURS[faction_key]
-
-    return SIDE_VIEW_FALLBACK_COLOURS[sum(ord(ch) for ch in side_key) % len(SIDE_VIEW_FALLBACK_COLOURS)]
-
-
-def draw_station_side_colour_legend(canvas):
-    legend_items = (
-        ("USFP", SIDE_VIEW_DIRECT_COLOURS["usfp"]),
-        ("TSN", SIDE_VIEW_DIRECT_COLOURS["tsn"]),
-        ("Pirate", SIDE_VIEW_DIRECT_COLOURS["pirate"]),
-        ("Unknown", SIDE_VIEW_DIRECT_COLOURS["unknown"]),
-        ("Hjorden", SIDE_VIEW_DIRECT_COLOURS["hjorden"]),
-        ("Hegemony", SIDE_VIEW_FACTION_COLOURS["hegemony"]),
-        ("Ximni", SIDE_VIEW_DIRECT_COLOURS["ximni"]),
-    )
-    x0, y0 = 10, 10
-    row_h = 18
-    width = 142
-    height = 24 + (len(legend_items) * row_h)
-    canvas.create_rectangle(
-        x0, y0, x0 + width, y0 + height,
-        fill="#071311", outline="#4aa68f", tags=("side_legend",)
-    )
-    canvas.create_text(
-        x0 + 8, y0 + 8,
-        text="Side Colours",
-        fill="#d7fff2",
-        anchor="nw",
-        font=("Arial", 8, "bold"),
-        tags=("side_legend",)
-    )
-    for idx, (label, colour) in enumerate(legend_items):
-        y = y0 + 28 + (idx * row_h)
-        canvas.create_rectangle(
-            x0 + 10, y, x0 + 22, y + 12,
-            fill=colour, outline="#111111", tags=("side_legend",)
-        )
-        canvas.create_text(
-            x0 + 28, y - 1,
-            text=label,
-            fill="#eef6ff",
-            anchor="nw",
-            font=("Arial", 8),
-            tags=("side_legend",)
-        )
-
-
-def get_incoming_only_gate_list(data: Any) -> List[str]:
-    meta = data.get("metadata", {}) if isinstance(data, dict) else {}
-    if not isinstance(meta, dict):
-        return []
-
-    cleaned = []
-    seen = set()
-    for key in INCOMING_ONLY_GATES_ALIASES:
-        raw_names = meta.get(key, [])
-        if isinstance(raw_names, str):
-            raw_names = [raw_names]
-        if not isinstance(raw_names, (list, tuple, set)):
-            continue
-        for name in raw_names:
-            gate_name = str(name or "").strip()
-            gate_key = gate_name.casefold()
-            if not gate_name or gate_key in seen:
-                continue
-            cleaned.append(gate_name)
-            seen.add(gate_key)
-    return cleaned
-
-
-def get_incoming_only_gate_names(data: Any) -> set:
-    return {name.casefold() for name in get_incoming_only_gate_list(data)}
-
-
-def set_incoming_only_gate(data: Dict[str, Any], gate_name: str, enabled: bool) -> None:
-    md = data.setdefault("metadata", {})
-    if not isinstance(md, dict):
-        md = {}
-        data["metadata"] = md
-
-    cleaned_name = str(gate_name or "").strip()
-    existing = get_incoming_only_gate_list(data)
-    existing_keys = {name.casefold() for name in existing}
-    gate_key = cleaned_name.casefold()
-
-    if enabled and cleaned_name and gate_key not in existing_keys:
-        existing.append(cleaned_name)
-    elif not enabled:
-        existing = [name for name in existing if name.casefold() != gate_key]
-
-    for key in INCOMING_ONLY_GATES_ALIASES:
-        md.pop(key, None)
-    if existing:
-        md[INCOMING_ONLY_GATES_KEY] = existing
-
-
-def rename_incoming_only_gate(data: Dict[str, Any], old_name: str, new_name: str) -> None:
-    cleaned_new = str(new_name or "").strip()
-    old_key = str(old_name or "").strip().casefold()
-    if not old_key or not cleaned_new:
-        return
-
-    existing = get_incoming_only_gate_list(data)
-    changed = False
-    renamed = []
-    seen = set()
-    for name in existing:
-        candidate = cleaned_new if name.casefold() == old_key else name
-        candidate_key = candidate.casefold()
-        if candidate_key in seen:
-            changed = True
-            continue
-        renamed.append(candidate)
-        seen.add(candidate_key)
-        changed = changed or candidate != name
-
-    if changed:
-        md = data.setdefault("metadata", {})
-        if isinstance(md, dict):
-            for key in INCOMING_ONLY_GATES_ALIASES:
-                md.pop(key, None)
-            if renamed:
-                md[INCOMING_ONLY_GATES_KEY] = renamed
-
-
-def remove_incoming_only_gate(data: Dict[str, Any], gate_name: str) -> None:
-    set_incoming_only_gate(data, gate_name, False)
-
-
-def draw_blue_gate_ring(canvas, sx, sy, radius=14, width=2, tags=()):
-    canvas.create_oval(
-        sx - radius, sy - radius, sx + radius, sy + radius,
-        outline="#3aa7ff", width=width, tags=tags
-    )
 
 
 def parse_database_snapshot(path):
@@ -623,456 +399,12 @@ class CategorizedItemDropdown(tk.Button):
         color = CARGO_ITEM_CATEGORY_COLORS.get(category, 'black')
         self.configure(fg=color, activeforeground=color)
 
-def distance_to_spine(px, pz, ax, az, bx, bz):
-    abx = bx - ax
-    abz = bz - az
-    apx = px - ax
-    apz = pz - az
-
-    ab_len_sq = abx * abx + abz * abz
-    if ab_len_sq == 0:
-        return math.hypot(apx, apz)
-
-    # NOTE: no clamping → ends fade naturally
-    t = (apx * abx + apz * abz) / ab_len_sq
-    cx = ax + t * abx
-    cz = az + t * abz
-
-    return math.hypot(px - cx, pz - cz)
-
-
-def influence(dist, radius):
-    if dist >= radius:
-        return 0.0
-    x = 1.0 - (dist / radius)
-    return x * x
-
-
-def generate_line_coords(start, end, count, radius, seed=None, y_range=(-600, 600),
-                         clumps=(), voids=()):
-    # Match the reference TerrainHandling.generateLineCoords placement so the
-    # editor preview uses the same asteroid/nebula dot distribution as runtime.
-    rng = random.Random(seed)
-    coords = []
-
-    dx = end[0] - start[0]
-    dz = end[2] - start[2]
-    length = math.hypot(dx, dz)
-
-    if length == 0:
-        return []
-
-    for _ in range(count):
-        # Position uniformly along the terrain spine.
-        t = rng.random()
-        cx = start[0] + t * dx
-        cz = start[2] + t * dz
-
-        # Scatter with the same Gaussian-style radial falloff as the reference.
-        u = max(1e-6, rng.random())
-        d = radius * math.sqrt(-math.log(u))
-
-        angle = rng.uniform(0, 2 * math.pi)
-        ox = math.cos(angle) * d
-        oz = math.sin(angle) * d
-
-        x = cx + ox
-        z = cz + oz
-        y = rng.uniform(*y_range)
-
-        density_bias = 0.0
-
-        for cx_, cz_, r, s in clumps:
-            dist = math.hypot(x - cx_, z - cz_)
-            if dist < r:
-                density_bias += (1 - dist / r) ** 2 * s
-
-        for vx_, vz_, r, s in voids:
-            dist = math.hypot(x - vx_, z - vz_)
-            if dist < r:
-                density_bias -= (1 - dist / r) ** 2 * s
-
-        if density_bias != 0:
-            push = density_bias * radius * 0.15
-            x += rng.uniform(-push, push)
-            z += rng.uniform(-push, push)
-
-        coords.append((x, y, z))
-
-    return coords
-
-
-def distance_sq_2d(ax, az, bx, bz):
-    dx = ax - bx
-    dz = az - bz
-    return dx * dx + dz * dz
-
-
-def percentile_value(values, percentile):
-    if not values:
-        return 0.0
-    pct = max(0.0, min(100.0, float(percentile)))
-    ordered = sorted(float(v) for v in values)
-    if len(ordered) == 1:
-        return ordered[0]
-    index = int((len(ordered) - 1) * (pct / 100.0))
-    index = max(0, min(len(ordered) - 1, index))
-    return ordered[index]
-
-
-def jittered_fcs_spacing(candidate, base_spacing, jitter_ratio=DEFAULT_FCS_SPACING_JITTER):
-    """
-    Return a deterministic spacing value for a candidate so repeated runs stay stable.
-    """
-    base_spacing = max(1.0, float(base_spacing))
-    jitter_ratio = max(0.0, float(jitter_ratio))
-    key = f"{candidate['source']}|{float(candidate['x']):.3f}|{float(candidate['z']):.3f}"
-    rng = random.Random(key)
-    factor = 1.0 + rng.uniform(-jitter_ratio, jitter_ratio)
-    return base_spacing * max(0.01, factor)
-
-
-def collect_nebula_points_for_fcs(terrain_data, cache=None):
-    nebula_points = []
-    if not isinstance(terrain_data, dict):
-        return nebula_points
-
-    cache_dict = cache if isinstance(cache, dict) else None
-
-    for key, feat in terrain_data.items():
-        if not isinstance(feat, dict):
-            continue
-        if str(feat.get("type", "")).strip().lower() != "nebulas":
-            continue
-
-        start = feat.get("start", [0, 0, 0])
-        end = feat.get("end", [0, 0, 0])
-        density = int(feat.get("density", 0) or 0)
-        scatter = float(feat.get("scatter", 0) or 0)
-        seed = feat.get("seed")
-        hide_on_map = bool(feat.get("hideonmap", False))
-
-        if density <= 0 or scatter <= 0:
-            continue
-        if not (isinstance(start, (list, tuple)) and isinstance(end, (list, tuple))):
-            continue
-        if len(start) < 3 or len(end) < 3:
-            continue
-
-        cache_key = (
-            "nebulas",
-            tuple(start),
-            tuple(end),
-            float(scatter),
-            int(density),
-            seed,
-        )
-        cache_token = (key, cache_key)
-        coords = cache_dict.get(cache_token) if cache_dict is not None else None
-        if coords is None:
-            coords = generate_line_coords(start, end, density, scatter, seed=seed)
-            if cache_dict is not None:
-                cache_dict[cache_token] = coords
-
-        for gx, _, gz in coords:
-            nebula_points.append((float(gx), float(gz), key, hide_on_map))
-
-    return nebula_points
-
-
-def collect_fcs_blocked_centers(system_data, replace_existing=False):
-    blocked = []
-    if not isinstance(system_data, dict):
-        return blocked
-
-    if replace_existing:
-        return blocked
-
-    objects = system_data.get("objects", {})
-    if isinstance(objects, dict):
-        for obj in objects.values():
-            if not isinstance(obj, dict):
-                continue
-            if str(obj.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
-                continue
-            coord = obj.get("coordinate")
-            if isinstance(coord, (list, tuple)) and len(coord) >= 3:
-                blocked.append((float(coord[0]), float(coord[2])))
-
-    terrain_data = system_data.get("terrain", {})
-    if isinstance(terrain_data, dict):
-        for feat in terrain_data.values():
-            if not isinstance(feat, dict):
-                continue
-            if str(feat.get("type", "")).strip().lower() != FCS_ZONE_TYPE:
-                continue
-            coord = feat.get("coordinate")
-            if isinstance(coord, (list, tuple)) and len(coord) >= 3:
-                blocked.append((float(coord[0]), float(coord[2])))
-
-    return blocked
-
-
-def generate_zone_name(existing_objects, zone_type=FCS_ZONE_TYPE):
-    prefix = "ZONE"
-    zone_key = str(zone_type or "").strip().lower()
-    if zone_key == FCS_ZONE_TYPE:
-        prefix = "FCS"
-    elif zone_key.endswith("_zone"):
-        candidate_prefix = zone_key[:-5].replace("_", "").upper()
-        if candidate_prefix:
-            prefix = candidate_prefix
-
-    if isinstance(existing_objects, dict):
-        existing_names = {str(name) for name in existing_objects.keys()}
-    else:
-        existing_names = {str(name) for name in (existing_objects or [])}
-
-    pattern = re.compile(rf'^{re.escape(prefix)}\s*(\d+)$', re.IGNORECASE)
-    used_numbers = []
-    for name in existing_names:
-        match = pattern.match(name.strip())
-        if not match:
-            continue
-        try:
-            used_numbers.append(int(match.group(1)))
-        except ValueError:
-            continue
-
-    next_value = (max(used_numbers) + 1) if used_numbers else 1
-    candidate = f"{prefix}{next_value}"
-    while candidate in existing_names:
-        next_value += 1
-        candidate = f"{prefix}{next_value}"
-    return candidate
-
-
-def select_fcs_zone_centers(points, min_spacing=DEFAULT_FCS_MIN_SPACING,
-                            density_radius=DEFAULT_FCS_DENSITY_RADIUS,
-                            percentile=DEFAULT_FCS_DENSITY_PERCENTILE,
-                            min_score=DEFAULT_FCS_MIN_SCORE,
-                            blocked_centers=()):
-    """
-    Pick zone centers from nebula dots using local point density.
-
-    Points are scored by nearby dot concentration, then greedily selected with a
-    minimum center-to-center spacing so zones track dense clusters without
-    piling into the same pocket.
-    """
-    if not points:
-        return []
-
-    min_spacing = max(1.0, float(min_spacing))
-    density_radius = max(1.0, float(density_radius))
-    cell_size = density_radius
-    radius_sq = density_radius * density_radius
-    min_spacing_sq = min_spacing * min_spacing
-
-    grid = {}
-    for idx, (x, z, source_key, source_hidden) in enumerate(points):
-        cell_key = (int(math.floor(x / cell_size)), int(math.floor(z / cell_size)))
-        grid.setdefault(cell_key, []).append(idx)
-
-    candidates = []
-    raw_scores = []
-
-    for idx, (x, z, source_key, source_hidden) in enumerate(points):
-        gx = int(math.floor(x / cell_size))
-        gz = int(math.floor(z / cell_size))
-        score = 0.0
-        weighted_x = 0.0
-        weighted_z = 0.0
-
-        for dx in (-1, 0, 1):
-            for dz in (-1, 0, 1):
-                for other_idx in grid.get((gx + dx, gz + dz), []):
-                    ox, oz, _, _ = points[other_idx]
-                    dist_sq = distance_sq_2d(x, z, ox, oz)
-                    if dist_sq > radius_sq:
-                        continue
-                    weight = 1.0 - (dist_sq / radius_sq)
-                    score += weight
-                    weighted_x += ox * weight
-                    weighted_z += oz * weight
-
-        if score <= 0:
-            continue
-
-        raw_scores.append(score)
-        candidates.append({
-            "score": float(score),
-            "x": float(weighted_x / score),
-            "z": float(weighted_z / score),
-            "source": source_key,
-            "hideonmap": bool(source_hidden),
-        })
-
-    if not candidates:
-        return []
-
-    threshold = max(float(min_score), percentile_value(raw_scores, percentile))
-    blocked = [
-        {"x": float(x), "z": float(z), "spacing": float(min_spacing)}
-        for x, z in blocked_centers
-    ]
-    selected = []
-    selected_signatures = set()
-
-    def _candidate_signature(candidate):
-        return (
-            candidate["source"],
-            round(float(candidate["x"]), 6),
-            round(float(candidate["z"]), 6),
-        )
-
-    def _try_select_candidate(candidate):
-        cx = float(candidate["x"])
-        cz = float(candidate["z"])
-        candidate_spacing = jittered_fcs_spacing(candidate, min_spacing)
-        for blocked_item in blocked:
-            bx = float(blocked_item["x"])
-            bz = float(blocked_item["z"])
-            blocked_spacing = float(blocked_item.get("spacing", min_spacing))
-            required_spacing = (candidate_spacing + blocked_spacing) / 2.0
-            if distance_sq_2d(cx, cz, bx, bz) < required_spacing * required_spacing:
-                return False
-        selected.append({
-            "x": cx,
-            "z": cz,
-            "score": float(candidate["score"]),
-            "source": candidate["source"],
-            "hideonmap": bool(candidate["hideonmap"]),
-        })
-        blocked.append({
-            "x": cx,
-            "z": cz,
-            "spacing": candidate_spacing,
-        })
-        selected_signatures.add(_candidate_signature(candidate))
-        return True
-
-    candidates_by_source = {}
-    for candidate in candidates:
-        candidates_by_source.setdefault(candidate["source"], []).append(candidate)
-
-    # Pass 1: try to guarantee one zone per nebula field, unless spacing blocks it.
-    source_priority = sorted(
-        (
-            max(source_candidates, key=lambda item: item["score"])
-            for source_candidates in candidates_by_source.values()
-        ),
-        key=lambda item: item["score"],
-        reverse=True,
-    )
-
-    for source_head in source_priority:
-        source_candidates = sorted(
-            candidates_by_source.get(source_head["source"], []),
-            key=lambda item: item["score"],
-            reverse=True,
-        )
-        for candidate in source_candidates:
-            if _try_select_candidate(candidate):
-                break
-
-    # Pass 2: add extra zones only for stronger dense pockets.
-    for candidate in sorted(candidates, key=lambda item: item["score"], reverse=True):
-        if candidate["score"] < threshold:
-            break
-        if _candidate_signature(candidate) in selected_signatures:
-            continue
-        _try_select_candidate(candidate)
-
-    return selected
 
 # valid names: letters, digits, dot, space; 1–20 chars
 _VALID_NAME = re.compile(r'^[A-Za-z0-9. ]{1,20}$')
-DEFAULT_PLANET_CLASS = 'EarthLike'
-RELAY_TYPE_SENSOR = 'Sensor Relay'
-RELAY_TYPE_WARNING_BUOY = 'Warning Buoy'
-RELAY_TYPE_OPTIONS = [RELAY_TYPE_SENSOR, RELAY_TYPE_WARNING_BUOY]
-WARNING_BUOY_DEFAULT_PING = 2
-WARNING_BUOY_DEFAULT_RANGE = 15000
 
-g_obj_lb = None
-g_relay_lb = None
-g_ter_lb = None
-g_ctx = None
-# module‐scope holders for the last description edit
-_last_desc_widget = None
-_last_desc_obj    = None
 
-def get_base_path():
-    # When frozen by PyInstaller, use the folder containing the executable,
-    # not the temporary one-file extraction directory or current working directory.
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(os.path.abspath(sys.executable))
-    # When running as a script, use the module directory.
-    return os.path.dirname(os.path.abspath(__file__))
-
-def get_data_path():
-    """Directory where system JSON files live under data/missions/.../Terrain"""
-    settings = load_editor_settings()
-    return str(resolve_configured_path(settings.get('systemMapsPath'), get_default_data_path()))
-
-def get_default_data_path():
-    return os.path.join(get_base_path(), 'data', 'missions', 'Map Designer', 'Terrain')
-
-def get_default_html_path():
-    return os.path.join(get_base_path(), 'HTML')
-
-def resolve_configured_path(value: Any, default_path: str) -> Path:
-    raw = str(value or '').strip()
-    if not raw:
-        return Path(default_path)
-    path = Path(os.path.expandvars(os.path.expanduser(raw)))
-    if not path.is_absolute():
-        path = Path(get_base_path()) / path
-    return path
-
-def get_html_output_path():
-    settings = load_editor_settings()
-    return str(resolve_configured_path(settings.get('htmlOutputPath'), get_default_html_path()))
-
-def get_settings_path():
-    base = get_base_path()
-    settings_path = os.path.join(base, 'Settings.json')
-    try:
-        if os.path.isdir(base) and os.access(base, os.W_OK):
-            return settings_path
-    except Exception:
-        pass
-    home = os.path.expanduser('~')
-    return os.path.join(home, '.tsnmaps', 'Settings.json')
-
-def _load_settings_file(path: str) -> Dict[str, Any]:
-    try:
-        with open(path, 'r') as f:
-            data = json.load(f)
-        return data if isinstance(data, dict) else {}
-    except Exception:
-        return {}
-
-def load_editor_settings():
-    base_path = os.path.join(get_base_path(), 'Settings.json')
-    settings = _load_settings_file(base_path)
-    user_path = get_settings_path()
-    if os.path.abspath(user_path) != os.path.abspath(base_path):
-        user_settings = _load_settings_file(user_path)
-        settings.update(user_settings)
-    return settings
-
-def save_editor_settings(settings: Dict[str, Any]) -> None:
-    path = get_settings_path()
-    try:
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-    except Exception:
-        pass
-    try:
-        with open(path, 'w') as f:
-            json.dump(settings, f, indent=4)
-    except Exception:
-        pass
+from AppPaths import get_base_path, get_resource_path
 
 
 def _parse_multiline_values(value: str) -> List[str]:
@@ -1342,261 +674,6 @@ def open_settings_editor(parent=None, on_save=None):
     ttk.Button(button_row, text="Cancel", command=dlg.destroy).pack(side=tk.RIGHT)
     return dlg
 
-def _normalize_roles(entry: Dict[str, Any]) -> set:
-    roles = set()
-    raw_roles = entry.get('roles')
-    if isinstance(raw_roles, str):
-        roles.update(r.strip().lower() for r in raw_roles.split(',') if r.strip())
-    elif isinstance(raw_roles, list):
-        roles.update(str(r).strip().lower() for r in raw_roles if str(r).strip())
-    raw_role = entry.get('role')
-    if isinstance(raw_role, str) and raw_role.strip():
-        roles.add(raw_role.strip().lower())
-    return roles
-
-def _normalize_author_list(value: Any) -> List[str]:
-    if value is None:
-        return []
-    items = []
-    if isinstance(value, str):
-        items = [x.strip() for x in value.split(',')]
-    elif isinstance(value, list):
-        items = [str(x).strip() for x in value]
-    else:
-        return []
-    cleaned = []
-    seen = set()
-    for item in items:
-        if not item:
-            continue
-        key = item.casefold()
-        if key in seen:
-            continue
-        seen.add(key)
-        cleaned.append(item)
-    return cleaned
-
-def _coerce_revision_number(value: Any) -> int:
-    try:
-        if isinstance(value, bool):
-            return int(value)
-        if isinstance(value, (int, float)):
-            return int(value)
-        if isinstance(value, str):
-            return int(value.strip() or 0)
-    except Exception:
-        return 0
-    return 0
-
-def normalize_relay_type(value: Any) -> str:
-    text = str(value or '').strip().casefold()
-    if text == RELAY_TYPE_WARNING_BUOY.casefold():
-        return RELAY_TYPE_WARNING_BUOY
-    return RELAY_TYPE_SENSOR
-
-def ensure_relay_dict(entry: Any) -> Dict[str, Any]:
-    if isinstance(entry, dict):
-        coord = entry.get('coordinate', [0, 0, 0])
-        if not (isinstance(coord, (list, tuple)) and len(coord) >= 3):
-            coord = [0, 0, 0]
-        entry['coordinate'] = [coord[0], coord[1], coord[2]]
-        entry['type'] = normalize_relay_type(entry.get('type'))
-        return entry
-
-    coord = entry if isinstance(entry, (list, tuple)) and len(entry) >= 3 else [0, 0, 0]
-    return {
-        'coordinate': [coord[0], coord[1], coord[2]],
-        'type': RELAY_TYPE_SENSOR,
-    }
-
-def build_gate_index_for_systems(data_base: str, current_filename: str):
-    system_files = {}
-    other_gate_index = {}
-    try:
-        filenames = os.listdir(data_base)
-    except Exception:
-        return system_files, other_gate_index
-
-    for filename in filenames:
-        if not filename.endswith('.json'):
-            continue
-        lowered = filename.lower()
-        if lowered in ('package.json', 'galmapinfo.json'):
-            continue
-        system_name = os.path.splitext(filename)[0]
-        system_files[system_name.lower()] = filename
-        if current_filename and lowered == current_filename.lower():
-            continue
-        path = os.path.join(data_base, filename)
-        try:
-            with open(path, 'r') as f:
-                data = json.load(f)
-        except Exception:
-            continue
-        objects = data.get('objects', {})
-        if not isinstance(objects, dict):
-            continue
-        gate_names = set()
-        for name, obj in objects.items():
-            if not isinstance(obj, dict):
-                continue
-            otype = str(obj.get('type', '')).lower()
-            if otype in ('jumpnode', 'jumppoint', 'jump_point'):
-                gate_names.add(name.lower())
-        other_gate_index[filename] = gate_names
-
-    if current_filename:
-        current_name = os.path.splitext(current_filename)[0]
-        system_files.setdefault(current_name.lower(), current_filename)
-
-    return system_files, other_gate_index
-
-# ─── Undo/Redo state ────────────────────────────────────────────────
-undo_stack = []
-redo_stack = []
-current_sm = None    # holds the active SystemMap instance
-sm_win = None        # editor window, used for bell()
-
-def push_undo():
-    # capture a deep copy of current data
-    if current_sm is None:
-        return
-    undo_stack.append(copy.deepcopy(current_sm.data))
-
-    # cap at 10
-    if len(undo_stack) > 10:
-        undo_stack.pop(0)
-    # any new action invalidates redo history
-    redo_stack.clear()
-
-def do_undo():
-    # Undo the last action
-    if not undo_stack:
-        sm_win.bell()
-        return
-    # Push current state onto redo
-    redo_stack.append(copy.deepcopy(current_sm.data))
-    # Pop the last undo state and restore it
-    state = undo_stack.pop()
-    current_sm.data = state
-    _refresh_ui()
-
-def do_redo():
-    # Redo the last undone action
-    if not redo_stack:
-        sm_win.bell()
-        return
-    # Push current state back onto undo
-    undo_stack.append(copy.deepcopy(current_sm.data))
-    # Pop the last redo state and restore it
-    state = redo_stack.pop()
-    current_sm.data = state
-    _refresh_ui()
-
-def _refresh_ui():
-    """Repopulate listboxes and redraw canvas from current_sm.data."""
-    # Objects: update context list & listbox
-    obj_names = current_sm.list_objects()
-    g_ctx['objs'].clear()
-    g_ctx['objs'].extend(obj_names)
-    g_obj_lb.delete(0, 'end')
-    for n in obj_names:
-        g_obj_lb.insert('end', n)
-    # Relays: update context list & listbox
-    relay_names = list(current_sm.list_sensor_relays().keys())
-    g_ctx['relay_order'].clear()
-    g_ctx['relay_order'].extend(relay_names)
-    g_relay_lb.delete(0, 'end')
-    for r in relay_names:
-        g_relay_lb.insert('end', r)
-    # Terrain: update context list & listbox
-    terrain_names = current_sm.list_terrain()
-    g_ctx['terrain_keys'].clear()
-    g_ctx['terrain_keys'].extend(terrain_names)
-    g_ter_lb.delete(0, 'end')
-    for t in terrain_names:
-        g_ter_lb.insert('end', t)
-    # clear side‐pane and redraw canvas
-    clear_edit_pane()
-    # redraw the canvas using the draw_map in our saved context
-    g_ctx['draw_map'](g_ctx)
-    # ─── Clear any stale drag/selection state ─────────────────────
-    g_ctx['drag_data'].clear()
-    current_selection['type'] = None
-    current_selection['name'] = None
-
-
-# Editor-only gridline modes
-GRID_MODES = ['off', 'grid', 'sector', 'combined']
-GRID_SPACING = {'grid': 20000, 'sector': 100000}
-
-class SystemMap:
-    """
-    A class to load, edit, and save stellar system maps for StellarCartography.
-    """
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-        self.data: Dict[str, Any] = self._load()
-
-    def _load(self) -> Dict[str, Any]:
-        with open(self.file_path, 'r') as f:
-            return json.load(f)
-
-    def save(self, file_path: Optional[str] = None) -> None:
-        target = file_path or self.file_path
-        with open(target, 'w') as f:
-            json.dump(self.data, f, indent=4)
-
-    def list_sensor_relays(self) -> Dict[str, List[float]]:
-        return self.data.get('sensor_relay', {})
-
-    def list_objects(self) -> List[str]:
-        return list(self.data.get('objects', {}).keys())
-
-    def get_object(self, name: str) -> Dict[str, Any]:
-        return self.data.get('objects', {}).get(name, {})
-
-    def update_object_coordinate(self, name: str, coord: List[float]) -> bool:
-        obj = self.data.get('objects', {}).get(name)
-        if obj:
-            obj['coordinate'] = coord
-            return True
-        return False
-
-    def list_terrain(self) -> List[str]:
-        return list(self.data.get('terrain', {}).keys())
-
-    def get_terrain_feature(self, key: str) -> Dict[str, Any]:
-        return self.data.get('terrain', {}).get(key, {})
-
-    def update_terrain_feature(self, key: str, feature: Dict[str, Any]) -> bool:
-        if key in self.data.get('terrain', {}):
-            self.data['terrain'][key] = feature
-            return True
-        return False
-
-    def get_system_map_coord(self) -> List[float]:
-        return self.data.get('systemMapCoord', [])
-
-    def set_system_map_coord(self, coord: List[float]) -> None:
-        self.data['systemMapCoord'] = coord
-
-    def get_alignment(self) -> Optional[str]:
-        return self.data.get('alignment') or self.data.get('systemalignment')
-
-    def set_alignment(self, alignment: str) -> None:
-        if 'alignment' in self.data:
-            self.data['alignment'] = alignment
-        else:
-            self.data['systemalignment'] = alignment
-
-    def get_description(self) -> str:
-        return self.data.get('metadata', {}).get('sysdescription', '')
-
-    def set_description(self, description: str) -> None:
-        md = self.data.setdefault('metadata', {})
-        md['sysdescription'] = description
-
 
 def open_system_editor(filename: str) -> None:
     undo_stack = []
@@ -1608,10 +685,13 @@ def open_system_editor(filename: str) -> None:
     text_dirty = False
     copy_state = {'source_name': None, 'source_obj': None}
     session_revision_bumped = False
+    saved_state = None
     # base for images, data_base for system JSON files
     base = get_base_path()
     data_base = get_data_path()
-    file_path = os.path.join(data_base, filename)
+    file_path = os.path.abspath(os.path.join(data_base, filename))
+    data_base = os.path.dirname(file_path)
+    filename = os.path.basename(file_path)
     editor_settings = load_editor_settings()
     if not isinstance(editor_settings, dict):
         editor_settings = {}
@@ -1654,11 +734,37 @@ def open_system_editor(filename: str) -> None:
         except tk.TclError:
             pass
 
+    def capture_edit_state():
+        # Include controls committed only on Save and direct model edits.
+        variables = [*coord_vars, align_var, author_var, sec_var, pirate_var,
+                     enemy_var, dev_var, focus_var, vis_var, skybox_var,
+                     *export_vars.values(), *assets_vars.values(),
+                     *traffic_vars.values()]
+        return copy.deepcopy(sm.data), tuple(var.get() for var in variables)
+
     def has_unsaved_changes():
-        try:
-            return bool(undo_stack) or text_dirty
-        except Exception:
-            return bool(text_dirty)
+        flush_pending_text_widgets()
+        return saved_state != capture_edit_state()
+
+    def mark_saved():
+        nonlocal saved_state, text_dirty
+        flush_pending_text_widgets()
+        saved_state = capture_edit_state()
+        text_dirty = False
+
+    def confirm_pending_changes(action):
+        if not has_unsaved_changes():
+            return True
+        response = messagebox.askyesnocancel(
+            "Unsaved changes",
+            f"Save changes before {action}?\n\n"
+            "Yes = Save\nNo = Discard Changes\nCancel = Keep Editing",
+            parent=win,
+        )
+        if response is None:
+            return False
+        return save_all() if response else True
+
     # Load ShipMap for valid hulls and sides
     # ─── Load Cargo/Teams presets and master lists from JSON ─────────────
     try:
@@ -1669,7 +775,7 @@ def open_system_editor(filename: str) -> None:
     
     # ─── Load item metadata for icons from tsn_databases.py ─────────────
     try:
-        db_path = Path(base) / DATABASE_SOURCE
+        db_path = get_resource_path(DATABASE_SOURCE)
         snapshot = parse_database_snapshot(db_path)
         item_meta = build_item_meta(snapshot)
     except Exception as e:
@@ -1933,137 +1039,22 @@ def open_system_editor(filename: str) -> None:
     # initialize system map
     
     try:
-        global current_sm
         sm = SystemMap(file_path)
-        current_sm = sm
-        # ── Normalize old relay entries (bare lists) into dicts ───────────────
-        sr = sm.data.get('sensor_relay', {})
-        for key, val in list(sr.items()):
-            if isinstance(val, list):
-                sr[key] = {'coordinate': val}
-
-        # ── Migrate legacy "jump_point" types to "jumpnode"/"jumppoint" ───
-        migrated = False
-        for obj_key, obj in sm.data.get('objects', {}).items():
-            if obj.get('type') == 'jump_point':
-                st = obj.get('state', '')
-                # fix typo in state
-                if st == 'Unteathered':
-                    obj['state'] = 'Untethered'
-                    st = 'Untethered'
-        # map by state
-                if st == 'Tethered':
-                    obj['type'] = 'jumpnode'
-                elif st == 'Untethered':
-                    obj['type'] = 'jumppoint'
-                migrated = True
-
-        if migrated:
-        # persist the silent migration immediately
-            sm.save()
-
-        # ── Sanitize all names: replace hyphens with spaces ─────────────
-        renamed = False
-        for category in ('objects', 'sensor_relay', 'terrain'):
-            d = sm.data.get(category, {})
-            for old in list(d.keys()):
-                if '-' in old:
-                    new = old.replace('-', ' ')
-                    if new not in d:
-                        d[new] = d.pop(old)
-                        if category == 'objects':
-                            rename_incoming_only_gate(sm.data, old, new)
-                        renamed = True
-        if renamed:
-            # write out the updated JSON silently
-            sm.save()
-        # ── Ensure asteroid fields have default composition ──────────────
-        comp_changed = False
-        for tkey, feat in sm.data.get('terrain', {}).items():
-            if feat.get('type', '').lower() == 'asteroids':
-            # if missing or empty, assign default composition
-                if not feat.get('composition'):
-                    feat['composition'] = ['Ast. Std Rand']
-                    comp_changed = True
-        if comp_changed:
-        # silently persist the added compositions
-            sm.save()
+        # Required silent main-game compatibility migration; keep on load.
+        sm.migrate_names()
+        migrate_legacy_structure(sm)
         # Do NOT push an initial undo state here; we only mark undo after the first real edit.
 
         # ── Silent side fixes + validation for stations/platforms/static ─────────────
-        def validate_and_fix_sides_on_load(_sm: SystemMap):
-            """
-            On load, silently fix common side typos and warn about anything else invalid.
-              - 'TSN'     → 'USFP'
-              - 'pirate'  → 'Pirate'
-            Only checks objects of type: station, platform, static.
-            Warnings list any remaining sides not in Settings.json Races.
-            """
-            fset = set(valid_sides)
-            remap = {'tsn': 'USFP', 'pirate': 'Pirate'}
-            changed = False
-            issues = []
-            for obj_name in _sm.list_objects():
-                obj = _sm.get_object(obj_name)
-                otype = (obj.get('type') or '').lower()
-                if otype not in ('station', 'platform', 'static'):
-                    continue
-                sides = obj.get('sides')
-                if not isinstance(sides, list) or not sides:
-                    continue
-                # apply silent remaps
-                new_sides = []
-                for s in sides:
-                    s2 = remap.get(str(s).lower(), s)
-                    if s2 != s:
-                        changed = True
-                    new_sides.append(s2)
-                obj['sides'] = new_sides
-                # flag anything not in the allowed list
-                for s in new_sides:
-                    if s not in fset:
-                        issues.append(f"{obj_name}: invalid side '{s}'")
-            if changed:
-                # persist silent fixes immediately
-                _sm.save()
+        def validate_and_fix_sides_on_load(_sm):
+            issues = migrate_sides(_sm, valid_sides)
             if issues:
-                # inform user once after load
-                msg = "Objects with invalid side values:\n\n" + "\n".join(issues)
-                try:
-                    messagebox.showwarning("Side Validation", msg)
-                except Exception:
-                    print(msg)
+                messagebox.showwarning("Side Validation", "Objects with invalid side values:\n\n" + "\n".join(issues))
 
-        def validate_and_fix_planet_classes_on_load(_sm: SystemMap):
-            valid_class_set = set(valid_planet_classes)
-            changed = False
-            issues = []
-            for terrain_key, feat in _sm.data.get('terrain', {}).items():
-                if not isinstance(feat, dict):
-                    continue
-                if str(feat.get('type', '')).lower() != 'planet':
-                    continue
-                cls = feat.get('class')
-                if not isinstance(cls, str) or not cls.strip():
-                    feat['class'] = DEFAULT_PLANET_CLASS
-                    cls = DEFAULT_PLANET_CLASS
-                    changed = True
-                else:
-                    cls = cls.strip()
-                    if cls != feat.get('class'):
-                        feat['class'] = cls
-                        changed = True
-                if valid_class_set and cls not in valid_class_set:
-                    display_name = feat.get('name', terrain_key)
-                    issues.append(f"{terrain_key} ({display_name}): invalid planet class '{cls}'")
-            if changed:
-                _sm.save()
+        def validate_and_fix_planet_classes_on_load(_sm):
+            issues = migrate_planet_classes(_sm, valid_planet_classes)
             if issues:
-                msg = "Planets with invalid class values:\n\n" + "\n".join(issues)
-                try:
-                    messagebox.showwarning("Planet Class Validation", msg)
-                except Exception:
-                    print(msg)
+                messagebox.showwarning("Planet Class Validation", "Planets with invalid class values:\n\n" + "\n".join(issues))
 
         validate_and_fix_planet_classes_on_load(sm)
         validate_and_fix_sides_on_load(sm)
@@ -2071,22 +1062,24 @@ def open_system_editor(filename: str) -> None:
 
     except Exception as e:
         messagebox.showerror("Error", f"Failed to load system map: {e}")
-        return("Error", f"Failed to load system map: {e}")
-        return
+        return None
+
+    gate_origins = {name: name for name, obj in sm.data.get('objects', {}).items() if is_gate(obj)}
+
+    def history_snapshot():
+        return copy.deepcopy((sm.data, gate_origins))
 
     def push_undo():
         if sm is None:
             return
-        undo_stack.append(copy.deepcopy(sm.data))
+        undo_stack.append(history_snapshot())
         # cap at 10
         if len(undo_stack) > 10:
             undo_stack.pop(0)
         # any new action invalidates redo history
         redo_stack.clear()
 
-    global sm_win
     win = tk.Toplevel()
-    sm_win = win
 
     # ── Skybox metadata dropdown ─────────────────────────────────────────
     # Values come from cargo-teams.json -> 'skyboxes'
@@ -2187,11 +1180,9 @@ def open_system_editor(filename: str) -> None:
         width = 20
         )
     skybox_cb.grid(row=row, column=4, sticky='nsew', padx=(1,0))
-    skybox_var.trace_add('write', lambda *a: md.__setitem__('skybox', skybox_var.get()))
+    skybox_var.trace_add('write', lambda *a: sm.data.setdefault('metadata', {}).__setitem__('skybox', skybox_var.get()))
   # Skybox preview (100×100px)
     preview_label = tk.Label(md_parent)
-
-
 
 
     row += 1
@@ -2296,7 +1287,7 @@ def open_system_editor(filename: str) -> None:
         )
         cb.grid(row=row, column=2 + i , sticky='w', pady=(5, 2))
         var.trace_add(
-            'write', lambda *a, c=cat, v=var: traffic.__setitem__(c, v.get())
+            'write', lambda *a, c=cat, v=var: sm.data.setdefault('traffic', {}).__setitem__(c, v.get())
         )
     row += 1
 
@@ -2426,11 +1417,6 @@ def open_system_editor(filename: str) -> None:
     mapel_header.bind("<Button-1>", toggle_map_elements)
 
     # Ordering helper: sort A–Z before 0–9, case-insensitive
-    def _az09_key(name: str):
-        if name is None:
-            return (1, "")
-        s = str(name)
-        return (1 if (s[:1].isdigit()) else 0, s.casefold())
 
     # Find stations that have cargo/team validation errors
     def _stations_with_cargo_errors():
@@ -2595,18 +1581,20 @@ def open_system_editor(filename: str) -> None:
         if not undo_stack:
             win.bell()
             return
-        redo_stack.append(copy.deepcopy(sm.data))
-        state = undo_stack.pop()
-        sm.data = state
+        redo_stack.append(history_snapshot())
+        sm.data, origins = undo_stack.pop()
+        gate_origins.clear()
+        gate_origins.update(origins)
         _refresh_ui()
 
     def do_redo():
         if not redo_stack:
             win.bell()
             return
-        undo_stack.append(copy.deepcopy(sm.data))
-        state = redo_stack.pop()
-        sm.data = state
+        undo_stack.append(history_snapshot())
+        sm.data, origins = redo_stack.pop()
+        gate_origins.clear()
+        gate_origins.update(origins)
         _refresh_ui()
 
     def bind_history_shortcuts(window):
@@ -2810,6 +1798,7 @@ def open_system_editor(filename: str) -> None:
         idx = objs.index(obj_name)
         remove_incoming_only_gate(sm.data, obj_name)
         del sm.data['objects'][obj_name]
+        gate_origins.pop(obj_name, None)
         objs.pop(idx)
         obj_lb.delete(idx)
         clear_edit_pane()
@@ -2849,9 +1838,24 @@ def open_system_editor(filename: str) -> None:
             win.bell()
             return
         if new_name != name:
+            if any(other != name and other.casefold() == new_name.casefold() for other in sm.data['objects']):
+                messagebox.showerror("Rename Object", "An object with that name already exists.", parent=win)
+                return
+            flush_pending_text_widgets()
+            renamed_data = copy.deepcopy(sm.data)
+            obj = renamed_data['objects'].pop(name)
+            renamed_data['objects'][new_name] = obj
+            try:
+                if is_gate(obj):
+                    rewrite_gate_references(renamed_data, Path(file_path).stem, {name: new_name})
+                rename_incoming_only_gate(renamed_data, name, new_name)
+            except ValueError as exc:
+                messagebox.showerror("Rename Object", str(exc), parent=win)
+                return
             push_undo()
-            sm.data['objects'][new_name] = sm.data['objects'].pop(name)
-            rename_incoming_only_gate(sm.data, name, new_name)
+            sm.data = renamed_data
+            if name in gate_origins:
+                gate_origins[new_name] = gate_origins.pop(name)
             idx = objs.index(name)
             objs[idx] = new_name
             obj_lb.delete(idx)
@@ -2859,6 +1863,7 @@ def open_system_editor(filename: str) -> None:
             clear_edit_pane()
             draw_map(ctx)
             show_object(new_name)
+            refresh_overviews()
 
     def rename_relay(name):
         new_name = simpledialog.askstring("Rename Relay","New name:", initialvalue=name)
@@ -3040,8 +2045,7 @@ def open_system_editor(filename: str) -> None:
 
         def save_cargo_team_config():
             try:
-                with open(os.path.join(base, 'cargo_teams.json'), 'w', encoding='utf-8') as cf:
-                    json.dump(ct_config, cf, indent=4)
+                atomic_write_json(os.path.join(base, 'cargo_teams.json'), ct_config)
                 return True
             except Exception as exc:
                 messagebox.showerror(
@@ -3768,7 +2772,6 @@ def open_system_editor(filename: str) -> None:
             ).grid(row=6, column=2, sticky='w')
 
 
-
             # Rename & Delete buttons on row 5
             tk.Button(edit_frame, text="Copy",
                       command=lambda n=name, o=obj: arm_copy_object(n, o))\
@@ -4041,7 +3044,6 @@ def open_system_editor(filename: str) -> None:
         hide_chk.pack(anchor='w', pady=2)
 
 
-
     # Save All button
     def save_all():
         nonlocal session_revision_bumped, text_dirty
@@ -4049,7 +3051,8 @@ def open_system_editor(filename: str) -> None:
         try:
             flush_pending_text_widgets()
             # Update in-memory state
-            sm.set_system_map_coord([float(var.get()) for var in coord_vars])
+            sm.set_system_map_coord(parse_map_coordinate_fields(
+                [var.get() for var in coord_vars], sm.get_system_map_coord()))
             sm.set_alignment(align_var.get())
             sm.set_description(desc_text.get('1.0', tk.END).strip())
             persist_author_setting()
@@ -4103,25 +3106,30 @@ def open_system_editor(filename: str) -> None:
                 md['revision_number'] = rev_num + 1
                 md['revision_date'] = datetime.date.today().isoformat()
                 bumped_this_save = True
-            # Persist to disk
-            sm.save()
+            # Update incoming gate references with the system save, so rename
+            # remains undoable until Save and cannot partially update the map.
+            renames = {original: current for current, original in gate_origins.items()
+                       if current != original and is_gate(sm.get_object(current))}
+            sm.save(gate_renames=renames)
+            gate_origins.clear()
+            gate_origins.update({name: name for name, obj in sm.data.get('objects', {}).items() if is_gate(obj)})
             if bumped_this_save:
                 session_revision_bumped = True
             refresh_author_metadata_display(md)
             # Mark as clean (no unsaved changes)
-            # Using the project's definition: "unsaved" ≙ undo list has entries.
-            # After a successful save, clear undo/redo so close won't warn.
+            # Reset history and the baseline only after a successful write.
             try:
                 undo_stack.clear()
                 redo_stack.clear()
             except Exception:
                 pass
-            text_dirty = False
+            mark_saved()
             # Inform user with a sound only (no popup)
             try:
                 win.bell()
             except Exception:
                 pass
+            return True
         except Exception as e:
             # Restore metadata on failure to avoid false revision bumps
             try:
@@ -4135,14 +3143,26 @@ def open_system_editor(filename: str) -> None:
             except Exception:
                 pass
             messagebox.showerror("Error", f"Save failed: {e}")
+            return False
 
    # ─── Reload button (clear & reload from disk) ──────────────────
     def reload_all():
-        nonlocal sm, text_dirty
+        nonlocal text_dirty, session_revision_bumped
+        if not confirm_pending_changes("reloading"):
+            return False
         try:
+            # Read first so a failed read leaves the current session intact.
+            reloaded = SystemMap(file_path)
+            # Reload may encounter newly imported legacy names; apply the same
+            # compatibility migration as initial opening before refreshing UI.
+            reloaded.migrate_names()
+            validate_and_fix_planet_classes_on_load(reloaded)
+            validate_and_fix_sides_on_load(reloaded)
             clear_edit_pane()
-            # re-instantiate from file
-            sm = SystemMap(file_path)
+            sm.data = reloaded.data
+            sm.disk_bytes = reloaded.disk_bytes
+            gate_origins.clear()
+            gate_origins.update({name: name for name, obj in sm.data.get('objects', {}).items() if is_gate(obj)})
             # refresh metadata fields
             for var, val in zip(coord_vars, sm.get_system_map_coord()):
                 var.set(str(val))
@@ -4187,7 +3207,7 @@ def open_system_editor(filename: str) -> None:
 
             focus_var.set(md.get('focus', ''))
             vis_var.set("Show" if md.get('visible', True) else "Hide")
-            skybox_var.set(md.get('skybox', '') or skybox_var.get())
+            skybox_var.set(md.get('skybox', ''))
 
             traffic = sm.data.get('traffic', {})
             if not isinstance(traffic, dict):
@@ -4217,16 +3237,19 @@ def open_system_editor(filename: str) -> None:
 
             # update drawing context and redraw
             ctx['sm'] = sm
-            draw_map(ctx)
-            text_dirty = False
+            undo_stack.clear()
+            redo_stack.clear()
+            copy_state.update(source_name=None, source_obj=None)
+            session_revision_bumped = False
+            _refresh_ui()
+            refresh_objects_list()
+            mark_saved()
         except Exception as e:
             messagebox.showerror("Error", f"Reload failed: {e}")
-            return
+            return False
         # Re-run validation after a reload
         validate_and_report()
-        validate_and_fix_planet_classes_on_load(sm)
-        validate_and_fix_sides_on_load(sm)
-        # Refresh object list ordering/coloring after reload
+        return True
 
     # ─── Load Different System ────────────────────────────────────────────────
     def load_different_system():
@@ -4242,73 +3265,16 @@ def open_system_editor(filename: str) -> None:
         if newfname == 'package.json':
             messagebox.showerror("Error", "Cannot open package.json")
             return
-        # Close this editor window and open a fresh one
-        win.destroy()
-        open_system_editor(newfname)
+        if not confirm_pending_changes("opening another system"):
+            return
+        # Preserve this session if the selected file cannot be opened.
+        replacement = open_system_editor(newpath)
+        if isinstance(replacement, tk.Toplevel):
+            win.destroy()
 
-
-    def is_number_like(value):
-        if isinstance(value, bool):
-            return False
-        if not isinstance(value, (int, float)):
-            return False
-        try:
-            return math.isfinite(float(value))
-        except Exception:
-            return False
-
-    def validate_coordinate_value(value, label, issues, required_len=3):
-        if not isinstance(value, (list, tuple)) or len(value) < required_len:
-            issues.append(f"{label}: expected a coordinate list with at least {required_len} values.")
-            return False
-        ok = True
-        for idx in range(required_len):
-            if is_number_like(value[idx]):
-                continue
-            issues.append(f"{label}: coordinate index {idx} is not a finite number ({value[idx]!r}).")
-            ok = False
-        return ok
 
     def collect_cargo_team_validation_issues():
-        cargo_set = set(ct_config.get('cargo', []))
-        team_set  = set(ct_config.get('teams', []))
-        issues    = []
-        # Nothing to validate against? Skip quietly.
-        if not cargo_set and not team_set:
-            return issues
-        objects = sm.data.get('objects', {})
-        if not isinstance(objects, dict):
-            issues.append("objects must be a JSON object for cargo/team validation.")
-            return issues
-        for obj_name, obj in objects.items():
-            if not isinstance(obj, dict):
-                issues.append(f"{obj_name}: object entry is not a JSON object.")
-                continue
-            carg  = obj.get('cargo') or {}
-            tms   = obj.get('teams') or {}
-            if not isinstance(carg, dict):
-                issues.append(f"{obj_name}: cargo must be a JSON object.")
-                carg = {}
-            if not isinstance(tms, dict):
-                issues.append(f"{obj_name}: teams must be a JSON object.")
-                tms = {}
-            # Cargo checks
-            for item, qty in carg.items():
-                if item in team_set:
-                    issues.append(f"{obj_name}: '{item}' is a TEAM but appears under cargo.")
-                elif item not in cargo_set:
-                    issues.append(f"{obj_name}: Unknown cargo item '{item}'.")
-                if not isinstance(qty, int) or qty < 0:
-                    issues.append(f"{obj_name}: Cargo '{item}' has invalid qty {qty} (non-negative integer required).")
-            # Team checks
-            for item, qty in tms.items():
-                if item in cargo_set:
-                    issues.append(f"{obj_name}: '{item}' is CARGO but appears under teams.")
-                elif item not in team_set:
-                    issues.append(f"{obj_name}: Unknown team '{item}'.")
-                if not isinstance(qty, int) or qty < 0:
-                    issues.append(f"{obj_name}: Team '{item}' has invalid qty {qty} (non-negative integer required).")
-        return issues
+        return collect_cargo_issues(sm.data, ct_config)
 
     # ─── Validation: Cargo & Teams against cargo_teams.json ─────────────
     def validate_and_report(show_success=False):
@@ -4400,524 +3366,31 @@ def open_system_editor(filename: str) -> None:
             dlg.focus_set()
 
     def verify_system_data():
-        errors = []
-        warnings = []
-
-        try:
-            encoded = json.dumps(sm.data, indent=4, allow_nan=False)
-            decoded = json.loads(encoded)
-            if not isinstance(decoded, dict):
-                errors.append("JSON round-trip did not produce an object at the root.")
-        except Exception as exc:
-            errors.append(f"Current system data cannot be serialized as valid JSON: {exc}")
-            show_validation_results("Verify System", errors, warnings)
-            return
-
-        if not isinstance(sm.data, dict):
-            errors.append("System root must be a JSON object.")
-            show_validation_results("Verify System", errors, warnings)
-            return
-
-        system_coord = sm.data.get('systemMapCoord')
-        validate_coordinate_value(system_coord, "systemMapCoord", errors)
-
-        metadata = sm.data.get('metadata', {})
-        if metadata is not None and not isinstance(metadata, dict):
-            errors.append("metadata must be a JSON object when present.")
-
-        objects = sm.data.get('objects', {})
-        if not isinstance(objects, dict):
-            errors.append("objects must be a JSON object.")
-            objects = {}
-
-        terrain_data = sm.data.get('terrain', {})
-        if not isinstance(terrain_data, dict):
-            errors.append("terrain must be a JSON object.")
-            terrain_data = {}
-
-        relay_data = sm.data.get('sensor_relay', {})
-        if relay_data is not None and not isinstance(relay_data, dict):
-            errors.append("sensor_relay must be a JSON object when present.")
-            relay_data = {}
-
-        current_gate_names = {
-            str(obj_name).lower()
-            for obj_name, obj in objects.items()
-            if isinstance(obj, dict)
-            and str(obj.get('type', '') or '').strip().lower() in ('jumpnode', 'jumppoint', 'jump_point')
-        }
-        gate_index = dict(other_gate_index)
-        gate_index[filename] = current_gate_names
-        incoming_only_gate_list = get_incoming_only_gate_list(sm.data)
-        incoming_only_gate_names = {name.casefold() for name in incoming_only_gate_list}
-        for gate_name in incoming_only_gate_list:
-            if gate_name.casefold() not in current_gate_names:
-                warnings.append(
-                    f"Incoming-only metadata references missing jump object '{gate_name}'."
-                )
-        for obj_name, obj in objects.items():
-            if not isinstance(obj, dict):
-                errors.append(f"Object '{obj_name}' must be a JSON object.")
-                continue
-            obj_type = str(obj.get('type', '') or '').strip().lower()
-            if not obj_type:
-                errors.append(f"Object '{obj_name}' is missing a type.")
-            coord = obj.get('coordinate')
-            validate_coordinate_value(coord, f"Object '{obj_name}' coordinate", errors)
-            if obj_type in ('jumpnode', 'jumppoint', 'jump_point'):
-                if str(obj_name).casefold() not in incoming_only_gate_names:
-                    destinations = obj.get('destinations')
-                    if not isinstance(destinations, dict) or not destinations:
-                        warnings.append(f"Jump object '{obj_name}' has no valid destinations.")
-                    else:
-                        for dest_gate_name, dest_system_name in destinations.items():
-                            gate_name = str(dest_gate_name or '').strip()
-                            system_name = str(dest_system_name or '').strip()
-                            if not gate_name or not system_name:
-                                errors.append(f"Jump object '{obj_name}' has a blank destination entry.")
-                                continue
-                            dest_system_key = system_name.lower()
-                            if dest_system_key.endswith('.json'):
-                                dest_system_key = dest_system_key[:-5]
-                            dest_filename = system_files.get(dest_system_key)
-                            if not dest_filename:
-                                warnings.append(
-                                    f"Jump object '{obj_name}' points to missing system '{system_name}'."
-                                )
-                                continue
-                            if gate_name.lower() not in gate_index.get(dest_filename, set()):
-                                warnings.append(
-                                    f"Jump object '{obj_name}' points to missing gate '{gate_name}' in system '{system_name}'."
-                                )
-            if is_zone_type(obj_type):
-                radius = obj.get('radius')
-                if not is_number_like(radius) or float(radius) <= 0:
-                    errors.append(f"Zone object '{obj_name}' must have a positive numeric radius.")
-            cargo = obj.get('cargo')
-            if cargo is not None and not isinstance(cargo, dict):
-                errors.append(f"Object '{obj_name}' cargo must be a JSON object.")
-            teams = obj.get('teams')
-            if teams is not None and not isinstance(teams, dict):
-                errors.append(f"Object '{obj_name}' teams must be a JSON object.")
-
-        line_terrain_types = {'asteroids', 'nebulas'}
-        coord_terrain_types = {'blackhole', 'planet'}
-        box_terrain_types = {'hidden_minefield', 'minefield'}
-
-        for terr_name, feat in terrain_data.items():
-            if not isinstance(feat, dict):
-                errors.append(f"Terrain '{terr_name}' must be a JSON object.")
-                continue
-            terr_type = str(feat.get('type', '') or '').strip().lower()
-            if not terr_type:
-                errors.append(f"Terrain '{terr_name}' is missing a type.")
-                continue
-
-            if terr_type in line_terrain_types:
-                validate_coordinate_value(feat.get('start'), f"Terrain '{terr_name}' start", errors)
-                validate_coordinate_value(feat.get('end'), f"Terrain '{terr_name}' end", errors)
-                density = feat.get('density')
-                scatter = feat.get('scatter')
-                if not isinstance(density, int) or density < 0:
-                    errors.append(f"Terrain '{terr_name}' density must be a non-negative integer.")
-                if not is_number_like(scatter) or float(scatter) < 0:
-                    errors.append(f"Terrain '{terr_name}' scatter must be a non-negative number.")
-            elif terr_type in coord_terrain_types or is_zone_type(terr_type):
-                validate_coordinate_value(feat.get('coordinate'), f"Terrain '{terr_name}' coordinate", errors)
-                if is_zone_type(terr_type):
-                    radius = feat.get('radius')
-                    if not is_number_like(radius) or float(radius) <= 0:
-                        errors.append(f"Terrain zone '{terr_name}' must have a positive numeric radius.")
-            elif terr_type in box_terrain_types:
-                validate_coordinate_value(feat.get('coordinate'), f"Terrain '{terr_name}' coordinate", errors)
-                width = feat.get('width')
-                height = feat.get('height')
-                if not is_number_like(width) or float(width) <= 0:
-                    errors.append(f"Terrain '{terr_name}' width must be a positive number.")
-                if not is_number_like(height) or float(height) <= 0:
-                    errors.append(f"Terrain '{terr_name}' height must be a positive number.")
-
-        for relay_name, relay in relay_data.items():
-            if isinstance(relay, dict):
-                coord = relay.get('coordinate')
-            else:
-                coord = relay
-            validate_coordinate_value(coord, f"Sensor relay '{relay_name}' coordinate", errors)
-
-        warnings.extend(collect_cargo_team_validation_issues())
+        errors, warnings = verify_map_data(
+            sm.data, filename=filename, system_files=system_files,
+            other_gate_index=other_gate_index, ct_config=ct_config,
+        )
         show_validation_results("Verify System", errors, warnings)
 
     def show_station_list():
-        list_win = tk.Toplevel(win)
-        list_win.title("Stations Overview")
-        list_win.transient(win)
-        list_win.geometry(f"{min(1250, list_win.winfo_screenwidth() - 80)}x{min(700, list_win.winfo_screenheight() - 100)}")
-        list_win.minsize(600, 350)
-        bind_history_shortcuts(list_win)
-
-        tk.Label(list_win, text="Click a name to edit cargo/teams. Drag header dividers to resize columns; click headings to sort.").pack(anchor='w', padx=8, pady=(8, 0))
-
-        bulk = tk.LabelFrame(list_win, text="Change side for all stations and platforms")
-        bulk.pack(fill='x', padx=8, pady=6)
-        source_var = tk.StringVar()
-        target_var = tk.StringVar()
-        tk.Label(bulk, text="From:").pack(side='left')
-        source_cb = ttk.Combobox(bulk, textvariable=source_var, state='readonly', width=20)
-        source_cb.pack(side='left', padx=4)
-        tk.Label(bulk, text="To:").pack(side='left')
-        ttk.Combobox(bulk, textvariable=target_var, values=sorted(valid_sides),
-                     state='readonly', width=20).pack(side='left', padx=4)
-        status_var = tk.StringVar()
-        def change_all_sides():
-            source, target = source_var.get(), target_var.get()
-            if not source or not target or source == target:
-                status_var.set("Choose two different sides.")
-                return
-            matches = [obj for obj in sm.data.get('objects', {}).values()
-                       if str(obj.get('type', '')).lower() in STATION_OR_PLATFORM_TYPES
-                       and _first_side(obj) == source]
-            if matches:
-                flush_pending_text_widgets()
-                push_undo()
-                for obj in matches:
-                    sides = obj.get('sides')
-                    obj['sides'] = [target] + (list(sides[1:]) if isinstance(sides, (list, tuple)) else [])
-                _refresh_ui()
-            status_var.set(f"Changed {len(matches)} objects from {source} to {target}.")
-        tk.Button(bulk, text="Change all", command=change_all_sides).pack(side='left', padx=4)
-        tk.Label(list_win, textvariable=status_var, anchor='w').pack(fill='x', padx=8)
-
-        container = tk.Frame(list_win)
-        container.pack(fill='both', expand=True, padx=8, pady=8)
-
-        canvas = tk.Canvas(container, highlightthickness=0)
-        vsb = ttk.Scrollbar(container, orient='vertical', command=canvas.yview)
-        hsb = ttk.Scrollbar(container, orient='horizontal', command=canvas.xview)
-        canvas.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-        hsb.grid(row=1, column=0, sticky='ew')
-        canvas.grid(row=0, column=0, sticky='nsew')
-        vsb.grid(row=0, column=1, sticky='ns')
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        rows_frame = tk.Frame(canvas)
-        rows_id = canvas.create_window((0, 0), window=rows_frame, anchor='nw')
-
-        def _sync_scrollregion(event=None):
-            canvas.configure(scrollregion=canvas.bbox('all'))
-
-        def _sync_width(event):
-            canvas.itemconfigure(rows_id, width=max(canvas.winfo_width(), sum(column_widths.values())))
-
-        rows_frame.bind("<Configure>", _sync_scrollregion)
-        canvas.bind("<Configure>", _sync_width)
-
-        type_values = ['station', 'platform']
-        platform_hulls = [
-            e['key'] for e in ship_entries
-            if any(
-                role in ('platform', 'defense')
-                for role in (
-                    e.get('roles')
-                    if isinstance(e.get('roles'), list)
-                    else [r.strip() for r in e.get('roles', '').split(',') if r.strip()]
-                )
-            )
-        ]
-        platform_hulls = sorted(platform_hulls)
-
-        def has_cargo(obj):
-            cargo = obj.get('cargo') or {}
-            for qty in cargo.values():
-                try:
-                    if int(qty) > 0:
-                        return True
-                except Exception:
-                    if qty:
-                        return True
-            return False
-
-        def _first_side(obj):
-            sides = obj.get('sides')
-            if isinstance(sides, (list, tuple)) and sides:
-                return str(sides[0] or '')
-            if isinstance(sides, str):
-                return sides
-            return ''
-
-        def _count_positive_values(values):
-            if not isinstance(values, dict):
-                return 0
-            count = 0
-            for qty in values.values():
-                try:
-                    if int(qty) > 0:
-                        count += 1
-                except Exception:
-                    if qty:
-                        count += 1
-            return count
-
-        def _cargo_team_counts(obj):
-            return (
-                _count_positive_values(obj.get('cargo') or {}),
-                _count_positive_values(obj.get('teams') or {}),
-            )
-
-        def _cargo_team_summary(obj):
-            cargo_count, team_count = _cargo_team_counts(obj)
-            if cargo_count or team_count:
-                return f"Cargo {cargo_count} / Teams {team_count}"
-            return "Empty"
-
-        def _facilities_text(obj):
-            facilities = obj.get('facilities') or []
-            if not isinstance(facilities, (list, tuple, set)):
-                return str(facilities or '')
-            return ", ".join(str(item) for item in facilities)
-
-        sort_state = {'column': 'name', 'reverse': False}
-        overview_columns = (
-            ('name', 'Name', 200),
-            ('type', 'Type', 110),
-            ('side', 'Side', 140),
-            ('hull', 'Hull', 180),
-            ('facilities', 'Facilities', 280),
-            ('cargo', 'Cargo/Teams', 160),
+        return open_station_overview(
+            win=win,
+            bind_history_shortcuts=bind_history_shortcuts,
+            valid_sides=valid_sides,
+            ship_entries=ship_entries,
+            overview_refreshers=overview_refreshers,
+            sm=sm,
+            refresh_objects_list=refresh_objects_list,
+            _az09_key=_az09_key,
+            valid_hulls=valid_hulls,
+            convert_station_type=convert_station_type,
+            open_cargo_teams_dialog=open_cargo_teams_dialog,
+            push_undo=push_undo,
+            flush_pending_text_widgets=flush_pending_text_widgets,
+            ctx=ctx,
+            _refresh_ui=_refresh_ui,
+            draw_map=draw_map,
         )
-
-        column_widths = {key: width for key, _, width in overview_columns}
-        initial_layout = True
-
-        def _station_sort_value(obj_name, obj, column):
-            if column == 'name':
-                return _az09_key(obj_name)
-            if column == 'type':
-                return _az09_key(str(obj.get('type', '') or ''))
-            if column == 'side':
-                return _az09_key(_first_side(obj))
-            if column == 'hull':
-                return _az09_key(str(obj.get('hull', '') or ''))
-            if column == 'facilities':
-                return _az09_key(_facilities_text(obj))
-            if column == 'cargo':
-                cargo_count, team_count = _cargo_team_counts(obj)
-                return (cargo_count + team_count, cargo_count, team_count)
-            return _az09_key(obj_name)
-
-        def _sort_entries(entries):
-            column = sort_state.get('column', 'name')
-            return sorted(
-                entries,
-                key=lambda item: (_station_sort_value(item[0], item[1], column), _az09_key(item[0])),
-                reverse=bool(sort_state.get('reverse')),
-            )
-
-        def _set_station_sort(column):
-            if sort_state.get('column') == column:
-                sort_state['reverse'] = not sort_state.get('reverse', False)
-            else:
-                sort_state['column'] = column
-                sort_state['reverse'] = False
-            build_rows()
-
-        def _maybe_resort_after_change(column):
-            if sort_state.get('column') == column:
-                list_win.after_idle(build_rows)
-
-        def open_ct_dialog(obj_name):
-            open_cargo_teams_dialog(obj_name)
-            build_rows()
-            refresh_objects_list()
-
-        def build_rows():
-            nonlocal initial_layout
-            for child in rows_frame.winfo_children():
-                child.destroy()
-
-            for idx, (_, _, minsize) in enumerate(overview_columns):
-                rows_frame.grid_columnconfigure(idx, minsize=column_widths[overview_columns[idx][0]], weight=0)
-            _sync_width(None)
-            source_cb['values'] = sorted({_first_side(o) for o in sm.data.get('objects', {}).values()
-                                          if str(o.get('type', '')).lower() in STATION_OR_PLATFORM_TYPES and _first_side(o)})
-
-            active_sort = sort_state.get('column', 'name')
-            sort_suffix = " v" if sort_state.get('reverse') else " ^"
-            for col_idx, (key, label, _) in enumerate(overview_columns):
-                header_text = f"{label}{sort_suffix if key == active_sort else ''}"
-                header = tk.Frame(rows_frame, width=column_widths[key], height=30)
-                header.grid(row=0, column=col_idx, sticky='ew')
-                header.pack_propagate(False)
-                grip = tk.Frame(header, width=7, cursor='sb_h_double_arrow', relief='raised', bd=1)
-                grip.pack(side='right', fill='y')
-                drag = {}
-                def start_resize(event, k=key, d=drag):
-                    d.update(x=event.x_root, width=column_widths[k])
-                def resize(event, k=key, d=drag, col=col_idx):
-                    column_widths[k] = max(70, d['width'] + event.x_root - d['x'])
-                    rows_frame.grid_columnconfigure(col, minsize=column_widths[k])
-                    for cell in rows_frame.grid_slaves(column=col):
-                        cell.configure(width=column_widths[k])
-                    _sync_width(None)
-                grip.bind('<ButtonPress-1>', start_resize)
-                grip.bind('<B1-Motion>', resize)
-                tk.Button(
-                    header,
-                    text=header_text,
-                    font=('Arial', 9, 'bold'),
-                    relief=tk.SUNKEN if key == active_sort else tk.RAISED,
-                    command=lambda k=key: _set_station_sort(k),
-                    anchor='w',
-                ).pack(side='left', fill='both', expand=True)
-
-            entries = []
-            for obj_name in sm.list_objects():
-                obj = sm.get_object(obj_name)
-                otype = str(obj.get('type', '')).lower()
-                if otype not in ('station', 'platform'):
-                    continue
-                entries.append((obj_name, obj))
-            entries = _sort_entries(entries)
-
-            if not entries:
-                tk.Label(rows_frame, text="No stations or platforms found.").grid(row=1, column=0, columnspan=len(overview_columns), sticky='w', padx=2, pady=4)
-                return
-
-            row = 1
-            for obj_name, obj in entries:
-                otype = str(obj.get('type', '')).lower()
-                if otype not in ('station', 'platform'):
-                    otype = 'station'
-
-                cells = []
-                for col, (key, _, _) in enumerate(overview_columns):
-                    cell = tk.Frame(rows_frame, width=column_widths[key], height=32)
-                    cell.grid(row=row, column=col, sticky='ew')
-                    cell.grid_propagate(False)
-                    cell.grid_columnconfigure(0, weight=1)
-                    cells.append(cell)
-
-                name_lbl = tk.Label(cells[0], text=obj_name, cursor='hand2')
-                if not has_cargo(obj):
-                    name_lbl.configure(fg='red')
-                name_lbl.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
-                name_lbl.bind("<Button-1>", lambda e, n=obj_name: open_ct_dialog(n))
-
-                type_var = tk.StringVar(value=otype)
-                type_cb = ttk.Combobox(cells[1], textvariable=type_var, values=type_values, state='readonly', width=10)
-                type_cb.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
-
-                current_side = _first_side(obj)
-                side_values = list(valid_sides)
-                if current_side and current_side not in side_values:
-                    side_values = [current_side] + side_values
-                side_var = tk.StringVar(value=current_side)
-                side_cb = ttk.Combobox(cells[2], textvariable=side_var, values=side_values, state='readonly', width=14)
-                side_cb.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
-
-                def apply_overview_side(*_, o=obj, v=side_var):
-                    if o.get('sides') == [v.get()]:
-                        return
-                    push_undo()
-                    o['sides'] = [v.get()]
-                    draw_map(ctx)
-                    _maybe_resort_after_change('side')
-
-                side_var.trace_add('write', apply_overview_side)
-
-                hull_var = tk.StringVar(value=obj.get('hull', ''))
-                hull_vals = platform_hulls if type_var.get() == 'platform' else valid_hulls
-                hull_cb = ttk.Combobox(cells[3], textvariable=hull_var, values=hull_vals, state='readonly', width=16)
-                hull_cb.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
-
-                def apply_overview_hull(*_, o=obj, v=hull_var):
-                    if o.get('hull') == v.get():
-                        return
-                    push_undo()
-                    o['hull'] = v.get()
-                    draw_map(ctx)
-                    _maybe_resort_after_change('hull')
-
-                hull_var.trace_add('write', apply_overview_hull)
-
-                fac_frame = tk.Frame(cells[4])
-                fac_frame.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
-                facs = obj.get('facilities', [])
-                dock_var = tk.BooleanVar(value="Docking" in facs)
-                refuel_var = tk.BooleanVar(value="Refuel" in facs)
-                repair_var = tk.BooleanVar(value="Repair" in facs)
-
-                def apply_facilities(o=obj, dv=dock_var, rv=refuel_var, pv=repair_var):
-                    new_list = []
-                    if dv.get():
-                        new_list.append("Docking")
-                    if rv.get():
-                        new_list.append("Refuel")
-                    if pv.get():
-                        new_list.append("Repair")
-                    if o.get('facilities', []) == new_list:
-                        return
-                    push_undo()
-                    o['facilities'] = new_list
-                    _maybe_resort_after_change('facilities')
-
-                dock_cb = tk.Checkbutton(fac_frame, text="Docking", variable=dock_var, command=apply_facilities)
-                refuel_cb = tk.Checkbutton(fac_frame, text="Refuel", variable=refuel_var, command=apply_facilities)
-                repair_cb = tk.Checkbutton(fac_frame, text="Repair", variable=repair_var, command=apply_facilities)
-                dock_cb.pack(side='left')
-                refuel_cb.pack(side='left')
-                repair_cb.pack(side='left')
-
-                def set_facility_state(enabled, dcb=dock_cb, rcb=refuel_cb, pcb=repair_cb):
-                    state = 'normal' if enabled else 'disabled'
-                    dcb.configure(state=state)
-                    rcb.configure(state=state)
-                    pcb.configure(state=state)
-
-                def on_type_change(*_, n=obj_name, tv=type_var):
-                    convert_station_type(n, tv.get())
-
-                type_var.trace_add('write', on_type_change)
-                set_facility_state(type_var.get() == 'station')
-
-                cargo_frame = tk.Frame(cells[5])
-                cargo_frame.grid(row=0, column=0, sticky='ew', padx=2, pady=2)
-                cargo_lbl = tk.Label(cargo_frame, text=_cargo_team_summary(obj))
-                if not has_cargo(obj):
-                    cargo_lbl.configure(fg='red')
-                cargo_lbl.pack(side='left', padx=(0, 4))
-                tk.Button(cargo_frame, text="Edit", command=lambda n=obj_name: open_ct_dialog(n)).pack(side='left')
-
-                row += 1
-
-            # Size for the actual font/DPI and contents on first open. Later
-            # rebuilds retain the user's column widths, including after undo.
-            rows_frame.update_idletasks()
-            for col, (key, _, _) in enumerate(overview_columns):
-                cells = rows_frame.grid_slaves(column=col)
-                for cell in cells:
-                    children = cell.winfo_children()
-                    cell.configure(height=max([32] + [child.winfo_reqheight() + 4 for child in children]))
-                if initial_layout:
-                    content_width = max([column_widths[key]] + [
-                        child.winfo_reqwidth() + 8 for cell in cells
-                        for child in cell.winfo_children()])
-                    column_widths[key] = min(500, content_width)
-                    rows_frame.grid_columnconfigure(col, minsize=column_widths[key])
-                    for cell in cells:
-                        cell.configure(width=column_widths[key])
-            if initial_layout:
-                width = min(sum(column_widths.values()) + 40, list_win.winfo_screenwidth() - 80)
-                list_win.geometry(f"{width}x{min(700, list_win.winfo_screenheight() - 100)}")
-                initial_layout = False
-            _sync_width(None)
-
-        overview_refreshers[list_win] = build_rows
-        def on_destroy(event):
-            if event.widget == list_win:
-                overview_refreshers.pop(list_win, None)
-        list_win.bind('<Destroy>', on_destroy, add='+')
-        build_rows()
 
     def show_info():
         info_win = tk.Toplevel(win)
@@ -4951,11 +3424,8 @@ def open_system_editor(filename: str) -> None:
         txt.config(state='disabled')
 
     def generate_terrain():
-        scripts_dir = os.path.join(base, 'scripts')
-        if scripts_dir not in sys.path:
-            sys.path.insert(0, scripts_dir)
         try:
-            import generate_system_terrain as gst
+            from scripts import generate_system_terrain as gst
         except Exception as exc:
             messagebox.showerror("Generate Terrain", f"Failed to load generator:\n{exc}")
             return
@@ -5234,31 +3704,8 @@ def open_system_editor(filename: str) -> None:
     # ─── Close/Exit handling with unsaved-changes prompt ─────────────────────
     # ─── Close/Exit handling with unsaved-changes prompt ─────────────────────
     def on_close():
-        """
-        Intercept window close. If there are unsaved changes
-        (defined as undo_stack having entries), ask the user:
-        - Yes   → Save changes and exit
-        - No    → Discard changes and exit
-        - Cancel→ Do not close
-        """
-        has_unsaved = has_unsaved_changes()
-        if not has_unsaved:
+        if confirm_pending_changes("closing"):
             win.destroy()
-            return
-        resp = messagebox.askyesnocancel(
-            "Unsaved changes",
-            "You have unsaved changes.\n"
-            "Save changes before closing?\n\n"
-            "Yes = Save & Exit\nNo = Discard Changes\nCancel = Keep Editing"
-        )
-        if resp is None:
-            # Cancel
-            return
-        if resp:
-            # Yes → Save then close (only if save succeeds)
-            save_all()
-        # For No or after successful save, close the window
-        win.destroy()
 
     # Toolbar: replace in-lined ribbon with external module
     toolbar_frame = tk.Frame(frame)
@@ -5282,7 +3729,6 @@ def open_system_editor(filename: str) -> None:
     map_canvas.bind('<g>', cycle_grid_mode)
 
 
-
     # now instantiate our refactored Toolbar
     base = get_base_path()
     toolbar = Toolbar(
@@ -5301,12 +3747,6 @@ def open_system_editor(filename: str) -> None:
     ).pack(side=tk.LEFT, padx=(10, 2), pady=2)
 
     # bind resize (unchanged)
-    def on_canvas_resize(event):
-        nonlocal map_scale, pan_x, pan_y
-        width = event.width
-        height = event.height
-        map_scale = width / 500000.0
-        pan_y    = height / 2
 
     map_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True, pady=5)
 
@@ -5339,481 +3779,11 @@ def open_system_editor(filename: str) -> None:
         return x, z
 
     def draw_map(ctx):
-        # Unpack pan/zoom state
-        pan_x = ctx['pan_x']
-        pan_y = ctx['pan_y']
-        map_scale = ctx['map_scale']
-        map_canvas = ctx['map_canvas']
-        sm = ctx['sm']
-        system_files = ctx.get('system_files', {})
-        other_gate_index = ctx.get('other_gate_index', {})
-        current_filename = ctx.get('current_system_filename', '')
-        side_colour_view = bool(side_colour_view_var.get())
-        gate_index = dict(other_gate_index)
-        current_objects = sm.data.get('objects', {})
-        incoming_only_gate_names = get_incoming_only_gate_names(sm.data)
-        if current_filename:
-            current_gate_names = set()
-            for obj_name, obj in current_objects.items():
-                if not isinstance(obj, dict):
-                    continue
-                otype = str(obj.get('type', '')).lower()
-                if otype in ('jumpnode', 'jumppoint', 'jump_point'):
-                    current_gate_names.add(obj_name.lower())
-            gate_index[current_filename] = current_gate_names
-        def has_invalid_destination(obj_name, obj):
-            if str(obj_name).strip().casefold() in incoming_only_gate_names:
-                return False
-            destinations = obj.get('destinations')
-            if not isinstance(destinations, dict) or not destinations:
-                return True
-            for dest_gate_name, dest_system_name in destinations.items():
-                if not dest_gate_name or not dest_system_name:
-                    return True
-                dest_system_key = str(dest_system_name).strip().lower()
-                if not dest_system_key:
-                    return True
-                if dest_system_key.endswith('.json'):
-                    dest_system_key = dest_system_key[:-5]
-                dest_filename = system_files.get(dest_system_key)
-                if not dest_filename:
-                    return True
-                if str(dest_gate_name).lower() not in gate_index.get(dest_filename, set()):
-                    return True
-            return False
-        # Define local coordinate transforms to use updated pan/zoom
-        hull_ranges = ctx.get('hull_ranges', {})
-        def coord_to_screen(x, z):
-            sx = x * map_scale + pan_x
-            sy = -z * map_scale + pan_y
-            return sx, sy
-        def screen_to_coord(sx, sy):
-            x = (sx - pan_x) / map_scale
-            z = -(sy - pan_y) / map_scale
-            return x, z
-
-        pan_x = ctx['pan_x']
-        pan_y = ctx['pan_y']
-        map_scale = ctx['map_scale']
-        map_canvas = ctx['map_canvas']
-        sm = ctx['sm']
-        # clear canvas
-        map_canvas.delete('all')
-        # draw gridlines based on current mode
-        mode = GRID_MODES[grid_mode_index]
-        if mode in ('grid', 'sector', 'combined'):
-            w = map_canvas.winfo_width()
-            h = map_canvas.winfo_height()
-            x_min, z_max = screen_to_coord(0, 0)
-            x_max, z_min = screen_to_coord(w, h)
-            for key, spacing in GRID_SPACING.items():
-                if mode == key or mode == 'combined':
-                    color = '#555555' if key == 'grid' else 'white'
-                    # vertical lines
-                    start_x = math.floor(x_min / spacing) * spacing
-                    end_x = math.ceil(x_max / spacing) * spacing
-                    x = start_x
-                    while x <= end_x:
-                        sx, _ = coord_to_screen(x, 0)
-                        map_canvas.create_line(sx, 0, sx, h, fill=color, tags='grid')
-                        x += spacing
-                    # horizontal lines
-                    start_z = math.floor(z_min / spacing) * spacing
-                    end_z = math.ceil(z_max / spacing) * spacing
-                    z = start_z
-                    while z <= end_z:
-                        _, sy = coord_to_screen(0, z)
-                        map_canvas.create_line(0, sy, w, sy, fill=color, tags='grid')
-                        z += spacing
-        # draw sensor relays (interactive)
-        for rname, entry in sm.list_sensor_relays().items():
-            relay_entry = ensure_relay_dict(entry)
-            if relay_entry is not entry:
-                sm.data.setdefault('sensor_relay', {})[rname] = relay_entry
-            coord = relay_entry['coordinate']
-            relay_type = normalize_relay_type(relay_entry.get('type'))
-            sx, sy = coord_to_screen(coord[0], coord[2])
-            if relay_type == RELAY_TYPE_WARNING_BUOY:
-                rr = 6
-                color = 'orange'
-                map_canvas.create_polygon(
-                    sx, sy - rr,
-                    sx + rr, sy + rr,
-                    sx - rr, sy + rr,
-                    fill=color,
-                    outline='',
-                    tags=('relay_pt', rname)
-                )
-                map_canvas.create_text(
-                    sx, sy - 12,
-                    text=rname,
-                    fill=color,
-                    font=('Arial', 8),
-                    tags=('relay_pt', rname)
-                )
-            else:
-                rr = 5
-                color = 'green' if (rname.startswith('SR-') or rname.startswith('Relay ')) else 'cyan'
-                map_canvas.create_oval(
-                    sx-rr, sy-rr, sx+rr, sy+rr,
-                    fill=color, outline='', tags=('relay_pt', rname)
-                )
-                if color == 'cyan':
-                    map_canvas.create_text(
-                        sx, sy-10,
-                        text=rname, fill='cyan', font=('Arial',8), tags=('relay_pt', rname)
-                    )
-        # draw objects (jumpnodes/jumppoints in green)
-        # Use the *live* object names from the SystemMap so newly created items
-        # always appear, regardless of how the sidebar list is sorted/colored.
-        for name in sm.list_objects():
-            obj = sm.get_object(name)
-            coord = obj.get('coordinate', [0,0,0])
-            otype = obj.get('type','').lower()
-            sx, sy = coord_to_screen(coord[0], coord[2])
-
-            zone_style = get_zone_style(otype)
-            if zone_style is not None:
-                try:
-                    radius = float(obj.get('radius', 0) or 0)
-                except Exception:
-                    radius = 0.0
-                if radius > 0:
-                    rpx = radius * map_scale
-                    map_canvas.create_oval(
-                        sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                        outline=zone_style['outline'],
-                        fill=zone_style['fill'],
-                        stipple='gray25',
-                        tags=('obj', name)
-                    )
-                r = 5
-                map_canvas.create_oval(
-                    sx-r, sy-r, sx+r, sy+r,
-                    fill=zone_style['outline'], outline='',
-                    tags=('obj', name)
-                )
-                map_canvas.create_text(
-                    sx, sy-10,
-                    text=name,
-                    fill=zone_style['text'],
-                    font=('Arial', 8, 'bold'),
-                    tags=('obj', name)
-                )
-                continue
-
-            # use green for jumpnode/jumppoint, white otherwise
-            if side_colour_view and otype in STATION_OR_PLATFORM_TYPES:
-                color = get_station_side_colour(get_object_primary_side(obj), race_to_faction_cf)
-            else:
-                color = 'light green' if otype in ('jumpnode','jumppoint') else 'white'
-
-            # ── Jump node/point drift ring (pale blue) ─────────────────────────
-            # If the object is a jumpnode/jumppoint and has a drift value,
-            # draw a pale blue circle with radius == drift (in world units).
-            if otype in ('jumpnode', 'jumppoint'):
-                # Accept a few possible key spellings, default 0 if absent/non-numeric
-                drift_val = (
-                    obj.get('drift', None)
-                    if obj.get('drift', None) not in (None, '')
-                    else obj.get('drift_range', obj.get('driftrange', 0))
-                )
-                try:
-                    drift_val = float(drift_val)
-                except Exception:
-                    drift_val = 0.0
-                if drift_val > 0:
-                    rpx = drift_val * map_scale
-                    map_canvas.create_oval(
-                        sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                        outline='light blue', width=2,
-                        tags=('obj', name)
-                    )
-
-            if otype in ('jumpnode', 'jumppoint') and has_invalid_destination(name, obj):
-                ring_r = 12
-                map_canvas.create_oval(
-                    sx - ring_r, sy - ring_r, sx + ring_r, sy + ring_r,
-                    outline='yellow', width=2,
-                    tags=('obj', name)
-                )
-
-            if otype in ('jumpnode', 'jumppoint') and name.casefold() in incoming_only_gate_names:
-                draw_blue_gate_ring(map_canvas, sx, sy, radius=14, width=2, tags=('obj', name))
-
-
-            # ── Station/static range visuals (weapon ranges) ───────────────────
-            # BRange / DRange live in ShipMap.json on the hull entry (roles station/static).
-            # We visualize:
-            #  • Orange ring with radius = BRange (in world units) if BRange > 0.
-            #  • Red ring with a fixed radius = 10,000 if DRange is non-zero (presence indicates defender missiles).
-            # Notes:
-            #  - Rings are drawn in world-units → converted to pixels via map_scale.
-            #  - They share the object's name tag so they move/scale with the object.
-            hull_key = obj.get('hull', '') or ''
-            br, dr = hull_ranges.get(hull_key, (0, 0))
-            # Allow per-object override if author put BRange/DRange on the object itself
-            if 'BRange' in obj:
-                try:
-                    br = float(obj['BRange'])
-                except Exception:
-                    pass
-            if 'DRange' in obj:
-                try:
-                    dr = float(obj['DRange'])
-                except Exception:
-                    pass
-
-            # Orange BRange ring (radius == BRange world-units)
-            if br and float(br) > 0:
-                rpx = float(br) * map_scale
-                map_canvas.create_oval(
-                    sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                    outline='orange', width=2,
-                    tags=('obj', name)
-                )
-
-            # Red DRange ring (any non-zero DRange → fixed 10,000 world-unit radius)
-            if dr and float(dr) != 0.0:
-                rpx = 10000 * map_scale
-                map_canvas.create_oval(
-                    sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                    outline='red', width=2,
-                    tags=('obj', name)
-                )
-
-
-            # enlarge jumpnode/jumppoint markers
-            if otype in ('jumpnode','jumppoint'):
-                r = 8
-            else:
-                r = 5
-            map_canvas.create_oval(
-                sx-r, sy-r, sx+r, sy+r,
-                fill=color, tags=('obj', name)
-            )
-            if object_has_blank_or_invalid_hull(obj, valid_hull_keys):
-                draw_red_cross(map_canvas, sx, sy, radius=9, width=3, tags=('obj', name))
-            map_canvas.create_text(
-                sx, sy-10,
-                text=name, fill=color,
-                # bold and slightly larger for jump nodes
-                font=('Arial',10,'bold') if otype in ('jumpnode','jumppoint') else ('Arial',8),
-                tags=('obj', name)
-            )
-        # draw terrain as boxes
-        for key in terrain_keys:
-            feat = sm.get_terrain_feature(key)
-            # blackhole rendering: yellow dot with black center
-            t_type = feat.get('type','').lower()
-            zone_style = get_zone_style(t_type)
-            if zone_style is not None:
-                coord = feat.get('coordinate', [0,0,0])
-                try:
-                    radius = float(feat.get('radius', 0) or 0)
-                except Exception:
-                    radius = 0.0
-                sx, sy = coord_to_screen(coord[0], coord[2])
-                if radius > 0:
-                    rpx = radius * map_scale
-                    map_canvas.create_oval(
-                        sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                        outline=zone_style['outline'],
-                        fill=zone_style['fill'],
-                        stipple='gray25',
-                        tags=('terrain', key)
-                    )
-                rr = 4
-                map_canvas.create_oval(
-                    sx - rr, sy - rr, sx + rr, sy + rr,
-                    fill='blue',
-                    tags=('terrain_pt', key, 'coord')
-                )
-                map_canvas.create_text(
-                    sx, sy - 10,
-                    text=key,
-                    fill=zone_style['text'],
-                    font=('Arial', 8, 'bold'),
-                    tags=('terrain', key)
-                )
-                continue
-            if t_type == 'blackhole':
-                coord = feat.get('coordinate',[0,0,0])
-                sx, sy = coord_to_screen(coord[0], coord[2])
-                rr = 5  # same size as sensor relays
-                # outer yellow dot
-                map_canvas.create_oval(sx-rr, sy-rr, sx+rr, sy+rr, fill='yellow', outline='', tags=('terrain', key))
-                # inner black dot
-                r2 = rr / 2
-                map_canvas.create_oval(sx-r2, sy-r2, sx+r2, sy+r2, fill='black', outline='', tags=('terrain', key))
-                continue
-            if t_type == 'planet':
-                # Render as a red filled circle ~15,000 world units radius
-                coord = feat.get('coordinate', [0,0,0])
-                sx, sy = coord_to_screen(coord[0], coord[2])
-                rpx = 15000 * map_scale
-                map_canvas.create_oval(
-                    sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                    outline='red', fill='red',
-                    tags=('terrain', key)
-                )
-                # draggable/selectable center handle (blue), like other single-point terrain
-                rr = 4
-                map_canvas.create_oval(
-                    sx - rr, sy - rr, sx + rr, sy + rr,
-                    fill='blue',
-                    tags=('terrain_pt', key, 'coord')
-                )
-                # optional label (use name if present)
-                pname = feat.get('name', '')
-                if pname:
-                    map_canvas.create_text(
-                        sx, sy - (10 if rpx > 15 else 0),
-                        text=pname, fill='white', font=('Arial',8),
-                        tags=('terrain', key)
-                    )
-                continue
-            if t_type == 'debris_field':
-                # Circular area: center at 'coordinate', radius from 'scatter'
-                coord = feat.get('coordinate', [0,0,0])
-                radius = float(feat.get('scatter', 0) or 0)
-                sx, sy = coord_to_screen(coord[0], coord[2])
-                rpx = radius * map_scale
-                # fill: mid-dark grey; keep beneath other elements via 'terrain' tag
-                map_canvas.create_oval(
-                    sx - rpx, sy - rpx, sx + rpx, sy + rpx,
-                    outline='#666666', fill='#444444',
-                    tags=('terrain', key)
-                )
-                # draggable/selectable center handle (blue)
-                rr = 4
-                map_canvas.create_oval(
-                    sx - rr, sy - rr, sx + rr, sy + rr,
-                    fill='blue',
-                    tags=('terrain_pt', key, 'coord')
-                )
-                # optional label at center
-                map_canvas.create_text(
-                    sx, sy - (10 if rpx > 15 else 0),
-                    text=key, fill='white', font=('Arial',8),
-                    tags=('terrain', key)
-                )
-                continue
-            if t_type in ('hidden_minefield', 'minefield'):
-                coord = feat.get('coordinate', [0,0,0])
-                width = float(feat.get('width', 15000) or 0)
-                height = float(feat.get('height', 15000) or 0)
-                # Width/height are treated as extents from center (full size = 2x)
-                extent_w = width
-                extent_h = height
-                x0, z0 = coord[0] - extent_w, coord[2] - extent_h
-                x1, z1 = coord[0] + extent_w, coord[2] + extent_h
-                sx0, sy0 = coord_to_screen(x0, z0)
-                sx1, sy1 = coord_to_screen(x1, z1)
-                outline = '#cc0000' if t_type == 'hidden_minefield' else '#ff9900'
-                fill = '#552222' if t_type == 'hidden_minefield' else '#7a3d00'
-                map_canvas.create_rectangle(
-                    sx0, sy0, sx1, sy1,
-                    outline=outline, fill=fill,
-                    tags=('terrain', key)
-                )
-                # draggable/selectable center handle (blue)
-                sx, sy = coord_to_screen(coord[0], coord[2])
-                rr = 4
-                map_canvas.create_oval(
-                    sx - rr, sy - rr, sx + rr, sy + rr,
-                    fill='blue',
-                    tags=('terrain_pt', key, 'coord')
-                )
-                # label at center
-                map_canvas.create_text(
-                    sx, sy - 10,
-                    text=key, fill='white', font=('Arial',8),
-                    tags=('terrain', key)
-                )
-                continue
-            x0, _, z0 = feat.get('start', [0,0,0])
-            x1, _, z1 = feat.get('end', [0,0,0])
-            dx, dz = x1 - x0, z1 - z0
-            length = math.hypot(dx, dz) or 1
-            ux, uz = dx/length, dz/length
-            px, pz = -uz, ux
-            half = feat.get('scatter', 0)
-            corners = [
-                (x0 + px*half, z0 + pz*half),
-                (x1 + px*half, z1 + pz*half),
-                (x1 - px*half, z1 - pz*half),
-                (x0 - px*half, z0 - pz*half)
-            ]
-            t_type = feat.get('type', '').lower()
-            color = '#800080' if t_type == 'nebulas' else '#A52A2A' if t_type == 'asteroids' else 'cyan'
-            pts = []
-            for gx, gz in corners:
-                sx2, sy2 = coord_to_screen(gx, gz)
-                pts.extend([sx2, sy2])
-            fill_color = color
-            fill_stipple = ''
-            if t_type in ('nebulas', 'asteroids'):
-                # Tkinter doesn't support alpha in hex colors; use stipple for translucency.
-                fill_stipple = 'gray25'
-            map_canvas.create_polygon(
-                pts, fill=fill_color, outline='',
-                stipple=fill_stipple,
-                tags=('terrain_poly', key)
-            )
-            # overlay exact placement dots for nebulae/asteroids
-            if t_type in ('nebulas', 'asteroids'):
-                density = int(feat.get('density', 125) or 0)
-                density = max(0, min(density, 10000))
-                seed = feat.get('seed')
-                scatter = float(feat.get('scatter', 0) or 0)
-                cache = ctx.setdefault('terrain_points_cache', {})
-                cache_key = (t_type, tuple(feat.get('start', [0, 0, 0])), tuple(feat.get('end', [0, 0, 0])),
-                             float(scatter), int(density), seed)
-                coords = cache.get((key, cache_key))
-                if coords is None and density > 0 and scatter > 0:
-                    coords = generate_line_coords(feat.get('start', [0, 0, 0]),
-                                                  feat.get('end', [0, 0, 0]),
-                                                  density, scatter, seed=seed)
-                    cache[(key, cache_key)] = coords
-                if coords:
-                    dot_color = '#C24BFF' if t_type == 'nebulas' else '#D8A25A'
-                    dot_radius_world = 500 if t_type == 'nebulas' else 150
-                    rpx = dot_radius_world * map_scale
-                    for gx, _, gz in coords:
-                        sx2, sy2 = coord_to_screen(gx, gz)
-                        map_canvas.create_oval(
-                            sx2 - rpx, sy2 - rpx, sx2 + rpx, sy2 + rpx,
-                            fill=dot_color, outline='',
-                            tags=('terrain_pt', key)
-                        )
-            # Label terrain at midpoint (hide names for asteroids & nebulas)
-            if t_type not in ('asteroids', 'nebulas'):
-                cx = (x0 + x1) / 2 * map_scale + pan_x
-                cy = -(z0 + z1) / 2 * map_scale + pan_y
-                map_canvas.create_text(cx, cy, text=key, fill='white', font=('Arial',8))
-            # Draw start/end points
-            ssx, ssy = coord_to_screen(x0, z0)
-            esx, esy = coord_to_screen(x1, z1)
-            r2 = 4
-            map_canvas.create_oval(
-                ssx-r2, ssy-r2, ssx+r2, ssy+r2,
-                fill='blue', tags=('terrain_pt', key, 'start')
-            )
-            map_canvas.create_oval(
-                esx-r2, esy-r2, esx+r2, esy+r2,
-                fill='blue', tags=('terrain_pt', key, 'end')
-            )
-
-        # ── finally: push all terrain behind relays & objects ─────────────
-        map_canvas.tag_lower('terrain_poly')
-        map_canvas.tag_lower('terrain')
-        map_canvas.tag_raise('terrain_pt')
-        map_canvas.tag_raise('relay_pt')
-        map_canvas.tag_raise('obj')
-        if side_colour_view:
-            draw_station_side_colour_legend(map_canvas)
-            map_canvas.tag_raise('side_legend')
+        return draw_system_map(
+            ctx, side_colour_view_var=side_colour_view_var,
+            grid_mode_index=grid_mode_index, race_to_faction_cf=race_to_faction_cf,
+            valid_hull_keys=valid_hull_keys, terrain_keys=terrain_keys,
+        )
 
     def on_canvas_release(event):
         # After drag, update sidebar
@@ -5846,7 +3816,6 @@ def open_system_editor(filename: str) -> None:
         pan_y = event.y + factor * (pan_y - event.y)
         map_scale *= factor
         draw_map(ctx)
-
 
 
     # Adapter: show_relay via generic helper
@@ -6008,7 +3977,6 @@ def open_system_editor(filename: str) -> None:
     draw_map(ctx)
 
 
-
     # Now that the initial draw & UI wiring are complete, enable undo.
     # Also ensure stacks are pristine so close dialog won't trigger until a real edit.
     try:
@@ -6026,10 +3994,13 @@ def open_system_editor(filename: str) -> None:
     except Exception: pass
     # Hook window-close protocol
     win.protocol("WM_DELETE_WINDOW", on_close)
+    win.confirm_pending_changes = confirm_pending_changes
+    win.system_file_path = str(Path(file_path).resolve())
 
     # Run validation once the editor window is up
     validate_and_report()
     refresh_objects_list()
+    mark_saved()
     return win
 if __name__ == "__main__":
     root = tk.Tk()

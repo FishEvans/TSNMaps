@@ -1,4 +1,5 @@
 import string
+import json
 
 def debug_braces(template):
     count = 0
@@ -39,10 +40,16 @@ def debug_template(template):
         if field_name is not None:
             print(f"[TEMPLATE DEBUG] Chunk {idx}: field_name={field_name!r}")
 
+def script_json(value):
+    # JSON quotes names safely; escape '<' so embedded text cannot end a script.
+    return json.dumps(value).replace('<', '\\u003c')
+
+
 def build_object_button(name, hidden, color=None):
-    color_value = f"'{color}'" if color is not None else "null"
+    name_value = script_json(name)
+    color_value = script_json(color)
     return (
-        f"addButton('{name}',function(){{highlight('{name}');}},false,"
+        f"addButton({name_value},function(){{highlight({name_value});}},false,"
         f"{color_value},{str(hidden).lower()})"
     )
 

@@ -2,6 +2,12 @@ import argparse
 import json
 from collections import deque
 from pathlib import Path
+import sys
+
+# Support both direct CLI use and the bundled application.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from JsonStorage import atomic_write_json
 
 
 def normalize_system_name(name):
@@ -92,16 +98,23 @@ def main():
         help="Exclude jumps with hideonmap=true from the hop graph.",
     )
     args = parser.parse_args()
+    try:
+        export_jump_table(args.systems_dir, args.out, include_hidden=not args.exclude_hidden)
+    except (ValueError, OSError) as exc:
+        parser.error(str(exc))
 
-    systems_dir = args.systems_dir
+
+def export_jump_table(systems_dir, out_path, *, include_hidden=True):
+
+    systems_dir = Path(systems_dir)
     systems = load_systems(systems_dir)
     if not systems:
-        raise SystemExit(f"No system JSON files found in {systems_dir}")
+        raise ValueError(f"No system JSON files found in {systems_dir}")
 
-    adjacency = build_adjacency(systems, include_hidden=not args.exclude_hidden)
+    adjacency = build_adjacency(systems, include_hidden=include_hidden)
     system_names = sorted(systems.keys(), key=str.lower)
 
-    out_path = args.out
+    out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     distances_table = {}
@@ -119,11 +132,12 @@ def main():
 
     payload = {
         "systems": system_names,
-        "include_hidden": not args.exclude_hidden,
+        "include_hidden": include_hidden,
         "distances": distances_table,
     }
-    with out_path.open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
+    atomic_write_json(out_path, payload)
+
+    return out_path
 
 
 if __name__ == "__main__":

@@ -1,6 +1,12 @@
 import argparse
 import json
 from pathlib import Path
+import sys
+
+# Support both direct CLI use and the bundled application.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from JsonStorage import atomic_write_json
 
 
 def normalize_system_name(name):
@@ -142,13 +148,20 @@ def main():
         help="Output JSON path.",
     )
     args = parser.parse_args()
+    try:
+        export_system_info(args.systems_dir, args.out)
+    except (ValueError, OSError) as exc:
+        parser.error(str(exc))
 
-    systems_dir = args.systems_dir
+
+def export_system_info(systems_dir, out_path):
+
+    systems_dir = Path(systems_dir)
     systems = load_systems(systems_dir)
     if not systems:
-        raise SystemExit(f"No system JSON files found in {systems_dir}")
+        raise ValueError(f"No system JSON files found in {systems_dir}")
 
-    out_path = args.out
+    out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     payload = []
@@ -173,8 +186,9 @@ def main():
                 "hidden_jumps": hidden,
             }
         )
-    with out_path.open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
+    atomic_write_json(out_path, payload)
+
+    return out_path
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from SystemEditor import (  # noqa: E402
+from TerrainGeometry import (  # noqa: E402
     DEFAULT_FCS_DENSITY_PERCENTILE,
     DEFAULT_FCS_DENSITY_RADIUS,
     DEFAULT_FCS_MIN_SCORE,
@@ -18,11 +18,13 @@ from SystemEditor import (  # noqa: E402
     collect_fcs_blocked_centers,
     collect_nebula_points_for_fcs,
     generate_zone_name,
-    get_data_path,
     percentile_value,
     select_fcs_zone_centers,
 )
 
+
+from EditorSettings import get_data_path
+from JsonStorage import commit_json_updates
 
 SKIP_FILENAMES = {"package.json", "galmapinfo.json"}
 FCS_RADIUS_MIN = 5000
@@ -155,9 +157,9 @@ def load_system(path):
     return data
 
 
-def save_system(path, data):
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(data, handle, indent=4)
+def save_system(path, data, expected):
+    # Retain the original and reject edits made since the batch was loaded.
+    commit_json_updates({path: data}, expected={path: expected})
 
 
 def count_existing_fcs_zones(system_data):
@@ -348,7 +350,10 @@ def build_system_entries(root, paths):
                 errors=len(errors),
             )
             try:
-                data = load_system(path)
+                original_bytes = path.read_bytes()
+                data = json.loads(original_bytes)
+                if not isinstance(data, dict):
+                    raise ValueError("System JSON must be an object.")
                 nebula_points = collect_nebula_points_for_fcs(data.get("terrain", {}), cache={})
                 existing_fcs_count = count_existing_fcs_zones(data)
             except Exception as exc:
@@ -373,6 +378,7 @@ def build_system_entries(root, paths):
             entries.append({
                 "path": path,
                 "data": data,
+                "original_bytes": original_bytes,
                 "nebula_points": nebula_points,
                 "existing_fcs_count": existing_fcs_count,
             })
@@ -649,7 +655,7 @@ def apply_batch(root, entries, settings):
                 created += 1
 
             try:
-                save_system(entry["path"], data)
+                save_system(entry["path"], data, entry["original_bytes"])
             except Exception as exc:
                 errors.append(f"{system_name}: {exc}")
                 update_progress_window(
@@ -711,9 +717,8 @@ def show_summary(root, summary, load_errors, apply_errors):
     messagebox.showinfo("Generate FCS Zones", "\n".join(lines))
 
 
-def main():
-    root = tk.Tk()
-    root.withdraw()
+def run_tool(root):
+    """Run within the existing application without creating another Tk root."""
 
     data_base, paths = list_system_paths()
     if not paths:
@@ -721,7 +726,6 @@ def main():
             "Generate FCS Zones",
             "No system JSON files were found in:\n" + str(data_base),
         )
-        root.destroy()
         return
 
     entries, load_errors = build_system_entries(root, paths)
@@ -730,7 +734,6 @@ def main():
             "Generate FCS Zones",
             "No readable system JSON files were found.",
         )
-        root.destroy()
         return
 
     if not any(entry["nebula_points"] for entry in entries):
@@ -738,17 +741,23 @@ def main():
             "Generate FCS Zones",
             "No nebula dots were found in the available systems.",
         )
-        root.destroy()
         return
 
     settings = show_settings_dialog(root, entries)
     if not settings:
-        root.destroy()
         return
 
     summary, apply_errors = apply_batch(root, entries, settings)
     show_summary(root, summary, load_errors, apply_errors)
-    root.destroy()
+
+
+def main():
+    root = tk.Tk()
+    root.withdraw()
+    try:
+        run_tool(root)
+    finally:
+        root.destroy()
 
 
 if __name__ == "__main__":

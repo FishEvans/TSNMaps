@@ -15,10 +15,8 @@ DESCRIPTION_FIELDS = {"description", "type", "race", "tags"}
 SHIP_STAT_FIELDS = {"shields", "systemhealth", "abilities"}
 
 
-def get_base_path():
-    if getattr(sys, "frozen", False):
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(os.path.abspath(__file__))
+from AppPaths import get_base_path, get_resource_path
+import EditorSettings
 
 
 def normalize_roles(roles):
@@ -100,7 +98,7 @@ def _load_hjson_like_file(path):
 
 @lru_cache(maxsize=1)
 def load_shipmap_index():
-    path = Path(get_base_path()) / SHIPMAP_RELATIVE_PATH
+    path = Path(EditorSettings.get_html_output_path()) / "Images" / "Ships" / "ShipMap.json"
     if not path.exists():
         return {}
 
@@ -120,7 +118,7 @@ def load_shipmap_index():
 
 @lru_cache(maxsize=1)
 def load_shipdata_index():
-    path = Path(get_base_path()) / SHIPDATA_PATH
+    path = get_resource_path(SHIPDATA_PATH)
     if not path.exists():
         return {}
 
@@ -180,7 +178,7 @@ def _parse_literal_fields(entry_node, allowed_fields):
 
 @lru_cache(maxsize=1)
 def load_authoritative_description_index():
-    path = Path(get_base_path()) / AUTHORITATIVE_DB_PATH
+    path = get_resource_path(AUTHORITATIVE_DB_PATH)
     if not path.exists():
         return {}
 
@@ -208,7 +206,7 @@ def load_authoritative_description_index():
 
 @lru_cache(maxsize=1)
 def load_authoritative_ship_stats_index():
-    path = Path(get_base_path()) / AUTHORITATIVE_DB_PATH
+    path = get_resource_path(AUTHORITATIVE_DB_PATH)
     if not path.exists():
         return {}
 
@@ -236,7 +234,7 @@ def load_authoritative_ship_stats_index():
 
 @lru_cache(maxsize=1)
 def load_low_priority_description_index():
-    path = Path(get_base_path()) / LOW_PRIORITY_DESC_PATH
+    path = get_resource_path(LOW_PRIORITY_DESC_PATH)
     if not path.exists():
         return {}
 
