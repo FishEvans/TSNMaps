@@ -653,6 +653,11 @@ def build_styles(layout):
       .system-name {{ font-size: 52px; }}
       #info img {{ max-width: 56%; }}
     }}
+    body.briefing-hide-left #controls,
+    body.briefing-hide-right #info,
+    body.briefing-hide-left #mobile-systems-toggle,
+    body.briefing-hide-right #mobile-info-toggle {{ display:none; }}
+    body.briefing-hide-left.briefing-hide-right #mobile-toolbar {{ display:none; }}
     """
 
 
@@ -837,6 +842,8 @@ def build_script(layout, system_meta, coords):
     }}
 
     function selectSystem(name) {{
+      if (!Object.prototype.hasOwnProperty.call(systemMeta, name) ||
+          (!systemMeta[name].visible && !isGM())) return false;
       if (selectedSystem && selectedSystem !== name) {{
         setJumpHighlight(selectedSystem, false);
       }}
@@ -847,13 +854,14 @@ def build_script(layout, system_meta, coords):
       if (isMobileLayout()) {{
         setActiveMobileDrawer('info');
       }}
+      return true;
     }}
 
     function clearSelectedSystem() {{
-      if (!selectedSystem) return;
-      setJumpHighlight(selectedSystem, false);
+      if (selectedSystem) setJumpHighlight(selectedSystem, false);
       selectedSystem = null;
       setSelectedSystemLink(null);
+      document.getElementById('system-details').innerHTML = '<p>Select a system to view metadata.</p>';
     }}
 
     function centerOnSystem(name) {{
@@ -1103,6 +1111,45 @@ def build_script(layout, system_meta, coords):
       }}
       applyGMVisibility();
       syncMobileDrawerState();
+    }});
+
+    // Briefing controls: URL state for initial load, postMessage for live changes.
+    function setBriefingPanels(left, right) {{
+      if (typeof left === 'boolean') document.body.classList.toggle('briefing-hide-left', !left);
+      if (typeof right === 'boolean') document.body.classList.toggle('briefing-hide-right', !right);
+      activeMobileDrawer = null;
+      syncMobileDrawerState();
+      resetZoom();
+    }}
+
+    function showBriefingSystem(name) {{
+      if (typeof name !== 'string' || !Object.prototype.hasOwnProperty.call(systemMeta, name)) return false;
+      if (!systemMeta[name].visible && !isGM()) return false;
+      setBriefingPanels(undefined, true);
+      selectSystem(name);
+      centerOnSystem(name);
+      return true;
+    }}
+
+    const briefingParams = new URLSearchParams(window.location.search);
+    const briefingPanels = briefingParams.get('panels');
+    if (briefingPanels === 'none') setBriefingPanels(false, false);
+    else if (briefingPanels === 'left') setBriefingPanels(true, false);
+    else if (briefingPanels === 'right') setBriefingPanels(false, true);
+    else if (briefingPanels === 'both') setBriefingPanels(true, true);
+    if (briefingParams.has('system')) {{
+      window.addEventListener('load', () => showBriefingSystem(briefingParams.get('system')));
+    }}
+
+    window.addEventListener('message', function(event) {{
+      if (event.source !== window.parent) return;
+      if (event.origin !== 'https://tsn-mission-briefing.fishevans.chatgpt.site' &&
+          event.origin !== window.location.origin) return;
+      const command = event.data;
+      if (!command || command.source !== 'tsn-briefing' || typeof command.type !== 'string') return;
+      if (command.type === 'setPanels') setBriefingPanels(command.left, command.right);
+      else if (command.type === 'showSystem') showBriefingSystem(command.name);
+      else if (command.type === 'clearSelection') clearSelectedSystem();
     }});
     """
 

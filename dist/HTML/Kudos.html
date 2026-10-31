@@ -173,6 +173,11 @@
             color: white;
         }
         #search-box::placeholder { color: rgba(255, 255, 255, 0.6); }
+        body.briefing-hide-left #controls,
+        body.briefing-hide-right #info,
+        body.briefing-hide-left #mobile-controls-btn,
+        body.briefing-hide-right #mobile-info-btn { display: none; }
+        body.briefing-hide-left.briefing-hide-right #mobile-toolbar { display: none; }
         @media (max-width: 900px) {
             body { display: block; }
             #mobile-toolbar { display: flex; }
@@ -379,9 +384,10 @@
     
     function highlight(name) {
         var obj = objData[name];
+        if (!obj) return false;
         if (obj.hidden && !isGM()) {
             alert("This object is not visible on the public map.");
-            return;
+            return false;
         }
         var annotation = {
             x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
@@ -475,10 +481,8 @@
             bindGalacticButton();
             attachAuthorHover();
             openInfoPanel();
-                + infoHtml;
-         
+            return true;
     }
-         bindGalacticButton();
     
 
     var fig = {"data": [{"type": "scatter", "x": [-356485.35679999995, -356699.2352656547, -357337.2111427732, -358388.3684872178, -359834.721705389, -361651.5232927191, -363807.68727033626, -366266.32107478194, -368985.35679999995, -371918.2709908727, -375014.8806724369, -378222.20199449867, -381485.35679999995, -384748.51160550123, -387955.832927563, -391052.4426091272, -393985.35679999995, -396704.39252521796, -399163.02632966364, -401319.1903072808, -403135.9918946109, -404582.3451127821, -405633.5024572266, -406271.4783343452, -406485.35679999995, -406271.4783343452, -405633.5024572267, -404582.34511278215, -403135.9918946109, -401319.1903072808, -399163.02632966364, -396704.39252521796, -393985.35679999995, -391052.4426091272, -387955.832927563, -384748.51160550123, -381485.35679999995, -378222.20199449867, -375014.88067243696, -371918.2709908727, -368985.35679999995, -366266.32107478194, -363807.68727033626, -361651.5232927191, -359834.721705389, -358388.36848721775, -357337.2111427733, -356699.2352656547, -356485.35679999995], "y": [68096.88832000001, 71360.0431255013, 74567.36444756303, 77663.97412912725, 80596.88832000001, 83315.92404521802, 85774.5578496637, 87930.7218272809, 89747.52341461097, 91193.87663278218, 92245.03397722672, 92883.00985434528, 93096.88832000001, 92883.00985434528, 92245.03397722672, 91193.87663278218, 89747.52341461097, 87930.7218272809, 85774.5578496637, 83315.92404521804, 80596.88832000001, 77663.97412912727, 74567.36444756304, 71360.04312550131, 68096.88832000001, 64833.733514498716, 61626.41219243699, 58529.802510872774, 55596.88832000002, 52877.852594781994, 50419.21879033634, 48263.05481271914, 46446.25322538905, 44999.900007217846, 43948.74266277331, 43310.76678565475, 43096.88832000001, 43310.76678565475, 43948.74266277331, 44999.90000721784, 46446.25322538905, 48263.05481271912, 50419.21879033632, 52877.85259478199, 55596.88832, 58529.802510872774, 61626.412192436976, 64833.73351449872, 68096.88832000001], "fill": "toself", "fillcolor": "rgba(80,204,80,0.12)", "line": {"shape": "spline", "color": "#50CC50", "width": 2}, "hoverinfo": "skip", "showlegend": false, "meta": {"render_layer": 7}}, {"type": "scatter", "x": [-381485.35679999995], "y": [68096.88832000001], "mode": "markers+text", "marker": {"symbol": "circle-open", "size": 16, "color": "#50CC50", "line": {"color": "#50CC50", "width": 5}}, "hovertext": ["JP 56 [P92]"], "hoverinfo": "text", "text": ["JP 56"], "textposition": "top center", "textfont": {"color": "#50CC50", "size": 20}, "meta": {"base_marker_size": 16, "base_text_size": 20, "render_layer": 7}}], "layout": {"title": "Kudos", "paper_bgcolor": "black", "plot_bgcolor": "black", "font": {"color": "white"}, "margin": {"l": 0, "r": 0, "t": 40, "b": 0}, "autosize": true, "dragmode": "pan", "hovermode": "closest", "xaxis": {"color": "white", "showgrid": false, "gridcolor": "gray", "gridwidth": 1.5, "zeroline": false, "dtick": 20000, "title": "X Axis"}, "yaxis": {"color": "white", "showgrid": false, "gridcolor": "gray", "gridwidth": 1.5, "zeroline": false, "dtick": 20000, "scaleanchor": "x", "scaleratio": 1, "title": "Z Axis"}, "shapes": []}};
@@ -1027,7 +1031,7 @@ function addButton(label, fn, header, color, isHidden) {
   addButton('None', clearAnnotations, false, null);
 
   addSection('--- Gates ---', function() {
-    addButton('JP 56',function(){highlight('JP 56');},false,null,false)
+    addButton("JP 56",function(){highlight("JP 56");},false,null,false)
   });
 
   addSection('--- Nav Points/POI ---', function() {
@@ -1070,6 +1074,40 @@ function addButton(label, fn, header, color, isHidden) {
         );
         header.style.display = hasVisibleEntry ? '' : 'none';
       });
+  });
+
+  // Briefing controls: URL state for initial load, postMessage for live changes.
+  function setBriefingPanels(left, right) {
+    if (typeof left === 'boolean') pageBody.classList.toggle('briefing-hide-left', !left);
+    if (typeof right === 'boolean') pageBody.classList.toggle('briefing-hide-right', !right);
+    closePanels();
+    requestAnimationFrame(function() { Plotly.Plots.resize(plotDiv); });
+  }
+
+  function showBriefingObject(name) {
+    if (typeof name !== 'string' || !Object.prototype.hasOwnProperty.call(objData, name)) return false;
+    if (objData[name].hidden && !isGM()) return false;
+    setBriefingPanels(undefined, true);
+    return highlight(name);
+  }
+
+  var briefingParams = new URLSearchParams(window.location.search);
+  var briefingPanels = briefingParams.get('panels');
+  if (briefingPanels === 'none') setBriefingPanels(false, false);
+  else if (briefingPanels === 'left') setBriefingPanels(true, false);
+  else if (briefingPanels === 'right') setBriefingPanels(false, true);
+  else if (briefingPanels === 'both') setBriefingPanels(true, true);
+  if (briefingParams.has('object')) showBriefingObject(briefingParams.get('object'));
+
+  window.addEventListener('message', function(event) {
+    if (event.source !== window.parent) return;
+    if (event.origin !== 'https://tsn-mission-briefing.fishevans.chatgpt.site' &&
+        event.origin !== window.location.origin) return;
+    var command = event.data;
+    if (!command || command.source !== 'tsn-briefing' || typeof command.type !== 'string') return;
+    if (command.type === 'setPanels') setBriefingPanels(command.left, command.right);
+    else if (command.type === 'showObject') showBriefingObject(command.name);
+    else if (command.type === 'clearSelection') clearAnnotations();
   });
 </script>
 </body>

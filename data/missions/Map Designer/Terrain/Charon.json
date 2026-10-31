@@ -1,27 +1,36 @@
 {
     "systemMapCoord": [
-        -5412.440318274779,
+        -5412.44031827478,
         0,
         5217.143807263146
     ],
     "systemalignment": "USFP",
     "metadata": {
-        "sysdescription": "",
-        "security": "Neutral",
-        "exports": [],
-        "focus": "",
-        "intel": {},
-        "development": "Unclaimed",
+        "sysdescription": "Charon is a fortified USFP frontier outpost linking Norayne, Triton and Waypoint 46. Mining and industry support a growing naval presence, while asteroid fields, nebulae and scattered debris make patrols difficult and provide ample cover for hostile activity.",
+        "security": "Low",
+        "exports": [
+            "Mining"
+        ],
+        "focus": "Defense & Security",
+        "intel": {
+            "pirate": "Low",
+            "enemy": "Mid",
+            "assets": [
+                "Shipyard",
+                "Fortification"
+            ]
+        },
+        "development": "Outpost",
         "visible": true,
         "skybox": "sky1.png",
         "original_author": "Tetra",
-        "revision_date": "2005-12-23",
-        "revision_number": 15,
+        "revision_date": "2026-10-10",
+        "revision_number": 18,
         "all_authors": [
             "Fish Evans",
             "Draeco"
         ],
-        "last_revision_author": "Draeco"
+        "last_revision_author": "Fish Evans"
     },
     "objects": {
         "Norayne Gate": {
@@ -258,9 +267,9 @@
         },
         "WP 33 K": {
             "coordinate": [
-                -128507.50234509072,
+                -130750.63544078301,
                 0,
-                -83289.16053228099
+                -82074.13010544766
             ],
             "sides": [
                 "USFP"
@@ -305,38 +314,41 @@
                 "Repair"
             ],
             "cargo": {
-                "Homing": 150,
-                "Nuke": 55,
-                "EMP": 45,
-                "Mine": 80,
-                "High Yield Warhead": 15,
-                "Warhead": 160,
-                "Torpedo Casing": 130,
-                "Navigational Array": 7,
-                "Tactical Array": 10,
-                "Guidance System": 60,
-                "Medical Supplies": 12,
-                "Repair Materials": 15,
-                "Sensor Suite": 22,
-                "Casing": 10,
-                "Computer Core": 2,
-                "FCS": 1,
-                "AMC": 2,
-                "Scorch": 44
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Warning Buoy": 5,
+                "Navigational Array": 1,
+                "Tactical Array": 2,
+                "Disruptor": 8,
+                "EMP": 12,
+                "Homing": 25,
+                "Mine": 12,
+                "Nuke": 12,
+                "Penetration": 6,
+                "Scorch": 25,
+                "Casing": 16,
+                "Guidance System": 31,
+                "High Yield Warhead": 7,
+                "Power Relay": 8,
+                "Receiver": 15,
+                "Sensor Suite": 6,
+                "Torpedo Casing": 15,
+                "Transmitter": 35,
+                "Warhead": 20
             },
             "teams": {
-                "DamCon": 10,
-                "Medics": 2,
-                "Combat Engineers": 10,
-                "Marines": 13
+                "Combat Engineers": 2,
+                "DamCon": 1,
+                "Marines": 4,
+                "Medics": 2
             },
-            "description": ""
+            "description": "Charon Forward Command is the system\u2019s main TSN military base, coordinating gate security, patrols and local defences. Its docking, refuelling, repair and ordnance facilities make it the operational centre of USFP activity on the Norayne frontier."
         },
         "WP 101 M": {
             "coordinate": [
-                -63690.25088972467,
+                -53729.06394134185,
                 0,
-                -4071.389346664537
+                345.78857614775717
             ],
             "sides": [
                 "USFP"
@@ -345,13 +357,14 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": ""
         },
         "SY 101": {
             "coordinate": [
-                -67566.38487908097,
+                -51971.04241690696,
                 0,
-                -8528.94343442428
+                -1903.1765502058404
             ],
             "sides": [
                 "USFP"
@@ -360,7 +373,8 @@
             "type": "station",
             "facilities": [],
             "cargo": {},
-            "teams": {}
+            "teams": {},
+            "description": "SY 101 is a compact naval shipyard supporting Charon\u2019s frontier fleet. It handles structural repairs, refits and maintenance for smaller combat vessels, reducing the need to send damaged ships deeper into USFP territory."
         },
         "WP 101 P": {
             "coordinate": [
@@ -416,16 +430,18 @@
         },
         "SY 889": {
             "coordinate": [
-                -38198.2395948327,
+                -41668.879391328075,
                 0,
-                2714.536894423816
+                4427.320170616339
             ],
             "sides": [
                 "USFP"
             ],
             "hull": "usfp_shipyard",
             "type": "station",
-            "facilities": [],
+            "facilities": [
+                "Repair"
+            ],
             "cargo": {},
             "teams": {},
             "description": ""
@@ -442,9 +458,34 @@
             "hull": "usfp_industrial_assembly",
             "type": "station",
             "facilities": [
-                "Refuel"
+                "Docking"
             ],
-            "cargo": {},
+            "cargo": {
+                "Fuel Cell 100": 3,
+                "Life Support": 2,
+                "Homing": 4,
+                "Casing": 15,
+                "Guidance System": 2,
+                "Meals": 3,
+                "Micro Controller": 9,
+                "Power Relay": 15,
+                "Rations": 26,
+                "Sensor Suite": 6,
+                "Torpedo Casing": 10,
+                "Warhead": 9,
+                "Aegirine": 18,
+                "Alerite": 41,
+                "Ashfilum": 45,
+                "Cabrite": 34,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 154,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 56,
+                "Reisium": 26,
+                "Tharium": 30
+            },
             "teams": {},
             "description": ""
         },
@@ -460,10 +501,32 @@
             "hull": "starbase_industry",
             "type": "station",
             "facilities": [
-                "Docking",
-                "Refuel"
+                "Docking"
             ],
-            "cargo": {},
+            "cargo": {
+                "Fuel Cell 100": 4,
+                "Homing": 7,
+                "Casing": 16,
+                "Guidance System": 4,
+                "Meals": 5,
+                "Micro Controller": 5,
+                "Power Relay": 17,
+                "Rations": 21,
+                "Torpedo Casing": 9,
+                "Warhead": 11,
+                "Aegirine": 23,
+                "Alerite": 42,
+                "Ashfilum": 37,
+                "Cabrite": 37,
+                "Denebite": 1,
+                "Gredian": 27,
+                "Ice": 134,
+                "Iron": 78,
+                "Mexalon": 7,
+                "Nuidinium": 53,
+                "Reisium": 29,
+                "Tharium": 26
+            },
             "teams": {},
             "description": ""
         },
@@ -479,10 +542,38 @@
             "hull": "usfp_industrial_processor",
             "type": "station",
             "facilities": [
-                "Refuel"
+                "Docking"
             ],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Life Support": 1,
+                "Homing": 5,
+                "Casing": 15,
+                "Guidance System": 2,
+                "Meals": 4,
+                "Micro Controller": 8,
+                "Power Relay": 16,
+                "Rations": 25,
+                "Sensor Suite": 5,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 20,
+                "Alerite": 40,
+                "Ashfilum": 42,
+                "Cabrite": 35,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 150,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 54,
+                "Reisium": 25,
+                "Tharium": 31
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 1
+            },
             "description": ""
         },
         "Corelia Mining": {
@@ -501,35 +592,42 @@
                 "Refuel"
             ],
             "cargo": {
-                "Iron": 750,
-                "Tharium": 60,
-                "Reisium": 60,
-                "Alerite": 54,
-                "Cabrite": 815,
-                "Ashfilum": 258,
-                "Denebite": 30,
-                "Aegirine": 151,
-                "Nuidinium": 159,
-                "Gredian": 180,
+                "Fuel Cell 100": 2,
                 "Life Support": 1,
+                "Homing": 35,
+                "Casing": 15,
+                "Guidance System": 2,
+                "Meals": 4,
                 "Micro Controller": 8,
                 "Power Relay": 16,
-                "FCS": 1,
-                "AMC": 1,
-                "Iso B Circuit": 22,
-                "Navigational Array": 1
+                "Rations": 25,
+                "Sensor Suite": 5,
+                "Torpedo Casing": 10,
+                "Warhead": 10,
+                "Aegirine": 20,
+                "Alerite": 40,
+                "Ashfilum": 42,
+                "Cabrite": 35,
+                "Denebite": 2,
+                "Gredian": 27,
+                "Ice": 150,
+                "Iron": 80,
+                "Mexalon": 8,
+                "Nuidinium": 54,
+                "Reisium": 25,
+                "Tharium": 31
             },
             "teams": {
                 "DamCon": 1,
-                "Medics": 2
+                "Medics": 1
             },
-            "description": ""
+            "description": "Corelia Mining is one of Charon\u2019s largest mineral-processing operations, feeding raw materials into the system\u2019s shipyards and factories. Though civilian, its output is closely tied to local military repair and construction."
         },
         "RS 9992": {
             "coordinate": [
-                -166618.6515354191,
+                -165904.69134871147,
                 0,
-                36840.336130016425
+                37035.052544573045
             ],
             "sides": [
                 "USFP"
@@ -541,7 +639,7 @@
             ],
             "cargo": {},
             "teams": {},
-            "description": "Classified research station",
+            "description": "RS 9992 is a classified USFP research station absent from normal civilian navigation records. It operates with restricted access and its own concealed defence platform; most personnel in Charon are officially expected not to ask what happens there.",
             "hideonmap": true
         },
         "Harrling Casinos": {
@@ -559,9 +657,35 @@
                 "Refuel",
                 "Docking"
             ],
-            "cargo": {},
-            "teams": {},
-            "description": ""
+            "cargo": {
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Life Support": 1,
+                "Aid Package": 16,
+                "Alcohol": 8,
+                "Casing": 6,
+                "Coffee": 7,
+                "Container": 25,
+                "Iso B Circuit": 25,
+                "Meals": 30,
+                "Medical Supplies": 6,
+                "Micro Controller": 8,
+                "Packaging": 15,
+                "Pets": 6,
+                "Power Relay": 16,
+                "Produce": 10,
+                "Rations": 25,
+                "Repair Materials": 16,
+                "Tea": 7,
+                "Torpedo Casing": 5,
+                "Ashfilum": 20,
+                "Ice": 100
+            },
+            "teams": {
+                "Diplomats": 1,
+                "Medics": 1
+            },
+            "description": "Harrling Casinos is Charon\u2019s main civilian leisure station, providing gaming, food, accommodation and basic services to naval crews, miners and traders. Its glamour is modest, but on a hard frontier posting it rarely lacks customers."
         },
         "Soulin Trading": {
             "coordinate": [
@@ -580,31 +704,45 @@
                 "Repair"
             ],
             "cargo": {
-                "Warhead": 13,
+                "Coolant": 15,
+                "Fuel Cell 100": 7,
+                "Fuel Cell 200": 1,
+                "Fuel Cell 400": 1,
                 "Life Support": 3,
-                "Micro Controller": 25,
-                "Medical Supplies": 25,
-                "Power Relay": 16,
-                "Transmitter": 8,
-                "Receiver": 6,
-                "Analysis Suite": 8,
-                "Sensor Suite": 8,
-                "Guidance System": 15,
-                "Wild Animals": 15,
-                "Pets": 4,
-                "Casing": 15,
                 "EMP": 10,
                 "Homing": 35,
-                "Coolant": 15,
-                "Tea": 12,
+                "Alcohol": 16,
+                "Analysis Suite": 8,
+                "Casing": 15,
                 "Coffee": 15,
-                "Alcohol": 16
+                "Container": 18,
+                "Denebite Crystals": 5,
+                "Guidance System": 15,
+                "High Yield Warhead": 3,
+                "Iso B Circuit": 7,
+                "Meals": 14,
+                "Medical Supplies": 25,
+                "Micro Controller": 25,
+                "Packaging": 8,
+                "Pets": 4,
+                "Power Relay": 16,
+                "Produce": 15,
+                "Rations": 25,
+                "Receiver": 6,
+                "Repair Materials": 8,
+                "Sensor Suite": 8,
+                "Tea": 12,
+                "Tharium Plating": 16,
+                "Torpedo Casing": 21,
+                "Transmitter": 8,
+                "Warhead": 13,
+                "Wild Animals": 15
             },
             "teams": {
                 "DamCon": 2,
                 "Medics": 2
             },
-            "description": ""
+            "description": "Soulin Trading is Charon\u2019s main commercial hub, offering docking, refuelling, repairs and a wide range of civilian and technical goods. It is a common stop for independent traders and off-duty crews."
         },
         "Serrin Transit": {
             "coordinate": [
@@ -622,30 +760,40 @@
                 "Refuel"
             ],
             "cargo": {
-                "Life Support": 3,
-                "Medical Supplies": 16,
-                "Micro Controller": 25,
-                "Power Relay": 16,
-                "Transmitter": 8,
-                "Receiver": 6,
-                "Analysis Suite": 8,
+                "Fuel Cell 100": 2,
+                "Fuel Cell 200": 1,
+                "Navigational Array": 1,
+                "Tactical Array": 10,
+                "Disruptor": 5,
+                "EMP": 6,
+                "Homing": 50,
+                "Mine": 6,
+                "Nuke": 2,
+                "Penetration": 2,
+                "Scorch": 8,
+                "Casing": 20,
+                "Guidance System": 25,
+                "High Yield Warhead": 15,
+                "Power Relay": 5,
                 "Sensor Suite": 8,
-                "Guidance System": 15,
-                "Casing": 15,
-                "EMP": 10,
-                "Homing": 55
+                "Tharium Plating": 9,
+                "Torpedo Casing": 27,
+                "Warhead": 26,
+                "Mexalon": 3
             },
             "teams": {
-                "DamCon": 2,
+                "Combat Engineers": 2,
+                "DamCon": 3,
+                "Marines": 1,
                 "Medics": 2
             },
             "description": ""
         },
         "DS 76": {
             "coordinate": [
-                -54891.381207183505,
+                -66013.58280665784,
                 0,
-                -48284.38818693066
+                -45667.39957528964
             ],
             "sides": [
                 "USFP"
@@ -686,9 +834,9 @@
         },
         "WP 9992": {
             "coordinate": [
-                -162029.20366183989,
+                -163381.40098514978,
                 0,
-                42404.28339038237
+                37644.54881233157
             ],
             "sides": [
                 "USFP"
@@ -696,322 +844,246 @@
             "hull": "defense_platform_fighter",
             "type": "station",
             "facilities": [],
-            "cargo": {},
-            "teams": {},
+            "cargo": {
+                "Coolant": 8,
+                "Fuel Cell 400": 1,
+                "Computer Core": 2,
+                "Life Support": 2,
+                "EMP": 10,
+                "Homing": 35,
+                "Analysis Suite": 8,
+                "Casing": 15,
+                "Denebite Crystals": 2,
+                "Guidance System": 15,
+                "High Yield Warhead": 10,
+                "Iso B Circuit": 2,
+                "Meals": 15,
+                "Medical Supplies": 16,
+                "Micro Controller": 25,
+                "Power Relay": 16,
+                "Rations": 8,
+                "Receiver": 6,
+                "Repair Materials": 6,
+                "Sensor Suite": 8,
+                "Transmitter": 8,
+                "Wild Animals": 15,
+                "Ice": 40,
+                "Mexalon": 9
+            },
+            "teams": {
+                "DamCon": 1,
+                "Medics": 5
+            },
             "description": "",
             "hideonmap": true
         }
     },
     "sensor_relay": {
-        "SR 80": {
+        "NAV HAZ 001": {
             "coordinate": [
-                -120835.25405275899,
+                43824.71221049814,
                 0,
-                -52064.06589505556
+                124351.19157794828
+            ],
+            "type": "Warning Buoy",
+            "broadcast": "Keep Clear",
+            "ping": 2,
+            "range": 16000,
+            "description": ""
+        },
+        "SR 001": {
+            "coordinate": [
+                -143411.1765053115,
+                0,
+                -77301.5065430476
             ],
             "type": "Sensor Relay"
         },
-        "SR 73": {
+        "SR 002": {
             "coordinate": [
-                -114029.69849720343,
+                -109223.67471918896,
                 0,
-                -39517.76959875926
+                -85534.41513644037
             ],
             "type": "Sensor Relay"
         },
-        "SR 78": {
+        "SR 003": {
             "coordinate": [
-                -107224.14294164788,
+                -75036.17293306641,
                 0,
-                -26971.473302462964
+                -93767.32372983315
             ],
             "type": "Sensor Relay"
         },
-        "SR 98": {
+        "SR 004": {
             "coordinate": [
-                -100418.58738609232,
+                -40848.67114694386,
                 0,
-                -14425.177006166661
+                -102000.23232322594
             ],
             "type": "Sensor Relay"
         },
-        "SR 61": {
+        "SR 005": {
             "coordinate": [
-                -93613.03183053677,
+                -6661.16936082131,
                 0,
-                -1878.8807098703692
+                -110233.14091661871
             ],
             "type": "Sensor Relay"
         },
-        "SR 60": {
+        "SR 006": {
             "coordinate": [
-                -86807.4762749812,
+                -15145.25143672434,
                 0,
-                10667.41558642593
+                -117567.4066059191
             ],
             "type": "Sensor Relay"
         },
-        "SR 90": {
+        "SR 007": {
             "coordinate": [
-                -80001.92071942565,
+                -13135.863576642036,
                 0,
-                23213.711882722237
+                -76575.89426024008
             ],
             "type": "Sensor Relay"
         },
-        "SR 85": {
+        "SR 008": {
             "coordinate": [
-                -73196.3651638701,
+                -11126.475716559731,
                 0,
-                35760.00817901853
+                -35584.38191456106
             ],
             "type": "Sensor Relay"
         },
-        "SR 39": {
+        "SR 009": {
             "coordinate": [
-                -66390.80960831454,
+                -9117.087856477427,
                 0,
-                48306.30447531482
+                5407.130431117956
             ],
             "type": "Sensor Relay"
         },
-        "SR 25": {
+        "SR 010": {
             "coordinate": [
-                -59585.25405275899,
+                -7107.699996395121,
                 0,
-                60852.60077161111
+                46398.64277679697
             ],
             "type": "Sensor Relay"
         },
-        "SR 22": {
+        "SR 011": {
             "coordinate": [
-                -52779.698497203426,
+                -5098.312136312816,
                 0,
-                73398.89706790741
+                87390.15512247602
             ],
             "type": "Sensor Relay"
         },
-        "SR 63": {
+        "SR 012": {
             "coordinate": [
-                -45974.14294164788,
+                1428.4965414831609,
                 0,
-                85945.1933642037
+                129939.398784608
+            ],
+            "type": "Sensor Relay",
+            "description": ""
+        },
+        "SR 013": {
+            "coordinate": [
+                -9101.852695881104,
+                0,
+                173111.7349733212
+            ],
+            "type": "Sensor Relay",
+            "description": ""
+        },
+        "SR 014": {
+            "coordinate": [
+                -138923.54361779432,
+                0,
+                -83809.69055653637
             ],
             "type": "Sensor Relay"
         },
-        "SR 45": {
+        "SR 015": {
             "coordinate": [
-                -39168.5873860923,
+                -117451.79905577197,
                 0,
-                98491.48966050002
+                -48042.586647071344
             ],
             "type": "Sensor Relay"
         },
-        "SR 58": {
+        "SR 016": {
             "coordinate": [
-                -32363.031830536755,
+                -95980.05449374963,
                 0,
-                111037.78595679632
+                -12275.482737606319
             ],
             "type": "Sensor Relay"
         },
-        "SR 18": {
+        "SR 017": {
             "coordinate": [
-                -25557.476274981193,
+                -74508.3099317273,
                 0,
-                123584.08225309261
+                23491.6211718587
             ],
             "type": "Sensor Relay"
         },
-        "SR 53": {
+        "SR 018": {
             "coordinate": [
-                -18751.920719425645,
+                -53036.56536970496,
                 0,
-                136130.3785493889
+                59258.72508132373
             ],
             "type": "Sensor Relay"
         },
-        "SR 99": {
+        "SR 019": {
             "coordinate": [
-                -2616.6999308644376,
+                -31564.820807682612,
                 0,
-                134635.87028083226
+                95025.82899078878
             ],
             "type": "Sensor Relay"
         },
-        "SR 72": {
+        "SR 020": {
             "coordinate": [
-                -3291.854251852092,
+                -15389.362721600437,
                 0,
-                120103.97727671702
+                134219.94179645035
+            ],
+            "type": "Sensor Relay",
+            "description": ""
+        },
+        "SR 021": {
+            "coordinate": [
+                13403.719027750954,
+                0,
+                163444.57417681284
+            ],
+            "type": "Sensor Relay",
+            "description": ""
+        },
+        "SR 022": {
+            "coordinate": [
+                31681.195198113273,
+                0,
+                -69764.46456488714
             ],
             "type": "Sensor Relay"
         },
-        "SR 81": {
+        "SR 023": {
             "coordinate": [
-                -3967.0085728397466,
+                88660.36484165087,
                 0,
-                105572.0842726018
+                -54414.973967036196
             ],
             "type": "Sensor Relay"
         },
-        "SR 13": {
+        "SR 024": {
             "coordinate": [
-                -4642.162893827401,
+                79590.21130655713,
                 0,
-                91040.19126848657
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 93": {
-            "coordinate": [
-                -5317.317214815055,
-                0,
-                76508.29826437135
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 56": {
-            "coordinate": [
-                -5992.47153580271,
-                0,
-                61976.40526025611
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 20": {
-            "coordinate": [
-                -6667.625856790364,
-                0,
-                47444.51225614088
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 32": {
-            "coordinate": [
-                -7342.780177778019,
-                0,
-                32912.61925202566
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 54": {
-            "coordinate": [
-                -8017.934498765673,
-                0,
-                18380.726247910425
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 33": {
-            "coordinate": [
-                -8693.088819753328,
-                0,
-                3848.833243795205
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 23": {
-            "coordinate": [
-                -9368.243140740982,
-                0,
-                -10683.05976032003
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 97": {
-            "coordinate": [
-                -10043.397461728637,
-                0,
-                -25214.952764435235
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 30": {
-            "coordinate": [
-                -10718.551782716291,
-                0,
-                -39746.8457685505
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 64": {
-            "coordinate": [
-                -11393.706103703946,
-                0,
-                -54278.73877266573
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 84": {
-            "coordinate": [
-                -12068.8604246916,
-                0,
-                -68810.63177678094
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 95": {
-            "coordinate": [
-                -12744.014745679255,
-                0,
-                -83342.52478089617
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 62": {
-            "coordinate": [
-                -113052.65672098791,
-                0,
-                -87200.54947225419
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 48": {
-            "coordinate": [
-                -100433.70095967104,
-                0,
-                -89852.94144756283
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 94": {
-            "coordinate": [
-                -87814.74519835417,
-                0,
-                -92505.33342287148
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 29": {
-            "coordinate": [
-                -75195.78943703728,
-                0,
-                -95157.72539818012
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 26": {
-            "coordinate": [
-                -62576.833675720416,
-                0,
-                -97810.11737348876
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 76": {
-            "coordinate": [
-                -49957.877914403536,
-                0,
-                -100462.50934879741
-            ],
-            "type": "Sensor Relay"
-        },
-        "SR 24": {
-            "coordinate": [
-                -37338.92215308666,
-                0,
-                -103114.90132410605
+                -97440.06124889111
             ],
             "type": "Sensor Relay"
         }
@@ -1091,7 +1163,772 @@
             "radius": 6004,
             "description": "Auto-surveyed fuel collection zone. Estimated radius: 6,004 units. Local nebular density index: 5.1. Source field: 1766339055111. Survey profile: volatile ice fines suspended in a quiet plasma band; field stability uneven but workable; collector saturation estimate 71%. Telemetry confidence: limited. Cycle filters often; particulate load may spike without warning.",
             "hideonmap": false
+        },
+        "Asteroid Arc": {
+            "type": "asteroids",
+            "seed": 8585645,
+            "start": [
+                484813.91,
+                0,
+                109385.96
+            ],
+            "end": [
+                473025.6,
+                0,
+                151556.05
+            ],
+            "density": 210,
+            "scatter": 11262,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 2": {
+            "type": "asteroids",
+            "seed": 2957073,
+            "start": [
+                476125.09,
+                0,
+                141692.94
+            ],
+            "end": [
+                461051.19,
+                0,
+                185003.14
+            ],
+            "density": 50,
+            "scatter": 10907,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 3": {
+            "type": "asteroids",
+            "seed": 6439546,
+            "start": [
+                464996.0,
+                0,
+                174749.47
+            ],
+            "end": [
+                445881.52,
+                0,
+                220304.44
+            ],
+            "density": 120,
+            "scatter": 11882,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 4": {
+            "type": "asteroids",
+            "seed": 6471592,
+            "start": [
+                450775.45,
+                0,
+                209616.83
+            ],
+            "end": [
+                427475.92,
+                0,
+                256687.83
+            ],
+            "density": 100,
+            "scatter": 12603,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 5": {
+            "type": "asteroids",
+            "seed": 4404134,
+            "start": [
+                432774.61,
+                0,
+                246718.43
+            ],
+            "end": [
+                410152.11,
+                0,
+                286048.87
+            ],
+            "density": 157,
+            "scatter": 13068,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 6": {
+            "type": "asteroids",
+            "seed": 8994758,
+            "start": [
+                415598.82,
+                0,
+                277222.03
+            ],
+            "end": [
+                391016.49,
+                0,
+                314390.87
+            ],
+            "density": 105,
+            "scatter": 12339,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 7": {
+            "type": "asteroids",
+            "seed": 1475267,
+            "start": [
+                397094.99,
+                0,
+                305807.84
+            ],
+            "end": [
+                368996.99,
+                0,
+                343025.2
+            ],
+            "density": 79,
+            "scatter": 13833,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Arc 8": {
+            "type": "asteroids",
+            "seed": 2864763,
+            "start": [
+                376080.92,
+                0,
+                334252.33
+            ],
+            "end": [
+                342784.89,
+                0,
+                373066.52
+            ],
+            "density": 10,
+            "scatter": 12723,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring": {
+            "type": "asteroids",
+            "seed": 5209829,
+            "start": [
+                -12794.49,
+                0,
+                406144.14
+            ],
+            "end": [
+                -43878.35,
+                0,
+                389864.81
+            ],
+            "density": 60,
+            "scatter": 9562,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 2": {
+            "type": "asteroids",
+            "seed": 9648634,
+            "start": [
+                -38591.71,
+                0,
+                395876.42
+            ],
+            "end": [
+                -53325.4,
+                0,
+                360055.12
+            ],
+            "density": 60,
+            "scatter": 8539,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 3": {
+            "type": "asteroids",
+            "seed": 3370735,
+            "start": [
+                -53035.48,
+                0,
+                368622.29
+            ],
+            "end": [
+                -40814.47,
+                0,
+                330194.77
+            ],
+            "density": 60,
+            "scatter": 8000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 4": {
+            "type": "asteroids",
+            "seed": 8911363,
+            "start": [
+                -46118.04,
+                0,
+                337095.56
+            ],
+            "end": [
+                -12374.82,
+                0,
+                315716.22
+            ],
+            "density": 60,
+            "scatter": 8000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 5": {
+            "type": "asteroids",
+            "seed": 4268724,
+            "start": [
+                -20465.99,
+                0,
+                317619.84
+            ],
+            "end": [
+                15914.24,
+                0,
+                322501.2
+            ],
+            "density": 60,
+            "scatter": 8095,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 6": {
+            "type": "asteroids",
+            "seed": 7902022,
+            "start": [
+                8577.19,
+                0,
+                318494.88
+            ],
+            "end": [
+                35784.75,
+                0,
+                348334.95
+            ],
+            "density": 60,
+            "scatter": 8913,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 7": {
+            "type": "asteroids",
+            "seed": 5518730,
+            "start": [
+                32473.38,
+                0,
+                340713.94
+            ],
+            "end": [
+                33964.33,
+                0,
+                376922.64
+            ],
+            "density": 60,
+            "scatter": 8000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 8": {
+            "type": "asteroids",
+            "seed": 220218,
+            "start": [
+                36533.76,
+                0,
+                369190.25
+            ],
+            "end": [
+                12774.43,
+                0,
+                399995.53
+            ],
+            "density": 60,
+            "scatter": 8000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Ring 9": {
+            "type": "asteroids",
+            "seed": 2654681,
+            "start": [
+                20089.42,
+                0,
+                395439.04
+            ],
+            "end": [
+                -19547.87,
+                0,
+                404123.34
+            ],
+            "density": 60,
+            "scatter": 8000,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field": {
+            "type": "asteroids",
+            "seed": 6803853,
+            "start": [
+                445047.53,
+                0,
+                -289123.04
+            ],
+            "end": [
+                468338.89,
+                0,
+                -239794.9
+            ],
+            "density": 200,
+            "scatter": 30823,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 2": {
+            "type": "asteroids",
+            "seed": 8156758,
+            "start": [
+                -319235.87,
+                0,
+                252791.67
+            ],
+            "end": [
+                -366472.42,
+                0,
+                249593.3
+            ],
+            "density": 200,
+            "scatter": 28305,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 3": {
+            "type": "asteroids",
+            "seed": 3538653,
+            "start": [
+                468958.29,
+                0,
+                -8084.48
+            ],
+            "end": [
+                506421.46,
+                0,
+                -23172.64
+            ],
+            "density": 200,
+            "scatter": 23524,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 4": {
+            "type": "asteroids",
+            "seed": 6046982,
+            "start": [
+                -115546.7575357848,
+                0,
+                -100741.24821188986
+            ],
+            "end": [
+                -156657.29,
+                0,
+                -48940.42
+            ],
+            "density": 251,
+            "scatter": 26118,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 5": {
+            "type": "asteroids",
+            "seed": 774283,
+            "start": [
+                128190.31564158297,
+                0,
+                -53104.59497487093
+            ],
+            "end": [
+                150373.95761689162,
+                0,
+                -129782.8357156117
+            ],
+            "density": 258,
+            "scatter": 12073,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 6": {
+            "type": "asteroids",
+            "seed": 1108667,
+            "start": [
+                -302546.39,
+                0,
+                -332887.29
+            ],
+            "end": [
+                -246298.80409877503,
+                0,
+                -308238.31713985396
+            ],
+            "density": 90,
+            "scatter": 9239,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Asteroid Field 7": {
+            "type": "asteroids",
+            "seed": 2817772,
+            "start": [
+                -9394.87,
+                0,
+                -451337.82
+            ],
+            "end": [
+                71196.15,
+                0,
+                -441313.41
+            ],
+            "density": 250,
+            "scatter": 34466,
+            "composition": [
+                "Ast. Std Rand"
+            ]
+        },
+        "Nebula Arc": {
+            "type": "nebulas",
+            "seed": 3814751,
+            "start": [
+                -114241.94,
+                0,
+                -224911.69
+            ],
+            "end": [
+                -77959.47,
+                0,
+                -239879.94
+            ],
+            "density": 517,
+            "scatter": 17489,
+            "composition": []
+        },
+        "Nebula Arc 2": {
+            "type": "nebulas",
+            "seed": 5518978,
+            "start": [
+                -86621.88,
+                0,
+                -236779.45
+            ],
+            "end": [
+                -47830.11,
+                0,
+                -248682.1
+            ],
+            "density": 200,
+            "scatter": 19831,
+            "composition": []
+        },
+        "Nebula Arc 3": {
+            "type": "nebulas",
+            "seed": 3307528,
+            "start": [
+                -56943.13,
+                0,
+                -246348.67
+            ],
+            "end": [
+                -16755.41,
+                0,
+                -254669.07
+            ],
+            "density": 200,
+            "scatter": 21805,
+            "composition": []
+        },
+        "Nebula Arc 4": {
+            "type": "nebulas",
+            "seed": 5823334,
+            "start": [
+                -26662.49,
+                0,
+                -253123.81
+            ],
+            "end": [
+                19011.12,
+                0,
+                -258195.67
+            ],
+            "density": 200,
+            "scatter": 19378,
+            "composition": []
+        },
+        "Nebula Arc 5": {
+            "type": "nebulas",
+            "seed": 6834305,
+            "start": [
+                8423.48,
+                0,
+                -257519.88
+            ],
+            "end": [
+                54509.37,
+                0,
+                -258304.87
+            ],
+            "density": 200,
+            "scatter": 17811,
+            "composition": []
+        },
+        "Nebula Arc 6": {
+            "type": "nebulas",
+            "seed": 234035,
+            "start": [
+                43317.88,
+                0,
+                -258664.7
+            ],
+            "end": [
+                94224.91,
+                0,
+                -254761.18
+            ],
+            "density": 230,
+            "scatter": 20393,
+            "composition": []
+        },
+        "Nebula Arc 7": {
+            "type": "nebulas",
+            "seed": 4319159,
+            "start": [
+                83366.44,
+                0,
+                -256067.69
+            ],
+            "end": [
+                126566.16,
+                0,
+                -248648.13
+            ],
+            "density": 743,
+            "scatter": 22500,
+            "composition": []
+        },
+        "Nebula Arc 8": {
+            "type": "nebulas",
+            "seed": 5321999,
+            "start": [
+                117253.63,
+                0,
+                -250672.5
+            ],
+            "end": [
+                154762.52,
+                0,
+                -240547.52
+            ],
+            "density": 200,
+            "scatter": 21427,
+            "composition": []
+        },
+        "Nebula Ring": {
+            "type": "nebulas",
+            "seed": 91162,
+            "start": [
+                215135.22,
+                0,
+                -140048.98
+            ],
+            "end": [
+                190556.56,
+                0,
+                -102852.52
+            ],
+            "density": 443,
+            "scatter": 13128,
+            "composition": []
+        },
+        "Nebula Ring 2": {
+            "type": "nebulas",
+            "seed": 9299530,
+            "start": [
+                195404.69,
+                0,
+                -103116.47
+            ],
+            "end": [
+                177966.2,
+                0,
+                -138025.38
+            ],
+            "density": 151,
+            "scatter": 14038,
+            "composition": []
+        },
+        "Nebula Ring 3": {
+            "type": "nebulas",
+            "seed": 9542339,
+            "start": [
+                175373.24,
+                0,
+                -134275.53
+            ],
+            "end": [
+                215284.09,
+                0,
+                -131865.3
+            ],
+            "density": 15,
+            "scatter": 12131,
+            "composition": []
+        },
+        "Nebula Field": {
+            "type": "nebulas",
+            "seed": 2409053,
+            "start": [
+                -369383.8,
+                0,
+                106903.16
+            ],
+            "end": [
+                -376579.51,
+                0,
+                71705.58
+            ],
+            "density": 100,
+            "scatter": 14717,
+            "composition": []
+        },
+        "Nebula Field 2": {
+            "type": "nebulas",
+            "seed": 8275945,
+            "start": [
+                -471931.55,
+                0,
+                -259399.05
+            ],
+            "end": [
+                -421298.804098775,
+                0,
+                -194904.9838065206
+            ],
+            "density": 159,
+            "scatter": 33391,
+            "composition": []
+        },
+        "Nebula Field 3": {
+            "type": "nebulas",
+            "seed": 9755017,
+            "start": [
+                -303481.86,
+                0,
+                -201809.37
+            ],
+            "end": [
+                -258627.12,
+                0,
+                -223937.35
+            ],
+            "density": 551,
+            "scatter": 15899,
+            "composition": []
+        },
+        "Nebula Field 4": {
+            "type": "nebulas",
+            "seed": 7495246,
+            "start": [
+                -176298.80409877503,
+                0,
+                -398238.31713985396
+            ],
+            "end": [
+                -228309.42,
+                0,
+                -477509.09
+            ],
+            "density": 350,
+            "scatter": 27638,
+            "composition": []
+        },
+        "Nebula Field 5": {
+            "type": "nebulas",
+            "seed": 3746868,
+            "start": [
+                111238.67,
+                0,
+                -325400.2
+            ],
+            "end": [
+                137034.52923455834,
+                0,
+                -299904.98380652064
+            ],
+            "density": 200,
+            "scatter": 17722,
+            "composition": []
+        },
+        "Debris Field": {
+            "type": "debris_field",
+            "seed": 344575,
+            "coordinate": [
+                39502.08,
+                0,
+                -522898.48
+            ],
+            "density": 120,
+            "scatter": 5875
+        },
+        "1791638202475": {
+            "type": "planet",
+            "class": "RingPlanet",
+            "name": "Spot",
+            "coordinate": [
+                -9431.280541715514,
+                0,
+                361311.4601934555
+            ],
+            "description": "Spot is a remote ringed planet beyond Charon\u2019s main inhabited zone. Its broad rock-and-ice rings make it an unmistakable navigational landmark, while the surrounding debris and distance from regular traffic leave the area sparsely visited and poorly watched."
+        },
+        "Debris": {
+            "type": "debris_field",
+            "seed": 3569931,
+            "coordinate": [
+                44497.21973505029,
+                0,
+                124366.957200858
+            ],
+            "density": 45,
+            "scatter": 8618
         }
     },
-    "traffic": {}
+    "traffic": {
+        "commercial": "light",
+        "civilian": "light",
+        "security": "medium"
+    }
 }

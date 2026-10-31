@@ -237,6 +237,11 @@ HTML_TEMPLATE = '''
             color: white;
         }}
         #search-box::placeholder {{ color: rgba(255, 255, 255, 0.6); }}
+        body.briefing-hide-left #controls,
+        body.briefing-hide-right #info,
+        body.briefing-hide-left #mobile-controls-btn,
+        body.briefing-hide-right #mobile-info-btn {{ display: none; }}
+        body.briefing-hide-left.briefing-hide-right #mobile-toolbar {{ display: none; }}
         @media (max-width: 900px) {{
             body {{ display: block; }}
             #mobile-toolbar {{ display: flex; }}
@@ -443,9 +448,10 @@ HTML_TEMPLATE = '''
     
     function highlight(name) {{
         var obj = objData[name];
+        if (!obj) return false;
         if (obj.hidden && !isGM()) {{
             alert("This object is not visible on the public map.");
-            return;
+            return false;
         }}
         var annotation = {{
             x: obj.x, y: obj.y, xref: 'x', yref: 'y', text: name,
@@ -539,10 +545,8 @@ HTML_TEMPLATE = '''
             bindGalacticButton();
             attachAuthorHover();
             openInfoPanel();
-                + infoHtml;
-         
+            return true;
     }}
-         bindGalacticButton();
     
 
     var fig = {fig_json};
@@ -1134,6 +1138,40 @@ function addButton(label, fn, header, color, isHidden) {{
         );
         header.style.display = hasVisibleEntry ? '' : 'none';
       }});
+  }});
+
+  // Briefing controls: URL state for initial load, postMessage for live changes.
+  function setBriefingPanels(left, right) {{
+    if (typeof left === 'boolean') pageBody.classList.toggle('briefing-hide-left', !left);
+    if (typeof right === 'boolean') pageBody.classList.toggle('briefing-hide-right', !right);
+    closePanels();
+    requestAnimationFrame(function() {{ Plotly.Plots.resize(plotDiv); }});
+  }}
+
+  function showBriefingObject(name) {{
+    if (typeof name !== 'string' || !Object.prototype.hasOwnProperty.call(objData, name)) return false;
+    if (objData[name].hidden && !isGM()) return false;
+    setBriefingPanels(undefined, true);
+    return highlight(name);
+  }}
+
+  var briefingParams = new URLSearchParams(window.location.search);
+  var briefingPanels = briefingParams.get('panels');
+  if (briefingPanels === 'none') setBriefingPanels(false, false);
+  else if (briefingPanels === 'left') setBriefingPanels(true, false);
+  else if (briefingPanels === 'right') setBriefingPanels(false, true);
+  else if (briefingPanels === 'both') setBriefingPanels(true, true);
+  if (briefingParams.has('object')) showBriefingObject(briefingParams.get('object'));
+
+  window.addEventListener('message', function(event) {{
+    if (event.source !== window.parent) return;
+    if (event.origin !== 'https://tsn-mission-briefing.fishevans.chatgpt.site' &&
+        event.origin !== window.location.origin) return;
+    var command = event.data;
+    if (!command || command.source !== 'tsn-briefing' || typeof command.type !== 'string') return;
+    if (command.type === 'setPanels') setBriefingPanels(command.left, command.right);
+    else if (command.type === 'showObject') showBriefingObject(command.name);
+    else if (command.type === 'clearSelection') clearAnnotations();
   }});
 </script>
 </body>

@@ -18,16 +18,22 @@
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/StellarCartography.py" type="text/plain"><tt>StellarCartography.py</tt></a>
 <span class="moduletype">Script</span>  <div class="import">
 imports:
-    <a href="#GalMapGen">GalMapGen</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#GalacticMapData">GalacticMapData</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
  &#8226;   <a href="#LibraryGen">LibraryGen</a>
- &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#MapGeneration">MapGeneration</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
  &#8226;   <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
- &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#SystemMetaOptions">SystemMetaOptions</a>
  &#8226;   <a href="#SystemTemplates">SystemTemplates</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
  &#8226;   <a href="#abc">abc</a>
@@ -162,7 +168,6 @@ imports:
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#genericpath">genericpath</a>
  &#8226;   <a href="#heapq">heapq</a>
- &#8226;   <a href="#importlib.util">importlib.util</a>
  &#8226;   <a href="#io">io</a>
  &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#keyword">keyword</a>
@@ -184,6 +189,8 @@ imports:
  &#8226;   <a href="#re._constants">re._constants</a>
  &#8226;   <a href="#re._parser">re._parser</a>
  &#8226;   <a href="#reprlib">reprlib</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_constants">sre_constants</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
@@ -363,6 +370,31 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="AppPaths"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/AppPaths.py" type="text/plain"><tt>AppPaths</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="CenteringTool"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/CenteringTool.py" type="text/plain"><tt>CenteringTool</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -381,17 +413,66 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="EditorSettings"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/EditorSettings.py" type="text/plain"><tt>EditorSettings</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="GalMapGen"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/GalMapGen.py" type="text/plain"><tt>GalMapGen</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#SystemEditor">SystemEditor</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
  &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#sys">sys</a>
  &#8226;   <a href="#urllib.parse">urllib.parse</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#MapGeneration">MapGeneration</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="GalacticMapData"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/GalacticMapData.py" type="text/plain"><tt>GalacticMapData</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
 
   </div>
   <div class="import">
@@ -403,12 +484,40 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="JsonStorage"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/JsonStorage.py" type="text/plain"><tt>JsonStorage</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#json">json</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#tempfile">tempfile</a>
+ &#8226;   <a href="#uuid">uuid</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="LibraryGen"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/LibraryGen.py" type="text/plain"><tt>LibraryGen</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
- &#8226;   <a href="#SystemEditor">SystemEditor</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#datetime">datetime</a>
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#html">html</a>
@@ -423,7 +532,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#StellarCartography.py">StellarCartography.py</a>
+    <a href="#MapGeneration">MapGeneration</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
 
   </div>
 
@@ -434,9 +544,10 @@ imported by:
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/LocMapGen.py" type="text/plain"><tt>LocMapGen</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#LocMapTemplate">LocMapTemplate</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#LocMapTemplate">LocMapTemplate</a>
  &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
- &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#glob">glob</a>
  &#8226;   <a href="#json">json</a>
@@ -450,7 +561,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#StellarCartography.py">StellarCartography.py</a>
+    <a href="#MapGeneration">MapGeneration</a>
 
   </div>
 
@@ -461,12 +572,105 @@ imported by:
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/LocMapTemplate.py" type="text/plain"><tt>LocMapTemplate</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#string">string</a>
+    <a href="#json">json</a>
+ &#8226;   <a href="#string">string</a>
 
   </div>
   <div class="import">
 imported by:
     <a href="#LocMapGen">LocMapGen</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="MapConsistency"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/MapConsistency.py" type="text/plain"><tt>MapConsistency</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#copy">copy</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#re">re</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#GalacticMapData">GalacticMapData</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="MapGeneration"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/MapGeneration.py" type="text/plain"><tt>MapGeneration</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#LibraryGen">LibraryGen</a>
+ &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#StellarCartography.py">StellarCartography.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="MapMetadata"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/MapMetadata.py" type="text/plain"><tt>MapMetadata</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#json">json</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#GalacticMapData">GalacticMapData</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
+ &#8226;   <a href="#SystemMapRenderer">SystemMapRenderer</a>
+ &#8226;   <a href="#SystemValidation">SystemValidation</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="MapTypes"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/MapTypes.py" type="text/plain"><tt>MapTypes</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#GalacticMapData">GalacticMapData</a>
+ &#8226;   <a href="#StationOverview">StationOverview</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMapRenderer">SystemMapRenderer</a>
+ &#8226;   <a href="#SystemMigrations">SystemMigrations</a>
+ &#8226;   <a href="#SystemValidation">SystemValidation</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
+ &#8226;   <a href="#Toolbar">Toolbar</a>
 
   </div>
 
@@ -2707,7 +2911,8 @@ imported by:
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/ProductionFlowGen.py" type="text/plain"><tt>ProductionFlowGen</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#SystemEditor">SystemEditor</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
  &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#html">html</a>
  &#8226;   <a href="#os">os</a>
@@ -2717,7 +2922,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#StellarCartography.py">StellarCartography.py</a>
+    <a href="#MapGeneration">MapGeneration</a>
 
   </div>
 
@@ -2745,7 +2950,9 @@ imported by:
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/ShipDescriptionResolver.py" type="text/plain"><tt>ShipDescriptionResolver</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#ast">ast</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#hjson">hjson</a>
  &#8226;   <a href="#json">json</a>
@@ -2765,11 +2972,29 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="StationOverview"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/StationOverview.py" type="text/plain"><tt>StationOverview</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#MapTypes">MapTypes</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="SysMapCanvas"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SysMapCanvas.py" type="text/plain"><tt>SysMapCanvas</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#SystemEditor">SystemEditor</a>
+    <a href="#MapTypes">MapTypes</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#copy">copy</a>
  &#8226;   <a href="#json">json</a>
@@ -2796,23 +3021,35 @@ imported by:
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SystemEditor.py" type="text/plain"><tt>SystemEditor</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#PIL">PIL</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
+ &#8226;   <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
+ &#8226;   <a href="#StationOverview">StationOverview</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
+ &#8226;   <a href="#SystemMapRenderer">SystemMapRenderer</a>
  &#8226;   <a href="#SystemMetaOptions">SystemMetaOptions</a>
+ &#8226;   <a href="#SystemMigrations">SystemMigrations</a>
+ &#8226;   <a href="#SystemValidation">SystemValidation</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#copy">copy</a>
  &#8226;   <a href="#datetime">datetime</a>
- &#8226;   <a href="#generate_system_terrain">generate_system_terrain</a>
  &#8226;   <a href="#json">json</a>
- &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#sys">sys</a>
  &#8226;   <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#tkinter.filedialog">tkinter.filedialog</a>
@@ -2824,12 +3061,48 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#GalMapGen">GalMapGen</a>
- &#8226;   <a href="#LibraryGen">LibraryGen</a>
- &#8226;   <a href="#LocMapGen">LocMapGen</a>
- &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
- &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
- &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
+    <a href="#StellarCartography.py">StellarCartography.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="SystemMap"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SystemMap.py" type="text/plain"><tt>SystemMap</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="SystemMapRenderer"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SystemMapRenderer.py" type="text/plain"><tt>SystemMapRenderer</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#re">re</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
 
   </div>
 
@@ -2848,11 +3121,68 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="SystemMigrations"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SystemMigrations.py" type="text/plain"><tt>SystemMigrations</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#MapTypes">MapTypes</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="SystemTemplates"></a>
   <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SystemTemplates.py" type="text/plain"><tt>SystemTemplates</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imported by:
     <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="SystemValidation"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/SystemValidation.py" type="text/plain"><tt>SystemValidation</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#math">math</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="TerrainGeometry"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/TerrainGeometry.py" type="text/plain"><tt>TerrainGeometry</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#MapTypes">MapTypes</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#re">re</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMapRenderer">SystemMapRenderer</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
 
   </div>
 
@@ -2864,6 +3194,7 @@ imported by:
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#CenteringTool">CenteringTool</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
  &#8226;   <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
@@ -2881,6 +3212,33 @@ imports:
 imported by:
     <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ToolsWindow"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/ToolsWindow.py" type="text/plain"><tt>ToolsWindow</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.filedialog">tkinter.filedialog</a>
+ &#8226;   <a href="#tkinter.messagebox">tkinter.messagebox</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#StellarCartography.py">StellarCartography.py</a>
 
   </div>
 
@@ -4010,6 +4368,16 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="_uuid"></a>
+  <tt>_uuid</tt> <span class="moduletype"><tt>C:\Program Files\Python313\DLLs\_uuid.pyd</tt></span>  <div class="import">
+imported by:
+    <a href="#uuid">uuid</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="_warnings"></a>
   <tt>_warnings</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
@@ -4172,9 +4540,14 @@ imported by:
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#py_compile">py_compile</a>
  &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#tokenize">tokenize</a>
  &#8226;   <a href="#unittest.main">unittest.main</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
  &#8226;   <a href="#zipfile">zipfile</a>
 
@@ -5651,6 +6024,7 @@ imported by:
  &#8226;   <a href="#pprint">pprint</a>
  &#8226;   <a href="#pydoc">pydoc</a>
  &#8226;   <a href="#queue">queue</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
  &#8226;   <a href="#selectors">selectors</a>
  &#8226;   <a href="#shlex">shlex</a>
  &#8226;   <a href="#shutil">shutil</a>
@@ -5879,7 +6253,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
+    <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
@@ -5897,6 +6272,7 @@ imported by:
  &#8226;   <a href="#numpy.f2py.func2subr">numpy.f2py.func2subr</a>
  &#8226;   <a href="#numpy.f2py.rules">numpy.f2py.rules</a>
  &#8226;   <a href="#numpy.ma.core">numpy.ma.core</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#weakref">weakref</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
@@ -6166,6 +6542,8 @@ imported by:
  &#8226;   <a href="#email.utils">email.utils</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
  &#8226;   <a href="#http.server">http.server</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
  &#8226;   <a href="#xmlrpc.client">xmlrpc.client</a>
  &#8226;   <a href="#yaml.constructor">yaml.constructor</a>
  &#8226;   <a href="#yaml.representer">yaml.representer</a>
@@ -9304,6 +9682,7 @@ imported by:
  &#8226;   <a href="#ssl">ssl</a>
  &#8226;   <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#typing_extensions">typing_extensions</a>
+ &#8226;   <a href="#uuid">uuid</a>
 
   </div>
 
@@ -9563,17 +9942,6 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="generate_system_terrain"></a>
-  <a target="code" href="" type="text/plain"><tt>generate_system_terrain</tt></a>
-<span class="moduletype">MissingModule</span>  <div class="import">
-imported by:
-    <a href="#SystemEditor">SystemEditor</a>
-
-  </div>
-
-</div>
-
-<div class="node">
   <a name="genericpath"></a>
   <a target="code" href="///C:/Program%20Files/Python313/Lib/genericpath.py" type="text/plain"><tt>genericpath</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -9755,6 +10123,7 @@ imported by:
     <a href="#hmac">hmac</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+ &#8226;   <a href="#uuid">uuid</a>
 
   </div>
 
@@ -9807,6 +10176,7 @@ imported by:
  &#8226;   <a href="#hjson.encoderH">hjson.encoderH</a>
  &#8226;   <a href="#hjson.ordered_dict">hjson.ordered_dict</a>
  &#8226;   <a href="#hjson.scanner">hjson.scanner</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
 
   </div>
 
@@ -10643,8 +11013,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#StellarCartography.py">StellarCartography.py</a>
- &#8226;   <a href="#numpy.testing._private.extbuild">numpy.testing._private.extbuild</a>
+    <a href="#numpy.testing._private.extbuild">numpy.testing._private.extbuild</a>
  &#8226;   <a href="#pkgutil">pkgutil</a>
  &#8226;   <a href="#py_compile">py_compile</a>
  &#8226;   <a href="#pydoc">pydoc</a>
@@ -10788,6 +11157,7 @@ imported by:
  &#8226;   <a href="#pydoc">pydoc</a>
  &#8226;   <a href="#quopri">quopri</a>
  &#8226;   <a href="#runpy">runpy</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
  &#8226;   <a href="#shlex">shlex</a>
  &#8226;   <a href="#socket">socket</a>
  &#8226;   <a href="#socketserver">socketserver</a>
@@ -10799,6 +11169,7 @@ imported by:
  &#8226;   <a href="#unittest.result">unittest.result</a>
  &#8226;   <a href="#urllib.error">urllib.error</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#xml.etree.ElementTree">xml.etree.ElementTree</a>
  &#8226;   <a href="#xml.sax">xml.sax</a>
  &#8226;   <a href="#xml.sax.saxutils">xml.sax.saxutils</a>
@@ -10912,20 +11283,33 @@ imports:
   <div class="import">
 imported by:
     <a href="#CenteringTool">CenteringTool</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
  &#8226;   <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
  &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#LocMapTemplate">LocMapTemplate</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
  &#8226;   <a href="#ResizeTool">ResizeTool</a>
  &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
+ &#8226;   <a href="#SystemValidation">SystemValidation</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#json.decoder">json.decoder</a>
  &#8226;   <a href="#json.encoder">json.encoder</a>
  &#8226;   <a href="#json.scanner">json.scanner</a>
  &#8226;   <a href="#numpy.__config__">numpy.__config__</a>
  &#8226;   <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
 
   </div>
 
@@ -11142,6 +11526,7 @@ imported by:
     <a href="#GalMapGen">GalMapGen</a>
  &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
  &#8226;   <a href="#PIL.FitsImagePlugin">PIL.FitsImagePlugin</a>
  &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.GimpGradientFile">PIL.GimpGradientFile</a>
@@ -11153,7 +11538,9 @@ imported by:
  &#8226;   <a href="#PIL.TiffImagePlugin">PIL.TiffImagePlugin</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
- &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMapRenderer">SystemMapRenderer</a>
+ &#8226;   <a href="#SystemValidation">SystemValidation</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#_pydatetime">_pydatetime</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
@@ -11167,6 +11554,8 @@ imported by:
  &#8226;   <a href="#numpy.lib">numpy.lib</a>
  &#8226;   <a href="#numpy.lib._index_tricks_impl">numpy.lib._index_tricks_impl</a>
  &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
  &#8226;   <a href="#selectors">selectors</a>
  &#8226;   <a href="#statistics">statistics</a>
  &#8226;   <a href="#urllib.parse">urllib.parse</a>
@@ -18907,9 +19296,12 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#GalMapGen">GalMapGen</a>
+    <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
  &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
  &#8226;   <a href="#PIL.BlpImagePlugin">PIL.BlpImagePlugin</a>
  &#8226;   <a href="#PIL.BmpImagePlugin">PIL.BmpImagePlugin</a>
  &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
@@ -19036,6 +19428,7 @@ imported by:
  &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#runpy">runpy</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
  &#8226;   <a href="#shlex">shlex</a>
  &#8226;   <a href="#shutil">shutil</a>
  &#8226;   <a href="#socket">socket</a>
@@ -19051,6 +19444,7 @@ imported by:
  &#8226;   <a href="#unittest.loader">unittest.loader</a>
  &#8226;   <a href="#unittest.main">unittest.main</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
  &#8226;   <a href="#xml.sax">xml.sax</a>
  &#8226;   <a href="#xml.sax.saxutils">xml.sax.saxutils</a>
@@ -19095,13 +19489,20 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#GalMapGen">GalMapGen</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#GalMapGen">GalMapGen</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
  &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
+ &#8226;   <a href="#MapGeneration">MapGeneration</a>
  &#8226;   <a href="#ProductionFlowGen">ProductionFlowGen</a>
  &#8226;   <a href="#ShipDescriptionResolver">ShipDescriptionResolver</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.resources._common">importlib.resources._common</a>
  &#8226;   <a href="#importlib.resources.abc">importlib.resources.abc</a>
@@ -19114,6 +19515,11 @@ imported by:
  &#8226;   <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
  &#8226;   <a href="#pathlib._abc">pathlib._abc</a>
  &#8226;   <a href="#pathlib._local">pathlib._local</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
  &#8226;   <a href="#zipfile._path">zipfile._path</a>
 
   </div>
@@ -19309,6 +19715,7 @@ imported by:
  &#8226;   <a href="#numpy.lib._utils_impl">numpy.lib._utils_impl</a>
  &#8226;   <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
  &#8226;   <a href="#pydoc">pydoc</a>
+ &#8226;   <a href="#uuid">uuid</a>
 
   </div>
 
@@ -19614,12 +20021,17 @@ imported by:
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#email.generator">email.generator</a>
  &#8226;   <a href="#email.utils">email.utils</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#secrets">secrets</a>
  &#8226;   <a href="#statistics">statistics</a>
  &#8226;   <a href="#tempfile">tempfile</a>
+ &#8226;   <a href="#uuid">uuid</a>
 
   </div>
 
@@ -19645,6 +20057,7 @@ imports:
 imported by:
     <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
+ &#8226;   <a href="#MapConsistency">MapConsistency</a>
  &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
  &#8226;   <a href="#PIL.GimpPaletteFile">PIL.GimpPaletteFile</a>
  &#8226;   <a href="#PIL.ImImagePlugin">PIL.ImImagePlugin</a>
@@ -19660,6 +20073,8 @@ imported by:
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMapRenderer">SystemMapRenderer</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
  &#8226;   <a href="#_pyrepl.pager">_pyrepl.pager</a>
@@ -19737,6 +20152,7 @@ imported by:
  &#8226;   <a href="#re._constants">re._constants</a>
  &#8226;   <a href="#re._parser">re._parser</a>
  &#8226;   <a href="#rlcompleter">rlcompleter</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
  &#8226;   <a href="#shlex">shlex</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_constants">sre_constants</a>
@@ -19945,6 +20361,180 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="scripts"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/__init__.py" type="text/plain"><tt>scripts</tt></a>
+<span class="moduletype">Package</span>  <div class="import">
+imports:
+    <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="scripts.ShipImageExtractor"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/ShipImageExtractor.py" type="text/plain"><tt>scripts.ShipImageExtractor</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#hjson">hjson</a>
+ &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#shutil">shutil</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#StellarCartography.py">StellarCartography.py</a>
+ &#8226;   <a href="#scripts">scripts</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="scripts.export_jump_table"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/export_jump_table.py" type="text/plain"><tt>scripts.export_jump_table</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#collections">collections</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ToolsWindow">ToolsWindow</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="scripts.export_systems_csv"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/export_systems_csv.py" type="text/plain"><tt>scripts.export_systems_csv</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ToolsWindow">ToolsWindow</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="scripts.generate_fcs_zones_all"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/generate_fcs_zones_all.py" type="text/plain"><tt>scripts.generate_fcs_zones_all</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#TerrainGeometry">TerrainGeometry</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.messagebox">tkinter.messagebox</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts">scripts</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="scripts.generate_system_terrain"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/generate_system_terrain.py" type="text/plain"><tt>scripts.generate_system_terrain</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#SystemTemplates">SystemTemplates</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#copy">copy</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.filedialog">tkinter.filedialog</a>
+ &#8226;   <a href="#tkinter.messagebox">tkinter.messagebox</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#scripts">scripts</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="scripts.generate_test_system"></a>
+  <a target="code" href="///C:/Users/Fish_/Documents/GitHub/TSNMaps/scripts/generate_test_system.py" type="text/plain"><tt>scripts.generate_test_system</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#json">json</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#scripts">scripts</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ToolsWindow">ToolsWindow</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="secrets"></a>
   <a target="code" href="///C:/Program%20Files/Python313/Lib/secrets.py" type="text/plain"><tt>secrets</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -20059,8 +20649,10 @@ imported by:
  &#8226;   <a href="#numpy.f2py._backends._meson">numpy.f2py._backends._meson</a>
  &#8226;   <a href="#numpy.lib._datasource">numpy.lib._datasource</a>
  &#8226;   <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#tempfile">tempfile</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
  &#8226;   <a href="#zipfile">zipfile</a>
 
@@ -20137,6 +20729,7 @@ imported by:
  &#8226;   <a href="#socketserver">socketserver</a>
  &#8226;   <a href="#ssl">ssl</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+ &#8226;   <a href="#uuid">uuid</a>
 
   </div>
 
@@ -20450,6 +21043,7 @@ imported by:
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#platform">platform</a>
  &#8226;   <a href="#pyi_rth_multiprocessing.py">pyi_rth_multiprocessing.py</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
 
   </div>
@@ -20460,7 +21054,8 @@ imported by:
   <a name="sys"></a>
   <tt>sys</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
-    <a href="#GalMapGen">GalMapGen</a>
+    <a href="#AppPaths">AppPaths</a>
+ &#8226;   <a href="#GalMapGen">GalMapGen</a>
  &#8226;   <a href="#LibraryGen">LibraryGen</a>
  &#8226;   <a href="#LocMapGen">LocMapGen</a>
  &#8226;   <a href="#PIL.DdsImagePlugin">PIL.DdsImagePlugin</a>
@@ -20609,6 +21204,12 @@ imported by:
  &#8226;   <a href="#quopri">quopri</a>
  &#8226;   <a href="#re._compiler">re._compiler</a>
  &#8226;   <a href="#runpy">runpy</a>
+ &#8226;   <a href="#scripts.ShipImageExtractor">scripts.ShipImageExtractor</a>
+ &#8226;   <a href="#scripts.export_jump_table">scripts.export_jump_table</a>
+ &#8226;   <a href="#scripts.export_systems_csv">scripts.export_systems_csv</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
+ &#8226;   <a href="#scripts.generate_test_system">scripts.generate_test_system</a>
  &#8226;   <a href="#selectors">selectors</a>
  &#8226;   <a href="#shlex">shlex</a>
  &#8226;   <a href="#shutil">shutil</a>
@@ -20634,6 +21235,7 @@ imported by:
  &#8226;   <a href="#unittest.runner">unittest.runner</a>
  &#8226;   <a href="#unittest.suite">unittest.suite</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#warnings">warnings</a>
  &#8226;   <a href="#weakref">weakref</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
@@ -20734,7 +21336,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
+    <a href="#JsonStorage">JsonStorage</a>
+ &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.JpegImagePlugin">PIL.JpegImagePlugin</a>
  &#8226;   <a href="#_pyrepl.pager">_pyrepl.pager</a>
@@ -20909,6 +21512,7 @@ imported by:
  &#8226;   <a href="#unittest.case">unittest.case</a>
  &#8226;   <a href="#unittest.runner">unittest.runner</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+ &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#xmlrpc.client">xmlrpc.client</a>
  &#8226;   <a href="#zipfile">zipfile</a>
  &#8226;   <a href="#zipimport">zipimport</a>
@@ -20939,10 +21543,14 @@ imports:
   <div class="import">
 imported by:
     <a href="#CenteringTool">CenteringTool</a>
+ &#8226;   <a href="#StationOverview">StationOverview</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#tkinter.commondialog">tkinter.commondialog</a>
  &#8226;   <a href="#tkinter.constants">tkinter.constants</a>
  &#8226;   <a href="#tkinter.dialog">tkinter.dialog</a>
@@ -21023,6 +21631,8 @@ imported by:
     <a href="#CenteringTool">CenteringTool</a>
  &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#tkinter">tkinter</a>
 
   </div>
@@ -21043,6 +21653,9 @@ imported by:
     <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#tkinter.simpledialog">tkinter.simpledialog</a>
 
@@ -21078,10 +21691,14 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#StellarCartography.py">StellarCartography.py</a>
+    <a href="#StationOverview">StationOverview</a>
+ &#8226;   <a href="#StellarCartography.py">StellarCartography.py</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
  &#8226;   <a href="#Toolbar">Toolbar</a>
+ &#8226;   <a href="#ToolsWindow">ToolsWindow</a>
+ &#8226;   <a href="#scripts.generate_fcs_zones_all">scripts.generate_fcs_zones_all</a>
+ &#8226;   <a href="#scripts.generate_system_terrain">scripts.generate_system_terrain</a>
  &#8226;   <a href="#tkinter">tkinter</a>
 
   </div>
@@ -21318,7 +21935,10 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PIL.BlpImagePlugin">PIL.BlpImagePlugin</a>
+    <a href="#EditorSettings">EditorSettings</a>
+ &#8226;   <a href="#MapMetadata">MapMetadata</a>
+ &#8226;   <a href="#MapTypes">MapTypes</a>
+ &#8226;   <a href="#PIL.BlpImagePlugin">PIL.BlpImagePlugin</a>
  &#8226;   <a href="#PIL.BmpImagePlugin">PIL.BmpImagePlugin</a>
  &#8226;   <a href="#PIL.BufrStubImagePlugin">PIL.BufrStubImagePlugin</a>
  &#8226;   <a href="#PIL.DdsImagePlugin">PIL.DdsImagePlugin</a>
@@ -21374,6 +21994,7 @@ imported by:
  &#8226;   <a href="#PIL.features">PIL.features</a>
  &#8226;   <a href="#SysMapCanvas">SysMapCanvas</a>
  &#8226;   <a href="#SystemEditor">SystemEditor</a>
+ &#8226;   <a href="#SystemMap">SystemMap</a>
  &#8226;   <a href="#_colorize">_colorize</a>
  &#8226;   <a href="#_pyrepl.pager">_pyrepl.pager</a>
  &#8226;   <a href="#asyncio.timeouts">asyncio.timeouts</a>
@@ -21859,6 +22480,34 @@ imports:
 imported by:
     <a href="#urllib.error">urllib.error</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="uuid"></a>
+  <a target="code" href="///C:/Program%20Files/Python313/Lib/uuid.py" type="text/plain"><tt>uuid</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#_uuid">_uuid</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#enum">enum</a>
+ &#8226;   <a href="#hashlib">hashlib</a>
+ &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#platform">platform</a>
+ &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#shutil">shutil</a>
+ &#8226;   <a href="#socket">socket</a>
+ &#8226;   <a href="#subprocess">subprocess</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#time">time</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#JsonStorage">JsonStorage</a>
 
   </div>
 
